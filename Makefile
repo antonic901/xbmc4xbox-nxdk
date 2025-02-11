@@ -16,6 +16,7 @@ SRCS += \
 
 NXDK_CXXFLAGS +=	-Ilib \
 									-Ixbmc \
+									-Wno-deprecated-declarations \
 									-D_XBOX
 
 include $(CURDIR)/xbmc/Makefile

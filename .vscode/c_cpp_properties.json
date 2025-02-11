@@ -11,7 +11,8 @@
             "defines": [
                 "NXDK",
                 "_XBOX",
-                "_WIN32"
+                "_WIN32",
+                "_MSC_VER"
             ],
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c23",
