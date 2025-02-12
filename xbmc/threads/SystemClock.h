@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "utils/log.h"
+
 #include <chrono>
 #include <limits>
 #include <thread>
@@ -47,6 +49,8 @@ public:
     if (duration > m_max)
     {
       m_totalWaitTime = m_max;
+      CLog::Log(LOGWARNING, "duration (%i) greater than max (%i) - duration will be truncated!",
+                duration.count(), m_max.count());
     }
     else
     {
