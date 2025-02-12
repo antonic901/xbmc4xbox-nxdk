@@ -17,13 +17,13 @@
 #include "platform/win32/threads/ThreadImplWin.h"
 #endif
 #include "threads/SingleLock.h"
+#include "utils/log.h"
 
 #include <atomic>
 #include <inttypes.h>
 #include <iostream>
 #include <mutex>
 #include <stdlib.h>
-#include <sstream>
 
 static thread_local CThread* currentThread;
 
@@ -70,6 +70,8 @@ void CThread::Create(bool bAutoDelete)
       StopThread(true);  // so let's just clean up
     else
     { // otherwise we have a problem.
+      CLog::Log(LOGERROR, "%s - fatal error creating thread %s - old thread id not null",
+                __FUNCTION__, m_ThreadName.c_str());
       exit(1);
     }
   }
@@ -116,6 +118,7 @@ void CThread::Create(bool bAutoDelete)
 
         if (pThread == nullptr)
         {
+          CLog::Log(LOGERROR, "%s, sanity failed. thread is NULL.", __FUNCTION__);
           promise.set_value(false);
           return;
         }
@@ -134,23 +137,29 @@ void CThread::Create(bool bAutoDelete)
 #endif
         pThread->m_impl->SetThreadInfo(name);
 
+        CLog::Log(LOGDEBUG, "Thread %s start, auto delete: %s", name.c_str(),
+                  (autodelete ? "true" : "false"));
+
         pThread->m_StartEvent.Set();
 
         pThread->Action();
 
         if (autodelete)
         {
+          CLog::Log(LOGDEBUG, "Thread %s %s terminating (autodelete)", name.c_str(), id.c_str());
           delete pThread;
           pThread = NULL;
         }
+        else
+          CLog::Log(LOGDEBUG, "Thread %s %s terminating", name.c_str(), id.c_str());
       }
       catch (const std::exception& e)
       {
-
+        CLog::Log(LOGDEBUG, "Thread Terminating with Exception: %s", e.what());
       }
       catch (...)
       {
-
+        CLog::Log(LOGDEBUG,"Thread Terminating with Exception");
       }
 
       promise.set_value(true);
