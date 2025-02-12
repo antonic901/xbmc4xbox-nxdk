@@ -8,15 +8,12 @@
 
 #include "Exception.h"
 
-#include "utils/log.h"
-
 namespace XbmcCommons
 {
   Exception::~Exception() = default;
 
   void Exception::LogThrowMessage(const char* prefix) const
   {
-    CLog::Log(LOGERROR, "EXCEPTION Thrown ({}) : {}", classname, message);
   }
 }
 

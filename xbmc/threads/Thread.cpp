@@ -13,14 +13,17 @@
 #include "IRunnable.h"
 #include "commons/Exception.h"
 #include "threads/IThreadImpl.h"
+#ifdef NXDK
+#include "platform/win32/threads/ThreadImplWin.h"
+#endif
 #include "threads/SingleLock.h"
-#include "utils/log.h"
 
 #include <atomic>
 #include <inttypes.h>
 #include <iostream>
 #include <mutex>
 #include <stdlib.h>
+#include <sstream>
 
 static thread_local CThread* currentThread;
 
@@ -67,8 +70,6 @@ void CThread::Create(bool bAutoDelete)
       StopThread(true);  // so let's just clean up
     else
     { // otherwise we have a problem.
-      CLog::Log(LOGERROR, "{} - fatal error creating thread {} - old thread id not null",
-                __FUNCTION__, m_ThreadName);
       exit(1);
     }
   }
@@ -115,7 +116,6 @@ void CThread::Create(bool bAutoDelete)
 
         if (pThread == nullptr)
         {
-          CLog::Log(LOGERROR, "{}, sanity failed. thread is NULL.", __FUNCTION__);
           promise.set_value(false);
           return;
         }
@@ -127,11 +127,12 @@ void CThread::Create(bool bAutoDelete)
         std::string id = ss.str();
         autodelete = pThread->m_bAutoDelete;
 
+#ifdef NXDK
+        pThread->m_impl = CThreadImplWin::CreateThreadImpl(pThread->m_thread->native_handle());
+#else
         pThread->m_impl = IThreadImpl::CreateThreadImpl(pThread->m_thread->native_handle());
+#endif
         pThread->m_impl->SetThreadInfo(name);
-
-        CLog::Log(LOGDEBUG, "Thread {} start, auto delete: {}", name,
-                  (autodelete ? "true" : "false"));
 
         pThread->m_StartEvent.Set();
 
@@ -139,20 +140,17 @@ void CThread::Create(bool bAutoDelete)
 
         if (autodelete)
         {
-          CLog::Log(LOGDEBUG, "Thread {} {} terminating (autodelete)", name, id);
           delete pThread;
           pThread = NULL;
         }
-        else
-          CLog::Log(LOGDEBUG, "Thread {} {} terminating", name, id);
       }
       catch (const std::exception& e)
       {
-        CLog::Log(LOGDEBUG, "Thread Terminating with Exception: {}", e.what());
+
       }
       catch (...)
       {
-        CLog::Log(LOGDEBUG,"Thread Terminating with Exception");
+
       }
 
       promise.set_value(true);
