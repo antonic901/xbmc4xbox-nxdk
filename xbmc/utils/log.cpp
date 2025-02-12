@@ -9,9 +9,11 @@
 #include "log.h"
 
 #include "CompileInfo.h"
+#ifndef NXDK
 #include "ServiceBroker.h"
 #include "settings/AdvancedSettings.h"
 #include "settings/SettingsComponent.h"
+#endif
 #include "threads/CriticalSection.h"
 #include "threads/SingleLock.h"
 #include "threads/Thread.h"
@@ -22,7 +24,7 @@
 #if defined(TARGET_POSIX)
 #include "platform/posix/utils/PosixInterfaceForCLog.h"
 typedef class CPosixInterfaceForCLog PlatformInterfaceForCLog;
-#elif defined(TARGET_WINDOWS)
+#elif defined(TARGET_WINDOWS) || defined(NXDK)
 #include "platform/win32/utils/Win32InterfaceForCLog.h"
 typedef class CWin32InterfaceForCLog PlatformInterfaceForCLog;
 #endif
@@ -59,14 +61,14 @@ CLog::~CLog() = default;
 
 void CLog::Close()
 {
-  CSingleLock waitLock(g_logState.critSec);
+  std::unique_lock<CCriticalSection> waitLock(g_logState.critSec);
   g_logState.m_platform.CloseLogFile();
   g_logState.m_repeatLine.clear();
 }
 
 void CLog::LogString(int logLevel, std::string&& logString)
 {
-  CSingleLock waitLock(g_logState.critSec);
+  std::unique_lock<CCriticalSection> waitLock(g_logState.critSec);
   std::string strData(logString);
   StringUtils::TrimRight(strData);
   if (!strData.empty())
@@ -96,13 +98,15 @@ void CLog::LogString(int logLevel, std::string&& logString)
 
 void CLog::LogString(int logLevel, int component, std::string&& logString)
 {
+#ifndef NXDK
   if (CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->CanLogComponent(component) && IsLogLevelLogged(logLevel))
     LogString(logLevel, std::move(logString));
+#endif
 }
 
 bool CLog::Init(const std::string& path)
 {
-  CSingleLock waitLock(g_logState.critSec);
+  std::unique_lock<CCriticalSection> waitLock(g_logState.critSec);
 
   // the log folder location is initialized in the CAdvancedSettings
   // constructor and changed in CApplication::Create()
@@ -145,7 +149,7 @@ void CLog::MemDump(char *pData, int length)
 
 void CLog::SetLogLevel(int level)
 {
-  CSingleLock waitLock(g_logState.critSec);
+  std::unique_lock<CCriticalSection> waitLock(g_logState.critSec);
   if (level >= LOG_LEVEL_NONE && level <= LOG_LEVEL_MAX)
   {
     g_logState.m_logLevel = level;
@@ -162,7 +166,7 @@ int CLog::GetLogLevel()
 
 void CLog::SetExtraLogLevels(int level)
 {
-  CSingleLock waitLock(g_logState.critSec);
+  std::unique_lock<CCriticalSection> waitLock(g_logState.critSec);
   g_logState.m_extraLogLevels = level;
 }
 
@@ -191,7 +195,7 @@ void CLog::PrintDebugString(const std::string& line)
 
 bool CLog::WriteLogString(int logLevel, const std::string& logString)
 {
-  static const char* prefixFormat = "%02d-%02d-%02d %02d:%02d:%02d.%03d T:%" PRIu64" %7s: ";
+  static const char* prefixFormat = "%02d-%02d-%02d %02d:%02d:%02d.%03d %7s: ";
 
   std::string strData(logString);
   /* fixup newline alignment, number of spaces should equal prefix length */
@@ -209,7 +213,6 @@ bool CLog::WriteLogString(int logLevel, const std::string& logString)
                                   minute,
                                   second,
                                   static_cast<int>(millisecond),
-                                  static_cast<uint64_t>(CThread::GetCurrentThreadNativeId()),
                                   levelNames[logLevel]) + strData;
 
   return g_logState.m_platform.WriteStringToLog(strData);
