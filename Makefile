@@ -16,6 +16,7 @@ SRCS += \
 
 NXDK_CXXFLAGS +=	-Ilib \
 									-Ixbmc \
+									-Ixbmc/platform/xbox \
 									-Wno-deprecated-declarations \
 									-D_XBOX
 
