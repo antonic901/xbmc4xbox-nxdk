@@ -3,4 +3,5 @@ SRCS += \
 	$(CURDIR)/xbmc/filesystem/File.cpp \
 	$(CURDIR)/xbmc/filesystem/FileFactory.cpp \
 	$(CURDIR)/xbmc/filesystem/IDirectory.cpp \
-	$(CURDIR)/xbmc/filesystem/IFile.cpp
+	$(CURDIR)/xbmc/filesystem/IFile.cpp \
+	$(CURDIR)/xbmc/filesystem/SpecialProtocol.cpp
