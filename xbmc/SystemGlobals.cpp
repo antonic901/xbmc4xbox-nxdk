@@ -6,6 +6,10 @@
  *  See LICENSES/README.md for more information.
  */
 
+#include "filesystem/DirectoryCache.h"
+
 // Guarantee that CSpecialProtocol is initialized before and uninitialized after ZipManager
 #include "filesystem/SpecialProtocol.h"
 std::map<std::string, std::string> CSpecialProtocol::m_pathMap;
+
+  XFILE::CDirectoryCache g_directoryCache;

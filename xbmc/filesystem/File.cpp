@@ -35,6 +35,17 @@ CFile::~CFile()
   Close();
 }
 
+bool CFile::Exists(const std::string& strFileName, bool bUseCache /* = true */)
+{
+  const CURL pathToUrl(strFileName);
+  return Exists(pathToUrl, bUseCache);
+}
+
+bool CFile::Exists(const CURL& file, bool bUseCache /* = true */)
+{
+  return false;
+}
+
 int CFile::Stat(struct __stat64 *buffer)
 {
   if (!buffer)

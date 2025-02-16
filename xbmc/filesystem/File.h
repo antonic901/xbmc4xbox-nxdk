@@ -40,6 +40,9 @@ public:
 
   IFile* GetImplementation() const { return m_pFile.get(); }
 
+  // CURL interface
+  static bool Exists(const CURL& file, bool bUseCache = true);
+
   /**
   * Fills struct __stat64 with information about file specified by filename
   * For st_mode function will set correctly _S_IFDIR (directory) flag and may set
@@ -54,6 +57,8 @@ public:
   */
   static int  Stat(const CURL& file, struct __stat64* buffer);
 
+  // string interface
+  static bool Exists(const std::string& strFileName, bool bUseCache = true);
   /**
   * Fills struct __stat64 with information about file specified by filename
   * For st_mode function will set correctly _S_IFDIR (directory) flag and may set

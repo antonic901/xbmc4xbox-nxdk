@@ -8,8 +8,39 @@
 
 #include "Util.h"
 
+#include "FileItem.h"
+#include "filesystem/Directory.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
+
+using namespace XFILE;
+
+/*!
+  \brief Finds next unused filename that matches padded int format identifier provided
+  \param[in]  fn_template    filename template consisting of a padded int format identifier (eg screenshot%03d)
+  \param[in]  max            maximum number to search for available name
+  \return "" on failure, string next available name matching format identifier on success
+*/
+
+std::string CUtil::GetNextFilename(const std::string &fn_template, int max)
+{
+  std::string searchPath = URIUtils::GetDirectory(fn_template);
+  std::string mask = URIUtils::GetExtension(fn_template);
+  std::string name = StringUtils::Format(fn_template.c_str(), 0);
+
+  CFileItemList items;
+  if (!CDirectory::GetDirectory(searchPath, items, mask, DIR_FLAG_NO_FILE_DIRS))
+    return name;
+
+  items.SetFastLookup(true);
+  for (int i = 0; i <= max; i++)
+  {
+    std::string name = StringUtils::Format(fn_template.c_str(), i);
+    if (!items.Get(name))
+      return name;
+  }
+  return "";
+}
 
 std::string CUtil::ValidatePath(const std::string &path, bool bFixDoubleSlashes /* = false */)
 {

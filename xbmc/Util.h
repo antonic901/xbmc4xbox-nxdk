@@ -16,11 +16,16 @@
 
 #define ARRAY_SIZE(X)         (sizeof(X)/sizeof((X)[0]))
 
+class CFileItem;
+class CFileItemList;
+
 class CUtil
 {
   CUtil() = delete;
 public:
   static std::string ValidatePath(const std::string &path, bool bFixDoubleSlashes = false); ///< return a validated path, with correct directory separators.
+
+  static std::string GetNextFilename(const std::string &fn_template, int max);
 
 };
 
