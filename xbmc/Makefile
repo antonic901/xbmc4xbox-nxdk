@@ -1,4 +1,5 @@
 SRCS += \
+	$(CURDIR)/xbmc/ServiceBroker.cpp \
 	$(CURDIR)/xbmc/URL.cpp \
 	$(CURDIR)/xbmc/Util.cpp
 
