@@ -1,4 +1,5 @@
 SRCS += \
+	$(CURDIR)/xbmc/utils/Archive.cpp \
 	$(CURDIR)/xbmc/utils/auto_buffer.cpp \
 	$(CURDIR)/xbmc/utils/JobManager.cpp \
 	$(CURDIR)/xbmc/utils/log.cpp \

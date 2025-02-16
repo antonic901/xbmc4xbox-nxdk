@@ -46,6 +46,16 @@ bool CFile::Exists(const CURL& file, bool bUseCache /* = true */)
   return false;
 }
 
+ssize_t CFile::Read(void *lpBuf, size_t uiBufSize)
+{
+  return -1;
+}
+
+ssize_t CFile::Write(const void* lpBuf, size_t uiBufSize)
+{
+  return -1;
+}
+
 int CFile::Stat(struct __stat64 *buffer)
 {
   if (!buffer)
