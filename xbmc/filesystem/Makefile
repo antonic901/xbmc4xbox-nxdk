@@ -1,5 +1,6 @@
 SRCS += \
 	$(CURDIR)/xbmc/filesystem/CacheStrategy.cpp \
+	$(CURDIR)/xbmc/filesystem/CircularCache.cpp \
 	$(CURDIR)/xbmc/filesystem/Directory.cpp \
 	$(CURDIR)/xbmc/filesystem/DirectoryCache.cpp \
 	$(CURDIR)/xbmc/filesystem/DirectoryFactory.cpp \
