@@ -1,4 +1,5 @@
 *.obj
 *.d
+*.exe
 RELEASE/
 DEBUG/
