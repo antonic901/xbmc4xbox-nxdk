@@ -8,6 +8,7 @@
 
 #include "XBDateTime.h"
 
+#include "LangInfo.h"
 #include "utils/Archive.h"
 #include "utils/StringUtils.h"
 #include "utils/XTimeUtils.h"
@@ -1167,14 +1168,14 @@ CDateTime CDateTime::FromRFC1123DateTime(const std::string &dateTime)
 std::string CDateTime::GetAsLocalizedTime(const std::string &format, bool withSeconds) const
 {
   std::string strOut;
-  const std::string& strFormat = format.empty() ? "HH:mm:ss" : format;
+  const std::string& strFormat = format.empty() ? g_langInfo.GetTimeFormat() : format;
 
   KODI::TIME::SystemTime dateTime;
   GetAsSystemTime(dateTime);
 
   // Prefetch meridiem symbol
   const std::string& strMeridiem =
-      dateTime.hour > 11 ? "PM" : "AM";
+      CLangInfo::MeridiemSymbolToString(dateTime.hour > 11 ? MeridiemSymbolPM : MeridiemSymbolAM);
 
   size_t length = strFormat.size();
   for (size_t i=0; i < length; ++i)
@@ -1325,7 +1326,7 @@ std::string CDateTime::GetAsLocalizedTime(const std::string &format, bool withSe
 
 std::string CDateTime::GetAsLocalizedDate(bool longDate/*=false*/) const
 {
-  return GetAsLocalizedDate("DDDD, D MMMM YYYY");
+  return GetAsLocalizedDate(g_langInfo.GetDateFormat(longDate));
 }
 
 std::string CDateTime::GetAsLocalizedDate(const std::string &strFormat) const
@@ -1466,7 +1467,7 @@ std::string CDateTime::GetAsLocalizedDateTime(bool longDate/*=false*/, bool with
 
 std::string CDateTime::GetAsLocalizedTime(TIME_FORMAT format, bool withSeconds /* = false */) const
 {
-  const std::string timeFormat = "HH:mm:ss";
+  const std::string timeFormat = g_langInfo.GetTimeFormat();
   bool use12hourclock = timeFormat.find('h') != std::string::npos;
   switch (format)
   {
