@@ -14,6 +14,12 @@
 
 #include "utils/GlobalsHandling.h"
 
+#define CACHE_BUFFER_MODE_INTERNET 0
+#define CACHE_BUFFER_MODE_ALL 1
+#define CACHE_BUFFER_MODE_TRUE_INTERNET 2
+#define CACHE_BUFFER_MODE_NONE 3
+#define CACHE_BUFFER_MODE_NETWORK 4
+
 class CAdvancedSettings
 {
   public:
@@ -23,6 +29,11 @@ class CAdvancedSettings
 
     typedef std::vector< std::pair<std::string, std::string> > StringMapping;
     StringMapping m_pathSubstitutions;
+
+    unsigned int m_cacheMemSize;
+    unsigned int m_cacheBufferMode;
+    unsigned int m_cacheChunkSize;
+    float m_cacheReadFactor;
 
     // runtime settings which cannot be set from advancedsettings.xml
     std::string m_videoExtensions;
