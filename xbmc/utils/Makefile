@@ -7,6 +7,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/Speed.cpp \
 	$(CURDIR)/xbmc/utils/StringUtils.cpp \
 	$(CURDIR)/xbmc/utils/Temperature.cpp \
+	$(CURDIR)/xbmc/utils/TimeUtils.cpp \
 	$(CURDIR)/xbmc/utils/URIUtils.cpp \
 	$(CURDIR)/xbmc/utils/UrlOptions.cpp \
 	$(CURDIR)/xbmc/utils/Variant.cpp
