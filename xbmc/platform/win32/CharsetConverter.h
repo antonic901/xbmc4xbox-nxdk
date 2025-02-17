@@ -20,6 +20,11 @@ namespace PLATFORM
 {
 namespace WINDOWS
 {
+#ifdef NXDK
+// On Windows 10 WCHAR is wchar_t so we need this: https://learn.microsoft.com/en-us/windows/win32/extensible-storage-engine/wchar
+std::string FromW(const WCHAR* str);
+#endif
+
 /**
  * Convert UTF-16 to UTF-8 strings
  * Windows specific method to avoid initialization issues
