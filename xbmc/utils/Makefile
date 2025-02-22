@@ -3,6 +3,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/auto_buffer.cpp \
 	$(CURDIR)/xbmc/utils/BitstreamStats.cpp \
 	$(CURDIR)/xbmc/utils/CharsetConverter.cpp \
+	$(CURDIR)/xbmc/utils/CharsetDetection.cpp \
 	$(CURDIR)/xbmc/utils/JobManager.cpp \
 	$(CURDIR)/xbmc/utils/Locale.cpp \
 	$(CURDIR)/xbmc/utils/log.cpp \
