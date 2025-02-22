@@ -164,3 +164,8 @@ BOOL LocalFileTimeToFileTime(const FILETIME *lpLocalFileTime, LPFILETIME lpFileT
   lpFileTime->dwHighDateTime = (uint32_t)(fileTimeValue >> 32);
   return 1;
 }
+
+double atof (const char* str)
+{
+  return strtod(str, nullptr);
+}
