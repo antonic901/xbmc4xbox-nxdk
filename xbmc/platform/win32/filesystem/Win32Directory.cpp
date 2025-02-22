@@ -17,7 +17,9 @@
 #include "utils/XTimeUtils.h"
 #include "utils/log.h"
 
-#ifndef NXDK
+#ifdef NXDK
+#include "platform/xbox/XBOXUtil.h"
+#else
 #include "platform/win32/WIN32Util.h"
 #endif
 
@@ -40,7 +42,7 @@ inline static std::wstring prepareWin32DirectoryName(const std::string& strPath)
 #endif
 
 #ifdef NXDK
-  std::string nameW(strPath);
+  std::string nameW(CXBOXUtil::GetFatXQualifiedPath(strPath));
 #else
   std::wstring nameW(CWIN32Util::ConvertPathToWin32Form(strPath));
 #endif
@@ -67,7 +69,7 @@ bool CWin32Directory::GetDirectory(const CURL& url, CFileItemList &items)
     pathWithSlash.push_back('\\');
 
 #ifdef NXDK
-  std::string searchMask(pathWithSlash);
+  std::string searchMask(CXBOXUtil::GetFatXQualifiedPath(pathWithSlash));
 #else
   std::wstring searchMask(CWIN32Util::ConvertPathToWin32Form(pathWithSlash));
 #endif
@@ -213,7 +215,7 @@ bool CWin32Directory::RemoveRecursive(const CURL& url)
     pathWithSlash.push_back('\\');
 
 #ifdef NXDK
-  auto basePath = pathWithSlash;
+  auto basePath = CXBOXUtil::GetFatXQualifiedPath(pathWithSlash);
 #else
   auto basePath = CWIN32Util::ConvertPathToWin32Form(pathWithSlash);
 #endif
