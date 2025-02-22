@@ -113,7 +113,9 @@
     "stop_token": "cpp",
     "text_encoding": "cpp",
     "thread": "cpp",
-    "ranges": "cpp"
+    "ranges": "cpp",
+    "filesystem": "cpp",
+    "cerrno": "cpp"
   },
   "editor.tabSize": 2
 }

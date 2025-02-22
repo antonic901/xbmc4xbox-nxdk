@@ -17,7 +17,11 @@
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c23",
             "cppStandard": "c++20",
-            "intelliSenseMode": "linux-clang-x64"
+            "intelliSenseMode": "linux-clang-x64",
+            "compilerArgs": [
+                "-include",
+                "${workspaceFolder}/xbmc/unimplemented.h"
+            ]
         }
     ],
     "version": 4

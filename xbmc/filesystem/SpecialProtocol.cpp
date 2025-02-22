@@ -1,0 +1,262 @@
+/*
+ *  Copyright (C) 2005-2018 Team Kodi
+ *  This file is part of Kodi - https://kodi.tv
+ *
+ *  SPDX-License-Identifier: GPL-2.0-or-later
+ *  See LICENSES/README.md for more information.
+ */
+
+#include "SpecialProtocol.h"
+
+#include "URL.h"
+#include "Util.h"
+#include "settings/AdvancedSettings.h"
+#include "utils/URIUtils.h"
+#include "utils/log.h"
+
+#include <cassert>
+
+#include "PlatformDefs.h"
+#ifdef TARGET_POSIX
+#include <dirent.h>
+#include "utils/StringUtils.h"
+#endif
+
+void CSpecialProtocol::SetProfilePath(const std::string &dir)
+{
+  SetPath("profile", dir);
+  CLog::Log(LOGINFO, "special://profile/ is mapped to: %s", GetPath("profile").c_str());
+}
+
+void CSpecialProtocol::SetXBMCPath(const std::string &dir)
+{
+  SetPath("xbmc", dir);
+}
+
+void CSpecialProtocol::SetXBMCBinPath(const std::string &dir)
+{
+  SetPath("xbmcbin", dir);
+}
+
+void CSpecialProtocol::SetXBMCBinAddonPath(const std::string &dir)
+{
+  SetPath("xbmcbinaddons", dir);
+}
+
+void CSpecialProtocol::SetXBMCAltBinAddonPath(const std::string &dir)
+{
+  SetPath("xbmcaltbinaddons", dir);
+}
+
+void CSpecialProtocol::SetXBMCFrameworksPath(const std::string &dir)
+{
+  SetPath("frameworks", dir);
+}
+
+void CSpecialProtocol::SetHomePath(const std::string &dir)
+{
+  SetPath("home", dir);
+}
+
+void CSpecialProtocol::SetUserHomePath(const std::string &dir)
+{
+  SetPath("userhome", dir);
+}
+
+void CSpecialProtocol::SetEnvHomePath(const std::string &dir)
+{
+  SetPath("envhome", dir);
+}
+
+void CSpecialProtocol::SetMasterProfilePath(const std::string &dir)
+{
+  SetPath("masterprofile", dir);
+}
+
+void CSpecialProtocol::SetTempPath(const std::string &dir)
+{
+  SetPath("temp", dir);
+}
+
+void CSpecialProtocol::SetLogPath(const std::string &dir)
+{
+  SetPath("logpath", dir);
+}
+
+bool CSpecialProtocol::ComparePath(const std::string &path1, const std::string &path2)
+{
+  return TranslatePath(path1) == TranslatePath(path2);
+}
+
+std::string CSpecialProtocol::TranslatePath(const std::string &path)
+{
+  CURL url(path);
+  // check for special-protocol, if not, return
+  if (!url.IsProtocol("special"))
+  {
+    return path;
+  }
+  return TranslatePath(url);
+}
+
+std::string CSpecialProtocol::TranslatePath(const CURL &url)
+{
+  // check for special-protocol, if not, return
+  if (!url.IsProtocol("special"))
+  {
+#if defined(TARGET_POSIX) && defined(_DEBUG)
+    std::string path(url.Get());
+    if (path.length() >= 2 && path[1] == ':')
+    {
+      CLog::Log(LOGWARNING, "Trying to access old style dir: {}", path);
+      // printf("Trying to access old style dir: %s\n", path.c_str());
+    }
+#endif
+
+    return url.Get();
+  }
+
+  const std::string& FullFileName = url.GetFileName();
+
+  std::string translatedPath;
+  std::string FileName;
+  std::string RootDir;
+
+  // Split up into the special://root and the rest of the filename
+  size_t pos = FullFileName.find('/');
+  if (pos != std::string::npos && pos > 1)
+  {
+    RootDir = FullFileName.substr(0, pos);
+
+    if (pos < FullFileName.size())
+      FileName = FullFileName.substr(pos + 1);
+  }
+  else
+    RootDir = FullFileName;
+
+  // TODO: add translation for musicplaylist, videoplaylist etc.
+
+  // from here on, we have our "real" special paths
+  if (     RootDir == "xbmc" ||
+           RootDir == "xbmcbin" ||
+           RootDir == "xbmcbinaddons" ||
+           RootDir == "xbmcaltbinaddons" ||
+           RootDir == "home" ||
+           RootDir == "envhome" ||
+           RootDir == "userhome" ||
+           RootDir == "temp" ||
+           RootDir == "profile" ||
+           RootDir == "masterprofile" ||
+           RootDir == "frameworks" ||
+           RootDir == "logpath")
+  {
+    std::string basePath = GetPath(RootDir);
+    if (!basePath.empty())
+      translatedPath = URIUtils::AddFileToFolder(basePath, FileName);
+    else
+      translatedPath.clear();
+  }
+
+  // check if we need to recurse in
+  if (URIUtils::IsSpecial(translatedPath))
+  { // we need to recurse in, as there may be multiple translations required
+    return TranslatePath(translatedPath);
+  }
+
+  // Validate the final path, just in case
+  return CUtil::ValidatePath(translatedPath);
+}
+
+std::string CSpecialProtocol::TranslatePathConvertCase(const std::string& path)
+{
+  std::string translatedPath = TranslatePath(path);
+
+#ifdef TARGET_POSIX
+  if (translatedPath.find("://") != std::string::npos)
+    return translatedPath;
+
+  // If the file exists with the requested name, simply return it
+  struct stat stat_buf;
+  if (stat(translatedPath.c_str(), &stat_buf) == 0)
+    return translatedPath;
+
+  std::string result;
+  std::vector<std::string> tokens;
+  StringUtils::Tokenize(translatedPath, tokens, "/");
+  std::string file;
+  DIR* dir;
+  struct dirent* de;
+
+  for (unsigned int i = 0; i < tokens.size(); i++)
+  {
+    file = result + "/";
+    file += tokens[i];
+    if (stat(file.c_str(), &stat_buf) == 0)
+    {
+      result += "/" + tokens[i];
+    }
+    else
+    {
+      dir = opendir(result.c_str());
+      if (dir)
+      {
+        while ((de = readdir(dir)) != NULL)
+        {
+          // check if there's a file with same name but different case
+          if (StringUtils::CompareNoCase(de->d_name, tokens[i]) == 0)
+          {
+            result += "/";
+            result += de->d_name;
+            break;
+          }
+        }
+
+        // if we did not find any file that somewhat matches, just
+        // fallback but we know it's not gonna be a good ending
+        if (de == NULL)
+          result += "/" + tokens[i];
+
+        closedir(dir);
+      }
+      else
+      { // this is just fallback, we won't succeed anyway...
+        result += "/" + tokens[i];
+      }
+    }
+  }
+
+  return result;
+#else
+  return translatedPath;
+#endif
+}
+
+void CSpecialProtocol::LogPaths()
+{
+  CLog::Log(LOGINFO, "special://xbmc/ is mapped to: %s", GetPath("xbmc").c_str());
+  CLog::Log(LOGINFO, "special://xbmcbin/ is mapped to: %s", GetPath("xbmcbin").c_str());
+  CLog::Log(LOGINFO, "special://xbmcbinaddons/ is mapped to: %s", GetPath("xbmcbinaddons").c_str());
+  CLog::Log(LOGINFO, "special://masterprofile/ is mapped to: %s", GetPath("masterprofile").c_str());
+#if defined(TARGET_POSIX)
+  CLog::Log(LOGINFO, "special://envhome/ is mapped to: {}", GetPath("envhome"));
+#endif
+  CLog::Log(LOGINFO, "special://home/ is mapped to: %s", GetPath("home").c_str());
+  CLog::Log(LOGINFO, "special://temp/ is mapped to: %s", GetPath("temp").c_str());
+  CLog::Log(LOGINFO, "special://logpath/ is mapped to: %s", GetPath("logpath").c_str());
+  //CLog::Log(LOGINFO, "special://userhome/ is mapped to: {}", GetPath("userhome"));
+}
+
+// private routines, to ensure we only set/get an appropriate path
+void CSpecialProtocol::SetPath(const std::string &key, const std::string &path)
+{
+  m_pathMap[key] = path;
+}
+
+std::string CSpecialProtocol::GetPath(const std::string &key)
+{
+  std::map<std::string, std::string>::iterator it = m_pathMap.find(key);
+  if (it != m_pathMap.end())
+    return it->second;
+  assert(false);
+  return "";
+}
