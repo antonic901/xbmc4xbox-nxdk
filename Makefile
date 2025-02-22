@@ -12,6 +12,7 @@ endif
 GEN_XISO = $(OUTPUT_DIR)/$(XBE_TITLE).iso
 
 SRCS += \
+	$(CURDIR)/xbmc/unimplemented.cpp \
 	$(CURDIR)/xbmc/platform/xbox/main.cpp \
 	$(CURDIR)/xbmc/SystemGlobals.cpp
 

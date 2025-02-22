@@ -1,22 +1,34 @@
+// contains all functions, variables and preprocessors which are needed by Kodi, but missing in NXDK
+// IMPORTANT: Some of them have valid, but most of them have dummy implementation which is not working
+
+#ifndef UNIMPLEMENTED_H
+#define UNIMPLEMENTED_H
+
 #include <exception>
 #include <iostream>
 
-extern "C" void __std_terminate() { std::terminate(); }
-extern "C" void __CxxFrameHandler3() {}
-extern "C" void _CxxThrowException(void*, void*) {}
+extern "C" void __std_terminate();
+extern "C" void __CxxFrameHandler3();
+extern "C" void _CxxThrowException(void*, void*);
 
-void testException()
-{
-  try
-  {
-    throw std::runtime_error("Test exception!");
-  }
-  catch (const std::exception& e)
-  {
-    // Catch standard exceptions
-  }
-  catch (...)
-  {
-    // Catch any other unknown exceptions
-  }
-}
+void testException();
+
+#include <string>
+#include <wchar.h>
+#include <locale>
+#include <codecvt>
+
+#define CP_UTF8 1
+#define WC_ERR_INVALID_CHARS 0x00000080
+#define MB_ERR_INVALID_CHARS 0x00000008
+
+int WideCharToMultiByte(unsigned int codePage, unsigned long flags,
+                        const wchar_t* wideStr, int wideLen,
+                        char* multiByteStr, int multiByteLen,
+                        const char* defaultChar, bool* usedDefaultChar);
+
+int MultiByteToWideChar(unsigned int codePage, unsigned long flags,
+                        const char* multiByteStr, int multiByteLen,
+                        wchar_t* wideStr, int wideLen);
+
+#endif // UNIMPLEMENTED_H
