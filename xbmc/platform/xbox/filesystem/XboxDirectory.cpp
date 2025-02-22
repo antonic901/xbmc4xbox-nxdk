@@ -1,43 +1,30 @@
 /*
- *      Copyright (C) 2005-2013 Team XBMC
- *      http://xbmc.org
+ *  Copyright (C) 2014-2018 Team Kodi
+ *  This file is part of Kodi - https://kodi.tv
  *
- *  This Program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2, or (at your option)
- *  any later version.
- *
- *  This Program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XBMC; see the file COPYING.  If not, see
- *  <http://www.gnu.org/licenses/>.
- *
+ *  SPDX-License-Identifier: GPL-2.0-or-later
+ *  See LICENSES/README.md for more information.
  */
 
-
-#include "system.h"
-#include "utils/log.h"
-#include "AutoPtrHandle.h"
 #include "XboxDirectory.h"
-#include "Util.h"
-#include "utils/URIUtils.h"
-#include "xbox/IoSupport.h"
-#include "iso9660.h"
-#include "URL.h"
-#include "settings/Settings.h"
+
 #include "FileItem.h"
+#include "URL.h"
 #include "utils/CharsetConverter.h"
-#include "threads/CriticalSection.h"
+#include "utils/StringUtils.h"
+#include "utils/URIUtils.h"
+#include "utils/log.h"
+
+#include "platform/xbox/XBOXUtil.h"
+
+#include <nxdk/mount.h>
+
+#include <windows.h>
 
 #ifndef INVALID_FILE_ATTRIBUTES
 #define INVALID_FILE_ATTRIBUTES ((DWORD) -1)
 #endif
 
-using namespace AUTOPTR;
 using namespace XFILE;
 
 CXboxDirectory::CXboxDirectory(void)
@@ -50,100 +37,100 @@ bool CXboxDirectory::GetDirectory(const CURL& url, CFileItemList &items)
 {
   WIN32_FIND_DATA wfd;
 
-  CStdString strPath=url.Get();
+  std::string strPath=url.Get();
   g_charsetConverter.utf8ToStringCharset(strPath);
 
-  CStdString strRoot = strPath;
+  std::string strRoot = strPath;
 
   memset(&wfd, 0, sizeof(wfd));
   URIUtils::AddSlashAtEnd(strRoot);
-  strRoot.Replace("/", "\\");
-  if (URIUtils::IsDVD(strRoot) && m_isoReader.IsScanned())
+  StringUtils::Replace(strRoot, "/", "\\");
+  if (URIUtils::IsDVD(strRoot))
   {
-    // Reset iso reader and remount or
-    // we can't access the dvd-rom
-    m_isoReader.Reset();
-
-    CIoSupport::Dismount("Cdrom0");
-    CIoSupport::RemapDriveLetter('D', "Cdrom0");
+    nxUnmountDrive('D');
+    nxMountDrive('D', "\\Device\\Cdrom0");
   }
 
-  CStdString strSearchMask = strRoot;
+  std::string strSearchMask = strRoot;
   strSearchMask += "*.*";
 
-  FILETIME localTime;
-  CAutoPtrFind hFind ( FindFirstFile(strSearchMask.c_str(), &wfd));
+  KODI::TIME::FileTime localTime;
+  HANDLE hFind = FindFirstFile(strSearchMask.c_str(), &wfd);
 
   // on error, check if path exists at all, this will return true if empty folder
-  if (!hFind.isValid())
+  if (hFind == INVALID_HANDLE_VALUE)
     return Exists(url);
 
-  if (hFind.isValid())
+  do
   {
-    do
+    if (wfd.cFileName[0] != 0)
     {
-      if (wfd.cFileName[0] != 0)
+      if ( (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
       {
-        if ( (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
+        std::string strDir = wfd.cFileName;
+        if (strDir != "." && strDir != "..")
         {
-          CStdString strDir = wfd.cFileName;
-          if (strDir != "." && strDir != "..")
-          {
-            CStdString strLabel=wfd.cFileName;
-            g_charsetConverter.unknownToUTF8(strLabel);
-            CFileItemPtr pItem(new CFileItem(strLabel));
-            CStdString itemPath = strRoot + wfd.cFileName;
-            g_charsetConverter.unknownToUTF8(itemPath);
-            pItem->m_bIsFolder = true;
-            URIUtils::AddSlashAtEnd(itemPath);
-            pItem->SetPath(itemPath);
-            FileTimeToLocalFileTime(&wfd.ftLastWriteTime, &localTime);
-            pItem->m_dateTime=localTime;
-
-            items.Add(pItem);
-          }
-        }
-        else
-        {
-          CStdString strLabel=wfd.cFileName;
+          std::string strLabel=wfd.cFileName;
           g_charsetConverter.unknownToUTF8(strLabel);
           CFileItemPtr pItem(new CFileItem(strLabel));
-          CStdString itemPath = strRoot + wfd.cFileName;
+          std::string itemPath = strRoot + wfd.cFileName;
           g_charsetConverter.unknownToUTF8(itemPath);
+          pItem->m_bIsFolder = true;
+          URIUtils::AddSlashAtEnd(itemPath);
           pItem->SetPath(itemPath);
-          pItem->m_bIsFolder = false;
-          pItem->m_dwSize = CUtil::ToInt64(wfd.nFileSizeHigh, wfd.nFileSizeLow);
-          FileTimeToLocalFileTime(&wfd.ftLastWriteTime, &localTime);
-          pItem->m_dateTime=localTime;
+          KODI::TIME::FileTime fileTime;
+          fileTime.lowDateTime = wfd.ftLastWriteTime.dwLowDateTime;
+          fileTime.highDateTime = wfd.ftLastWriteTime.dwHighDateTime;
+          if (KODI::TIME::FileTimeToLocalFileTime(&fileTime, &localTime) == TRUE)
+            pItem->m_dateTime=localTime;
 
           items.Add(pItem);
         }
       }
+      else
+      {
+        std::string strLabel=wfd.cFileName;
+        g_charsetConverter.unknownToUTF8(strLabel);
+        CFileItemPtr pItem(new CFileItem(strLabel));
+        std::string itemPath = strRoot + wfd.cFileName;
+        g_charsetConverter.unknownToUTF8(itemPath);
+        pItem->SetPath(itemPath);
+        pItem->m_bIsFolder = false;
+        pItem->m_dwSize = (__int64(wfd.nFileSizeHigh) << 32) + wfd.nFileSizeLow;
+        KODI::TIME::FileTime fileTime;
+        fileTime.lowDateTime = wfd.ftLastWriteTime.dwLowDateTime;
+        fileTime.highDateTime = wfd.ftLastWriteTime.dwHighDateTime;
+        if (KODI::TIME::FileTimeToLocalFileTime(&fileTime, &localTime) == TRUE)
+          pItem->m_dateTime=localTime;
+
+        items.Add(pItem);
+      }
     }
-    while (FindNextFile((HANDLE)hFind, &wfd));
-#ifdef _XBOX
-    // if we use AutoPtrHandle, this auto-closes
-    FindClose((HANDLE)hFind); //should be closed
-#endif
   }
+  while (FindNextFile((HANDLE)hFind, &wfd));
+
+  FindClose(hFind);
+
   return true;
 }
 
 bool CXboxDirectory::Create(const CURL& url)
 {
-  CStdString strPath1 = url.Get();
+  std::string strPath1 = url.Get();
   g_charsetConverter.utf8ToStringCharset(strPath1);
   URIUtils::AddSlashAtEnd(strPath1);
 
+#if 0
   // okey this is really evil, since the create will succeed
   // the caller will have no idea that a different directory was created
   if (CSettings::GetInstance().GetBool("services.ftpautofatx"))
   {
-    CStdString strPath2(strPath1);
-    CUtil::GetFatXQualifiedPath(strPath1);
+    std::string strPath2(strPath1);
+    CXBOXUtil::GetFatXQualifiedPath(strPath1);
     if(strPath2 != strPath1)
       CLog::Log(LOGNOTICE,"fatxq: %s -> %s",strPath2.c_str(), strPath1.c_str());
   }
+#endif
 
   if(::CreateDirectory(strPath1.c_str(), NULL))
     return true;
@@ -155,17 +142,17 @@ bool CXboxDirectory::Create(const CURL& url)
 
 bool CXboxDirectory::Remove(const CURL& url)
 {
-  CStdString strPath1 = url.Get();
+  std::string strPath1 = url.Get();
   g_charsetConverter.utf8ToStringCharset(strPath1);
-  return (::RemoveDirectory(strPath1) || GetLastError() == ERROR_PATH_NOT_FOUND) ? true : false;
+  return (::RemoveDirectory(strPath1.c_str()) || GetLastError() == ERROR_PATH_NOT_FOUND) ? true : false;
 }
 
 bool CXboxDirectory::Exists(const CURL& url)
 {
-  CStdString strReplaced=url.Get();
+  std::string strReplaced=url.Get();
   g_charsetConverter.utf8ToStringCharset(strReplaced);
-  strReplaced.Replace("/","\\");
-  CUtil::GetFatXQualifiedPath(strReplaced);
+  StringUtils::Replace(strReplaced, "/", "\\");
+  CXBOXUtil::GetFatXQualifiedPath(strReplaced);
   URIUtils::AddSlashAtEnd(strReplaced);
   DWORD attributes = GetFileAttributes(strReplaced.c_str());
   if(attributes == INVALID_FILE_ATTRIBUTES)
