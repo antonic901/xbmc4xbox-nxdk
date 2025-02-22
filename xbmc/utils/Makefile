@@ -7,6 +7,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/JobManager.cpp \
 	$(CURDIR)/xbmc/utils/Locale.cpp \
 	$(CURDIR)/xbmc/utils/log.cpp \
+	$(CURDIR)/xbmc/utils/RegExp.cpp \
 	$(CURDIR)/xbmc/utils/Speed.cpp \
 	$(CURDIR)/xbmc/utils/StringUtils.cpp \
 	$(CURDIR)/xbmc/utils/Temperature.cpp \
