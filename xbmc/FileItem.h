@@ -14,6 +14,7 @@
  */
 
 #include "LockType.h"
+#include "XBDateTime.h"
 #include "threads/CriticalSection.h"
 #include "utils/ISerializable.h"
 
@@ -454,6 +455,7 @@ public:
 
   bool m_bIsShareOrDrive;    ///< is this a root share/drive
   int m_iDriveType;     ///< If \e m_bIsShareOrDrive is \e true, use to get the share type. Types see: CMediaSource::m_iDriveType
+  CDateTime m_dateTime;             ///< file creation date & time
   int64_t m_dwSize;             ///< file size (0 for folders)
   std::string m_strDVDLabel;
   std::string m_strTitle;
@@ -471,6 +473,8 @@ public:
 
   // part of CGUIListItem
   bool m_bIsFolder;
+  void SetProperty(const std::string &strKey, const CVariant &value) { };
+
 private:
   /*! \brief initialize all members of this class (not CGUIListItem members) to default values.
    Called from constructors, and from Reset()
