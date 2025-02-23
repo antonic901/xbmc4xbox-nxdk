@@ -114,13 +114,13 @@ static std::string ToTimeFormat(bool use24HourClock, bool singleHour, bool merid
   if (!meridiem)
     return singleHour ? TIME_FORMAT_SINGLE_12 : TIME_FORMAT_DOUBLE_12;
 
-  return StringUtils::Format("%s xx", ToTimeFormat(false, singleHour, false).c_str());
+  return StringUtils::Format("{} xx", ToTimeFormat(false, singleHour, false));
 }
 
 static std::string ToSettingTimeFormat(const CDateTime& time, const std::string& timeFormat)
 {
-  return StringUtils::Format("%s (%s)",
-                             time.GetAsLocalizedTime(timeFormat, true).c_str(), timeFormat.c_str());
+  return StringUtils::Format("{} ({})",
+                             time.GetAsLocalizedTime(timeFormat, true), timeFormat);
 }
 
 static CTemperature::Unit StringToTemperatureUnit(const std::string& temperatureUnit)
@@ -204,7 +204,7 @@ void CLangInfo::CRegion::SetGlobalLocale()
   }
   g_langInfo.m_originalLocale = std::locale(std::locale::classic(), new custom_numpunct(m_cDecimalSep, m_cThousandsSep, m_strGrouping));
 
-  CLog::Log(LOGDEBUG, "trying to set locale to %s", strLocale.c_str());
+  CLog::Log(LOGDEBUG, "trying to set locale to {}", strLocale);
 
   // We need to set the locale to only change the collate. Otherwise,
   // decimal separator is changed depending of the current language
@@ -263,7 +263,7 @@ void CLangInfo::CRegion::SetGlobalLocale()
 #if 0
   g_charsetConverter.resetSystemCharset();
 #endif
-  CLog::Log(LOGINFO, "global locale set to %s", strLocale.c_str());
+  CLog::Log(LOGINFO, "global locale set to {}", strLocale);
 
 #ifdef TARGET_ANDROID
   // Force UTF8 for, e.g., vsnprintf
@@ -964,8 +964,8 @@ std::string CLangInfo::GetTemperatureAsString(const CTemperature& temperature) c
     return "Unknown"; // "Unknown"
 
   CTemperature::Unit temperatureUnit = GetTemperatureUnit();
-  return StringUtils::Format("%s%s", temperature.ToString(temperatureUnit).c_str(),
-                             GetTemperatureUnitString().c_str());
+  return StringUtils::Format("{}{}", temperature.ToString(temperatureUnit),
+                             GetTemperatureUnitString());
 }
 
 // Returns the temperature unit string for the current language
@@ -1018,7 +1018,7 @@ std::string CLangInfo::GetSpeedAsString(const CSpeed& speed) const
   if (!speed.IsValid())
     return "Unknown"; // "Unknown"
 
-  return StringUtils::Format("%s%s", speed.ToString(GetSpeedUnit()).c_str(), GetSpeedUnitString().c_str());
+  return StringUtils::Format("{}{}", speed.ToString(GetSpeedUnit()), GetSpeedUnitString());
 }
 
 // Returns the speed unit string for the current language

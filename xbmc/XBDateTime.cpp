@@ -840,7 +840,7 @@ std::string CDateTime::GetAsDBDate() const
   KODI::TIME::SystemTime st;
   GetAsSystemTime(st);
 
-  return StringUtils::Format("%04hu-%02hu-%02hu", st.year, st.month, st.day);
+  return StringUtils::Format("{:04}-{:02}-{:02}", st.year, st.month, st.day);
 }
 
 std::string CDateTime::GetAsDBTime() const
@@ -848,7 +848,7 @@ std::string CDateTime::GetAsDBTime() const
   KODI::TIME::SystemTime st;
   GetAsSystemTime(st);
 
-  return StringUtils::Format("%02hu:%02hu:%02hu", st.hour, st.minute, st.second);
+  return StringUtils::Format("{:02}:{:02}:{:02}", st.hour, st.minute, st.second);
 }
 
 std::string CDateTime::GetAsDBDateTime() const
@@ -856,7 +856,7 @@ std::string CDateTime::GetAsDBDateTime() const
   KODI::TIME::SystemTime st;
   GetAsSystemTime(st);
 
-  return StringUtils::Format("%04hu-%02hu-%02hu %02hu:%02hu:%02hu", st.year, st.month, st.day,
+  return StringUtils::Format("{:04}-{:02}-{:02} {:02}:{:02}:{:02}", st.year, st.month, st.day,
                              st.hour, st.minute, st.second);
 }
 
@@ -865,7 +865,7 @@ std::string CDateTime::GetAsSaveString() const
   KODI::TIME::SystemTime st;
   GetAsSystemTime(st);
 
-  return StringUtils::Format("%04hu%02hu%02hu_%02hu%02hu%02hu", st.year, st.month, st.day, st.hour,
+  return StringUtils::Format("{:04}{:02}{:02}_{:02}{:02}{:02}", st.year, st.month, st.day, st.hour,
                              st.minute, st.second);
 }
 
@@ -1238,7 +1238,7 @@ std::string CDateTime::GetAsLocalizedTime(const std::string &format, bool withSe
       if (partLength==1)
         str = std::to_string(hour);
       else
-        str = StringUtils::Format("%02i", hour);
+        str = StringUtils::Format("{:02}", hour);
 
       strOut+=str;
     }
@@ -1265,7 +1265,7 @@ std::string CDateTime::GetAsLocalizedTime(const std::string &format, bool withSe
       if (partLength==1)
         str = std::to_string(dateTime.minute);
       else
-        str = StringUtils::Format("%02i", dateTime.minute);
+        str = StringUtils::Format("{:02}", dateTime.minute);
 
       strOut+=str;
     }
@@ -1294,7 +1294,7 @@ std::string CDateTime::GetAsLocalizedTime(const std::string &format, bool withSe
         if (partLength==1)
           str = std::to_string(dateTime.second);
         else
-          str = StringUtils::Format("%02i", dateTime.second);
+          str = StringUtils::Format("{:02}", dateTime.second);
 
         strOut+=str;
       }
@@ -1387,7 +1387,7 @@ std::string CDateTime::GetAsLocalizedDate(const std::string &strFormat) const
       if (partLength==1) // single-digit number
         str = std::to_string(dateTime.day);
       else if (partLength==2) // two-digit number
-        str = StringUtils::Format("%02i", dateTime.day);
+        str = StringUtils::Format("{:02}", dateTime.day);
       else // Day of week string
       {
         int wday = dateTime.dayOfWeek;
@@ -1419,7 +1419,7 @@ std::string CDateTime::GetAsLocalizedDate(const std::string &strFormat) const
       if (partLength==1) // single-digit number
         str = std::to_string(dateTime.month);
       else if (partLength==2) // two-digit number
-        str = StringUtils::Format("%02i", dateTime.month);
+        str = StringUtils::Format("{:02}", dateTime.month);
       else // Month string
       {
         int wmonth = dateTime.month;
@@ -1524,8 +1524,8 @@ std::string CDateTime::GetAsRFC1123DateTime() const
   else if (weekDay > 6)
     weekDay = 6;
   if (weekDay != time.GetDayOfWeek())
-    CLog::Log(LOGWARNING, "Invalid day of week %i in %s", time.GetDayOfWeek(),
-              time.GetAsDBDateTime().c_str());
+    CLog::Log(LOGWARNING, "Invalid day of week {} in {}", time.GetDayOfWeek(),
+              time.GetAsDBDateTime());
 
   int month = time.GetMonth();
   if (month < 1)
@@ -1533,9 +1533,9 @@ std::string CDateTime::GetAsRFC1123DateTime() const
   else if (month > 12)
     month = 12;
   if (month != time.GetMonth())
-    CLog::Log(LOGWARNING, "Invalid month %i in %s", time.GetMonth(), time.GetAsDBDateTime().c_str());
+    CLog::Log(LOGWARNING, "Invalid month {} in {}", time.GetMonth(), time.GetAsDBDateTime());
 
-  return StringUtils::Format("%s, %02i %s %04i %02i:%02i:%02i GMT", DAY_NAMES[weekDay],
+  return StringUtils::Format("{}, {:02} {} {:04} {:02}:{:02}:{:02} GMT", DAY_NAMES[weekDay],
                              time.GetDay(), MONTH_NAMES[month - 1], time.GetYear(), time.GetHour(),
                              time.GetMinute(), time.GetSecond());
 }
@@ -1545,7 +1545,7 @@ std::string CDateTime::GetAsW3CDate() const
   KODI::TIME::SystemTime st;
   GetAsSystemTime(st);
 
-  return StringUtils::Format("%04hu-%02hu-%02hu", st.year, st.month, st.day);
+  return StringUtils::Format("{:04}-{:02}-{:02}", st.year, st.month, st.day);
 }
 
 std::string CDateTime::GetAsW3CDateTime(bool asUtc /* = false */) const
@@ -1556,13 +1556,13 @@ std::string CDateTime::GetAsW3CDateTime(bool asUtc /* = false */) const
   KODI::TIME::SystemTime st;
   w3cDate.GetAsSystemTime(st);
 
-  std::string result = StringUtils::Format("%04hu-%02hu-%02huT%02hu:%02hu:%02hu", st.year, st.month,
+  std::string result = StringUtils::Format("{:04}-{:02}-{:02}T{:02}:{:02}:{:02}", st.year, st.month,
                                            st.day, st.hour, st.minute, st.second);
   if (asUtc)
     return result + "Z";
 
   CDateTimeSpan bias = GetTimezoneBias();
-  return result + StringUtils::Format("%c%02i:%02i", (bias.GetSecondsTotal() >= 0 ? '+' : '-'),
+  return result + StringUtils::Format("{}{:02}:{:02}", (bias.GetSecondsTotal() >= 0 ? '+' : '-'),
                                       abs(bias.GetHours()), abs(bias.GetMinutes()));
 }
 

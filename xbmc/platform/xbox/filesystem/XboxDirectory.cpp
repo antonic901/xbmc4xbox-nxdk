@@ -128,7 +128,7 @@ bool CXboxDirectory::Create(const CURL& url)
     std::string strPath2(strPath1);
     CXBOXUtil::GetFatXQualifiedPath(strPath1);
     if(strPath2 != strPath1)
-      CLog::Log(LOGNOTICE,"fatxq: %s -> %s",strPath2.c_str(), strPath1.c_str());
+      CLog::Log(LOGNOTICE,"fatxq: {} -> {}",strPath2, strPath1);
   }
 #endif
 

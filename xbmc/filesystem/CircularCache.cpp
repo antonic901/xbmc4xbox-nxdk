@@ -224,8 +224,8 @@ int64_t CCircularCache::Seek(int64_t pos)
 
     if (pos < m_beg || pos > m_end)
       CLog::Log(LOGDEBUG,
-                "CCircularCache::%s - (-) Wait for data failed for pos %lld, ended up at %lld",
-                __FUNCTION__, /*fmt::ptr(this), */pos, m_cur);
+                "CCircularCache::{} - ({}) Wait for data failed for pos {}, ended up at {}",
+                __FUNCTION__, fmt::ptr(this), pos, m_cur);
   }
 
   if (pos >= m_beg && pos <= m_end)

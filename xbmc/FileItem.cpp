@@ -1075,7 +1075,7 @@ void CFileItemList::RemoveDiscCache(const std::string& cacheFile) const
 
 void CFileItemList::RemoveDiscCacheCRC(const std::string& crc) const
 {
-  std::string cachefile = StringUtils::Format("special://temp/archive_cache/%s.fi", crc.c_str());
+  std::string cachefile = StringUtils::Format("special://temp/archive_cache/{}.fi", crc);
   RemoveDiscCache(cachefile);
 }
 

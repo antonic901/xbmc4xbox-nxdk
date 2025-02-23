@@ -173,11 +173,11 @@ bool CWin32File::OpenForWrite(const CURL& url, bool bOverWrite /*= false*/)
       if (!hiddenSet)
       {
 #ifdef NXDK
-        CLog::LogF(LOGWARNING, "Can't set hidden attribute for file \"%s\"",
-                   pathnameW.c_str());
+        CLog::LogF(LOGWARNING, "Can't set hidden attribute for file \"{}\"",
+                   pathnameW);
 #else
-        CLog::LogF(LOGWARNING, "Can't set hidden attribute for file \"%s\"",
-                   KODI::PLATFORM::WINDOWS::FromW(pathnameW).c_str());
+        CLog::LogF(LOGWARNING, "Can't set hidden attribute for file \"{}\"",
+                   KODI::PLATFORM::WINDOWS::FromW(pathnameW));
 #endif
       }
     }

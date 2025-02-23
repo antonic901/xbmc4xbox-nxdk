@@ -195,7 +195,7 @@ bool CDirectory::GetDirectory(const CURL& url,
             continue;
           }
 
-          CLog::Log(LOGERROR, "%s - Error getting %s", __FUNCTION__, url.GetRedacted().c_str());
+          CLog::Log(LOGERROR, "{} - Error getting {}", __FUNCTION__, url.GetRedacted());
           return false;
         }
       }
@@ -294,8 +294,8 @@ bool CDirectory::GetDirectory(const CURL& url,
     return true;
   }
   XBMCCOMMONS_HANDLE_UNCHECKED
-  catch (...) { CLog::Log(LOGERROR, "%s - Unhandled exception", __FUNCTION__); }
-  CLog::Log(LOGERROR, "%s - Error getting %s", __FUNCTION__, url.GetRedacted().c_str());
+  catch (...) { CLog::Log(LOGERROR, "{} - Unhandled exception", __FUNCTION__); }
+  CLog::Log(LOGERROR, "{} - Error getting {}", __FUNCTION__, url.GetRedacted());
   return false;
 }
 
@@ -317,8 +317,8 @@ bool CDirectory::Create(const CURL& url)
         return true;
   }
   XBMCCOMMONS_HANDLE_UNCHECKED
-  catch (...) { CLog::Log(LOGERROR, "%s - Unhandled exception", __FUNCTION__); }
-  CLog::Log(LOGERROR, "%s - Error creating %s", __FUNCTION__, url.GetRedacted().c_str());
+  catch (...) { CLog::Log(LOGERROR, "{} - Unhandled exception", __FUNCTION__); }
+  CLog::Log(LOGERROR, "{} - Error creating {}", __FUNCTION__, url.GetRedacted());
   return false;
 }
 
@@ -349,8 +349,8 @@ bool CDirectory::Exists(const CURL& url, bool bUseCache /* = true */)
       return pDirectory->Exists(realURL);
   }
   XBMCCOMMONS_HANDLE_UNCHECKED
-  catch (...) { CLog::Log(LOGERROR, "%s - Unhandled exception", __FUNCTION__); }
-  CLog::Log(LOGERROR, "%s - Error checking for %s", __FUNCTION__, url.GetRedacted().c_str());
+  catch (...) { CLog::Log(LOGERROR, "{} - Unhandled exception", __FUNCTION__); }
+  CLog::Log(LOGERROR, "{} - Error checking for {}", __FUNCTION__, url.GetRedacted());
   return false;
 }
 
@@ -381,8 +381,8 @@ bool CDirectory::Remove(const CURL& url)
       }
   }
   XBMCCOMMONS_HANDLE_UNCHECKED
-  catch (...) { CLog::Log(LOGERROR, "%s - Unhandled exception", __FUNCTION__); }
-  CLog::Log(LOGERROR, "%s - Error removing %s", __FUNCTION__, url.GetRedacted().c_str());
+  catch (...) { CLog::Log(LOGERROR, "{} - Unhandled exception", __FUNCTION__); }
+  CLog::Log(LOGERROR, "{} - Error removing {}", __FUNCTION__, url.GetRedacted());
   return false;
 }
 
@@ -402,8 +402,8 @@ bool CDirectory::RemoveRecursive(const CURL& url)
       }
   }
   XBMCCOMMONS_HANDLE_UNCHECKED
-  catch (...) { CLog::Log(LOGERROR, "%s - Unhandled exception", __FUNCTION__); }
-  CLog::Log(LOGERROR, "%s - Error removing %s", __FUNCTION__, url.GetRedacted().c_str());
+  catch (...) { CLog::Log(LOGERROR, "{} - Unhandled exception", __FUNCTION__); }
+  CLog::Log(LOGERROR, "{} - Error removing {}", __FUNCTION__, url.GetRedacted());
   return false;
 }
 

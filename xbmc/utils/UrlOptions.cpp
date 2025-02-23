@@ -108,7 +108,7 @@ void CUrlOptions::AddOptions(const std::string &options)
   {
     // remove leading ?, #, ; or | if present
     if (!m_strLead.empty())
-      CLog::Log(LOGWARNING, "%s: original leading str %s overridden by %s", __FUNCTION__, m_strLead.c_str(),
+      CLog::Log(LOGWARNING, "{}: original leading str {} overridden by {}", __FUNCTION__, m_strLead,
                 strOptions.at(0));
     m_strLead = strOptions.at(0);
     strOptions.erase(0, 1);

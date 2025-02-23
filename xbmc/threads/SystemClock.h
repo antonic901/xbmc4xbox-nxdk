@@ -49,7 +49,7 @@ public:
     if (duration > m_max)
     {
       m_totalWaitTime = m_max;
-      CLog::Log(LOGWARNING, "duration (%i) greater than max (%i) - duration will be truncated!",
+      CLog::Log(LOGWARNING, "duration ({}) greater than max ({}) - duration will be truncated!",
                 duration.count(), m_max.count());
     }
     else

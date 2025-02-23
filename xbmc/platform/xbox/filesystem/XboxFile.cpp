@@ -128,7 +128,7 @@ bool CXboxFile::OpenForWrite(const CURL& url, bool bOverWrite)
     std::string strPathOriginal = strPath;
     CUtil::GetFatXQualifiedPath(strPath);
     if (strPathOriginal != strPath)
-      CLog::Log(LOGINFO,"CXboxFile::OpenForWrite: WARNING: Truncated filename %s %s", strPathOriginal.c_str(), strPath.c_str());
+      CLog::Log(LOGINFO,"CXboxFile::OpenForWrite: WARNING: Truncated filename {} {}", strPathOriginal, strPath);
   }
 #endif
 
@@ -223,7 +223,7 @@ int64_t CXboxFile::GetLength()
     if(GetFileSizeEx((HANDLE)m_hFile, &i64Size))
       m_i64FileLen = i64Size.QuadPart;
     else
-      CLog::Log(LOGERROR, "CXboxFile::GetLength - GetFileSizeEx failed with error %d", GetLastError());
+      CLog::Log(LOGERROR, "CXboxFile::GetLength - GetFileSizeEx failed with error {}", GetLastError());
   }
   return m_i64FileLen;
 }

@@ -25,7 +25,7 @@
 void CSpecialProtocol::SetProfilePath(const std::string &dir)
 {
   SetPath("profile", dir);
-  CLog::Log(LOGINFO, "special://profile/ is mapped to: %s", GetPath("profile").c_str());
+  CLog::Log(LOGINFO, "special://profile/ is mapped to: {}", GetPath("profile"));
 }
 
 void CSpecialProtocol::SetXBMCPath(const std::string &dir)
@@ -233,16 +233,16 @@ std::string CSpecialProtocol::TranslatePathConvertCase(const std::string& path)
 
 void CSpecialProtocol::LogPaths()
 {
-  CLog::Log(LOGINFO, "special://xbmc/ is mapped to: %s", GetPath("xbmc").c_str());
-  CLog::Log(LOGINFO, "special://xbmcbin/ is mapped to: %s", GetPath("xbmcbin").c_str());
-  CLog::Log(LOGINFO, "special://xbmcbinaddons/ is mapped to: %s", GetPath("xbmcbinaddons").c_str());
-  CLog::Log(LOGINFO, "special://masterprofile/ is mapped to: %s", GetPath("masterprofile").c_str());
+  CLog::Log(LOGINFO, "special://xbmc/ is mapped to: {}", GetPath("xbmc"));
+  CLog::Log(LOGINFO, "special://xbmcbin/ is mapped to: {}", GetPath("xbmcbin"));
+  CLog::Log(LOGINFO, "special://xbmcbinaddons/ is mapped to: {}", GetPath("xbmcbinaddons"));
+  CLog::Log(LOGINFO, "special://masterprofile/ is mapped to: {}", GetPath("masterprofile"));
 #if defined(TARGET_POSIX)
   CLog::Log(LOGINFO, "special://envhome/ is mapped to: {}", GetPath("envhome"));
 #endif
-  CLog::Log(LOGINFO, "special://home/ is mapped to: %s", GetPath("home").c_str());
-  CLog::Log(LOGINFO, "special://temp/ is mapped to: %s", GetPath("temp").c_str());
-  CLog::Log(LOGINFO, "special://logpath/ is mapped to: %s", GetPath("logpath").c_str());
+  CLog::Log(LOGINFO, "special://home/ is mapped to: {}", GetPath("home"));
+  CLog::Log(LOGINFO, "special://temp/ is mapped to: {}", GetPath("temp"));
+  CLog::Log(LOGINFO, "special://logpath/ is mapped to: {}", GetPath("logpath"));
   //CLog::Log(LOGINFO, "special://userhome/ is mapped to: {}", GetPath("userhome"));
 }
 
