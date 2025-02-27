@@ -14,9 +14,7 @@
 #include "messaging/IMessageTarget.h"
 #include "threads/SingleLock.h"
 #include "utils/log.h"
-#if 0
-#include "windowing/GraphicContext.h"
-#endif
+#include "guilib/GraphicContext.h"
 #include "ServiceBroker.h"
 
 #include <memory>
@@ -145,9 +143,7 @@ int CApplicationMessenger::SendMsg(ThreadMessage&& message, bool wait)
     if (winSystem)
 #endif
     {
-#if 0
-      CSingleExit exit(winSystem->GetGfxContext());
-#endif
+      CSingleExit exit(g_graphicsContext);
       waitEvent->Wait();
     }
     return *result;
