@@ -25,19 +25,19 @@
 
 #pragma once
 
+#include <string>
 #include <vector>
 #include <stack>
 #include <map>
 #include "threads/CriticalSection.h"  // base class
 #include "TransformMatrix.h"        // for the members m_guiTransform etc.
 #include "Geometry.h"               // for CRect/CPoint
-#include "gui3d.h"
-#include "utils/StdString.h"
-
-#include "common/Mouse.h"
 
 #include "utils/GlobalsHandling.h"
-#include "settings/lib/ISettingCallback.h"
+
+#ifdef NXDK
+#include <windows.h>
+#endif
 
 /*!
  \ingroup graphics
@@ -96,10 +96,10 @@ struct RESOLUTION_INFO
   int iSubtitles;
   DWORD dwFlags;
   float fPixelRatio;
-  CStdString strMode;
-  CStdString strId;
+  std::string strMode;
+  std::string strId;
 public:
-  RESOLUTION_INFO(int width = 1280, int height = 720, float aspect = 0, const CStdString &mode = "")
+  RESOLUTION_INFO(int width = 1280, int height = 720, float aspect = 0, const std::string &mode = "")
   {
     iWidth = width;
     iHeight = height;
@@ -130,17 +130,19 @@ public:
   CGraphicContext(void);
   virtual ~CGraphicContext(void);
 
+#if 0
   LPDIRECT3DDEVICE8 Get3DDevice() { return m_pd3dDevice; }
   void SetD3DDevice(LPDIRECT3DDEVICE8 p3dDevice);
   //  void         GetD3DParameters(D3DPRESENT_PARAMETERS &params);
   void SetD3DParameters(D3DPRESENT_PARAMETERS *p3dParams);
   int GetBackbufferCount() const { return (m_pd3dParams)?m_pd3dParams->BackBufferCount:0; }
+#endif
   int GetWidth() const { return m_iScreenWidth; }
   int GetHeight() const { return m_iScreenHeight; }
   int GetFPS() const;
   DWORD GetNewID();
-  const CStdString& GetMediaDir() const { return m_strMediaDir; }
-  void SetMediaDir(const CStdString& strMediaDir);
+  const std::string& GetMediaDir() const { return m_strMediaDir; }
+  void SetMediaDir(const std::string& strMediaDir);
   bool IsWidescreen() const { return m_bWidescreen; }
   bool SetViewPort(float fx, float fy , float fwidth, float fheight, bool intersectPrevious = false);
   void RestoreViewPort();
@@ -246,7 +248,7 @@ public:
   }
   inline TransformMatrix AddTransform(const TransformMatrix &matrix)
   {
-    ASSERT(m_groupTransform.size());
+    assert(m_groupTransform.size());
     TransformMatrix absoluteMatrix = m_groupTransform.size() ? m_groupTransform.top() * matrix : matrix;
     m_groupTransform.push(absoluteMatrix);
     UpdateFinalTransform(m_groupTransform.top());
@@ -256,13 +258,13 @@ public:
   {
     // TODO: We only need to add it to the group transform as other transforms may be added on top of this one later on
     //       Once all transforms are cached then this can be removed and UpdateFinalTransform can be called directly
-    ASSERT(m_groupTransform.size());
+    assert(m_groupTransform.size());
     m_groupTransform.push(matrix);
     UpdateFinalTransform(m_groupTransform.top());
   }
   inline void RemoveTransform()
   {
-    ASSERT(m_groupTransform.size());
+    assert(m_groupTransform.size());
     if (m_groupTransform.size())
       m_groupTransform.pop();
     if (m_groupTransform.size())
@@ -277,15 +279,17 @@ public:
 protected:
   void SetFullScreenViewWindow(RESOLUTION &res);
 
+#if 0
   LPDIRECT3DDEVICE8 m_pd3dDevice;
   D3DPRESENT_PARAMETERS* m_pd3dParams;
   std::stack<D3DVIEWPORT8*> m_viewStack;
+#endif
   DWORD m_stateBlock;
   int m_iScreenHeight;
   int m_iScreenWidth;
   int m_iBackBufferCount;
   bool m_bWidescreen;
-  CStdString m_strMediaDir;
+  std::string m_strMediaDir;
   CRect m_videoRect;
   bool m_bFullScreenVideo;
   bool m_bCalibrating;
@@ -318,6 +322,5 @@ private:
  \brief
  */
 
-XBMC_GLOBAL(CGraphicContext,g_graphicsContext);
-
-#endif
+XBMC_GLOBAL_REF(CGraphicContext,g_graphicsContext);
+#define g_graphicsContext XBMC_GLOBAL_USE(CGraphicContext)

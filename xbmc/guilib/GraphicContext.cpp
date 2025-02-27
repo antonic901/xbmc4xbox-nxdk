@@ -18,37 +18,19 @@
  *
  */
 
-#include "include.h"
 #include "GraphicContext.h"
-#include "XBVideoConfig.h"
-#include "Application.h"
-#include "messaging/ApplicationMessenger.h"
-#include "GUIAudioManager.h"
-#include "settings/DisplaySettings.h"
-#include "settings/lib/Setting.h"
-#include "settings/Settings.h"
-#ifdef HAS_XBOX_D3D
- #include "xgraphics.h"
- #define D3D_CLEAR_STENCIL D3DCLEAR_STENCIL
-#else
- #define D3D_CLEAR_STENCIL 0x0l
-#endif
-#include "addons/Skin.h"
 #include "TextureManager.h"
 #include "utils/MathUtils.h"
-#include "GUIWindowManager.h"
 
 using namespace std;
-using namespace KODI::MESSAGING;
-
-/* quick access to a skin setting, fine unless we starts clearing video settings */
-static CSettingInt* g_guiSkinzoom = NULL;
 
 CGraphicContext::CGraphicContext(void) :
   m_iScreenWidth(720),
   m_iScreenHeight(576),
+#if 0
   m_pd3dDevice(NULL),
   m_pd3dParams(NULL),
+#endif
   m_stateBlock(0xffffffff),
   m_maxTextureSize(4096),
   m_strMediaDir(""),
@@ -61,6 +43,7 @@ CGraphicContext::CGraphicContext(void) :
 
 CGraphicContext::~CGraphicContext(void)
 {
+#if 0
   if (m_stateBlock != 0xffffffff)
   {
     Get3DDevice()->DeleteStateBlock(m_stateBlock);
@@ -71,9 +54,10 @@ CGraphicContext::~CGraphicContext(void)
     m_viewStack.pop();
     if (viewport) delete viewport;
   }
+#endif
 }
 
-
+#if 0
 void CGraphicContext::SetD3DDevice(LPDIRECT3DDEVICE8 p3dDevice)
 {
   m_pd3dDevice = p3dDevice;
@@ -83,6 +67,7 @@ void CGraphicContext::SetD3DParameters(D3DPRESENT_PARAMETERS *p3dParams)
 {
   m_pd3dParams = p3dParams;
 }
+#endif
 
 void CGraphicContext::SetOrigin(float x, float y)
 {
@@ -166,6 +151,7 @@ void CGraphicContext::ClipRect(CRect &vertex, CRect &texture, CRect *texture2)
 
 bool CGraphicContext::SetViewPort(float fx, float fy , float fwidth, float fheight, bool intersectPrevious /* = false */)
 {
+#if 0
   D3DVIEWPORT8 newviewport;
   D3DVIEWPORT8 *oldviewport = new D3DVIEWPORT8;
   Get3DDevice()->GetViewport(oldviewport);
@@ -249,10 +235,13 @@ bool CGraphicContext::SetViewPort(float fx, float fy , float fwidth, float fheig
 
   UpdateCameraPosition(m_cameras.top());
   return true;
+#endif
+  return false;
 }
 
 void CGraphicContext::RestoreViewPort()
 {
+#if 0
   if (!m_viewStack.size()) return;
   D3DVIEWPORT8 *oldviewport = (D3DVIEWPORT8*)m_viewStack.top();
   m_viewStack.pop();
@@ -267,12 +256,14 @@ void CGraphicContext::RestoreViewPort()
     delete oldviewport;
 #endif
   }
+#endif
 
   UpdateCameraPosition(m_cameras.top());
 }
 
 void CGraphicContext::SetScissors(const CRect& rect)
 {
+#if 0
   if (!m_pd3dDevice)
     return;
 
@@ -285,10 +276,12 @@ void CGraphicContext::SetScissors(const CRect& rect)
   scissor.x2 = MathUtils::round_int(m_scissors.x2);
   scissor.y2 = MathUtils::round_int(m_scissors.y2);
   m_pd3dDevice->SetScissors(1, TRUE, &scissor);
+#endif
 }
 
 void CGraphicContext::ResetScissors()
 {
+#if 0
   if (!m_pd3dDevice)
     return;
 
@@ -300,6 +293,7 @@ void CGraphicContext::ResetScissors()
   scissor.x2 = CDisplaySettings::Get().GetCurrentResolutionInfo().iWidth;
   scissor.y2 = CDisplaySettings::Get().GetCurrentResolutionInfo().iHeight;
   m_pd3dDevice->SetScissors(0, FALSE, &scissor);
+#endif
 }
 
 const CRect& CGraphicContext::GetViewWindow() const
@@ -323,6 +317,7 @@ void CGraphicContext::SetViewWindow(float left, float top, float right, float bo
 
 void CGraphicContext::ClipToViewWindow()
 {
+#if 0
   D3DRECT clip = { (long)m_videoRect.x1, (long)m_videoRect.y1, (long)m_videoRect.x2, (long)m_videoRect.y2 };
   if (m_videoRect.x1 < 0) clip.x1 = 0;
   if (m_videoRect.y1 < 0) clip.y1 = 0;
@@ -335,14 +330,17 @@ void CGraphicContext::ClipToViewWindow()
 #ifdef HAS_XBOX_D3D
   m_pd3dDevice->SetScissors(1, FALSE, &clip);
 #endif
+#endif
 }
 
 void CGraphicContext::SetFullScreenViewWindow(RESOLUTION &res)
 {
+#if 0
   m_videoRect.x1 = (float)CDisplaySettings::Get().GetResolutionInfo(res).Overscan.left;
   m_videoRect.y1 = (float)CDisplaySettings::Get().GetResolutionInfo(res).Overscan.top;
   m_videoRect.x2 = (float)CDisplaySettings::Get().GetResolutionInfo(res).Overscan.right;
   m_videoRect.y2 = (float)CDisplaySettings::Get().GetResolutionInfo(res).Overscan.bottom;
+#endif
 }
 
 void CGraphicContext::SetFullScreenVideo(bool bOnOff)
@@ -370,11 +368,15 @@ void CGraphicContext::SetCalibrating(bool bOnOff)
 
 bool CGraphicContext::IsValidResolution(RESOLUTION res)
 {
+#if 0
   return g_videoConfig.IsValidResolution(res);
+#endif
+  return false;
 }
 
 void CGraphicContext::GetAllowedResolutions(vector<RESOLUTION> &res, bool bAllowPAL60)
 {
+#if 0
   bool bCanDoWidescreen = g_videoConfig.HasWidescreen();
   res.clear();
   if (g_videoConfig.HasPAL())
@@ -401,11 +403,13 @@ void CGraphicContext::GetAllowedResolutions(vector<RESOLUTION> &res, bool bAllow
     if (g_videoConfig.Has1080i())
       res.push_back(RES_HDTV_1080i);
   }
+#endif
 }
 
 // call SetVideoResolutionInternal and ensure its done from mainthread
 void CGraphicContext::SetVideoResolution(RESOLUTION res, BOOL NeedZ, bool forceClear /* = false */)
 {
+#if 0
   if (g_application.IsCurrentThread())
   {
     SetVideoResolutionInternal(res, NeedZ, forceClear);
@@ -414,10 +418,12 @@ void CGraphicContext::SetVideoResolution(RESOLUTION res, BOOL NeedZ, bool forceC
   {
     CApplicationMessenger::Get().SendMsg(TMSG_SETVIDEORESOLUTION, res, forceClear ? 1 : 0, NULL, NeedZ ? "true" : "false");
   }
+#endif
 }
 
 void CGraphicContext::SetVideoResolutionInternal(RESOLUTION res, BOOL NeedZ, bool forceClear)
 {
+#if 0
   if (res == RES_AUTORES)
   {
     res = g_videoConfig.GetBestMode();
@@ -526,6 +532,7 @@ void CGraphicContext::SetVideoResolutionInternal(RESOLUTION res, BOOL NeedZ, boo
   }
 
   Unlock();
+#endif
 }
 
 RESOLUTION CGraphicContext::GetVideoResolution() const
@@ -536,6 +543,7 @@ RESOLUTION CGraphicContext::GetVideoResolution() const
 void CGraphicContext::SetScreenFilters(bool useFullScreenFilters)
 {
   Lock();
+#if 0
   if (m_pd3dDevice)
   {
     // These are only valid here and nowhere else
@@ -545,6 +553,7 @@ void CGraphicContext::SetScreenFilters(bool useFullScreenFilters)
     m_pd3dDevice->SetFlickerFilter(useFullScreenFilters ? CSettings::GetInstance().GetInt("videoplayer.flicker") : CSettings::GetInstance().GetInt("videoscreen.flickerfilter"));
 #endif
   }
+#endif
   Unlock();
 }
 
@@ -583,6 +592,7 @@ void CGraphicContext::ResetOverscan(RESOLUTION res, OVERSCAN &overscan)
 
 void CGraphicContext::ResetScreenParameters(RESOLUTION res)
 {
+#if 0
   ResetOverscan(res, CDisplaySettings::Get().GetResolutionInfo(res).Overscan);
   CDisplaySettings::Get().GetResolutionInfo(res).fPixelRatio = GetPixelRatio(res);
   // 1080i
@@ -671,25 +681,32 @@ void CGraphicContext::ResetScreenParameters(RESOLUTION res)
   default:
     break;
   }
+#endif
 }
 
 float CGraphicContext::GetPixelRatio(RESOLUTION iRes) const
 {
+#if 0
   return CDisplaySettings::Get().GetResolutionInfo(iRes).fPixelRatio;
+#endif
+  return 1.0;
 }
 
 void CGraphicContext::Clear(color_t color)
 {
+#if 0
   if (!m_pd3dDevice) return;
   //Not trying to clear the zbuffer when there is none is 7 fps faster (pal resolution)
   if ((!m_pd3dParams) || (m_pd3dParams->EnableAutoDepthStencil == TRUE))
     m_pd3dDevice->Clear( 0L, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3D_CLEAR_STENCIL, color, 1.0f, 0L );
   else
     m_pd3dDevice->Clear( 0L, NULL, D3DCLEAR_TARGET, color, 1.0f, 0L );
+#endif
 }
 
 void CGraphicContext::CaptureStateBlock()
 {
+#if 0
   if (m_stateBlock != 0xffffffff)
   {
     Get3DDevice()->DeleteStateBlock(m_stateBlock);
@@ -700,23 +717,30 @@ void CGraphicContext::CaptureStateBlock()
     // Creation failure
     m_stateBlock = 0xffffffff;
   }
+#endif
 }
 
 void CGraphicContext::ApplyStateBlock()
 {
+#if 0
   if (m_stateBlock != 0xffffffff)
   {
     Get3DDevice()->ApplyStateBlock(m_stateBlock);
   }
+#endif
 }
 
 const RESOLUTION_INFO &CGraphicContext::GetResInfo() const
 {
+#if 0
   return CDisplaySettings::Get().GetResolutionInfo(m_Resolution);
+#endif
+  return RESOLUTION_INFO();
 }
 
 void CGraphicContext::GetGUIScaling(const RESOLUTION_INFO &res, float &scaleX, float &scaleY, TransformMatrix *matrix /* = NULL */)
 {
+#if 0
   if (m_Resolution != RES_INVALID)
   {
     // calculate necessary scalings
@@ -760,6 +784,7 @@ void CGraphicContext::GetGUIScaling(const RESOLUTION_INFO &res, float &scaleX, f
     if (matrix)
       matrix->Reset();
   }
+#endif
 }
 
 void CGraphicContext::SetScalingResolution(const RESOLUTION_INFO &res, bool needsScaling)
@@ -808,6 +833,7 @@ void CGraphicContext::InvertFinalCoords(float &x, float &y) const
 
 float CGraphicContext::GetScalingPixelRatio() const
 {
+#if 0
   // assume the resolutions are different - we want to return the aspect ratio of the video resolution
   // but only once it's been corrected for the skin -> screen coordinates scaling
   float winWidth = (float)m_windowResolution.iWidth;
@@ -817,6 +843,8 @@ float CGraphicContext::GetScalingPixelRatio() const
   float outPR = GetPixelRatio(m_Resolution);
 
   return outPR * (outWidth / outHeight) / (winWidth / winHeight);
+#endif
+  return 1.0;
 }
 
 void CGraphicContext::SetCameraPosition(const CPoint &camera)
@@ -836,7 +864,7 @@ void CGraphicContext::SetCameraPosition(const CPoint &camera)
 
 void CGraphicContext::RestoreCameraPosition()
 { // remove the top camera from the stack
-  ASSERT(m_cameras.size());
+  assert(m_cameras.size());
   m_cameras.pop();
   UpdateCameraPosition(m_cameras.top());
 }
@@ -872,6 +900,7 @@ CRect CGraphicContext::generateAABB(const CRect &rect) const
 
 void CGraphicContext::UpdateCameraPosition(const CPoint &camera)
 {
+#if 0
   // NOTE: This routine is currently called (twice) every time there is a <camera>
   //       tag in the skin.  It actually only has to be called before we render
   //       something, so another option is to just save the camera coordinates
@@ -907,6 +936,7 @@ void CGraphicContext::UpdateCameraPosition(const CPoint &camera)
   D3DXMATRIX mtxProjection;
   D3DXMatrixPerspectiveOffCenterLH(&mtxProjection, (-w - offset.x)*0.5f, (w - offset.x)*0.5f, (-h + offset.y)*0.5f, (h + offset.y)*0.5f, h, 100*h);
   m_pd3dDevice->SetTransform(D3DTS_PROJECTION, &mtxProjection);
+#endif
 }
 
 bool CGraphicContext::RectIsAngled(float x1, float y1, float x2, float y2) const
@@ -926,7 +956,7 @@ int CGraphicContext::GetFPS() const
   return 60;
 }
 
-void CGraphicContext::SetMediaDir(const CStdString &strMediaDir)
+void CGraphicContext::SetMediaDir(const std::string &strMediaDir)
 {
   g_TextureManager.SetTexturePath(strMediaDir);
   m_strMediaDir = strMediaDir;

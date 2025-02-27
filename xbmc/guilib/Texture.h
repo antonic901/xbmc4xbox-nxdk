@@ -27,7 +27,6 @@
 #ifndef GUILIB_TEXTURE_H
 #define GUILIB_TEXTURE_H
 
-#include "utils/StdString.h"
 #include "XBTF.h"
 
 #pragma once
@@ -45,8 +44,13 @@ class CBaseTexture
 {
 
 public:
+#if 0
   CBaseTexture(unsigned int width = 0, unsigned int height = 0, unsigned int format = XB_FMT_A8R8G8B8,
                IDirect3DTexture8* texture = NULL, IDirect3DPalette8* palette = NULL, bool packed = false);
+#else
+  CBaseTexture(unsigned int width = 0, unsigned int height = 0, unsigned int format = XB_FMT_A8R8G8B8,
+               void* texture = NULL, void* palette = NULL, bool packed = false);
+#endif
   virtual ~CBaseTexture();
 
   /*! \brief Load a texture from a file
@@ -58,7 +62,7 @@ public:
    \param autoRotate whether the textures should be autorotated based on EXIF information (defaults to false).
    \return a CBaseTexture pointer to the created texture - NULL if the texture failed to load.
    */
-  static CBaseTexture *LoadFromFile(const CStdString& texturePath, unsigned int idealWidth = 0, unsigned int idealHeight = 0,
+  static CBaseTexture *LoadFromFile(const std::string& texturePath, unsigned int idealWidth = 0, unsigned int idealHeight = 0,
                                     bool autoRotate = false);
 
   /*! \brief Load a texture from a file in memory
@@ -74,13 +78,17 @@ public:
   static CBaseTexture *LoadFromFileInMemory(unsigned char* buffer, size_t bufferSize, const std::string& mimeType,
                                             unsigned int idealWidth = 0, unsigned int idealHeight = 0);                                  
 
+#if 0
   bool LoadPaletted(unsigned int width, unsigned int height, unsigned int pitch, unsigned int format, const unsigned char *pixels, IDirect3DPalette8 *palette);
+#endif
 
   bool HasAlpha() const;
 
+#if 0
   IDirect3DTexture8* GetTextureObject() const { return m_texture; }
   IDirect3DPalette8* GetPaletteObject() const { return m_palette; }
   void SetPaletteObject(IDirect3DPalette8* palette) { m_palette = palette; }
+#endif
 
   unsigned char* GetPixels() const { return m_pixels; }
   unsigned int GetPitch() const { return m_pitch; }
@@ -111,7 +119,7 @@ private:
 protected:
   bool LoadFromFileInMem(unsigned char* buffer, size_t size, const std::string& mimeType,
                          unsigned int maxWidth, unsigned int maxHeight);
-  bool LoadFromFileInternal(const CStdString& texturePath, unsigned int maxWidth, unsigned int maxHeight, bool autoRotate);
+  bool LoadFromFileInternal(const std::string& texturePath, unsigned int maxWidth, unsigned int maxHeight, bool autoRotate);
   void LoadFromImage(ImageInfo &image, bool autoRotate = false);
   // helpers for computation of texture parameters for compressed textures
   unsigned int GetRows(unsigned int height) const;
@@ -123,11 +131,13 @@ protected:
   unsigned int m_originalWidth;   ///< original image width before scaling or cropping
   unsigned int m_originalHeight;  ///< original image height before scaling or cropping
 
+#if 0
   IDirect3DTexture8* m_texture;
   /* NOTICE for future:
     Note that in SDL and Win32 we already convert the paletted textures into normal textures,
     so there's no chance of having m_palette as a real palette */
   IDirect3DPalette8* m_palette;
+#endif
 
   // this variable should hold Data which represents loaded Texture
   unsigned char* m_pixels;

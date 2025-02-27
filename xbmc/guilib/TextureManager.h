@@ -28,8 +28,12 @@
 #include <vector>
 #include <utility>
 
+#if 0
 #include "TextureBundle.h"
+#endif
 #include "threads/CriticalSection.h"
+
+class CBaseTexture;
 
 /************************************************************************/
 /*                                                                      */
@@ -107,11 +111,13 @@ public:
   CGUITextureManager(void);
   virtual ~CGUITextureManager(void);
 
+#if 0
 #ifdef HAS_XBOX_D3D
   void StartPreLoad();
   void PreLoad(const std::string& strTextureName);
   void EndPreLoad();
   void FlushPreLoad();
+#endif
 #endif
   bool HasTexture(const std::string &textureName, std::string *path = NULL, int *bundle = NULL, int *size = NULL);
   static bool CanLoad(const std::string &texturePath); ///< Returns true if the texture manager can load this texture
@@ -132,15 +138,17 @@ public:
   void ReleaseHwTexture(unsigned int texture);
 protected:
   std::vector<CTextureMap*> m_vecTextures;
-  std::list<std::pair<CTextureMap*, unsigned int> > m_unusedTextures;
+  std::list<std::pair<CTextureMap*, std::chrono::time_point<std::chrono::steady_clock>> > m_unusedTextures;
   std::vector<unsigned int> m_unusedHwTextures;
   typedef std::vector<CTextureMap*>::iterator ivecTextures;
-  typedef std::list<std::pair<CTextureMap*, unsigned int> >::iterator ilistUnused;
+  typedef std::list<std::pair<CTextureMap*, std::chrono::time_point<std::chrono::steady_clock>> >::iterator ilistUnused;
+#if 0
   // we have 2 texture bundles (one for the base textures, one for the theme)
   CTextureBundle m_TexBundle[2];
 #ifdef HAS_XBOX_D3D
   std::list<std::string> m_PreLoadNames[2];
   std::list<std::string>::iterator m_iNextPreload[2];
+#endif
 #endif
 
   std::vector<std::string> m_texturePaths;
