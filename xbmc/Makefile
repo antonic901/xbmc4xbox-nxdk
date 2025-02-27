@@ -8,6 +8,7 @@ SRCS += \
 
 include $(CURDIR)/xbmc/commons/Makefile
 include $(CURDIR)/xbmc/filesystem/Makefile
+include $(CURDIR)/xbmc/guilib/Makefile
 include $(CURDIR)/xbmc/platform/Makefile
 include $(CURDIR)/xbmc/settings/Makefile
 include $(CURDIR)/xbmc/threads/Makefile
