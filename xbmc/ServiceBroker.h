@@ -12,6 +12,14 @@
 
 #include <memory>
 
+namespace KODI
+{
+namespace MESSAGING
+{
+class CApplicationMessenger;
+}
+} // namespace KODI
+
 class CJobManager;
 
 class CServiceBroker
@@ -24,8 +32,14 @@ public:
   static void UnregisterJobManager();
   static std::shared_ptr<CJobManager> GetJobManager();
 
+  static void RegisterAppMessenger(
+      const std::shared_ptr<KODI::MESSAGING::CApplicationMessenger>& appMessenger);
+  static void UnregisterAppMessenger();
+  static std::shared_ptr<KODI::MESSAGING::CApplicationMessenger> GetAppMessenger();
+
 private:
   std::shared_ptr<CJobManager> m_jobManager;
+  std::shared_ptr<KODI::MESSAGING::CApplicationMessenger> m_appMessenger;
 };
 
 XBMC_GLOBAL_REF(CServiceBroker, g_serviceBroker);
