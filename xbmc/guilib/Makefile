@@ -1,4 +1,6 @@
 SRCS += \
+	$(CURDIR)/xbmc/guilib/DirtyRegionSolvers.cpp \
+	$(CURDIR)/xbmc/guilib/DirtyRegionTracker.cpp \
 	$(CURDIR)/xbmc/guilib/GraphicContext.cpp \
 	$(CURDIR)/xbmc/guilib/GUIAudioManager.cpp \
 	$(CURDIR)/xbmc/guilib/GUIMessage.cpp \
