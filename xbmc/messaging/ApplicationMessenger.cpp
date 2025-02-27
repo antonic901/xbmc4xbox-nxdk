@@ -8,9 +8,7 @@
 
 #include "ApplicationMessenger.h"
 
-#if 0
 #include "guilib/GUIMessage.h"
-#endif
 #include "messaging/IMessageTarget.h"
 #include "threads/SingleLock.h"
 #include "utils/log.h"
@@ -281,10 +279,8 @@ void CApplicationMessenger::SendGUIMessage(const CGUIMessage &message, int windo
 {
   ThreadMessage tMsg(TMSG_GUI_MESSAGE);
   tMsg.param1 = windowID == WINDOW_INVALID ? 0 : windowID;
-#if 0
   tMsg.lpVoid = new CGUIMessage(message);
   SendMsg(std::move(tMsg), waitResult);
-#endif
 }
 
 void CApplicationMessenger::RegisterReceiver(IMessageTarget* target)
