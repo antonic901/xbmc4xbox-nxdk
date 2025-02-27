@@ -2,9 +2,56 @@ SRCS += \
 	$(CURDIR)/xbmc/guilib/DirtyRegionSolvers.cpp \
 	$(CURDIR)/xbmc/guilib/DirtyRegionTracker.cpp \
 	$(CURDIR)/xbmc/guilib/GraphicContext.cpp \
+	$(CURDIR)/xbmc/guilib/GUIAction.cpp \
 	$(CURDIR)/xbmc/guilib/GUIAudioManager.cpp \
+	$(CURDIR)/xbmc/guilib/GUIBaseContainer.cpp \
+	$(CURDIR)/xbmc/guilib/GUIBorderedImage.cpp \
+	$(CURDIR)/xbmc/guilib/GUIButtonControl.cpp \
+	$(CURDIR)/xbmc/guilib/GUICallback.cpp \
+	$(CURDIR)/xbmc/guilib/GUIColorManager.cpp \
+	$(CURDIR)/xbmc/guilib/GUIControl.cpp \
+	$(CURDIR)/xbmc/guilib/GUIControlFactory.cpp \
+	$(CURDIR)/xbmc/guilib/GUIControlGroup.cpp \
+	$(CURDIR)/xbmc/guilib/GUIControlGroupList.cpp \
+	$(CURDIR)/xbmc/guilib/GUIDialog.cpp \
+	$(CURDIR)/xbmc/guilib/GUIEditControl.cpp \
+	$(CURDIR)/xbmc/guilib/GUIFadeLabelControl.cpp \
+	$(CURDIR)/xbmc/guilib/GUIFixedListContainer.cpp \
+	$(CURDIR)/xbmc/guilib/GUIImage.cpp \
+	$(CURDIR)/xbmc/guilib/GUIKeyboardFactory.cpp \
+	$(CURDIR)/xbmc/guilib/GUILabelControl.cpp \
+	$(CURDIR)/xbmc/guilib/GUIListContainer.cpp \
+	$(CURDIR)/xbmc/guilib/GUIListGroup.cpp \
+	$(CURDIR)/xbmc/guilib/GUIListItem.cpp \
+	$(CURDIR)/xbmc/guilib/GUIListLabel.cpp \
 	$(CURDIR)/xbmc/guilib/GUIMessage.cpp \
+	$(CURDIR)/xbmc/guilib/GUIMoverControl.cpp \
+	$(CURDIR)/xbmc/guilib/GUIMultiImage.cpp \
+	$(CURDIR)/xbmc/guilib/GUIPanelContainer.cpp \
+	$(CURDIR)/xbmc/guilib/GUIProgressControl.cpp \
+	$(CURDIR)/xbmc/guilib/GUIRadioButtonControl.cpp \
+	$(CURDIR)/xbmc/guilib/GUIPanelContainer.cpp \
+	$(CURDIR)/xbmc/guilib/GUIMultiImage.cpp \
+	$(CURDIR)/xbmc/guilib/GUIPanelContainer.cpp \
+	$(CURDIR)/xbmc/guilib/GUIRenderingControl.cpp \
+	$(CURDIR)/xbmc/guilib/GUIResizeControl.cpp \
+	$(CURDIR)/xbmc/guilib/GUIRSSControl.cpp \
+	$(CURDIR)/xbmc/guilib/GUIScrollBarControl.cpp \
+	$(CURDIR)/xbmc/guilib/GUISettingsSliderControl.cpp \
+	$(CURDIR)/xbmc/guilib/GUISliderControl.cpp \
 	$(CURDIR)/xbmc/guilib/GUISound.cpp \
-	$(CURDIR)/xbmc/guilib/LocalizeStrings.cpp \
+	$(CURDIR)/xbmc/guilib/GUISpinControl.cpp \
+	$(CURDIR)/xbmc/guilib/GUISpinControlEx.cpp \
+	$(CURDIR)/xbmc/guilib/GUIStaticItem.cpp \
+	$(CURDIR)/xbmc/guilib/GUITextBox.cpp \
+	$(CURDIR)/xbmc/guilib/GUITextLayout.cpp \
+	$(CURDIR)/xbmc/guilib/GUIToggleButtonControl.cpp \
+	$(CURDIR)/xbmc/guilib/GUIVideoControl.cpp \
+	$(CURDIR)/xbmc/guilib/GUIVisualisationControl.cpp \
+	$(CURDIR)/xbmc/guilib/GUIWindow.cpp \
+	$(CURDIR)/xbmc/guilib/GUIWindowManager.cpp \
+	$(CURDIR)/xbmc/guilib/GUIWrappingListContainer.cpp \
 	$(CURDIR)/xbmc/guilib/Texture.cpp \
-	$(CURDIR)/xbmc/guilib/TextureManager.cpp
+	$(CURDIR)/xbmc/guilib/TextureManager.cpp \
+	$(CURDIR)/xbmc/guilib/Tween.cpp \
+	$(CURDIR)/xbmc/guilib/VisibleEffect.cpp
