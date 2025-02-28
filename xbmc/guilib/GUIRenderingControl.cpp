@@ -21,7 +21,6 @@
 #include "GUIRenderingControl.h"
 #include "threads/SingleLock.h"
 #include "guilib/IRenderingCallback.h"
-#include "windowing/WindowingFactory.h"
 
 #define LABEL_ROW1 10
 #define LABEL_ROW2 11
@@ -46,7 +45,7 @@ bool CGUIRenderingControl::InitCallback(IRenderingCallback *callback)
   if (!callback)
     return false;
 
-  CSingleLock lock(m_rendering);
+  std::unique_lock<CCriticalSection> lock(m_rendering);
   g_graphicsContext.CaptureStateBlock();
   float x = g_graphicsContext.ScaleFinalXCoord(GetXPosition(), GetYPosition());
   float y = g_graphicsContext.ScaleFinalYCoord(GetXPosition(), GetYPosition());
@@ -82,7 +81,7 @@ void CGUIRenderingControl::UpdateVisibility(const CGUIListItem *item)
 void CGUIRenderingControl::Process(unsigned int currentTime, CDirtyRegionList &dirtyregions)
 {
   //! @todo Add processing to the addon so it could mark when actually changing
-  CSingleLock lock(m_rendering);
+  std::unique_lock<CCriticalSection> lock(m_rendering);
   if (m_callback && m_callback->IsDirty())
     MarkDirtyRegion();
 
@@ -91,7 +90,7 @@ void CGUIRenderingControl::Process(unsigned int currentTime, CDirtyRegionList &d
 
 void CGUIRenderingControl::Render()
 {
-  CSingleLock lock(m_rendering);
+  std::unique_lock<CCriticalSection> lock(m_rendering);
   if (m_callback)
   {
     // set the viewport - note: We currently don't have any control over how
@@ -109,7 +108,7 @@ void CGUIRenderingControl::Render()
 
 void CGUIRenderingControl::FreeResources(bool immediately)
 {
-  CSingleLock lock(m_rendering);
+  std::unique_lock<CCriticalSection> lock(m_rendering);
 
   if (!m_callback) return;
 

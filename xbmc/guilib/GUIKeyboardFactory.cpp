@@ -18,19 +18,16 @@
  *
  */
 
-#include "Application.h"
+#include "ServiceBroker.h"
 #include "messaging/ApplicationMessenger.h"
 #include "LocalizeStrings.h"
 #include "GUIKeyboardFactory.h"
-#include "dialogs/GUIDialogOK.h"
 #include "GUIUserMessages.h"
 #include "GUIWindowManager.h"
-#include "settings/Settings.h"
 #include "utils/md5.h"
 #include "utils/StringUtils.h"
 #include "utils/Variant.h"
 
-#include "dialogs/GUIDialogKeyboardGeneric.h"
 #if defined(TARGET_DARWIN_IOS)
 #include "dialogs/GUIDialogKeyboardTouch.h"
 #endif
@@ -58,12 +55,12 @@ void CGUIKeyboardFactory::keyTypedCB(CGUIKeyboard *ref, const std::string &typed
       case FILTERING_SEARCH:
         message.SetParam1(GUI_MSG_SEARCH_UPDATE);
         message.SetStringParam(typedString);
-        CApplicationMessenger::GetInstance().SendGUIMessage(message, g_windowManager.GetActiveWindow());
+        CServiceBroker::GetAppMessenger()->SendGUIMessage(message, g_windowManager.GetActiveWindow());
         break;
       case FILTERING_CURRENT:
         message.SetParam1(GUI_MSG_FILTER_ITEMS);
         message.SetStringParam(typedString);
-        CApplicationMessenger::GetInstance().SendGUIMessage(message);
+        CServiceBroker::GetAppMessenger()->SendGUIMessage(message);
         break;
       case FILTERING_NONE:
         break;
@@ -94,6 +91,7 @@ bool CGUIKeyboardFactory::ShowAndGetInput(std::string& aTextString, CVariant hea
   else if (heading.isInteger() && heading.asInteger())
     headingStr = g_localizeStrings.Get((uint32_t)heading.asInteger());
 
+#if 0
 #if defined(TARGET_DARWIN_IOS)
   kb = (CGUIDialogKeyboardTouch*)g_windowManager.GetWindow(WINDOW_DIALOG_KEYBOARD_TOUCH);
 #else
@@ -107,6 +105,7 @@ bool CGUIKeyboardFactory::ShowAndGetInput(std::string& aTextString, CVariant hea
     confirmed = kb->ShowAndGetInput(keyTypedCB, aTextString, aTextString, headingStr, hiddenInput);
     g_activedKeyboard = NULL;
   }
+#endif
 
   if (confirmed)
   {
@@ -171,7 +170,9 @@ bool CGUIKeyboardFactory::ShowAndVerifyNewPassword(std::string& newPassword, CVa
     StringUtils::ToLower(newPassword);
     return true;
   }
+#if 0
   CGUIDialogOK::ShowAndGetInput(CVariant{12341}, CVariant{12344});
+#endif
   return false;
 }
 
@@ -197,7 +198,7 @@ int CGUIKeyboardFactory::ShowAndVerifyPassword(std::string& strPassword, const s
   else
     strHeadingTemp = StringUtils::Format("%s - %i %s",
                                          g_localizeStrings.Get(12326).c_str(),
-                                         CSettings::GetInstance().GetInt(CSettings::SETTING_MASTERLOCK_MAXRETRIES) - iRetries,
+                                         3 - iRetries,
                                          g_localizeStrings.Get(12343).c_str());
 
   std::string strUserInput;

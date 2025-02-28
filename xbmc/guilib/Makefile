@@ -7,7 +7,6 @@ SRCS += \
 	$(CURDIR)/xbmc/guilib/GUIBaseContainer.cpp \
 	$(CURDIR)/xbmc/guilib/GUIBorderedImage.cpp \
 	$(CURDIR)/xbmc/guilib/GUIButtonControl.cpp \
-	$(CURDIR)/xbmc/guilib/GUICallback.cpp \
 	$(CURDIR)/xbmc/guilib/GUIColorManager.cpp \
 	$(CURDIR)/xbmc/guilib/GUIControl.cpp \
 	$(CURDIR)/xbmc/guilib/GUIControlFactory.cpp \
@@ -17,12 +16,18 @@ SRCS += \
 	$(CURDIR)/xbmc/guilib/GUIEditControl.cpp \
 	$(CURDIR)/xbmc/guilib/GUIFadeLabelControl.cpp \
 	$(CURDIR)/xbmc/guilib/GUIFixedListContainer.cpp \
+	$(CURDIR)/xbmc/guilib/GUIFont.cpp \
+	$(CURDIR)/xbmc/guilib/GUIFontManager.cpp \
 	$(CURDIR)/xbmc/guilib/GUIImage.cpp \
+	$(CURDIR)/xbmc/guilib/GUIIncludes.cpp \
+	$(CURDIR)/xbmc/guilib/GUIInfoTypes.cpp \
 	$(CURDIR)/xbmc/guilib/GUIKeyboardFactory.cpp \
+	$(CURDIR)/xbmc/guilib/GUILabel.cpp \
 	$(CURDIR)/xbmc/guilib/GUILabelControl.cpp \
 	$(CURDIR)/xbmc/guilib/GUIListContainer.cpp \
 	$(CURDIR)/xbmc/guilib/GUIListGroup.cpp \
 	$(CURDIR)/xbmc/guilib/GUIListItem.cpp \
+	$(CURDIR)/xbmc/guilib/GUIListItemLayout.cpp \
 	$(CURDIR)/xbmc/guilib/GUIListLabel.cpp \
 	$(CURDIR)/xbmc/guilib/GUIMessage.cpp \
 	$(CURDIR)/xbmc/guilib/GUIMoverControl.cpp \
@@ -35,7 +40,6 @@ SRCS += \
 	$(CURDIR)/xbmc/guilib/GUIPanelContainer.cpp \
 	$(CURDIR)/xbmc/guilib/GUIRenderingControl.cpp \
 	$(CURDIR)/xbmc/guilib/GUIResizeControl.cpp \
-	$(CURDIR)/xbmc/guilib/GUIRSSControl.cpp \
 	$(CURDIR)/xbmc/guilib/GUIScrollBarControl.cpp \
 	$(CURDIR)/xbmc/guilib/GUISettingsSliderControl.cpp \
 	$(CURDIR)/xbmc/guilib/GUISliderControl.cpp \
@@ -45,13 +49,15 @@ SRCS += \
 	$(CURDIR)/xbmc/guilib/GUIStaticItem.cpp \
 	$(CURDIR)/xbmc/guilib/GUITextBox.cpp \
 	$(CURDIR)/xbmc/guilib/GUITextLayout.cpp \
+	$(CURDIR)/xbmc/guilib/GUITexture.cpp \
+	$(CURDIR)/xbmc/guilib/GUITexturePBKIT.cpp \
 	$(CURDIR)/xbmc/guilib/GUIToggleButtonControl.cpp \
 	$(CURDIR)/xbmc/guilib/GUIVideoControl.cpp \
-	$(CURDIR)/xbmc/guilib/GUIVisualisationControl.cpp \
 	$(CURDIR)/xbmc/guilib/GUIWindow.cpp \
 	$(CURDIR)/xbmc/guilib/GUIWindowManager.cpp \
 	$(CURDIR)/xbmc/guilib/GUIWrappingListContainer.cpp \
+	$(CURDIR)/xbmc/guilib/IWindowManagerCallback.cpp \
+	$(CURDIR)/xbmc/guilib/LocalizeStrings.cpp \
 	$(CURDIR)/xbmc/guilib/Texture.cpp \
 	$(CURDIR)/xbmc/guilib/TextureManager.cpp \
-	$(CURDIR)/xbmc/guilib/Tween.cpp \
 	$(CURDIR)/xbmc/guilib/VisibleEffect.cpp

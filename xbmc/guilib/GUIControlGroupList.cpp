@@ -21,7 +21,6 @@
 #include "GUIControlGroupList.h"
 #include "input/Key.h"
 #include "guiinfo/GUIInfoLabels.h"
-#include "GUIControlProfiler.h"
 #include "utils/StringUtils.h"
 #include "GUIFont.h" // for XBFONT_* definitions
 
@@ -54,9 +53,7 @@ void CGUIControlGroupList::Process(unsigned int currentTime, CDirtyRegionList &d
   for (iControls it = m_children.begin(); it != m_children.end(); ++it)
   {
     CGUIControl *control = *it;
-    GUIPROFILER_VISIBILITY_BEGIN(control);
     control->UpdateVisibility();
-    GUIPROFILER_VISIBILITY_END(control);
   }
 
   ValidateOffset();

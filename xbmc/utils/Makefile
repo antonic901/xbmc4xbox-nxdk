@@ -13,6 +13,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/RegExp.cpp \
 	$(CURDIR)/xbmc/utils/Speed.cpp \
 	$(CURDIR)/xbmc/utils/StringUtils.cpp \
+	$(CURDIR)/xbmc/utils/StringValidation.cpp \
 	$(CURDIR)/xbmc/utils/Temperature.cpp \
 	$(CURDIR)/xbmc/utils/TimeUtils.cpp \
 	$(CURDIR)/xbmc/utils/URIUtils.cpp \

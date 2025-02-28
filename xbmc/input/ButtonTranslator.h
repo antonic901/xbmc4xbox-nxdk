@@ -35,6 +35,7 @@
 
 class CKey;
 class CAction;
+class TiXmlElement;
 class TiXmlNode;
 class CRegExp;
 

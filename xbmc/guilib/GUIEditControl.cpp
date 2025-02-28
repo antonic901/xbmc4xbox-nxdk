@@ -23,12 +23,10 @@
 #include "utils/CharsetConverter.h"
 #include "utils/Variant.h"
 #include "GUIKeyboardFactory.h"
-#include "dialogs/GUIDialogNumeric.h"
 #include "input/XBMC_vkeys.h"
 #include "input/Key.h"
 #include "LocalizeStrings.h"
 #include "XBDateTime.h"
-#include "windowing/WindowingFactory.h"
 #include "utils/md5.h"
 #include "utils/Variant.h"
 #include "GUIUserMessages.h"
@@ -260,7 +258,9 @@ bool CGUIEditControl::OnAction(const CAction &action)
         }
       default:
         {
+#ifndef _XBOX
           if (!g_Windowing.IsTextInputEnabled())
+#endif
           {
             ClearMD5();
             m_edit.clear();
@@ -304,6 +304,7 @@ void CGUIEditControl::OnClick()
   std::string utf8;
   g_charsetConverter.wToUTF8(m_text2, utf8);
   bool textChanged = false;
+#if 0
   switch (m_inputType)
   {
     case INPUT_TYPE_READONLY:
@@ -365,6 +366,7 @@ void CGUIEditControl::OnClick()
       textChanged = CGUIKeyboardFactory::ShowAndGetInput(utf8, m_inputHeading, true, m_inputType == INPUT_TYPE_PASSWORD || m_inputType == INPUT_TYPE_PASSWORD_MD5);
       break;
   }
+#endif
   if (textChanged)
   {
     ClearMD5();
@@ -685,6 +687,7 @@ void CGUIEditControl::OnSMSCharacter(unsigned int key)
 
 void CGUIEditControl::OnPasteClipboard()
 {
+#ifndef _XBOX
   std::wstring unicode_text;
   std::string utf8_text;
 
@@ -704,6 +707,7 @@ void CGUIEditControl::OnPasteClipboard()
     m_cursorPos += unicode_text.length();
     UpdateText();
   }
+#endif
 }
 
 void CGUIEditControl::SetInputValidation(StringValidation::Validator inputValidator, void *data /* = NULL */)
@@ -746,7 +750,9 @@ void CGUIEditControl::ValidateInput()
 void CGUIEditControl::SetFocus(bool focus)
 {
   m_smsTimer.Stop();
+#ifndef _XBOX
   g_Windowing.EnableTextInput(focus);
+#endif
   CGUIControl::SetFocus(focus);
   SetInvalid();
 }

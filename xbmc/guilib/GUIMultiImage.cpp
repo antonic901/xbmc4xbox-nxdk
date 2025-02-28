@@ -19,6 +19,7 @@
  */
 
 #include "GUIMultiImage.h"
+#include "ServiceBroker.h"
 #include "TextureManager.h"
 #include "filesystem/Directory.h"
 #include "utils/URIUtils.h"
@@ -26,10 +27,11 @@
 #include "FileItem.h"
 #include "settings/AdvancedSettings.h"
 #include "input/Key.h"
-#include "TextureCache.h"
 #include "WindowIDs.h"
 #include "utils/Random.h"
 #include "utils/StringUtils.h"
+
+#include <mutex>
 
 using namespace XFILE;
 
@@ -231,7 +233,11 @@ void CGUIMultiImage::LoadDirectory()
    3. Bundled folder
    */
   CFileItem item(m_currentPath, false);
+#if 0
   if (item.IsPicture() || CTextureCache::GetInstance().HasCachedImage(m_currentPath))
+#else
+  if (item.IsPicture())
+#endif
     m_files.push_back(m_currentPath);
   else // bundled folder?
     g_TextureManager.GetBundledTexturesFromPath(m_currentPath, m_files);
@@ -241,9 +247,9 @@ void CGUIMultiImage::LoadDirectory()
     return;
   }
   // slow(er) checks necessary - do them in the background
-  CSingleLock lock(m_section);
+  std::unique_lock<CCriticalSection> lock(m_section);
   m_directoryStatus = LOADING;
-  m_jobID = CJobManager::GetInstance().AddJob(new CMultiImageJob(m_currentPath), this, CJob::PRIORITY_NORMAL);
+  m_jobID = CServiceBroker::GetJobManager()->AddJob(new CMultiImageJob(m_currentPath), this, CJob::PRIORITY_NORMAL);
 }
 
 void CGUIMultiImage::OnDirectoryLoaded()
@@ -263,15 +269,15 @@ void CGUIMultiImage::OnDirectoryLoaded()
 
 void CGUIMultiImage::CancelLoading()
 {
-  CSingleLock lock(m_section);
+  std::unique_lock<CCriticalSection> lock(m_section);
   if (m_directoryStatus == LOADING)
-    CJobManager::GetInstance().CancelJob(m_jobID);
+    CServiceBroker::GetJobManager()->CancelJob(m_jobID);
   m_directoryStatus = UNLOADED;
 }
 
 void CGUIMultiImage::OnJobComplete(unsigned int jobID, bool success, CJob *job)
 {
-  CSingleLock lock(m_section);
+  std::unique_lock<CCriticalSection> lock(m_section);
   if (m_directoryStatus == LOADING && strncmp(job->GetType(), "multiimage", 10) == 0)
   {
     m_files = ((CMultiImageJob *)job)->m_files;

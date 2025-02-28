@@ -6,7 +6,9 @@
  *  See LICENSES/README.md for more information.
  */
 
+#include "GUILargeTextureManager.h"
 #include "guilib/TextureManager.h"
+#include "GUIInfoManager.h"
 #include "filesystem/DirectoryCache.h"
 #include "guilib/LocalizeStrings.h"
 
@@ -20,3 +22,6 @@ std::map<std::string, std::string> CSpecialProtocol::m_pathMap;
   XFILE::CDirectoryCache g_directoryCache;
 
   CGUITextureManager g_TextureManager;
+  CGUILargeTextureManager g_largeTextureManager;
+
+  CGUIInfoManager    g_infoManager;

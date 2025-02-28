@@ -28,6 +28,16 @@ CFileItem::CFileItem(const CFileItem& item)
   *this = item;
 }
 
+CFileItem::CFileItem(const CGUIListItem& item)
+{
+  Initialize();
+  // not particularly pretty, but it gets around the issue of Initialize() defaulting
+  // parameters in the CGUIListItem base class.
+  *((CGUIListItem *)this) = item;
+
+  FillInMimeType(false);
+}
+
 CFileItem::CFileItem(void)
 {
   Initialize();
@@ -74,6 +84,7 @@ CFileItem& CFileItem::operator=(const CFileItem& item)
   if (this == &item)
     return *this;
 
+  CGUIListItem::operator=(item);
   m_bLabelPreformatted=item.m_bLabelPreformatted;
   m_strPath = item.m_strPath;
   m_strDynPath = item.m_strDynPath;
@@ -524,6 +535,12 @@ void CFileItem::CleanString()
 
 void CFileItem::SetLabel(const std::string &strLabel)
 {
+  if (strLabel == "..")
+  {
+    m_bIsParentFolder = true;
+    m_bIsFolder = true;
+  }
+  CGUIListItem::SetLabel(strLabel);
 }
 
 void CFileItem::SetFileSizeLabel()

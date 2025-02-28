@@ -23,9 +23,10 @@
 #include "GUILabelControl.h"
 #include "threads/SingleLock.h"
 #include "utils/TimeUtils.h"
-#include "Application.h"
 #include "messaging/ApplicationMessenger.h"
 #include "input/Key.h"
+
+#include <mutex>
 
 using namespace KODI::MESSAGING;
 
@@ -166,7 +167,7 @@ void CGUIDialog::Open_Internal(bool bProcessRenderLoop, const std::string &param
 {
   // Lock graphic context here as it is sometimes called from non rendering threads
   // maybe we should have a critical section per window instead??
-  CSingleLock lock(g_graphicsContext);
+  std::unique_lock<CCriticalSection> lock(g_graphicsContext);
 
   if (!g_windowManager.Initialized() ||
       (m_active && !m_closing && !IsAnimating(ANIM_TYPE_WINDOW_CLOSE)))
@@ -190,9 +191,9 @@ void CGUIDialog::Open_Internal(bool bProcessRenderLoop, const std::string &param
     if (!m_windowLoaded)
       Close(true);
 
-    lock.Leave();
+    lock.unlock();
 
-    while (m_active && !g_application.m_bStop)
+    while (m_active/* && !g_application.m_bStop*/)
     {
       g_windowManager.ProcessRenderLoop();
     }
@@ -201,6 +202,7 @@ void CGUIDialog::Open_Internal(bool bProcessRenderLoop, const std::string &param
 
 void CGUIDialog::Open(const std::string &param /* = "" */)
 {
+#if 0
   if (!g_application.IsCurrentThread())
   {
     // make sure graphics lock is not held
@@ -208,6 +210,7 @@ void CGUIDialog::Open(const std::string &param /* = "" */)
     CApplicationMessenger::GetInstance().SendMsg(TMSG_GUI_DIALOG_OPEN, -1, -1, static_cast<void*>(this), param);
   }
   else
+#endif
     Open_Internal(param);
 }
 

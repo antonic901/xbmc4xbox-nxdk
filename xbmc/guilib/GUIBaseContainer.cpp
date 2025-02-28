@@ -23,14 +23,12 @@
 #include "GUIInfoManager.h"
 #include "utils/TimeUtils.h"
 #include "utils/log.h"
-#include "utils/SortUtils.h"
 #include "utils/StringUtils.h"
 #include "FileItem.h"
 #include "input/Key.h"
 #include "utils/MathUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "listproviders/IListProvider.h"
-#include "settings/Settings.h"
 #include "guiinfo/GUIInfoLabels.h"
 
 #define HOLD_TIME_START 100
@@ -575,8 +573,10 @@ void CGUIBaseContainer::OnJumpLetter(char letter, bool skip /*=false*/)
   {
     CGUIListItemPtr item = m_items[i];
     std::string label = item->GetLabel();
+#if 0
     if (CSettings::GetInstance().GetBool(CSettings::SETTING_FILELISTS_IGNORETHEWHENSORTING))
       label = SortUtils::RemoveArticles(label);
+#endif
     if (0 == strnicmp(label.c_str(), m_match.c_str(), m_match.size()))
     {
       SelectItem(i);

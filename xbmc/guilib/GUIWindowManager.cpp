@@ -661,12 +661,11 @@ void CGUIWindowManager::OnApplicationMessage(ThreadMessage* pMsg)
   {
     if (pMsg->lpVoid)
     {
+#if 0
       CAction *action = static_cast<CAction *>(pMsg->lpVoid);
       if (pMsg->param1 == WINDOW_INVALID)
       {
-#if 0
         g_application.OnAction(*action);
-#endif
       }
       else
       {
@@ -677,6 +676,7 @@ void CGUIWindowManager::OnApplicationMessage(ThreadMessage* pMsg)
           CLog::Log(LOGWARNING, "Failed to get window with ID %i to send an action to", pMsg->param1);
       }
       delete action;
+#endif
     }
   }
   break;

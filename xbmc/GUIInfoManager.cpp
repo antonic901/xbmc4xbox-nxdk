@@ -19,8 +19,9 @@
  */
 
 #include "system.h"
-#include "CompileInfo.h"
+#include "utils/CompileInfo.h"
 #include "GUIInfoManager.h"
+#include "ServiceBroker.h"
 #include "Util.h"
 #include "utils/URIUtils.h"
 #include "LangInfo.h"
@@ -59,7 +60,7 @@
 
 #ifdef NXDK
 #include "filesystem/File.h"
-#include "utils/Job.h"
+#include "utils/JobManager.h"
 #endif
 #define SYSHEATUPDATEINTERVAL 60000
 
@@ -5175,6 +5176,7 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition)
 
 int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool &listItemDependent)
 {
+#if 0
   /* We need to disable caching in INFO::InfoBool::Get if either of the following are true:
    *  1. if condition is between LISTITEM_START and LISTITEM_END
    *  2. if condition is string or integer the corresponding label is between LISTITEM_START and LISTITEM_END
@@ -5752,6 +5754,7 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
       }
     }
   }
+#endif
 
   return 0;
 }
@@ -5818,6 +5821,7 @@ std::string CGUIInfoManager::GetLabel(int info, int contextWindow, std::string *
     return GetSkinVariableString(info, false);
 
   std::string strLabel;
+#if 0
   if (info >= MULTI_INFO_START && info <= MULTI_INFO_END)
     return GetMultiInfoLabel(m_multiInfo[info - MULTI_INFO_START], contextWindow);
 
@@ -6666,6 +6670,7 @@ std::string CGUIInfoManager::GetLabel(int info, int contextWindow, std::string *
     strLabel = g_Windowing.GetRenderVersionString();
     break;
   }
+#endif
 
   return strLabel;
 }
@@ -6673,6 +6678,7 @@ std::string CGUIInfoManager::GetLabel(int info, int contextWindow, std::string *
 // tries to get a integer value for use in progressbars/sliders and such
 bool CGUIInfoManager::GetInt(int &value, int info, int contextWindow, const CGUIListItem *item /* = NULL */) const
 {
+#if 0
   if (info >= MULTI_INFO_START && info <= MULTI_INFO_END)
     return GetMultiInfoInt(value, m_multiInfo[info - MULTI_INFO_START], contextWindow);
 
@@ -6779,6 +6785,7 @@ bool CGUIInfoManager::GetInt(int &value, int info, int contextWindow, const CGUI
       value = g_powerManager.BatteryLevel();
       return true;
   }
+#endif
   return false;
 }
 
@@ -6798,7 +6805,7 @@ INFO::InfoPtr CGUIInfoManager::Register(const std::string &expression, int conte
   if (condition.empty())
     return INFO::InfoPtr();
 
-  CSingleLock lock(m_critInfo);
+  std::unique_lock<CCriticalSection> lock(m_critInfo);
   // do we have the boolean expression already registered?
   std::vector<InfoPtr>::const_iterator i = std::find_if(m_bools.begin(), m_bools.end(), InfoBoolFinder(condition, context));
   if (i != m_bools.end())
@@ -6826,6 +6833,7 @@ bool CGUIInfoManager::EvaluateBool(const std::string &expression, int contextWin
 bool CGUIInfoManager::GetBool(int condition1, int contextWindow, const CGUIListItem *item)
 {
   bool bReturn = false;
+#if 0
   int condition = abs(condition1);
 
   if (condition >= LISTITEM_START && condition < LISTITEM_END)
@@ -7350,6 +7358,7 @@ bool CGUIInfoManager::GetBool(int condition1, int contextWindow, const CGUIListI
   }
   if (condition1 < 0)
     bReturn = !bReturn;
+#endif
   return bReturn;
 }
 
@@ -7357,6 +7366,7 @@ bool CGUIInfoManager::GetBool(int condition1, int contextWindow, const CGUIListI
 bool CGUIInfoManager::GetMultiInfoBool(const GUIInfo &info, int contextWindow, const CGUIListItem *item)
 {
   bool bReturn = false;
+#if 0
   int condition = abs(info.m_info);
 
   if (condition >= LISTITEM_START && condition <= LISTITEM_END)
@@ -7852,11 +7862,13 @@ bool CGUIInfoManager::GetMultiInfoBool(const GUIInfo &info, int contextWindow, c
       }
     }
   }
+#endif
   return (info.m_info < 0) ? !bReturn : bReturn;
 }
 
 bool CGUIInfoManager::GetMultiInfoInt(int &value, const GUIInfo &info, int contextWindow) const
 {
+#if 0
   if (info.m_info >= LISTITEM_START && info.m_info <= LISTITEM_END)
   {
     CFileItemPtr item;
@@ -7883,6 +7895,7 @@ bool CGUIInfoManager::GetMultiInfoInt(int &value, const GUIInfo &info, int conte
     if (item) // If we got a valid item, do the lookup
       return GetItemInt(value, item.get(), info.m_info);
   }
+#endif
 
   return 0;
 }
@@ -7890,6 +7903,7 @@ bool CGUIInfoManager::GetMultiInfoInt(int &value, const GUIInfo &info, int conte
 /// \brief Examines the multi information sent and returns the string as appropriate
 std::string CGUIInfoManager::GetMultiInfoLabel(const GUIInfo &info, int contextWindow, std::string *fallback)
 {
+#if 0
   if (info.m_info == SKIN_STRING)
   {
     return CSkinSettings::GetInstance().GetString(info.GetData1());
@@ -8151,6 +8165,7 @@ std::string CGUIInfoManager::GetMultiInfoLabel(const GUIInfo &info, int contextW
   {
     return g_application.m_pPlayer->GetRadioText(info.GetData1());
   }
+#endif
 
   return "";
 }
@@ -8158,6 +8173,7 @@ std::string CGUIInfoManager::GetMultiInfoLabel(const GUIInfo &info, int contextW
 /// \brief Obtains the filename of the image to show from whichever subsystem is needed
 std::string CGUIInfoManager::GetImage(int info, int contextWindow, std::string *fallback)
 {
+#if 0
   if (info >= CONDITIONAL_LABEL_START && info <= CONDITIONAL_LABEL_END)
     return GetSkinVariableString(info, true);
 
@@ -8201,6 +8217,7 @@ std::string CGUIInfoManager::GetImage(int info, int contextWindow, std::string *
         return GetItemImage(item.get(), info, fallback);
     }
   }
+#endif
   return GetLabel(info, contextWindow, fallback);
 }
 
@@ -8256,6 +8273,7 @@ std::string CGUIInfoManager::LocalizeTime(const CDateTime &time, TIME_FORMAT for
 
 std::string CGUIInfoManager::GetDuration(TIME_FORMAT format) const
 {
+#if 0
   if (g_application.m_pPlayer->IsPlayingAudio() && m_currentFile->HasMusicInfoTag())
   {
     const CMusicInfoTag& tag = *m_currentFile->GetMusicInfoTag();
@@ -8267,11 +8285,13 @@ std::string CGUIInfoManager::GetDuration(TIME_FORMAT format) const
   unsigned int iTotal = MathUtils::round_int(g_application.GetTotalTime());
   if (iTotal > 0)
     return StringUtils::SecondsToTimeString(iTotal, format);
+#endif
   return "";
 }
 
 std::string CGUIInfoManager::GetMusicPartyModeLabel(int item)
 {
+#if 0
   // get song counts
   if (item >= MUSICPM_SONGSPLAYED && item <= MUSICPM_RANDOMSONGSPICKED)
   {
@@ -8314,11 +8334,13 @@ std::string CGUIInfoManager::GetMusicPartyModeLabel(int item)
     std::string strLabel = StringUtils::Format("%i", iSongs);
     return strLabel;
   }
+#endif
   return "";
 }
 
 const std::string CGUIInfoManager::GetMusicPlaylistInfo(const GUIInfo& info)
 {
+#if 0
   PLAYLIST::CPlayList& playlist = g_playlistPlayer.GetPlaylist(PLAYLIST_MUSIC);
   if (playlist.size() < 1)
     return "";
@@ -8354,10 +8376,13 @@ const std::string CGUIInfoManager::GetMusicPlaylistInfo(const GUIInfo& info)
   else if (info.m_info == MUSICPLAYER_COVER)
     return playlistItem->GetArt("thumb");
   return GetMusicTagLabel(info.m_info, playlistItem.get());
+#endif
+  return "";
 }
 
 std::string CGUIInfoManager::GetPlaylistLabel(int item, int playlistid /* = PLAYLIST_NONE */) const
 {
+#if 0
   if (playlistid <= PLAYLIST_NONE && !g_application.m_pPlayer->IsPlaying())
     return "";
 
@@ -8393,11 +8418,13 @@ std::string CGUIInfoManager::GetPlaylistLabel(int item, int playlistid /* = PLAY
         return g_localizeStrings.Get(594); // 594: Off
     }
   }
+#endif
   return "";
 }
 
 std::string CGUIInfoManager::GetRadioRDSLabel(int item)
 {
+#if 0
   if (!g_application.m_pPlayer->IsPlaying() ||
       !m_currentFile->HasPVRChannelInfoTag() ||
       !m_currentFile->HasPVRRadioRDSInfoTag())
@@ -8561,11 +8588,13 @@ std::string CGUIInfoManager::GetRadioRDSLabel(int item)
   default:
     break;
   }
+#endif
   return "";
 }
 
 std::string CGUIInfoManager::GetMusicLabel(int item)
 {
+#if 0
   if (!g_application.m_pPlayer->IsPlaying() || !m_currentFile->HasMusicInfoTag()) return "";
 
   switch (item)
@@ -8622,11 +8651,13 @@ std::string CGUIInfoManager::GetMusicLabel(int item)
     }
     break;
   }
+#endif
   return GetMusicTagLabel(item, m_currentFile);
 }
 
 std::string CGUIInfoManager::GetMusicTagLabel(int info, const CFileItem *item)
 {
+#if 0
   if (!item->HasMusicInfoTag()) return "";
   const CMusicInfoTag &tag = *item->GetMusicInfoTag();
 
@@ -8739,11 +8770,13 @@ std::string CGUIInfoManager::GetMusicTagLabel(int info, const CFileItem *item)
       return StringUtils::Format("%i", m_currentFile->GetMusicInfoTag()->GetDatabaseId());
     break;
   }
+#endif
   return "";
 }
 
 std::string CGUIInfoManager::GetVideoLabel(int item)
 {
+#if 0
   if (!g_application.m_pPlayer->IsPlaying())
     return "";
 
@@ -9119,51 +9152,66 @@ std::string CGUIInfoManager::GetVideoLabel(int item)
   
   if (item == VIDEOPLAYER_TITLE)
     return GetLabel(PLAYER_TITLE);
+#endif
 
   return "";
 }
 
 int64_t CGUIInfoManager::GetPlayTime() const
 {
+#if 0
   if (g_application.m_pPlayer->IsPlaying())
   {
     int64_t lPTS = (int64_t)(g_application.GetTime() * 1000);
     if (lPTS < 0) lPTS = 0;
     return lPTS;
   }
+#endif
   return 0;
 }
 
 std::string CGUIInfoManager::GetCurrentPlayTime(TIME_FORMAT format) const
 {
+#if 0
   if (format == TIME_FORMAT_GUESS && GetTotalPlayTime() >= 3600)
     format = TIME_FORMAT_HH_MM_SS;
   if (g_application.m_pPlayer->IsPlaying())
     return StringUtils::SecondsToTimeString(MathUtils::round_int(GetPlayTime()/1000.0), format);
+#endif
   return "";
 }
 
 std::string CGUIInfoManager::GetCurrentSeekTime(TIME_FORMAT format) const
 {
+#if 0
   if (format == TIME_FORMAT_GUESS && GetTotalPlayTime() >= 3600)
     format = TIME_FORMAT_HH_MM_SS;
   return StringUtils::SecondsToTimeString(g_application.GetTime() + CSeekHandler::GetInstance().GetSeekSize(), format);
+#endif
+  return "";
 }
 
 int CGUIInfoManager::GetTotalPlayTime() const
 {
+#if 0
   int iTotalTime = MathUtils::round_int(g_application.GetTotalTime());
   return iTotalTime > 0 ? iTotalTime : 0;
+#endif
+  return 0;
 }
 
 int CGUIInfoManager::GetPlayTimeRemaining() const
 {
+#if 0
   int iReverse = GetTotalPlayTime() - MathUtils::round_int(g_application.GetTime());
   return iReverse > 0 ? iReverse : 0;
+#endif
+  return 0;
 }
 
 float CGUIInfoManager::GetSeekPercent() const
 {
+#if 0
   if (GetTotalPlayTime() == 0)
     return 0.0f;
 
@@ -9177,15 +9225,19 @@ float CGUIInfoManager::GetSeekPercent() const
     percent = 0.0f;
 
   return percent;
+#endif
+  return 0.0f;
 }
 
 std::string CGUIInfoManager::GetCurrentPlayTimeRemaining(TIME_FORMAT format) const
 {
+#if 0
   if (format == TIME_FORMAT_GUESS && GetTotalPlayTime() >= 3600)
     format = TIME_FORMAT_HH_MM_SS;
   int timeRemaining = GetPlayTimeRemaining();
   if (timeRemaining && g_application.m_pPlayer->IsPlaying())
     return StringUtils::SecondsToTimeString(timeRemaining, format);
+#endif
   return "";
 }
 
@@ -9199,7 +9251,7 @@ void CGUIInfoManager::ResetCurrentItem()
 void CGUIInfoManager::SetCurrentItem(const CFileItemPtr item)
 {
   CSetCurrentItemJob *job = new CSetCurrentItemJob(item);
-  CJobManager::GetInstance().AddJob(job, NULL);
+  CServiceBroker::GetJobManager()->AddJob(job, NULL);
 }
 
 void CGUIInfoManager::SetCurrentItemJob(const CFileItemPtr item)
@@ -9211,6 +9263,7 @@ void CGUIInfoManager::SetCurrentItemJob(const CFileItemPtr item)
   else
     SetCurrentMovie(*item);
 
+#if 0
   if (item->HasPVRRadioRDSInfoTag())
     m_currentFile->SetPVRRadioRDSInfoTag(item->GetPVRRadioRDSInfoTag());
   if (item->HasEPGInfoTag())
@@ -9224,6 +9277,7 @@ void CGUIInfoManager::SetCurrentItemJob(const CFileItemPtr item)
 
   SetChanged();
   NotifyObservers(ObservableMessageCurrentItem);
+#endif
 }
 
 void CGUIInfoManager::SetCurrentAlbumThumb(const std::string &thumbFileName)
@@ -9239,6 +9293,7 @@ void CGUIInfoManager::SetCurrentAlbumThumb(const std::string &thumbFileName)
 
 void CGUIInfoManager::SetCurrentSong(CFileItem &item)
 {
+#if 0
   CLog::Log(LOGDEBUG,"CGUIInfoManager::SetCurrentSong(%s)",item.GetPath().c_str());
   *m_currentFile = item;
 
@@ -9272,10 +9327,12 @@ void CGUIInfoManager::SetCurrentSong(CFileItem &item)
   m_currentFile->FillInDefaultIcon();
 
   CMusicInfoLoader::LoadAdditionalTagInfo(m_currentFile);
+#endif
 }
 
 void CGUIInfoManager::SetCurrentMovie(CFileItem &item)
 {
+#if 0
   CLog::Log(LOGDEBUG,"CGUIInfoManager::SetCurrentMovie(%s)", CURL::GetRedacted(item.GetPath()).c_str());
   *m_currentFile = item;
 
@@ -9325,6 +9382,7 @@ void CGUIInfoManager::SetCurrentMovie(CFileItem &item)
 
   item.FillInDefaultIcon();
   m_currentMovieThumb = item.GetArt("thumb");
+#endif
 }
 
 std::string CGUIInfoManager::GetSystemHeatInfo(int info)
@@ -9351,10 +9409,12 @@ std::string CGUIInfoManager::GetSystemHeatInfo(int info)
       text = StringUtils::Format("%i%%", m_fanSpeed * 2);
       break;
     case SYSTEM_CPU_USAGE:
+#if 0
 #if defined(TARGET_DARWIN) || defined(TARGET_WINDOWS)
       text = StringUtils::Format("%d%%", g_cpuInfo.getUsedPercentage());
 #else
       text = StringUtils::Format("%s", g_cpuInfo.GetCoresUsageString().c_str());
+#endif
 #endif
       break;
   }
@@ -9366,6 +9426,7 @@ CTemperature CGUIInfoManager::GetGPUTemperature()
   int  value = 0;
   char scale = 0;
 
+#if 0
 #if defined(TARGET_DARWIN_OSX)
   value = SMCGetTemperature(SMC_KEY_GPU_TEMP);
   return CTemperature::CreateFromCelsius(value);
@@ -9382,6 +9443,7 @@ CTemperature CGUIInfoManager::GetGPUTemperature()
 
   if (ret != 2)
     return CTemperature();
+#endif
 #endif
 
   if (scale == 'C' || scale == 'c')
@@ -9428,7 +9490,7 @@ bool CGUIInfoManager::ToggleShowInfo()
 
 void CGUIInfoManager::Clear()
 {
-  CSingleLock lock(m_critInfo);
+  std::unique_lock<CCriticalSection> lock(m_critInfo);
   m_skinVariableStrings.clear();
 
   /*
@@ -9464,6 +9526,7 @@ void CGUIInfoManager::UpdateFPS()
 
 void CGUIInfoManager::UpdateAVInfo()
 {
+#if 0
   if(g_application.m_pPlayer->IsPlaying())
   {
     if (CServiceBroker::GetDataCacheCore().HasAVInfoChanges())
@@ -9480,6 +9543,7 @@ void CGUIInfoManager::UpdateAVInfo()
       m_isPvrChannelPreview = g_PVRManager.IsChannelPreview();
     }
   }
+#endif
 }
 
 int CGUIInfoManager::AddListItemProp(const std::string &str, int offset)
@@ -9535,6 +9599,7 @@ int CGUIInfoManager::ConditionalStringParameter(const std::string &parameter, bo
 
 bool CGUIInfoManager::GetItemInt(int &value, const CGUIListItem *item, int info) const
 {
+#if 0
   if (!item)
   {
     value = 0;
@@ -9583,11 +9648,13 @@ bool CGUIInfoManager::GetItemInt(int &value, const CGUIListItem *item, int info)
   }
 
   value = 0;
+#endif
   return false;
 }
 
 std::string CGUIInfoManager::GetItemLabel(const CFileItem *item, int info, std::string *fallback)
 {
+#if 0
   if (!item) return "";
 
   if (info >= CONDITIONAL_LABEL_START && info <= CONDITIONAL_LABEL_END)
@@ -10638,6 +10705,7 @@ std::string CGUIInfoManager::GetItemLabel(const CFileItem *item, int info, std::
       return StringUtils::FormatFileSize(item->GetAddonInfo()->PackageSize());
     break;
   }
+#endif
 
   return "";
 }
@@ -10652,6 +10720,7 @@ std::string CGUIInfoManager::GetItemImage(const CFileItem *item, int info, std::
 
 bool CGUIInfoManager::GetItemBool(const CGUIListItem *item, int condition) const
 {
+#if 0
   if (!item) return false;
   if (condition >= LISTITEM_PROPERTY_START && condition - LISTITEM_PROPERTY_START < (int)m_listitemProperties.size())
   { // grab the property
@@ -10821,6 +10890,7 @@ bool CGUIInfoManager::GetItemBool(const CGUIListItem *item, int condition) const
         return (pItem->GetVideoInfoTag()->m_type == MediaTypeVideoCollection);
     }
   }
+#endif
 
   return false;
 }
@@ -10830,13 +10900,14 @@ void CGUIInfoManager::ResetCache()
   // reset any animation triggers as well
   m_containerMoves.clear();
   // mark our infobools as dirty
-  CSingleLock lock(m_critInfo);
+  std::unique_lock<CCriticalSection> lock(m_critInfo);
   for (std::vector<InfoPtr>::iterator i = m_bools.begin(); i != m_bools.end(); ++i)
     (*i)->SetDirty();
 }
 
 std::string CGUIInfoManager::GetPictureLabel(int info)
 {
+#if 0
   if (info == SLIDE_FILE_NAME)
     return GetItemLabel(m_currentSlide, LISTITEM_FILENAME);
   else if (info == SLIDE_FILE_PATH)
@@ -10858,17 +10929,20 @@ std::string CGUIInfoManager::GetPictureLabel(int info)
   }
   if (m_currentSlide->HasPictureInfoTag())
     return m_currentSlide->GetPictureInfoTag()->GetInfo(info);
+#endif
   return "";
 }
 
 void CGUIInfoManager::SetCurrentSlide(CFileItem &item)
 {
+#if 0
   if (m_currentSlide->GetPath() != item.GetPath())
   {
     if (!item.GetPictureInfoTag()->Loaded()) // If picture metadata has not been loaded yet, load it now
       item.GetPictureInfoTag()->Load(item.GetPath());
     *m_currentSlide = item;
   }
+#endif
 }
 
 void CGUIInfoManager::ResetCurrentSlide()
@@ -10906,6 +10980,7 @@ CGUIWindow *CGUIInfoManager::GetWindowWithCondition(int contextWindow, int condi
   return NULL;
 }
 
+#if 0
 void CGUIInfoManager::SetCurrentVideoTag(const CVideoInfoTag &tag)
 {
   *m_currentFile->GetVideoInfoTag() = tag;
@@ -10918,12 +10993,14 @@ void CGUIInfoManager::SetCurrentSongTag(const MUSIC_INFO::CMusicInfoTag &tag)
   *m_currentFile->GetMusicInfoTag() = tag;
   m_currentFile->m_lStartOffset = 0;
 }
+#endif
 
 const CFileItem& CGUIInfoManager::GetCurrentSlide() const
 {
   return *m_currentSlide;
 }
 
+#if 0
 const MUSIC_INFO::CMusicInfoTag* CGUIInfoManager::GetCurrentSongTag() const
 {
   if (m_currentFile->HasMusicInfoTag())
@@ -10948,6 +11025,7 @@ const CVideoInfoTag* CGUIInfoManager::GetCurrentMovieTag() const
 
   return NULL;
 }
+#endif
 
 void GUIInfo::SetInfoFlag(uint32_t flag)
 {
@@ -11018,6 +11096,7 @@ void CGUIInfoManager::ResetLibraryBools()
 
 bool CGUIInfoManager::GetLibraryBool(int condition)
 {
+#if 0
   if (condition == LIBRARY_HAS_MUSIC)
   {
     if (m_libraryHasMusic < 0)
@@ -11115,6 +11194,7 @@ bool CGUIInfoManager::GetLibraryBool(int condition)
             GetLibraryBool(LIBRARY_HAS_TVSHOWS) ||
             GetLibraryBool(LIBRARY_HAS_MUSICVIDEOS));
   }
+#endif
   return false;
 }
 
@@ -11123,7 +11203,7 @@ int CGUIInfoManager::RegisterSkinVariableString(const CSkinVariableString* info)
   if (!info)
     return 0;
 
-  CSingleLock lock(m_critInfo);
+  std::unique_lock<CCriticalSection> lock(m_critInfo);
   m_skinVariableStrings.push_back(*info);
   delete info;
   return CONDITIONAL_LABEL_START + m_skinVariableStrings.size() - 1;
@@ -11164,6 +11244,7 @@ bool CGUIInfoManager::ConditionsChangedValues(const std::map<INFO::InfoPtr, bool
 bool CGUIInfoManager::IsPlayerChannelPreviewActive() const
 {
   bool bReturn(false);
+#if 0
   if (m_playerShowInfo && m_currentFile->HasPVRChannelInfoTag())
   {
     if (m_isPvrChannelPreview)
@@ -11177,9 +11258,11 @@ bool CGUIInfoManager::IsPlayerChannelPreviewActive() const
         bReturn = !m_audioInfo.valid;
     }
   }
+#endif
   return bReturn;
 }
 
+#if 0
 CEpgInfoTagPtr CGUIInfoManager::GetEpgInfoTag() const
 {
   CEpgInfoTagPtr currentTag;
@@ -11191,6 +11274,7 @@ CEpgInfoTagPtr CGUIInfoManager::GetEpgInfoTag() const
   }
   return currentTag;
 }
+#endif
 
 int CGUIInfoManager::GetMessageMask()
 {
@@ -11230,11 +11314,13 @@ void CGUIInfoManager::OnApplicationMessage(KODI::MESSAGING::ThreadMessage* pMsg)
       return;
 
     CFileItemPtr itemptr(item);
+#if 0
     if (pMsg->param1 == 1 && item->HasMusicInfoTag()) // only grab music tag
       SetCurrentSongTag(*item->GetMusicInfoTag());
     else if (pMsg->param1 == 2 && item->HasVideoInfoTag()) // only grab video tag
       SetCurrentVideoTag(*item->GetVideoInfoTag());
     else
+#endif
       SetCurrentItem(itemptr);
   }
   break;

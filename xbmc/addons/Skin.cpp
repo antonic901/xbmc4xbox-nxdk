@@ -21,16 +21,18 @@
 #include "Skin.h"
 #include "filesystem/File.h"
 #include "filesystem/SpecialProtocol.h"
+#include "guilib/WindowIDs.h"
 #include "utils/URIUtils.h"
 #include "utils/StringUtils.h"
-#include "XMLUtils.h"
+#include "utils/log.h"
+#include "utils/XMLUtils.h"
 
 using namespace std;
 using namespace XFILE;
 
 #define SKIN_MIN_VERSION 2.1f
 
-CSkinInfo g_SkinInfo; // global
+std::shared_ptr<CSkinInfo> g_SkinInfo;
 
 CSkinInfo::CSkinInfo()
 {
@@ -43,8 +45,8 @@ CSkinInfo::~CSkinInfo()
 void CSkinInfo::SetDefaults()
 {
   m_strBaseDir = "";
-  m_DefaultResolution = PAL_4x3;
-  m_DefaultResolutionWide = INVALID;
+  m_DefaultResolution = RES_PAL_4x3;
+  m_DefaultResolutionWide = RES_INVALID;
   m_effectsSlowDown = 1.0f;
   m_Version = 1.0;
   m_debugging = false;
@@ -53,14 +55,14 @@ void CSkinInfo::SetDefaults()
   m_bLegacy = false;
 }
 
-void CSkinInfo::Load(const CStdString& strSkinDir, bool loadIncludes)
+void CSkinInfo::Load(const std::string& strSkinDir, bool loadIncludes)
 {
   SetDefaults();
   m_strBaseDir = strSkinDir;
 
   // Load from skin.xml
   TiXmlDocument xmlDoc;
-  CStdString strFile = m_strBaseDir + "\\skin.xml";
+  std::string strFile = m_strBaseDir + "\\skin.xml";
   if (xmlDoc.LoadFile(strFile))
   { // ok - get the default skin folder out of it...
     const TiXmlNode* root = xmlDoc.RootElement();
@@ -81,6 +83,7 @@ void CSkinInfo::Load(const CStdString& strSkinDir, bool loadIncludes)
       // get the legacy parameter to tweak the control behaviour for old skins such as PM3
       XMLUtils::GetBoolean(root, "legacy", m_bLegacy);   
 
+#if 0
       // now load the credits information
       const TiXmlNode *pChild = root->FirstChild("credits");
       if (pChild)
@@ -88,19 +91,20 @@ void CSkinInfo::Load(const CStdString& strSkinDir, bool loadIncludes)
         const TiXmlNode *pGrandChild = pChild->FirstChild("skinname");
         if (pGrandChild && pGrandChild->FirstChild())
         {
-          CStdString strName = pGrandChild->FirstChild()->Value();
+          std::string strName = pGrandChild->FirstChild()->Value();
           swprintf(credits[0], L"%S Skin", strName.Left(44).c_str());
         }
         pGrandChild = pChild->FirstChild("name");
         m_iNumCreditLines = 1;
         while (pGrandChild && pGrandChild->FirstChild() && m_iNumCreditLines < 6)
         {
-          CStdString strName = pGrandChild->FirstChild()->Value();
+          std::string strName = pGrandChild->FirstChild()->Value();
           swprintf(credits[m_iNumCreditLines], L"%S", strName.Left(49).c_str());
           m_iNumCreditLines++;
           pGrandChild = pGrandChild->NextSibling("name");
         }
       }
+#endif
 
       // now load the startupwindow information
       LoadStartupWindows(root->FirstChildElement("startupwindows"));
@@ -113,7 +117,7 @@ void CSkinInfo::Load(const CStdString& strSkinDir, bool loadIncludes)
     LoadIncludes();
 }
 
-bool CSkinInfo::Check(const CStdString& strSkinDir)
+bool CSkinInfo::Check(const std::string& strSkinDir)
 {
   CSkinInfo info;
   info.Load(strSkinDir, false);
@@ -130,35 +134,47 @@ bool CSkinInfo::Check(const CStdString& strSkinDir)
   return true;
 }
 
-CStdString CSkinInfo::GetSkinPath(const CStdString& strFile, RESOLUTION *res, const CStdString& strBaseDir /* = "" */) const
+std::string CSkinInfo::GetSkinPath(const std::string& strFile, RESOLUTION_INFO *resInfo, const std::string& strBaseDir /* = "" */) const
 {
-  CStdString strPathToUse = m_strBaseDir;
-  if (!strBaseDir.IsEmpty())
+  RESOLUTION res = RES_INVALID;
+  if (resInfo->iWidth == 1080)
+    res = RES_HDTV_1080i;
+  else if (resInfo->iWidth == 1280)
+    res = RES_HDTV_720p;
+  else if (resInfo->iWidth == 480)
+    res = RES_NTSC_16x9;
+  return GetSkinPath(strFile, &res, strBaseDir);
+}
+
+std::string CSkinInfo::GetSkinPath(const std::string& strFile, RESOLUTION *res, const std::string& strBaseDir /* = "" */) const
+{
+  std::string strPathToUse = m_strBaseDir;
+  if (!strBaseDir.empty())
     strPathToUse = strBaseDir;
 
   // if the caller doesn't care about the resolution just use a temporary
-  RESOLUTION tempRes = INVALID;
+  RESOLUTION tempRes = RES_INVALID;
   if (!res)
     res = &tempRes;
 
   // first try and load from the current resolution's directory
-  if (*res == INVALID)
+  if (*res == RES_INVALID)
     *res = g_graphicsContext.GetVideoResolution();
-  CStdString strPath = URIUtils::AddFileToFolder(strPathToUse, GetDirFromRes(*res));
+  std::string strPath = URIUtils::AddFileToFolder(strPathToUse, GetDirFromRes(*res));
   strPath = URIUtils::AddFileToFolder(strPath, strFile);
   if (CFile::Exists(strPath))
     return strPath;
   // if we're in 1080i mode, try 720p next
-  if (*res == HDTV_1080i)
+  if (*res == RES_HDTV_1080i)
   {
-    *res = HDTV_720p;
+    *res = RES_HDTV_720p;
     strPath = URIUtils::AddFileToFolder(strPathToUse, GetDirFromRes(*res));
     strPath = URIUtils::AddFileToFolder(strPath, strFile);
     if (CFile::Exists(strPath))
       return strPath;
   }
   // that failed - drop to the default widescreen resolution if where in a widemode
-  if (*res == PAL_16x9 || *res == NTSC_16x9 || *res == HDTV_480p_16x9 || *res == HDTV_720p)
+  if (*res == RES_PAL_16x9 || *res == RES_NTSC_16x9 || *res == RES_HDTV_480p_16x9 || *res == RES_HDTV_720p)
   {
     *res = m_DefaultResolutionWide;
     strPath = URIUtils::AddFileToFolder(strPathToUse, GetDirFromRes(*res));
@@ -171,41 +187,41 @@ CStdString CSkinInfo::GetSkinPath(const CStdString& strFile, RESOLUTION *res, co
   strPath = URIUtils::AddFileToFolder(strPathToUse, GetDirFromRes(*res));
   strPath = URIUtils::AddFileToFolder(strPath, strFile);
   // check if we don't have any subdirectories
-  if (*res == INVALID) *res = PAL_4x3;
+  if (*res == RES_INVALID) *res = RES_PAL_4x3;
   return strPath;
 }
 
-bool CSkinInfo::HasSkinFile(const CStdString &strFile) const
+bool CSkinInfo::HasSkinFile(const std::string &strFile) const
 {
   return CFile::Exists(GetSkinPath(strFile));
 }
 
-CStdString CSkinInfo::GetDirFromRes(RESOLUTION res) const
+std::string CSkinInfo::GetDirFromRes(RESOLUTION res) const
 {
-  CStdString strRes;
+  std::string strRes;
   switch (res)
   {
-  case PAL_4x3:
+  case RES_PAL_4x3:
     strRes = "PAL";
     break;
-  case PAL_16x9:
+  case RES_PAL_16x9:
     strRes = "PAL16x9";
     break;
-  case NTSC_4x3:
-  case HDTV_480p_4x3:
+  case RES_NTSC_4x3:
+  case RES_HDTV_480p_4x3:
     strRes = "NTSC";
     break;
-  case NTSC_16x9:
-  case HDTV_480p_16x9:
+  case RES_NTSC_16x9:
+  case RES_HDTV_480p_16x9:
     strRes = "ntsc16x9";
     break;
-  case HDTV_720p:
+  case RES_HDTV_720p:
     strRes = "720p";
     break;
-  case HDTV_1080i:
+  case RES_HDTV_1080i:
     strRes = "1080i";
     break;
-  case INVALID:
+  case RES_INVALID:
   default:
     strRes = "";
     break;
@@ -213,25 +229,25 @@ CStdString CSkinInfo::GetDirFromRes(RESOLUTION res) const
   return strRes;
 }
 
-RESOLUTION CSkinInfo::TranslateResolution(const CStdString &res, RESOLUTION def)
+RESOLUTION CSkinInfo::TranslateResolution(const std::string &res, RESOLUTION def)
 {
-  if (res.Equals("pal"))
-    return PAL_4x3;
-  else if (res.Equals("pal16x9"))
-    return PAL_16x9;
-  else if (res.Equals("ntsc"))
-    return NTSC_4x3;
-  else if (res.Equals("ntsc16x9"))
-    return NTSC_16x9;
-  else if (res.Equals("720p"))
-    return HDTV_720p;
-  else if (res.Equals("1080i"))
-    return HDTV_1080i;
+  if (res == "pal")
+    return RES_PAL_4x3;
+  else if (res == "pal16x9")
+    return RES_PAL_16x9;
+  else if (res == "ntsc")
+    return RES_NTSC_4x3;
+  else if (res == "ntsc16x9")
+    return RES_NTSC_16x9;
+  else if (res == "720p")
+    return RES_HDTV_720p;
+  else if (res == "1080i")
+    return RES_HDTV_1080i;
   CLog::Log(LOGERROR, "%s invalid resolution specified for %s", __FUNCTION__, res.c_str());
   return def;
 }
 
-CStdString CSkinInfo::GetBaseDir() const
+std::string CSkinInfo::GetBaseDir() const
 {
   return m_strBaseDir;
 }
@@ -251,13 +267,13 @@ double CSkinInfo::GetMinVersion()
 
 void CSkinInfo::LoadIncludes()
 {
-  CStdString includesPath = PTH_IC(GetSkinPath("includes.xml"));
+  std::string includesPath = GetSkinPath("includes.xml");
   CLog::Log(LOGINFO, "Loading skin includes from %s", includesPath.c_str());
   m_includes.ClearIncludes();
   m_includes.LoadIncludes(includesPath);
 }
 
-void CSkinInfo::ResolveIncludes(TiXmlElement *node, std::map<int, bool>* xmlIncludeConditions /* = NULL */)
+void CSkinInfo::ResolveIncludes(TiXmlElement *node, std::map<INFO::InfoPtr, bool>* xmlIncludeConditions /* = NULL */)
 {
   if(xmlIncludeConditions)
     xmlIncludeConditions->clear();
@@ -267,7 +283,7 @@ void CSkinInfo::ResolveIncludes(TiXmlElement *node, std::map<int, bool>* xmlIncl
 
 int CSkinInfo::GetStartWindow() const
 {
-  int windowID = g_guiSettings.GetInt("lookandfeel.startupwindow");
+  int windowID = WINDOW_HOME;
   assert(m_startupWindows.size());
   for (vector<CStartupWindow>::const_iterator it = m_startupWindows.begin(); it != m_startupWindows.end(); it++)
   {
@@ -288,7 +304,7 @@ bool CSkinInfo::LoadStartupWindows(const TiXmlElement *startup)
     {
       int id;
       window->Attribute("id", &id);
-      CStdString name = window->FirstChild()->Value();
+      std::string name = window->FirstChild()->Value();
       m_startupWindows.push_back(CStartupWindow(id + WINDOW_HOME, name));
       window = window->NextSiblingElement("window");
     }
@@ -300,23 +316,22 @@ bool CSkinInfo::LoadStartupWindows(const TiXmlElement *startup)
     m_startupWindows.push_back(CStartupWindow(WINDOW_HOME, "513"));
     m_startupWindows.push_back(CStartupWindow(WINDOW_PROGRAMS, "0"));
     m_startupWindows.push_back(CStartupWindow(WINDOW_PICTURES, "1"));
-    m_startupWindows.push_back(CStartupWindow(WINDOW_MUSIC, "2"));
-    m_startupWindows.push_back(CStartupWindow(WINDOW_VIDEOS, "3"));
+    m_startupWindows.push_back(CStartupWindow(WINDOW_MUSIC_NAV, "2"));
+    m_startupWindows.push_back(CStartupWindow(WINDOW_VIDEO_NAV, "3"));
     m_startupWindows.push_back(CStartupWindow(WINDOW_FILES, "7"));
     m_startupWindows.push_back(CStartupWindow(WINDOW_SETTINGS_MENU, "Settings"));
-    m_startupWindows.push_back(CStartupWindow(WINDOW_SCRIPTS, "247"));
   }
   return true;
 }
 
 bool CSkinInfo::IsWide(RESOLUTION res) const
 {
-  return (res == PAL_16x9 || res == NTSC_16x9 || res == HDTV_480p_16x9 || res == HDTV_720p || res == HDTV_1080i);
+  return (res == RES_PAL_16x9 || res == RES_NTSC_16x9 || res == RES_HDTV_480p_16x9 || res == RES_HDTV_720p || res == RES_HDTV_1080i);
 }
 
-void CSkinInfo::GetSkinPaths(std::vector<CStdString> &paths) const
+void CSkinInfo::GetSkinPaths(std::vector<std::string> &paths) const
 {
-  RESOLUTION resToUse = INVALID;
+  RESOLUTION resToUse = RES_INVALID;
   GetSkinPath("Home.xml", &resToUse);
   paths.push_back(URIUtils::AddFileToFolder(m_strBaseDir, GetDirFromRes(resToUse)));
   // see if we need to add other paths
@@ -328,22 +343,22 @@ void CSkinInfo::GetSkinPaths(std::vector<CStdString> &paths) const
 
 bool CSkinInfo::GetResolution(const TiXmlNode *root, const char *tag, RESOLUTION &res) const
 {
-  CStdString strRes;
+  std::string strRes;
   if (XMLUtils::GetString(root, tag, strRes))
   {
-    strRes.ToLower();
+    StringUtils::ToLower(strRes);
     if (strRes == "pal")
-      res = PAL_4x3;
+      res = RES_PAL_4x3;
     else if (strRes == "pal16x9")
-      res = PAL_16x9;
+      res = RES_PAL_16x9;
     else if (strRes == "ntsc")
-      res = NTSC_4x3;
+      res = RES_NTSC_4x3;
     else if (strRes == "ntsc16x9")
-      res = NTSC_16x9;
+      res = RES_NTSC_16x9;
     else if (strRes == "720p")
-      res = HDTV_720p;
+      res = RES_HDTV_720p;
     else if (strRes == "1080i")
-      res = HDTV_1080i;
+      res = RES_HDTV_1080i;
     else
     {
       CLog::Log(LOGERROR, "%s invalid resolution specified for <%s>, %s", __FUNCTION__, tag, strRes.c_str());
@@ -362,7 +377,7 @@ int CSkinInfo::GetFirstWindow() const
   return startWindow;
 }
 
-const INFO::CSkinVariableString* CSkinInfo::CreateSkinVariable(const CStdString& name, int context)
+const INFO::CSkinVariableString* CSkinInfo::CreateSkinVariable(const std::string& name, int context)
 {
   return m_includes.CreateSkinVariable(name, context);
 }

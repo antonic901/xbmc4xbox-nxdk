@@ -23,10 +23,7 @@
 #include "GUIInfoManager.h"
 #include "utils/log.h"
 #include "GUIWindowManager.h"
-#include "GUIControlProfiler.h"
 #include "GUITexture.h"
-#include "input/MouseStat.h"
-#include "input/InputManager.h"
 #include "input/Key.h"
 
 CGUIControl::CGUIControl() :
@@ -177,17 +174,19 @@ void CGUIControl::DoRender()
 {
   if (IsVisible())
   {
+#ifndef _XBOX
     bool hasStereo = m_stereo != 0.0
                   && g_graphicsContext.GetStereoMode() != RENDER_STEREO_MODE_MONO
                   && g_graphicsContext.GetStereoMode() != RENDER_STEREO_MODE_OFF;
+#endif
 
     g_graphicsContext.SetTransform(m_cachedTransform);
     if (m_hasCamera)
       g_graphicsContext.SetCameraPosition(m_camera);
+#ifndef _XBOX
     if (hasStereo)
       g_graphicsContext.SetStereoFactor(m_stereo);
-
-    GUIPROFILER_RENDER_BEGIN(this);
+#endif
 
     if (m_hitColor != 0xffffffff)
     {
@@ -197,10 +196,10 @@ void CGUIControl::DoRender()
 
     Render();
 
-    GUIPROFILER_RENDER_END(this);
-
+#ifndef _XBOX
     if (hasStereo)
       g_graphicsContext.RestoreStereoFactor();
+#endif
     if (m_hasCamera)
       g_graphicsContext.RestoreCameraPosition();
     g_graphicsContext.RemoveTransform();
@@ -577,8 +576,10 @@ EVENT_RESULT CGUIControl::SendMouseEvent(const CPoint &point, const CMouseEvent 
 // override this function to implement custom mouse behaviour
 bool CGUIControl::OnMouseOver(const CPoint &point)
 {
+#if 0
   if (CInputManager::GetInstance().GetMouseState() != MOUSE_STATE_DRAG)
     CInputManager::GetInstance().SetMouseState(MOUSE_STATE_FOCUS);
+#endif
   if (!CanFocus()) return false;
   if (!HasFocus())
   {

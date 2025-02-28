@@ -21,7 +21,6 @@
 #include "system.h"
 #include "GUIVideoControl.h"
 #include "GUIWindowManager.h"
-#include "Application.h"
 #include "input/Key.h"
 #include "WindowIDs.h"
 
@@ -37,7 +36,9 @@ CGUIVideoControl::~CGUIVideoControl(void)
 void CGUIVideoControl::Process(unsigned int currentTime, CDirtyRegionList &dirtyregions)
 {
   //! @todo Proper processing which marks when its actually changed. Just mark always for now.
+#if 0
   if (g_application.m_pPlayer->IsRenderingGuiLayer())
+#endif
     MarkDirtyRegion();
 
   CGUIControl::Process(currentTime, dirtyregions);
@@ -45,6 +46,8 @@ void CGUIVideoControl::Process(unsigned int currentTime, CDirtyRegionList &dirty
 
 void CGUIVideoControl::Render()
 {
+  // IMPORTANT: Video rendering is different on XBMC4Xbox as well as Render method of video control. Refer to XBMC4Xbox
+#if 0
   if (g_application.m_pPlayer->IsRenderingVideo())
   {
     if (!g_application.m_pPlayer->IsPausedPlayback())
@@ -73,6 +76,7 @@ void CGUIVideoControl::Render()
 
     g_graphicsContext.RemoveTransform();
   }
+#endif
   //! @todo remove this crap: HAS_VIDEO_PLAYBACK
   //! instantiating a video control having no playback is complete nonsense
   CGUIControl::Render();
@@ -80,14 +84,17 @@ void CGUIVideoControl::Render()
 
 void CGUIVideoControl::RenderEx()
 {
+#if 0
   if (g_application.m_pPlayer->IsRenderingVideo())
     g_application.m_pPlayer->Render(false, 255, false);
-  
+#endif
+
   CGUIControl::RenderEx();
 }
 
 EVENT_RESULT CGUIVideoControl::OnMouseEvent(const CPoint &point, const CMouseEvent &event)
 {
+#if 0
   if (!g_application.m_pPlayer->IsPlayingVideo()) return EVENT_RESULT_UNHANDLED;
   if (event.m_id == ACTION_MOUSE_LEFT_CLICK)
   { // switch to fullscreen
@@ -95,6 +102,7 @@ EVENT_RESULT CGUIVideoControl::OnMouseEvent(const CPoint &point, const CMouseEve
     g_windowManager.SendMessage(message);
     return EVENT_RESULT_HANDLED;
   }
+#endif
   return EVENT_RESULT_UNHANDLED;
 }
 

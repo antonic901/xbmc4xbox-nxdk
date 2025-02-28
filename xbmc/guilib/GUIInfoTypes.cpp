@@ -20,15 +20,12 @@
 
 #include "GUIInfoTypes.h"
 #include "GUIInfoManager.h"
-#include "addons/AddonManager.h"
 #include "utils/log.h"
 #include "LocalizeStrings.h"
 #include "GUIColorManager.h"
 #include "GUIListItem.h"
 #include "utils/StringUtils.h"
 #include "addons/Skin.h"
-
-using ADDON::CAddonMgr;
 
 CGUIInfoBool::CGUIInfoBool(bool value)
 {

@@ -1,15 +1,20 @@
 SRCS += \
 	$(CURDIR)/xbmc/FileItem.cpp \
+	$(CURDIR)/xbmc/GUIInfoManager.cpp \
+	$(CURDIR)/xbmc/GUILargeTextureManager.cpp \
 	$(CURDIR)/xbmc/LangInfo.cpp \
 	$(CURDIR)/xbmc/ServiceBroker.cpp \
 	$(CURDIR)/xbmc/URL.cpp \
 	$(CURDIR)/xbmc/Util.cpp \
 	$(CURDIR)/xbmc/XBDateTime.cpp
 
+include $(CURDIR)/xbmc/addons/Makefile
 include $(CURDIR)/xbmc/commons/Makefile
 include $(CURDIR)/xbmc/filesystem/Makefile
 include $(CURDIR)/xbmc/guilib/Makefile
 include $(CURDIR)/xbmc/input/Makefile
+include $(CURDIR)/xbmc/interfaces/Makefile
+include $(CURDIR)/xbmc/listproviders/Makefile
 include $(CURDIR)/xbmc/messaging/Makefile
 include $(CURDIR)/xbmc/platform/Makefile
 include $(CURDIR)/xbmc/settings/Makefile

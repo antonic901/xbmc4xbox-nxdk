@@ -250,7 +250,6 @@ void CGUITexturePBKIT::DrawQuad(const CRect &rect, color_t color, CBaseTexture *
   p3DDevice->SetRenderState( D3DRS_YUVENABLE, FALSE);
 #endif
   p3DDevice->SetVertexShader( D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX2 );
-#endif
 
   CRect coords = texCoords ? *texCoords : CRect(0.0f, 0.0f, 1.0f, 1.0f);
   CUSTOMVERTEX verts[4] = {

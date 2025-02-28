@@ -24,7 +24,6 @@
 #include "GUIButtonControl.h"
 #include "GUIRadioButtonControl.h"
 #include "GUISpinControl.h"
-#include "GUIRSSControl.h"
 #include "GUIImage.h"
 #include "GUIBorderedImage.h"
 #include "GUILabelControl.h"
@@ -38,7 +37,7 @@
 #include "GUIMoverControl.h"
 #include "GUIResizeControl.h"
 #include "GUISpinControlEx.h"
-#include "GUIVisualisationControl.h"
+#include "GUIRenderingControl.h"
 #include "GUISettingsSliderControl.h"
 #include "GUIMultiImage.h"
 #include "GUIControlGroup.h"
@@ -47,7 +46,6 @@
 #include "GUIListContainer.h"
 #include "GUIFixedListContainer.h"
 #include "GUIWrappingListContainer.h"
-#include "epg/GUIEPGGridContainer.h"
 #include "GUIPanelContainer.h"
 #include "GUIListLabel.h"
 #include "GUIListGroup.h"
@@ -58,13 +56,9 @@
 #include "utils/XMLUtils.h"
 #include "GUIFontManager.h"
 #include "GUIColorManager.h"
-#include "utils/RssManager.h"
 #include "utils/StringUtils.h"
 #include "GUIAction.h"
-#include "games/controllers/guicontrols/GUIGameController.h"
 #include "Util.h"
-
-using namespace EPG;
 
 typedef struct
 {
@@ -1152,16 +1146,6 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
         ((CGUIFadeLabelControl *)control)->SetScrolling(scrollValue == CGUIControl::ALWAYS);
     }
     break;
-  case CGUIControl::GUICONTROL_RSS:
-    {
-      control = new CGUIRSSControl(
-        parentID, id, posX, posY, width, height,
-        labelInfo, textColor3, headlineColor, strRSSTags);
-      RssUrls::const_iterator iter = CRssManager::GetInstance().GetUrls().find(iUrlSet);
-      if (iter != CRssManager::GetInstance().GetUrls().end())
-        ((CGUIRSSControl *)control)->SetUrlSet(iUrlSet);
-    }
-    break;
   case CGUIControl::GUICONTROL_BUTTON:
     {
       control = new CGUIButtonControl(
@@ -1333,16 +1317,6 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
       ((CGUIWrappingListContainer *)control)->SetUnFocusActions(unfocusActions);
     }
     break;
-  case CGUIControl::GUICONTAINER_EPGGRID:
-    {
-      CGUIEPGGridContainer *epgGridContainer = new CGUIEPGGridContainer(parentID, id, posX, posY, width, height, scrollTime, preloadItems, timeBlocks, rulerUnit, textureProgressIndicator);
-      control = epgGridContainer;
-      epgGridContainer->LoadLayout(pControlNode);
-      epgGridContainer->SetRenderOffset(offset);
-      epgGridContainer->SetType(viewType, viewLabel);
-      epgGridContainer->SetPageControl(pageControl);
-    }
-    break;
   case CGUIControl::GUICONTAINER_FIXEDLIST:
     {
       CScroller scroller;
@@ -1416,14 +1390,8 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
       ((CGUISpinControlEx *)control)->SetReverse(bReverse);
     }
     break;
-  case CGUIControl::GUICONTROL_VISUALISATION:
-    control = new CGUIVisualisationControl(parentID, id, posX, posY, width, height);
-    break;
   case CGUIControl::GUICONTROL_RENDERADDON:
     control = new CGUIRenderingControl(parentID, id, posX, posY, width, height);
-    break;
-  case CGUIControl::GUICONTROL_GAMECONTROLLER:
-    control = new GAME::CGUIGameController(parentID, id, posX, posY, width, height);
     break;
   default:
     break;

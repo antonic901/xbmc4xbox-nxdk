@@ -21,10 +21,10 @@
 #include "system.h"
 #include "GUIWindow.h"
 #include "GUIWindowManager.h"
+#include "ServiceBroker.h"
 #include "input/Key.h"
 #include "GUIControlFactory.h"
 #include "GUIControlGroup.h"
-#include "GUIControlProfiler.h"
 
 #include "addons/Skin.h"
 #include "GUIInfoManager.h"
@@ -34,7 +34,6 @@
 #include "input/ButtonTranslator.h"
 #include "utils/XMLUtils.h"
 #include "GUIAudioManager.h"
-#include "Application.h"
 #include "messaging/ApplicationMessenger.h"
 #include "utils/Variant.h"
 #include "utils/StringUtils.h"
@@ -42,6 +41,8 @@
 #ifdef HAS_PERFORMANCE_SAMPLE
 #include "utils/PerformanceSample.h"
 #endif
+
+#include <mutex>
 
 using namespace KODI::MESSAGING;
 
@@ -349,8 +350,6 @@ void CGUIWindow::DoRender()
   g_graphicsContext.AddGUITransform();
   CGUIControlGroup::DoRender();
   g_graphicsContext.RemoveTransform();
-
-  if (CGUIControlProfiler::IsRunning()) CGUIControlProfiler::Instance().EndFrame();
 }
 
 void CGUIWindow::AfterRender()
@@ -366,7 +365,7 @@ void CGUIWindow::AfterRender()
 
 void CGUIWindow::Close_Internal(bool forceClose /*= false*/, int nextWindowID /*= 0*/, bool enableSound /*= true*/)
 {
-  CSingleLock lock(g_graphicsContext);
+  std::unique_lock<CCriticalSection> lock(g_graphicsContext);
 
   if (!m_active)
     return;
@@ -393,17 +392,19 @@ void CGUIWindow::Close_Internal(bool forceClose /*= false*/, int nextWindowID /*
 
 void CGUIWindow::Close(bool forceClose /*= false*/, int nextWindowID /*= 0*/, bool enableSound /*= true*/, bool bWait /* = true */)
 {
+#if 0
   if (!g_application.IsCurrentThread())
   {
     // make sure graphics lock is not held
     CSingleExit leaveIt(g_graphicsContext);
     int param2 = (forceClose ? 0x01 : 0) | (enableSound ? 0x02 : 0);
     if (bWait)
-      CApplicationMessenger::GetInstance().SendMsg(TMSG_GUI_WINDOW_CLOSE, nextWindowID, param2, static_cast<void*>(this));
+      CServiceBroker::GetAppMessenger()->SendMsg(TMSG_GUI_WINDOW_CLOSE, nextWindowID, param2, static_cast<void*>(this));
     else
-      CApplicationMessenger::GetInstance().PostMsg(TMSG_GUI_WINDOW_CLOSE, nextWindowID, param2, static_cast<void*>(this));
+      CServiceBroker::GetAppMessenger()->PostMsg(TMSG_GUI_WINDOW_CLOSE, nextWindowID, param2, static_cast<void*>(this));
   }
   else
+#endif
     Close_Internal(forceClose, nextWindowID, enableSound);
 }
 
@@ -745,7 +746,7 @@ bool CGUIWindow::NeedXMLReload()
 
 void CGUIWindow::AllocResources(bool forceLoad /*= FALSE */)
 {
-  CSingleLock lock(g_graphicsContext);
+  std::unique_lock<CCriticalSection> lock(g_graphicsContext);
 
 #ifdef _DEBUG
   int64_t start;
@@ -827,14 +828,16 @@ bool CGUIWindow::Initialize()
     return false;     // can't load if we have no skin yet
   if(!NeedXMLReload())
     return true;
+#if 0
   if(g_application.IsCurrentThread())
     AllocResources();
+#endif
   else
   {
     // if not app thread, send gui msg via app messenger
     // and wait for results, so windowLoaded flag would be updated
     CGUIMessage msg(GUI_MSG_WINDOW_LOAD, 0, 0);
-    CApplicationMessenger::GetInstance().SendGUIMessage(msg, GetID(), true);
+    CServiceBroker::GetAppMessenger()->SendGUIMessage(msg, GetID(), true);
   }
   return m_windowLoaded;
 }
@@ -1006,7 +1009,7 @@ void CGUIWindow::SetDefaults()
 
 CRect CGUIWindow::GetScaledBounds() const
 {
-  CSingleLock lock(g_graphicsContext);
+  std::unique_lock<CCriticalSection> lock(g_graphicsContext);
   g_graphicsContext.SetScalingResolution(m_coordsRes, m_needsScaling);
   CPoint pos(GetPosition());
   CRect rect(pos.x, pos.y, pos.x + m_width, pos.y + m_height);
@@ -1039,13 +1042,13 @@ void CGUIWindow::DumpTextureUse()
 
 void CGUIWindow::SetProperty(const std::string &strKey, const CVariant &value)
 {
-  CSingleLock lock(*this);
+  std::unique_lock<CCriticalSection> lock(*this);
   m_mapProperties[strKey] = value;
 }
 
 CVariant CGUIWindow::GetProperty(const std::string &strKey) const
 {
-  CSingleLock lock(*this);
+  std::unique_lock<CCriticalSection> lock(const_cast<CGUIWindow&>(*this));
   std::map<std::string, CVariant, icompare>::const_iterator iter = m_mapProperties.find(strKey);
   if (iter == m_mapProperties.end())
     return CVariant(CVariant::VariantTypeNull);
@@ -1055,7 +1058,7 @@ CVariant CGUIWindow::GetProperty(const std::string &strKey) const
 
 void CGUIWindow::ClearProperties()
 {
-  CSingleLock lock(*this);
+  std::unique_lock<CCriticalSection> lock(*this);
   m_mapProperties.clear();
 }
 

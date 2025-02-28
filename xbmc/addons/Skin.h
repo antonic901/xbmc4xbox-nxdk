@@ -20,8 +20,10 @@
  *
  */
 
-#include "GraphicContext.h" // needed for the RESOLUTION members
-#include "GUIIncludes.h"    // needed for the GUIInclude member
+#include "guilib/GraphicContext.h" // needed for the RESOLUTION members
+#include "guilib/GUIIncludes.h"    // needed for the GUIInclude member
+
+#include <string>
 
 #define CREDIT_LINE_LENGTH 50
 
@@ -33,12 +35,12 @@ public:
   class CStartupWindow
   {
   public:
-    CStartupWindow(int id, const CStdString &name)
+    CStartupWindow(int id, const std::string &name)
     {
       m_id = id; m_name = name;
     };
     int m_id;
-    CStdString m_name;
+    std::string m_name;
   };
 
   CSkinInfo();
@@ -48,9 +50,9 @@ public:
    \param skinDir folder of the skin to load
    \param loadIncludes whether the includes from the skin should also be loaded (defaults to true)
    */
-  void Load(const CStdString& skinDir, bool loadIncludes = true);
+  void Load(const std::string& skinDir, bool loadIncludes = true);
 
-  bool HasSkinFile(const CStdString &strFile) const;
+  bool HasSkinFile(const std::string &strFile) const;
 
   /*! \brief Get the full path to the specified file in the skin
    We search for XML files in the skin folder that best matches the current resolution.
@@ -59,10 +61,11 @@ public:
    \param baseDir [in] If non-empty, the given directory is searched instead of the skin's directory.  Defaults to empty.
    \return path to the XML file
    */
-  CStdString GetSkinPath(const CStdString& file, RESOLUTION *res = NULL, const CStdString& baseDir = "") const;
+  std::string GetSkinPath(const std::string& file, RESOLUTION_INFO *resInfo, const std::string& baseDir = "") const;
+  std::string GetSkinPath(const std::string& file, RESOLUTION *res = NULL, const std::string& baseDir = "") const;
 
   wchar_t* GetCreditsLine(int i);
-  CStdString GetBaseDir() const;
+  std::string GetBaseDir() const;
   double GetVersion() const { return m_Version; };
 
   /*! \brief Return whether skin debugging is enabled
@@ -88,9 +91,9 @@ public:
    \param def the default to use if res is invalid
    \return the translated resolution
    */
-  static RESOLUTION TranslateResolution(const CStdString &res, RESOLUTION def);
+  static RESOLUTION TranslateResolution(const std::string &res, RESOLUTION def);
 
-  void ResolveIncludes(TiXmlElement *node, std::map<int, bool>* xmlIncludeConditions = NULL);
+  void ResolveIncludes(TiXmlElement *node, std::map<INFO::InfoPtr, bool>* xmlIncludeConditions = NULL);
 
   float GetEffectsSlowdown() const { return m_effectsSlowDown; };
 
@@ -103,11 +106,13 @@ public:
   /*! \brief Retrieve the skin paths to search for skin XML files
    \param paths [out] vector of paths to search, in order.
    */
-  void GetSkinPaths(std::vector<CStdString> &paths) const;;
+  void GetSkinPaths(std::vector<std::string> &paths) const;;
 
-  static bool Check(const CStdString& strSkinDir); // checks if everything is present and accounted for without loading the skin
+  static bool Check(const std::string& strSkinDir); // checks if everything is present and accounted for without loading the skin
   static double GetMinVersion();
-  const INFO::CSkinVariableString* CreateSkinVariable(const CStdString& name, int context);
+  const INFO::CSkinVariableString* CreateSkinVariable(const std::string& name, int context);
+
+  inline std::string Path() { return m_strBaseDir; }
 protected:
   /*! \brief grab a resolution tag from an XML node
    \param node XML node to look for the given tag
@@ -121,7 +126,7 @@ protected:
    \param res RESOLUTION to translate
    \return directory name for res
    */
-  CStdString GetDirFromRes(RESOLUTION res) const;
+  std::string GetDirFromRes(RESOLUTION res) const;
 
   void SetDefaults();
   void LoadIncludes();
@@ -132,7 +137,7 @@ protected:
   int m_iNumCreditLines;  // number of credit lines
   RESOLUTION m_DefaultResolution; // default resolution for the skin in 4:3 modes
   RESOLUTION m_DefaultResolutionWide; // default resolution for the skin in 16:9 modes
-  CStdString m_strBaseDir;
+  std::string m_strBaseDir;
   double m_Version;
 
   float m_effectsSlowDown;
@@ -146,4 +151,4 @@ protected:
   bool m_bLegacy;
 };
 
-extern CSkinInfo g_SkinInfo;
+extern std::shared_ptr<CSkinInfo> g_SkinInfo;

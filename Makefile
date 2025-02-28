@@ -20,6 +20,7 @@ NXDK_CXXFLAGS +=	-Ilib \
 									-Ixbmc \
 									-Ixbmc/platform/xbox \
 									-Wno-deprecated-declarations \
+									-Wno-inconsistent-missing-override \
 									-D_XBOX
 
 include $(CURDIR)/xbmc/Makefile

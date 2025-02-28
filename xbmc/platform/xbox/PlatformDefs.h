@@ -11,3 +11,5 @@
 #include "../win32/PlatformDefs.h"
 
 #include <sys/stat.h>
+
+#define strcmpi stricmp
