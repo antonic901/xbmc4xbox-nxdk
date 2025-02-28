@@ -19,6 +19,7 @@
 #include "utils/JobManager.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
+#include "Application.h"
 
 using namespace XFILE;
 using namespace std::chrono_literals;
@@ -186,7 +187,7 @@ bool CDirectory::GetDirectory(const CURL& url,
         {
           // @TODO ProcessRequirements() can bring up the keyboard input dialog
           // filesystem must not depend on GUI
-          if (/*CServiceBroker::GetAppMessenger()->IsProcessThread() &&*/ // on X4X it's g_application.IsCurrentThread()
+          if (g_application.IsCurrentThread() &&
               pDirectory->ProcessRequirements())
           {
             authUrl.SetDomain("");

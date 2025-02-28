@@ -1,4 +1,5 @@
 SRCS += \
+	$(CURDIR)/xbmc/Application.cpp \
 	$(CURDIR)/xbmc/FileItem.cpp \
 	$(CURDIR)/xbmc/GUIInfoManager.cpp \
 	$(CURDIR)/xbmc/GUILargeTextureManager.cpp \

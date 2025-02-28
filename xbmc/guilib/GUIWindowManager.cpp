@@ -20,6 +20,7 @@
 
 #include "GUIWindowManager.h"
 #include "GUIDialog.h"
+#include "Application.h"
 #include "ServiceBroker.h"
 #include "messaging/ApplicationMessenger.h"
 #include "messaging/helpers/DialogHelper.h"
@@ -478,15 +479,13 @@ void CGUIWindowManager::ForceActivateWindow(int iWindowID, const std::string& st
 
 void CGUIWindowManager::ActivateWindow(int iWindowID, const std::vector<std::string>& params, bool swappingWindows /* = false */, bool force /* = false */)
 {
-#if 0
   if (!g_application.IsCurrentThread())
   {
     // make sure graphics lock is not held
     CSingleExit leaveIt(g_graphicsContext);
-    CApplicationMessenger::GetInstance().SendMsg(TMSG_GUI_ACTIVATE_WINDOW, iWindowID, swappingWindows ? 1 : 0, nullptr, "", params);
+    CServiceBroker::GetAppMessenger()->SendMsg(TMSG_GUI_ACTIVATE_WINDOW, iWindowID, swappingWindows ? 1 : 0, nullptr, "", params);
   }
   else
-#endif
   {
     std::unique_lock<CCriticalSection> lock(g_graphicsContext);
     ActivateWindow_Internal(iWindowID, params, swappingWindows, force);
@@ -661,7 +660,6 @@ void CGUIWindowManager::OnApplicationMessage(ThreadMessage* pMsg)
   {
     if (pMsg->lpVoid)
     {
-#if 0
       CAction *action = static_cast<CAction *>(pMsg->lpVoid);
       if (pMsg->param1 == WINDOW_INVALID)
       {
@@ -676,7 +674,6 @@ void CGUIWindowManager::OnApplicationMessage(ThreadMessage* pMsg)
           CLog::Log(LOGWARNING, "Failed to get window with ID %i to send an action to", pMsg->param1);
       }
       delete action;
-#endif
     }
   }
   break;
@@ -760,9 +757,7 @@ bool RenderOrderSortFunction(CGUIWindow *first, CGUIWindow *second)
 
 void CGUIWindowManager::Process(unsigned int currentTime)
 {
-#if 0
   assert(g_application.IsCurrentThread());
-#endif
   std::unique_lock<CCriticalSection> lock(g_graphicsContext);
 
   CDirtyRegionList dirtyregions;
@@ -833,9 +828,7 @@ void CGUIWindowManager::RenderEx() const
 
 bool CGUIWindowManager::Render()
 {
-#if 0
   assert(g_application.IsCurrentThread());
-#endif
   CSingleExit lock(g_graphicsContext);
 
   CDirtyRegionList dirtyRegions = m_tracker.GetDirtyRegions();
@@ -901,9 +894,7 @@ void CGUIWindowManager::AfterRender()
 
 void CGUIWindowManager::FrameMove()
 {
-#if 0
   assert(g_application.IsCurrentThread());
-#endif 
   std::unique_lock<CCriticalSection> lock(g_graphicsContext);
 
   if(m_iNested == 0)
@@ -953,7 +944,6 @@ CGUIWindow* CGUIWindowManager::GetWindow(int id) const
 
 void CGUIWindowManager::ProcessRenderLoop(bool renderOnly /*= false*/)
 {
-#if 0
   if (g_application.IsCurrentThread() && m_pCallback)
   {
     m_iNested++;
@@ -963,7 +953,6 @@ void CGUIWindowManager::ProcessRenderLoop(bool renderOnly /*= false*/)
     m_pCallback->Render();
     m_iNested--;
   }
-#endif
 }
 
 void CGUIWindowManager::SetCallback(IWindowManagerCallback& callback)

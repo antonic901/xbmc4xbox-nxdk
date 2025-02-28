@@ -34,6 +34,7 @@
 #include "input/ButtonTranslator.h"
 #include "utils/XMLUtils.h"
 #include "GUIAudioManager.h"
+#include "Application.h"
 #include "messaging/ApplicationMessenger.h"
 #include "utils/Variant.h"
 #include "utils/StringUtils.h"
@@ -392,7 +393,6 @@ void CGUIWindow::Close_Internal(bool forceClose /*= false*/, int nextWindowID /*
 
 void CGUIWindow::Close(bool forceClose /*= false*/, int nextWindowID /*= 0*/, bool enableSound /*= true*/, bool bWait /* = true */)
 {
-#if 0
   if (!g_application.IsCurrentThread())
   {
     // make sure graphics lock is not held
@@ -404,7 +404,6 @@ void CGUIWindow::Close(bool forceClose /*= false*/, int nextWindowID /*= 0*/, bo
       CServiceBroker::GetAppMessenger()->PostMsg(TMSG_GUI_WINDOW_CLOSE, nextWindowID, param2, static_cast<void*>(this));
   }
   else
-#endif
     Close_Internal(forceClose, nextWindowID, enableSound);
 }
 
@@ -828,10 +827,8 @@ bool CGUIWindow::Initialize()
     return false;     // can't load if we have no skin yet
   if(!NeedXMLReload())
     return true;
-#if 0
   if(g_application.IsCurrentThread())
     AllocResources();
-#endif
   else
   {
     // if not app thread, send gui msg via app messenger

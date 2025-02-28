@@ -23,8 +23,10 @@
 #include "GUILabelControl.h"
 #include "threads/SingleLock.h"
 #include "utils/TimeUtils.h"
+#include "Application.h"
 #include "messaging/ApplicationMessenger.h"
 #include "input/Key.h"
+#include "ServiceBroker.h"
 
 #include <mutex>
 
@@ -193,7 +195,7 @@ void CGUIDialog::Open_Internal(bool bProcessRenderLoop, const std::string &param
 
     lock.unlock();
 
-    while (m_active/* && !g_application.m_bStop*/)
+    while (m_active && !g_application.m_bStop)
     {
       g_windowManager.ProcessRenderLoop();
     }
@@ -202,15 +204,13 @@ void CGUIDialog::Open_Internal(bool bProcessRenderLoop, const std::string &param
 
 void CGUIDialog::Open(const std::string &param /* = "" */)
 {
-#if 0
   if (!g_application.IsCurrentThread())
   {
     // make sure graphics lock is not held
     CSingleExit leaveIt(g_graphicsContext);
-    CApplicationMessenger::GetInstance().SendMsg(TMSG_GUI_DIALOG_OPEN, -1, -1, static_cast<void*>(this), param);
+    CServiceBroker::GetAppMessenger()->SendMsg(TMSG_GUI_DIALOG_OPEN, -1, -1, static_cast<void*>(this), param);
   }
   else
-#endif
     Open_Internal(param);
 }
 

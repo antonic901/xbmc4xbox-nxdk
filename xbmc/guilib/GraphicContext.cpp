@@ -19,6 +19,9 @@
  */
 
 #include "GraphicContext.h"
+#include "ServiceBroker.h"
+#include "Application.h"
+#include "messaging/ApplicationMessenger.h"
 #include "TextureManager.h"
 #include "utils/MathUtils.h"
 
@@ -409,16 +412,14 @@ void CGraphicContext::GetAllowedResolutions(vector<RESOLUTION> &res, bool bAllow
 // call SetVideoResolutionInternal and ensure its done from mainthread
 void CGraphicContext::SetVideoResolution(RESOLUTION res, BOOL NeedZ, bool forceClear /* = false */)
 {
-#if 0
   if (g_application.IsCurrentThread())
   {
     SetVideoResolutionInternal(res, NeedZ, forceClear);
   }
   else
   {
-    CApplicationMessenger::Get().SendMsg(TMSG_SETVIDEORESOLUTION, res, forceClear ? 1 : 0, NULL, NeedZ ? "true" : "false");
+    CServiceBroker::GetAppMessenger()->SendMsg(TMSG_SETVIDEORESOLUTION, res, forceClear ? 1 : 0, NULL, NeedZ ? "true" : "false");
   }
-#endif
 }
 
 void CGraphicContext::SetVideoResolutionInternal(RESOLUTION res, BOOL NeedZ, bool forceClear)

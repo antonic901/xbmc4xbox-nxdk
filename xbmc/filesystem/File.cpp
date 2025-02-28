@@ -23,6 +23,7 @@
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
+#include "Application.h"
 
 using namespace XFILE;
 
@@ -126,10 +127,7 @@ bool CFile::Copy(const CURL& url2, const CURL& dest, XFILE::IFileCallback* pCall
     float start = 0.0f;
     while (true)
     {
-#if 0
-      // in XBMC4Xbox it is: g_application.ResetScreenSaver()
-      appPower->ResetScreenSaver(); 
-#endif
+      g_application.ResetScreenSaver();
 
       iRead = file.Read(buffer.data(), buffer.size());
       if (iRead == 0) break;
