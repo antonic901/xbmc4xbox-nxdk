@@ -24,6 +24,16 @@ using namespace std;
 
 CAdvancedSettings::CAdvancedSettings()
 {
+  m_videoUseTimeSeeking = true;
+  m_videoTimeSeekForward = 30;
+  m_videoTimeSeekBackward = -30;
+  m_videoTimeSeekForwardBig = 600;
+  m_videoTimeSeekBackwardBig = -600;
+  m_videoPercentSeekForward = 2;
+  m_videoPercentSeekBackward = -2;
+  m_videoPercentSeekForwardBig = 10;
+  m_videoPercentSeekBackwardBig = -10;
+
   m_cacheMemSize = 1024 * 1024 * 20; // 20 MiB
   m_cacheBufferMode = CACHE_BUFFER_MODE_NETWORK; // Default (buffer all network filesystems)
   m_cacheChunkSize = 128 * 1024; // 128 KiB
