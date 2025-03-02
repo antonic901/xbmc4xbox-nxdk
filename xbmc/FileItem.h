@@ -15,6 +15,7 @@
 
 #include "LockType.h"
 #include "XBDateTime.h"
+#include "guilib/GUIListItem.h"
 #include "threads/CriticalSection.h"
 #include "utils/ISerializable.h"
 
@@ -47,18 +48,19 @@ enum EFileFolderType {
   \sa CFileItemList
   */
 class CFileItem :
-  public ISerializable
+  public CGUIListItem, public ISerializable
 {
 public:
   CFileItem(void);
   CFileItem(const CFileItem& item);
+  CFileItem(const CGUIListItem& item);
   explicit CFileItem(const std::string& strLabel);
   explicit CFileItem(const char* strLabel);
   CFileItem(const CURL& path, bool bIsFolder);
   CFileItem(const std::string& strPath, bool bIsFolder);
 
   ~CFileItem(void);
-  CFileItem* Clone() const { return new CFileItem(*this); }
+  virtual CGUIListItem *Clone() const { return new CFileItem(*this); };
 
   const CURL GetURL() const;
   void SetURL(const CURL& url);
@@ -192,7 +194,7 @@ public:
   void CleanString();
   void FillInDefaultIcon();
   void SetFileSizeLabel();
-  void SetLabel(const std::string &strLabel);
+  virtual void SetLabel(const std::string &strLabel);
   bool IsLabelPreformatted() const { return m_bLabelPreformatted; }
   void SetLabelPreformatted(bool bYesNo) { m_bLabelPreformatted=bYesNo; }
 

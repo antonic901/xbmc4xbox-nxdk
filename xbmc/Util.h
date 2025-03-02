@@ -27,6 +27,22 @@ public:
 
   static std::string GetNextFilename(const std::string &fn_template, int max);
 
+  /*! \brief Split a comma separated parameter list into separate parameters.
+   Takes care of the case where we may have a quoted string containing commas, or we may
+   have a function (i.e. parentheses) with multiple parameters as a single parameter.
+
+   eg:
+
+    foo, bar(param1, param2), foo
+
+   will return:
+
+    "foo", "bar(param1, param2)", and "foo".
+
+   \param paramString the string to break up
+   \param parameters the returned parameters
+   */
+  static void SplitParams(const std::string &paramString, std::vector<std::string> &parameters);
 };
 
 

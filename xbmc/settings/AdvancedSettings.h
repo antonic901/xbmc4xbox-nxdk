@@ -30,6 +30,9 @@ class CAdvancedSettings
     typedef std::vector< std::pair<std::string, std::string> > StringMapping;
     StringMapping m_pathSubstitutions;
 
+    bool m_guiVisualizeDirtyRegions;
+    int  m_guiAlgorithmDirtyRegions;
+
     unsigned int m_cacheMemSize;
     unsigned int m_cacheBufferMode;
     unsigned int m_cacheChunkSize;

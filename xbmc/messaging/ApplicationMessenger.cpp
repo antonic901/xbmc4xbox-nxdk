@@ -8,15 +8,11 @@
 
 #include "ApplicationMessenger.h"
 
-#if 0
 #include "guilib/GUIMessage.h"
-#endif
 #include "messaging/IMessageTarget.h"
 #include "threads/SingleLock.h"
 #include "utils/log.h"
-#if 0
-#include "windowing/GraphicContext.h"
-#endif
+#include "guilib/GraphicContext.h"
 #include "ServiceBroker.h"
 
 #include <memory>
@@ -145,9 +141,7 @@ int CApplicationMessenger::SendMsg(ThreadMessage&& message, bool wait)
     if (winSystem)
 #endif
     {
-#if 0
-      CSingleExit exit(winSystem->GetGfxContext());
-#endif
+      CSingleExit exit(g_graphicsContext);
       waitEvent->Wait();
     }
     return *result;
@@ -285,10 +279,8 @@ void CApplicationMessenger::SendGUIMessage(const CGUIMessage &message, int windo
 {
   ThreadMessage tMsg(TMSG_GUI_MESSAGE);
   tMsg.param1 = windowID == WINDOW_INVALID ? 0 : windowID;
-#if 0
   tMsg.lpVoid = new CGUIMessage(message);
   SendMsg(std::move(tMsg), waitResult);
-#endif
 }
 
 void CApplicationMessenger::RegisterReceiver(IMessageTarget* target)
