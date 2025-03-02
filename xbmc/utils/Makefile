@@ -2,6 +2,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/Archive.cpp \
 	$(CURDIR)/xbmc/utils/auto_buffer.cpp \
 	$(CURDIR)/xbmc/utils/BitstreamStats.cpp \
+	$(CURDIR)/xbmc/utils/BooleanLogic.cpp \
 	$(CURDIR)/xbmc/utils/CharsetConverter.cpp \
 	$(CURDIR)/xbmc/utils/CharsetDetection.cpp \
 	$(CURDIR)/xbmc/utils/DatabaseUtils.cpp \
