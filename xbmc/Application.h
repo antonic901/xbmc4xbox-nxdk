@@ -53,6 +53,11 @@ public:
 
   CApplicationPlayer* m_pPlayer;
 
+  bool IsStandAlone()
+  {
+    return true;
+  }
+
   // should be part of XBApplicationEx.h
   bool m_bStop = false;
 
