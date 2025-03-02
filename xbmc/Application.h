@@ -33,10 +33,12 @@ class CFileItem;
 class CFileItemList;
 class CKey;
 
+#include "ApplicationPlayer.h"
 #include "FileItem.h"
 
 class CApplication
 {
+  friend class CApplicationPlayer;
 public:
   CApplication(void);
   virtual ~CApplication(void);
@@ -48,6 +50,8 @@ public:
   bool OnAction(const CAction &action);
 
   void ResetScreenSaver();
+
+  CApplicationPlayer* m_pPlayer;
 
   // should be part of XBApplicationEx.h
   bool m_bStop = false;
