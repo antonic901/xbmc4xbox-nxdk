@@ -1,5 +1,6 @@
 SRCS += \
 	$(CURDIR)/xbmc/Application.cpp \
+	$(CURDIR)/xbmc/ApplicationPlayer.cpp \
 	$(CURDIR)/xbmc/FileItem.cpp \
 	$(CURDIR)/xbmc/GUIInfoManager.cpp \
 	$(CURDIR)/xbmc/GUILargeTextureManager.cpp \
@@ -11,6 +12,7 @@ SRCS += \
 
 include $(CURDIR)/xbmc/addons/Makefile
 include $(CURDIR)/xbmc/commons/Makefile
+include $(CURDIR)/xbmc/cores/Makefile
 include $(CURDIR)/xbmc/filesystem/Makefile
 include $(CURDIR)/xbmc/guilib/Makefile
 include $(CURDIR)/xbmc/input/Makefile

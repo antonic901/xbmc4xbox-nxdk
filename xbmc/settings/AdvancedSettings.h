@@ -27,6 +27,16 @@ class CAdvancedSettings
 
     static CAdvancedSettings* getInstance();
 
+    bool m_videoUseTimeSeeking;
+    int m_videoTimeSeekForward;
+    int m_videoTimeSeekBackward;
+    int m_videoTimeSeekForwardBig;
+    int m_videoTimeSeekBackwardBig;
+    int m_videoPercentSeekForward;
+    int m_videoPercentSeekForwardBig;
+    int m_videoPercentSeekBackward;
+    int m_videoPercentSeekBackwardBig;
+
     typedef std::vector< std::pair<std::string, std::string> > StringMapping;
     StringMapping m_pathSubstitutions;
 

@@ -23,7 +23,8 @@
 #include "input/Key.h"
 
 CApplication::CApplication(void)
-  : m_itemCurrentFile(new CFileItem)
+  : m_pPlayer(new CApplicationPlayer)
+  , m_itemCurrentFile(new CFileItem)
 {
 }
 
