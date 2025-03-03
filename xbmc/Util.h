@@ -44,6 +44,8 @@ public:
    */
   static void SplitParams(const std::string &paramString, std::vector<std::string> &parameters);
 
+  static bool MakeShortenPath(std::string StrInput, std::string& StrOutput, size_t iTextMaxLength);
+
   /*!
    * \brief Thread-safe random number generation
    */
