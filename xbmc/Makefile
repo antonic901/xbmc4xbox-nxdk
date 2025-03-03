@@ -28,3 +28,4 @@ include $(CURDIR)/xbmc/platform/Makefile
 include $(CURDIR)/xbmc/settings/Makefile
 include $(CURDIR)/xbmc/threads/Makefile
 include $(CURDIR)/xbmc/utils/Makefile
+include $(CURDIR)/xbmc/view/Makefile

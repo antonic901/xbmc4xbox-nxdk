@@ -18,6 +18,7 @@
 #include "guilib/GUIListItem.h"
 #include "threads/CriticalSection.h"
 #include "utils/ISerializable.h"
+#include "utils/SortUtils.h"
 
 #include <map>
 #include <memory>
@@ -563,7 +564,15 @@ public:
   void Assign(const CFileItemList& itemlist, bool append = false);
   bool Copy  (const CFileItemList& item, bool copyItems = true);
   void Reserve(size_t iCount);
+  void Sort(SortBy sortBy, SortOrder sortOrder, SortAttribute sortAttributes = SortAttributeNone);
+  /* \brief Sorts the items based on the given sorting options
 
+  In contrast to Sort (see above) this does not change the internal
+  state by storing the sorting method and order used and therefore
+  will always execute the sorting even if the list of items has
+  already been sorted with the same options before.
+  */
+  void Sort(SortDescription sortDescription);
   void Randomize();
   void FillInDefaultIcons();
   int GetFolderCount() const;

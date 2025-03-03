@@ -989,6 +989,14 @@ void CFileItemList::FillSortFields(FILEITEMFILLFUNC func)
   std::for_each(m_items.begin(), m_items.end(), func);
 }
 
+void CFileItemList::Sort(SortBy sortBy, SortOrder sortOrder, SortAttribute sortAttributes /* = SortAttributeNone */)
+{
+}
+
+void CFileItemList::Sort(SortDescription sortDescription)
+{
+}
+
 void CFileItemList::Randomize()
 {
 }
