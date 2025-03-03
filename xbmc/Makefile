@@ -13,6 +13,7 @@ SRCS += \
 	$(CURDIR)/xbmc/XBDateTime.cpp
 
 include $(CURDIR)/xbmc/addons/Makefile
+include $(CURDIR)/xbmc/application/Makefile
 include $(CURDIR)/xbmc/commons/Makefile
 include $(CURDIR)/xbmc/cores/Makefile
 include $(CURDIR)/xbmc/dbwrappers/Makefile
