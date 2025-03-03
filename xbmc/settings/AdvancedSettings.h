@@ -20,6 +20,39 @@
 #define CACHE_BUFFER_MODE_NONE 3
 #define CACHE_BUFFER_MODE_NETWORK 4
 
+class DatabaseSettings
+{
+public:
+  DatabaseSettings() { Reset(); }
+  void Reset()
+  {
+    type.clear();
+    host.clear();
+    port.clear();
+    user.clear();
+    pass.clear();
+    name.clear();
+    key.clear();
+    cert.clear();
+    ca.clear();
+    capath.clear();
+    ciphers.clear();
+    compression = false;
+  };
+  std::string type;
+  std::string host;
+  std::string port;
+  std::string user;
+  std::string pass;
+  std::string name;
+  std::string key;
+  std::string cert;
+  std::string ca;
+  std::string capath;
+  std::string ciphers;
+  bool compression;
+};
+
 class CAdvancedSettings
 {
   public:

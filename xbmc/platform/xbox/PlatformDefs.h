@@ -13,3 +13,4 @@
 #include <sys/stat.h>
 
 #define strcmpi stricmp
+#define unlink remove

@@ -194,3 +194,16 @@ void CUtil::SplitParams(const std::string &paramString, std::vector<std::string>
   if (!parameter.empty() || parameters.size())
     parameters.push_back(parameter);
 }
+
+int CUtil::GetRandomNumber()
+{
+#if defined(TARGET_WINDOWS) || defined(NXDK)
+  unsigned int number;
+  if (rand_s(&number) == 0)
+    return (int)number;
+#else
+  return rand_r(&s_randomSeed);
+#endif
+
+  return rand();
+}

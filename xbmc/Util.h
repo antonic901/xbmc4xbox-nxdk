@@ -43,6 +43,11 @@ public:
    \param parameters the returned parameters
    */
   static void SplitParams(const std::string &paramString, std::vector<std::string> &parameters);
+
+  /*!
+   * \brief Thread-safe random number generation
+   */
+  static int GetRandomNumber();
 };
 
 

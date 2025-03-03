@@ -4,13 +4,16 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/BitstreamStats.cpp \
 	$(CURDIR)/xbmc/utils/CharsetConverter.cpp \
 	$(CURDIR)/xbmc/utils/CharsetDetection.cpp \
+	$(CURDIR)/xbmc/utils/DatabaseUtils.cpp \
 	$(CURDIR)/xbmc/utils/JobManager.cpp \
+	$(CURDIR)/xbmc/utils/LabelFormatter.cpp \
 	$(CURDIR)/xbmc/utils/Locale.cpp \
 	$(CURDIR)/xbmc/utils/log.cpp \
 	$(CURDIR)/xbmc/utils/md5.cpp \
 	$(CURDIR)/xbmc/utils/Observer.cpp \
 	$(CURDIR)/xbmc/utils/POUtils.cpp \
 	$(CURDIR)/xbmc/utils/RegExp.cpp \
+	$(CURDIR)/xbmc/utils/SortUtils.cpp \
 	$(CURDIR)/xbmc/utils/Speed.cpp \
 	$(CURDIR)/xbmc/utils/StringUtils.cpp \
 	$(CURDIR)/xbmc/utils/StringValidation.cpp \
