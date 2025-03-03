@@ -7,6 +7,8 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/CharsetDetection.cpp \
 	$(CURDIR)/xbmc/utils/DatabaseUtils.cpp \
 	$(CURDIR)/xbmc/utils/JobManager.cpp \
+	$(CURDIR)/xbmc/utils/JSONVariantParser.cpp \
+	$(CURDIR)/xbmc/utils/JSONVariantWriter.cpp \
 	$(CURDIR)/xbmc/utils/LabelFormatter.cpp \
 	$(CURDIR)/xbmc/utils/Locale.cpp \
 	$(CURDIR)/xbmc/utils/log.cpp \
