@@ -96,7 +96,7 @@ protected:
   virtual CSettingSection* GetSection() = 0;
   virtual CSetting* GetSetting(const std::string &settingId) = 0;
   virtual void Save() = 0;
-  virtual unsigned int GetDelayMs() const { return 1500; }
+  virtual std::chrono::milliseconds GetDelayMs() const { return std::chrono::milliseconds(1500); }
   virtual std::string GetLocalizedString(uint32_t labelId) const;
   
   virtual void OnOkay() { m_confirmed = true; }

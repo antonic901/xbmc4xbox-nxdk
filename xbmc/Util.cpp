@@ -195,6 +195,69 @@ void CUtil::SplitParams(const std::string &paramString, std::vector<std::string>
     parameters.push_back(parameter);
 }
 
+bool CUtil::MakeShortenPath(std::string StrInput, std::string& StrOutput, size_t iTextMaxLength)
+{
+  size_t iStrInputSize = StrInput.size();
+  if(iStrInputSize <= 0 || iTextMaxLength >= iStrInputSize)
+  {
+    StrOutput = StrInput;
+    return true;
+  }
+
+  char cDelim = '\0';
+  size_t nGreaterDelim, nPos;
+
+  nPos = StrInput.find_last_of( '\\' );
+  if (nPos != std::string::npos)
+    cDelim = '\\';
+  else
+  {
+    nPos = StrInput.find_last_of( '/' );
+    if (nPos != std::string::npos)
+      cDelim = '/';
+  }
+  if ( cDelim == '\0' )
+    return false;
+
+  if (nPos == StrInput.size() - 1)
+  {
+    StrInput.erase(StrInput.size() - 1);
+    nPos = StrInput.find_last_of(cDelim);
+  }
+  while( iTextMaxLength < iStrInputSize )
+  {
+    nPos = StrInput.find_last_of( cDelim, nPos );
+    nGreaterDelim = nPos;
+
+    if (nPos == std::string::npos || nPos == 0)
+      break;
+
+    nPos = StrInput.find_last_of( cDelim, nPos - 1 );
+
+    if ( nPos == std::string::npos)
+      break;
+    if ( nGreaterDelim > nPos ) StrInput.replace( nPos + 1, nGreaterDelim - nPos - 1, ".." );
+    iStrInputSize = StrInput.size();
+  }
+  // replace any additional /../../ with just /../ if necessary
+  std::string replaceDots = StringUtils::Format("..%c..", cDelim);
+  while (StrInput.size() > (unsigned int)iTextMaxLength)
+    if (!StringUtils::Replace(StrInput, replaceDots, ".."))
+      break;
+  // finally, truncate our string to force inside our max text length,
+  // replacing the last 2 characters with ".."
+
+  // eg end up with:
+  // "smb://../Playboy Swimsuit Cal.."
+  if (iTextMaxLength > 2 && StrInput.size() > (unsigned int)iTextMaxLength)
+  {
+    StrInput.erase(iTextMaxLength - 2);
+    StrInput += "..";
+  }
+  StrOutput = StrInput;
+  return true;
+}
+
 int CUtil::GetRandomNumber()
 {
 #if defined(TARGET_WINDOWS) || defined(NXDK)

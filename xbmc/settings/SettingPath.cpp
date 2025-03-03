@@ -25,6 +25,8 @@
 #include "utils/XBMCTinyXML.h"
 #include "utils/XMLUtils.h"
 
+#include <mutex>
+
 #define XML_ELM_DEFAULT     "default"
 #define XML_ELM_CONSTRAINTS "constraints"
 
@@ -51,7 +53,7 @@ CSetting* CSettingPath::Clone(const std::string &id) const
 
 bool CSettingPath::Deserialize(const TiXmlNode *node, bool update /* = false */)
 {
-  CExclusiveLock lock(m_critical);
+  std::unique_lock<CSharedSection> lock(m_critical);
 
   if (!CSettingString::Deserialize(node, update))
     return false;
@@ -103,7 +105,7 @@ void CSettingPath::copy(const CSettingPath &setting)
 {
   CSettingString::Copy(setting);
 
-  CExclusiveLock lock(m_critical);
+  std::unique_lock<CSharedSection> lock(m_critical);
   m_writable = setting.m_writable;
   m_sources = setting.m_sources;
 }

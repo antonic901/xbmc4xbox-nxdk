@@ -23,9 +23,6 @@
 #include <set>
 #include <utility>
 
-#include "addons/AddonManager.h"
-#include "addons/GUIWindowAddonBrowser.h"
-#include "dialogs/GUIDialogFileBrowser.h"
 #include "dialogs/GUIDialogOK.h"
 #include "dialogs/GUIDialogSelect.h"
 #include "dialogs/GUIDialogSlider.h"
@@ -39,17 +36,16 @@
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
 #include "settings/lib/Setting.h"
-#include "settings/MediaSourceSettings.h"
-#include "settings/SettingAddon.h"
 #include "settings/SettingControl.h"
 #include "settings/SettingPath.h"
 #include "settings/SettingUtils.h"
-#include "storage/MediaManager.h"
 #include "Util.h"
 #include "utils/StringUtils.h"
 #include "utils/Variant.h"
 
+#if 0
 using namespace ADDON;
+#endif
 
 template<typename TValueType>
 static CFileItemPtr GetFileItem(const std::string& label, const TValueType& value, const std::set<TValueType>& selectedValues)
@@ -538,6 +534,7 @@ bool CGUIControlButtonSetting::OnClick()
     const CSettingControlButton *buttonControl = static_cast<const CSettingControlButton*>(control);
     if (controlFormat == "addon")
     {
+#if 0
       // prompt for the addon
       CSettingAddon *setting = (CSettingAddon *)m_pSetting;
       std::string addonID = setting->GetValue();
@@ -547,6 +544,8 @@ bool CGUIControlButtonSetting::OnClick()
         return false;
 
       SetValid(setting->SetValue(addonID));
+#endif
+      return false;
     }
     else if (controlFormat == "path")
       SetValid(GetPath((CSettingPath *)m_pSetting));
@@ -609,11 +608,13 @@ void CGUIControlButtonSetting::Update(bool updateDisplayOnly /* = false */)
       std::string strValue = ((CSettingString *)m_pSetting)->GetValue();
       if (controlFormat == "addon")
       {
+#if 0
         ADDON::AddonPtr addon;
         if (ADDON::CAddonMgr::GetInstance().GetAddon(strValue, addon))
           strText = addon->Name();
         if (strText.empty())
           strText = g_localizeStrings.Get(231); // None
+#endif
       }
       else if (controlFormat == "path")
       {
@@ -670,6 +671,7 @@ bool CGUIControlButtonSetting::GetPath(CSettingPath *pathSetting)
   if (pathSetting == NULL)
     return false;
 
+#if 0
   std::string path = pathSetting->GetValue();
 
   VECSOURCES shares;
@@ -688,6 +690,8 @@ bool CGUIControlButtonSetting::GetPath(CSettingPath *pathSetting)
     return false;
 
   return pathSetting->SetValue(path);
+#endif
+  return false;
 }
 
 void CGUIControlButtonSetting::OnSliderChange(void *data, CGUISliderControl *slider)
@@ -1071,8 +1075,8 @@ void CGUIControlRangeSetting::Update(bool updateDisplayOnly /* = false */)
 
       if (controlFormat == "date" || controlFormat == "time")
       {
-        CDateTime dateLower = (time_t)valueLower;
-        CDateTime dateUpper = (time_t)valueUpper;
+        CDateTime dateLower((time_t)valueLower);
+        CDateTime dateUpper((time_t)valueUpper);
 
         if (controlFormat == "date")
         {

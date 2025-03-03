@@ -22,7 +22,6 @@
 #include <vector>
 
 #include "GUIDialogSettingsManualBase.h"
-#include "settings/SettingAddon.h"
 #include "settings/SettingPath.h"
 #include "settings/SettingUtils.h"
 #include "settings/lib/Setting.h"
@@ -97,7 +96,7 @@ CSettingGroup* CGUIDialogSettingsManualBase::AddGroup(CSettingCategory *category
 
   size_t groups = category->GetGroups().size();
 
-  CSettingGroup *group = new CSettingGroup(StringUtils::Format("%" PRIuS, groups + 1), m_settingsManager);
+  CSettingGroup *group = new CSettingGroup(StringUtils::Format("{0}", groups + 1), m_settingsManager);
   if (group == NULL)
     return NULL;
 
@@ -258,28 +257,6 @@ CSettingString* CGUIDialogSettingsManualBase::AddInfoLabelButton(CSettingGroup *
     return NULL;
 
   setting->SetControl(GetButtonControl("infolabel", false));
-  setSettingDetails(setting, level, visible, help);
-
-  group->AddSetting(setting);
-  return setting;
-}
-
-CSettingAddon* CGUIDialogSettingsManualBase::AddAddon(CSettingGroup *group, const std::string &id, int label, int level, std::string value, ADDON::TYPE addonType,
-                                                      bool allowEmpty /* = false */, int heading /* = -1 */, bool hideValue /* = false */, bool showInstalledAddons /* = true */,
-                                                      bool showInstallableAddons /* = false */, bool showMoreAddons /* = true */, bool delayed /* = false */,
-                                                      bool visible /* = true */, int help /* = -1 */)
-{
-  if (group == NULL || id.empty() || label < 0 ||
-      GetSetting(id) != NULL)
-    return NULL;
-
-  CSettingAddon *setting = new CSettingAddon(id, label, value, m_settingsManager);
-  if (setting == NULL)
-    return NULL;
-
-  setting->SetControl(GetButtonControl("addon", delayed, heading, hideValue, showInstalledAddons, showInstallableAddons, showMoreAddons));
-  setting->SetAddonType(addonType);
-  setting->SetAllowEmpty(allowEmpty);
   setSettingDetails(setting, level, visible, help);
 
   group->AddSetting(setting);

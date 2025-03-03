@@ -21,6 +21,7 @@
 #include "SettingsManager.h"
 
 #include <algorithm>
+#include <shared_mutex>
 #include <utility>
 
 #include "SettingDefinitions.h"
@@ -48,8 +49,8 @@ CSettingsManager::~CSettingsManager()
 
 bool CSettingsManager::Initialize(const TiXmlElement *root)
 {
-  CExclusiveLock lock(m_critical);
-  CExclusiveLock settingsLock(m_settingsCritical);
+  std::unique_lock<CSharedSection> lock(m_critical);
+  std::unique_lock<CSharedSection> settingsLock(m_settingsCritical);
   if (m_initialized || root == NULL)
     return false;
 
@@ -91,8 +92,8 @@ bool CSettingsManager::Initialize(const TiXmlElement *root)
 
 bool CSettingsManager::Load(const TiXmlElement *root, bool &updated, bool triggerEvents /* = true */, std::map<std::string, CSetting*> *loadedSettings /* = NULL */)
 {
-  CSharedLock lock(m_critical);
-  CExclusiveLock settingsLock(m_settingsCritical);
+  std::shared_lock<CSharedSection> lock(m_critical);
+  std::unique_lock<CSharedSection> settingsLock(m_settingsCritical);
   if (m_loaded || root == NULL)
     return false;
 
@@ -115,8 +116,8 @@ bool CSettingsManager::Load(const TiXmlElement *root, bool &updated, bool trigge
 
 bool CSettingsManager::Save(TiXmlNode *root) const
 {
-  CSharedLock lock(m_critical);
-  CSharedLock settingsLock(m_settingsCritical);
+  std::shared_lock<CSharedSection> lock(m_critical);
+  std::shared_lock<CSharedSection> settingsLock(m_settingsCritical);
   if (!m_initialized || root == NULL)
     return false;
 
@@ -143,7 +144,7 @@ bool CSettingsManager::Save(TiXmlNode *root) const
 
 void CSettingsManager::Unload()
 {
-  CExclusiveLock lock(m_settingsCritical);
+  std::unique_lock<CSharedSection> lock(m_settingsCritical);
   if (!m_loaded)
     return;
 
@@ -159,7 +160,7 @@ void CSettingsManager::Unload()
 
 void CSettingsManager::Clear()
 {
-  CExclusiveLock lock(m_critical);
+  std::unique_lock<CSharedSection> lock(m_critical);
   Unload();
 
   m_settings.clear();
@@ -197,7 +198,7 @@ bool CSettingsManager::LoadSetting(const TiXmlNode *node, const std::string &set
 
 void CSettingsManager::SetInitialized()
 {
-  CExclusiveLock lock(m_settingsCritical);
+  std::unique_lock<CSharedSection> lock(m_settingsCritical);
   if (m_initialized)
     return;
 
@@ -294,7 +295,7 @@ void CSettingsManager::AddSection(CSettingSection *section)
 
 void CSettingsManager::RegisterCallback(ISettingCallback *callback, const std::set<std::string> &settingList)
 {
-  CExclusiveLock lock(m_settingsCritical);
+  std::unique_lock<CSharedSection> lock(m_settingsCritical);
   if (callback == NULL)
     return;
 
@@ -320,14 +321,14 @@ void CSettingsManager::RegisterCallback(ISettingCallback *callback, const std::s
 
 void CSettingsManager::UnregisterCallback(ISettingCallback *callback)
 {
-  CExclusiveLock lock(m_settingsCritical);
+  std::unique_lock<CSharedSection> lock(m_settingsCritical);
   for (SettingMap::iterator settingIt = m_settings.begin(); settingIt != m_settings.end(); ++settingIt)
     settingIt->second.callbacks.erase(callback);
 }
 
 void CSettingsManager::RegisterSettingType(const std::string &settingType, ISettingCreator *settingCreator)
 {
-  CExclusiveLock lock(m_critical);
+  std::unique_lock<CSharedSection> lock(m_critical);
   if (settingType.empty() || settingCreator == NULL)
     return;
 
@@ -341,7 +342,7 @@ void CSettingsManager::RegisterSettingControl(const std::string &controlType, IS
   if (controlType.empty() || settingControlCreator == NULL)
     return;
 
-  CExclusiveLock lock(m_critical);
+  std::unique_lock<CSharedSection> lock(m_critical);
   SettingControlCreatorMap::const_iterator creatorIt = m_settingControlCreators.find(controlType);
   if (creatorIt == m_settingControlCreators.end())
     m_settingControlCreators.insert(make_pair(controlType, settingControlCreator));
@@ -352,7 +353,7 @@ void CSettingsManager::RegisterSettingsHandler(ISettingsHandler *settingsHandler
   if (settingsHandler == NULL)
     return;
 
-  CExclusiveLock lock(m_critical);
+  std::unique_lock<CSharedSection> lock(m_critical);
   if (find(m_settingsHandlers.begin(), m_settingsHandlers.end(), settingsHandler) == m_settingsHandlers.end())
     m_settingsHandlers.push_back(settingsHandler);
 }
@@ -362,7 +363,7 @@ void CSettingsManager::UnregisterSettingsHandler(ISettingsHandler *settingsHandl
   if (settingsHandler == NULL)
     return;
 
-  CExclusiveLock lock(m_critical);
+  std::unique_lock<CSharedSection> lock(m_critical);
   SettingsHandlers::iterator it = find(m_settingsHandlers.begin(), m_settingsHandlers.end(), settingsHandler);
   if (it != m_settingsHandlers.end())
     m_settingsHandlers.erase(it);
@@ -370,7 +371,7 @@ void CSettingsManager::UnregisterSettingsHandler(ISettingsHandler *settingsHandl
 
 void CSettingsManager::RegisterSubSettings(ISubSettings *subSettings)
 {
-  CExclusiveLock lock(m_critical);
+  std::unique_lock<CSharedSection> lock(m_critical);
   if (subSettings == NULL)
     return;
 
@@ -379,7 +380,7 @@ void CSettingsManager::RegisterSubSettings(ISubSettings *subSettings)
 
 void CSettingsManager::UnregisterSubSettings(ISubSettings *subSettings)
 {
-  CExclusiveLock lock(m_critical);
+  std::unique_lock<CSharedSection> lock(m_critical);
   if (subSettings == NULL)
     return;
 
@@ -404,13 +405,13 @@ void CSettingsManager::RegisterSettingOptionsFiller(const std::string &identifie
 
 void CSettingsManager::UnregisterSettingOptionsFiller(const std::string &identifier)
 {
-  CExclusiveLock lock(m_critical);
+  std::unique_lock<CSharedSection> lock(m_critical);
   m_optionsFillers.erase(identifier);
 }
 
 void* CSettingsManager::GetSettingOptionsFiller(const CSetting *setting)
 {
-  CSharedLock lock(m_critical);
+  std::shared_lock<CSharedSection> lock(m_critical);
   if (setting == NULL)
     return NULL;
 
@@ -460,7 +461,7 @@ void* CSettingsManager::GetSettingOptionsFiller(const CSetting *setting)
 
 CSetting* CSettingsManager::GetSetting(const std::string &id) const
 {
-  CSharedLock lock(m_settingsCritical);
+  std::shared_lock<CSharedSection> lock(m_settingsCritical);
   if (id.empty())
     return NULL;
 
@@ -477,7 +478,7 @@ CSetting* CSettingsManager::GetSetting(const std::string &id) const
 
 std::vector<CSettingSection*> CSettingsManager::GetSections() const
 {
-  CSharedLock lock(m_critical);
+  std::shared_lock<CSharedSection> lock(m_critical);
   std::vector<CSettingSection*> sections;
   for (SettingSectionMap::const_iterator sectionIt = m_sections.begin(); sectionIt != m_sections.end(); ++sectionIt)
     sections.push_back(sectionIt->second);
@@ -487,7 +488,7 @@ std::vector<CSettingSection*> CSettingsManager::GetSections() const
 
 CSettingSection* CSettingsManager::GetSection(const std::string &section) const
 {
-  CSharedLock lock(m_critical);
+  std::shared_lock<CSharedSection> lock(m_critical);
   if (section.empty())
     return NULL;
 
@@ -504,7 +505,7 @@ CSettingSection* CSettingsManager::GetSection(const std::string &section) const
 
 SettingDependencyMap CSettingsManager::GetDependencies(const std::string &id) const
 {
-  CSharedLock lock(m_settingsCritical);
+  std::shared_lock<CSharedSection> lock(m_settingsCritical);
   SettingMap::const_iterator setting = m_settings.find(id);
   if (setting == m_settings.end())
     return SettingDependencyMap();
@@ -522,7 +523,7 @@ SettingDependencyMap CSettingsManager::GetDependencies(const CSetting *setting) 
 
 bool CSettingsManager::GetBool(const std::string &id) const
 {
-  CSharedLock lock(m_settingsCritical);
+  std::shared_lock<CSharedSection> lock(m_settingsCritical);
   CSetting *setting = GetSetting(id);
   if (setting == NULL || setting->GetType() != SettingTypeBool)
     return false;
@@ -532,7 +533,7 @@ bool CSettingsManager::GetBool(const std::string &id) const
 
 bool CSettingsManager::SetBool(const std::string &id, bool value)
 {
-  CSharedLock lock(m_settingsCritical);
+  std::shared_lock<CSharedSection> lock(m_settingsCritical);
   CSetting *setting = GetSetting(id);
   if (setting == NULL || setting->GetType() != SettingTypeBool)
     return false;
@@ -542,7 +543,7 @@ bool CSettingsManager::SetBool(const std::string &id, bool value)
 
 bool CSettingsManager::ToggleBool(const std::string &id)
 {
-  CSharedLock lock(m_settingsCritical);
+  std::shared_lock<CSharedSection> lock(m_settingsCritical);
   CSetting *setting = GetSetting(id);
   if (setting == NULL || setting->GetType() != SettingTypeBool)
     return false;
@@ -552,7 +553,7 @@ bool CSettingsManager::ToggleBool(const std::string &id)
 
 int CSettingsManager::GetInt(const std::string &id) const
 {
-  CSharedLock lock(m_settingsCritical);
+  std::shared_lock<CSharedSection> lock(m_settingsCritical);
   CSetting *setting = GetSetting(id);
   if (setting == NULL || setting->GetType() != SettingTypeInteger)
     return 0;
@@ -562,7 +563,7 @@ int CSettingsManager::GetInt(const std::string &id) const
 
 bool CSettingsManager::SetInt(const std::string &id, int value)
 {
-  CSharedLock lock(m_settingsCritical);
+  std::shared_lock<CSharedSection> lock(m_settingsCritical);
   CSetting *setting = GetSetting(id);
   if (setting == NULL || setting->GetType() != SettingTypeInteger)
     return false;
@@ -572,7 +573,7 @@ bool CSettingsManager::SetInt(const std::string &id, int value)
 
 double CSettingsManager::GetNumber(const std::string &id) const
 {
-  CSharedLock lock(m_settingsCritical);
+  std::shared_lock<CSharedSection> lock(m_settingsCritical);
   CSetting *setting = GetSetting(id);
   if (setting == NULL || setting->GetType() != SettingTypeNumber)
     return 0.0;
@@ -582,7 +583,7 @@ double CSettingsManager::GetNumber(const std::string &id) const
 
 bool CSettingsManager::SetNumber(const std::string &id, double value)
 {
-  CSharedLock lock(m_settingsCritical);
+  std::shared_lock<CSharedSection> lock(m_settingsCritical);
   CSetting *setting = GetSetting(id);
   if (setting == NULL || setting->GetType() != SettingTypeNumber)
     return false;
@@ -592,7 +593,7 @@ bool CSettingsManager::SetNumber(const std::string &id, double value)
 
 std::string CSettingsManager::GetString(const std::string &id) const
 {
-  CSharedLock lock(m_settingsCritical);
+  std::shared_lock<CSharedSection> lock(m_settingsCritical);
   CSetting *setting = GetSetting(id);
   if (setting == NULL || setting->GetType() != SettingTypeString)
     return "";
@@ -602,7 +603,7 @@ std::string CSettingsManager::GetString(const std::string &id) const
 
 bool CSettingsManager::SetString(const std::string &id, const std::string &value)
 {
-  CSharedLock lock(m_settingsCritical);
+  std::shared_lock<CSharedSection> lock(m_settingsCritical);
   CSetting *setting = GetSetting(id);
   if (setting == NULL || setting->GetType() != SettingTypeString)
     return false;
@@ -612,7 +613,7 @@ bool CSettingsManager::SetString(const std::string &id, const std::string &value
 
 std::vector< std::shared_ptr<CSetting> > CSettingsManager::GetList(const std::string &id) const
 {
-  CSharedLock lock(m_settingsCritical);
+  std::shared_lock<CSharedSection> lock(m_settingsCritical);
   CSetting *setting = GetSetting(id);
   if (setting == NULL || setting->GetType() != SettingTypeList)
     return std::vector< std::shared_ptr<CSetting> >();
@@ -622,7 +623,7 @@ std::vector< std::shared_ptr<CSetting> > CSettingsManager::GetList(const std::st
 
 bool CSettingsManager::SetList(const std::string &id, const std::vector< std::shared_ptr<CSetting> > &value)
 {
-  CSharedLock lock(m_settingsCritical);
+  std::shared_lock<CSharedSection> lock(m_settingsCritical);
   CSetting *setting = GetSetting(id);
   if (setting == NULL || setting->GetType() != SettingTypeList)
     return false;
@@ -632,7 +633,7 @@ bool CSettingsManager::SetList(const std::string &id, const std::vector< std::sh
 
 void CSettingsManager::AddCondition(const std::string &condition)
 {
-  CExclusiveLock lock(m_critical);
+  std::unique_lock<CSharedSection> lock(m_critical);
   if (condition.empty())
     return;
 
@@ -641,7 +642,7 @@ void CSettingsManager::AddCondition(const std::string &condition)
 
 void CSettingsManager::AddCondition(const std::string &identifier, SettingConditionCheck condition, void *data /*= NULL*/)
 {
-  CExclusiveLock lock(m_critical);
+  std::unique_lock<CSharedSection> lock(m_critical);
   if (identifier.empty() || condition == NULL)
     return;
 
@@ -653,7 +654,7 @@ bool CSettingsManager::Serialize(TiXmlNode *parent) const
   if (parent == NULL)
     return false;
 
-  CSharedLock lock(m_settingsCritical);
+  std::shared_lock<CSharedSection> lock(m_settingsCritical);
 
   for (SettingMap::const_iterator it = m_settings.begin(); it != m_settings.end(); ++it)
   {
@@ -708,7 +709,7 @@ bool CSettingsManager::Deserialize(const TiXmlNode *node, bool &updated, std::ma
   if (node == NULL)
     return false;
 
-  CSharedLock lock(m_settingsCritical);
+  std::shared_lock<CSharedSection> lock(m_settingsCritical);
 
   for (SettingMap::iterator it = m_settings.begin(); it != m_settings.end(); ++it)
   {
@@ -729,7 +730,7 @@ bool CSettingsManager::OnSettingChanging(const CSetting *setting)
   if (setting == NULL)
     return false;
 
-  CSharedLock lock(m_settingsCritical);
+  std::shared_lock<CSharedSection> lock(m_settingsCritical);
   if (!m_loaded)
     return true;
 
@@ -739,7 +740,7 @@ bool CSettingsManager::OnSettingChanging(const CSetting *setting)
 
   Setting settingData = settingIt->second;
   // now that we have a copy of the setting's data, we can leave the lock
-  lock.Leave();
+  lock.unlock();
 
   for (CallbackSet::iterator callback = settingData.callbacks.begin();
         callback != settingData.callbacks.end();
@@ -754,7 +755,7 @@ bool CSettingsManager::OnSettingChanging(const CSetting *setting)
   
 void CSettingsManager::OnSettingChanged(const CSetting *setting)
 {
-  CSharedLock lock(m_settingsCritical);
+  std::shared_lock<CSharedSection> lock(m_settingsCritical);
   if (!m_loaded || setting == NULL)
     return;
     
@@ -764,7 +765,7 @@ void CSettingsManager::OnSettingChanged(const CSetting *setting)
 
   Setting settingData = settingIt->second;
   // now that we have a copy of the setting's data, we can leave the lock
-  lock.Leave();
+  lock.unlock();
     
   for (CallbackSet::iterator callback = settingData.callbacks.begin();
         callback != settingData.callbacks.end();
@@ -782,7 +783,7 @@ void CSettingsManager::OnSettingChanged(const CSetting *setting)
 
 void CSettingsManager::OnSettingAction(const CSetting *setting)
 {
-  CSharedLock lock(m_settingsCritical);
+  std::shared_lock<CSharedSection> lock(m_settingsCritical);
   if (!m_loaded || setting == NULL)
     return;
 
@@ -792,7 +793,7 @@ void CSettingsManager::OnSettingAction(const CSetting *setting)
 
   Setting settingData = settingIt->second;
   // now that we have a copy of the setting's data, we can leave the lock
-  lock.Leave();
+  lock.unlock();
 
   for (CallbackSet::iterator callback = settingData.callbacks.begin();
         callback != settingData.callbacks.end();
@@ -802,7 +803,7 @@ void CSettingsManager::OnSettingAction(const CSetting *setting)
 
 bool CSettingsManager::OnSettingUpdate(CSetting* &setting, const char *oldSettingId, const TiXmlNode *oldSettingNode)
 {
-  CSharedLock lock(m_settingsCritical);
+  std::shared_lock<CSharedSection> lock(m_settingsCritical);
   if (setting == NULL)
     return false;
 
@@ -812,7 +813,7 @@ bool CSettingsManager::OnSettingUpdate(CSetting* &setting, const char *oldSettin
 
   Setting settingData = settingIt->second;
   // now that we have a copy of the setting's data, we can leave the lock
-  lock.Leave();
+  lock.unlock();
 
   bool ret = false;
   for (CallbackSet::iterator callback = settingData.callbacks.begin();
@@ -825,7 +826,7 @@ bool CSettingsManager::OnSettingUpdate(CSetting* &setting, const char *oldSettin
 
 void CSettingsManager::OnSettingPropertyChanged(const CSetting *setting, const char *propertyName)
 {
-  CSharedLock lock(m_settingsCritical);
+  std::shared_lock<CSharedSection> lock(m_settingsCritical);
   if (!m_loaded || setting == NULL)
     return;
 
@@ -835,7 +836,7 @@ void CSettingsManager::OnSettingPropertyChanged(const CSetting *setting, const c
 
   Setting settingData = settingIt->second;
   // now that we have a copy of the setting's data, we can leave the lock
-  lock.Leave();
+  lock.unlock();
 
   for (CallbackSet::iterator callback = settingData.callbacks.begin();
         callback != settingData.callbacks.end();
@@ -879,7 +880,7 @@ CSetting* CSettingsManager::CreateSetting(const std::string &settingType, const 
       return new CSettingList(settingId, elementSetting, const_cast<CSettingsManager*>(this));
   }
 
-  CSharedLock lock(m_critical);
+  std::shared_lock<CSharedSection> lock(m_critical);
   SettingCreatorMap::const_iterator creator = m_settingCreators.find(settingType);
   if (creator != m_settingCreators.end())
     return creator->second->CreateSetting(settingType, settingId, (CSettingsManager*)this);
@@ -892,7 +893,7 @@ ISettingControl* CSettingsManager::CreateControl(const std::string &controlType)
   if (controlType.empty())
     return NULL;
 
-  CSharedLock lock(m_critical);
+  std::shared_lock<CSharedSection> lock(m_critical);
   SettingControlCreatorMap::const_iterator creator = m_settingControlCreators.find(controlType);
   if (creator != m_settingControlCreators.end() && creator->second != NULL)
     return creator->second->CreateControl(controlType);
@@ -902,7 +903,7 @@ ISettingControl* CSettingsManager::CreateControl(const std::string &controlType)
 
 bool CSettingsManager::OnSettingsLoading()
 {
-  CSharedLock lock(m_critical);
+  std::shared_lock<CSharedSection> lock(m_critical);
   for (SettingsHandlers::const_iterator it = m_settingsHandlers.begin(); it != m_settingsHandlers.end(); ++it)
   {
     if (!(*it)->OnSettingsLoading())
@@ -914,21 +915,21 @@ bool CSettingsManager::OnSettingsLoading()
 
 void CSettingsManager::OnSettingsUnloaded()
 {
-  CSharedLock lock(m_critical);
+  std::shared_lock<CSharedSection> lock(m_critical);
   for (SettingsHandlers::const_iterator it = m_settingsHandlers.begin(); it != m_settingsHandlers.end(); ++it)
     (*it)->OnSettingsUnloaded();
 }
 
 void CSettingsManager::OnSettingsLoaded()
 {
-  CSharedLock lock(m_critical);
+  std::shared_lock<CSharedSection> lock(m_critical);
   for (SettingsHandlers::const_iterator it = m_settingsHandlers.begin(); it != m_settingsHandlers.end(); ++it)
     (*it)->OnSettingsLoaded();
 }
 
 bool CSettingsManager::OnSettingsSaving() const
 {
-  CSharedLock lock(m_critical);
+  std::shared_lock<CSharedSection> lock(m_critical);
   for (SettingsHandlers::const_iterator it = m_settingsHandlers.begin(); it != m_settingsHandlers.end(); ++it)
   {
     if (!(*it)->OnSettingsSaving())
@@ -940,14 +941,14 @@ bool CSettingsManager::OnSettingsSaving() const
 
 void CSettingsManager::OnSettingsSaved() const
 {
-  CSharedLock lock(m_critical);
+  std::shared_lock<CSharedSection> lock(m_critical);
   for (SettingsHandlers::const_iterator it = m_settingsHandlers.begin(); it != m_settingsHandlers.end(); ++it)
     (*it)->OnSettingsSaved();
 }
 
 void CSettingsManager::OnSettingsCleared()
 {
-  CSharedLock lock(m_critical);
+  std::shared_lock<CSharedSection> lock(m_critical);
   for (SettingsHandlers::const_iterator it = m_settingsHandlers.begin(); it != m_settingsHandlers.end(); ++it)
     (*it)->OnSettingsCleared();
 }
@@ -955,7 +956,7 @@ void CSettingsManager::OnSettingsCleared()
 bool CSettingsManager::Load(const TiXmlNode *settings)
 {
   bool ok = true;
-  CSharedLock lock(m_critical);
+  std::shared_lock<CSharedSection> lock(m_critical);
   for (std::set<ISubSettings*>::const_iterator it = m_subSettings.begin(); it != m_subSettings.end(); ++it)
     ok &= (*it)->Load(settings);
 
@@ -1101,7 +1102,7 @@ void CSettingsManager::UpdateSettingByDependency(const std::string &settingId, S
 
 void CSettingsManager::RegisterSettingOptionsFiller(const std::string &identifier, void *filler, SettingOptionsFillerType type)
 {
-  CExclusiveLock lock(m_critical);
+  std::unique_lock<CSharedSection> lock(m_critical);
   SettingOptionsFillerMap::const_iterator it = m_optionsFillers.find(identifier);
   if (it != m_optionsFillers.end())
     return;

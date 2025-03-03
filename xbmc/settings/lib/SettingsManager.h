@@ -464,6 +464,6 @@ private:
   typedef std::map<std::string, SettingOptionsFiller> SettingOptionsFillerMap;
   SettingOptionsFillerMap m_optionsFillers;
 
-  CSharedSection m_critical;
-  CSharedSection m_settingsCritical;
+  mutable CSharedSection m_critical;
+  mutable CSharedSection m_settingsCritical;
 };

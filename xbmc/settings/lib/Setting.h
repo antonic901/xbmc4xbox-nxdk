@@ -21,6 +21,7 @@
 
 #include <map>
 #include <set>
+#include <shared_mutex>
 #include <string>
 #include <vector>
 
@@ -133,7 +134,7 @@ protected:
   SettingDependencies m_dependencies;
   std::set<CSettingUpdate> m_updates;
   bool m_changed;
-  CSharedSection m_critical;
+  mutable CSharedSection m_critical;
 };
 
 typedef std::shared_ptr<CSetting> SettingPtr;
@@ -222,7 +223,7 @@ public:
   virtual bool CheckValidity(const std::string &value) const override;
   virtual void Reset() override { SetValue(m_default); }
 
-  bool GetValue() const { CSharedLock lock(m_critical); return m_value; }
+  bool GetValue() const { std::shared_lock<CSharedSection> lock(m_critical); return m_value; }
   bool SetValue(bool value);
   bool GetDefault() const { return m_default; }
   void SetDefault(bool value);
@@ -262,7 +263,7 @@ public:
   virtual bool CheckValidity(int value) const;
   virtual void Reset() override { SetValue(m_default); }
 
-  int GetValue() const { CSharedLock lock(m_critical); return m_value; }
+  int GetValue() const { std::shared_lock<CSharedSection> lock(m_critical); return m_value; }
   bool SetValue(int value);
   int GetDefault() const { return m_default; }
   void SetDefault(int value);
@@ -332,7 +333,7 @@ public:
   virtual bool CheckValidity(double value) const;
   virtual void Reset() override { SetValue(m_default); }
 
-  double GetValue() const { CSharedLock lock(m_critical); return m_value; }
+  double GetValue() const { std::shared_lock<CSharedSection> lock(m_critical); return m_value; }
   bool SetValue(double value);
   double GetDefault() const { return m_default; }
   void SetDefault(double value);
@@ -379,7 +380,7 @@ public:
   virtual bool CheckValidity(const std::string &value) const override;
   virtual void Reset() override { SetValue(m_default); }
 
-  virtual const std::string& GetValue() const { CSharedLock lock(m_critical); return m_value; }
+  virtual const std::string& GetValue() const { std::shared_lock<CSharedSection> lock(m_critical); return m_value; }
   virtual bool SetValue(const std::string &value);
   virtual const std::string& GetDefault() const { return m_default; }
   virtual void SetDefault(const std::string &value);

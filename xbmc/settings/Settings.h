@@ -611,5 +611,5 @@ private:
 
   bool m_initialized;
   CSettingsManager *m_settingsManager;
-  CCriticalSection m_critical;
+  mutable CCriticalSection m_critical;
 };
