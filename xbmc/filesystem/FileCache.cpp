@@ -12,6 +12,7 @@
 #include "ServiceBroker.h"
 #include "URL.h"
 #include "settings/AdvancedSettings.h"
+#include "settings/SettingsComponent.h"
 #include "threads/Thread.h"
 #include "utils/log.h"
 
@@ -137,7 +138,7 @@ bool CFileCache::Open(const CURL& url)
   // Determine the best chunk size we can use
   m_chunkSize = CFile::DetermineChunkSize(
       m_source.GetChunkSize(),
-      g_advancedSettings.m_cacheChunkSize);
+      CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_cacheChunkSize);
   CLog::Log(LOGDEBUG,
             "CFileCache::{} - <{}> source chunk size is {}, setting cache chunk size to {}",
             __FUNCTION__, m_sourcePath, m_source.GetChunkSize(), m_chunkSize);
@@ -146,7 +147,7 @@ bool CFileCache::Open(const CURL& url)
 
   if (!m_pCache)
   {
-    if (g_advancedSettings.m_cacheMemSize == 0)
+    if (CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_cacheMemSize == 0)
     {
       // Use cache on disk
       m_pCache = std::unique_ptr<CSimpleFileCache>(new CSimpleFileCache()); // C++14 - Replace with std::make_unique
@@ -155,7 +156,7 @@ bool CFileCache::Open(const CURL& url)
     else
     {
       size_t cacheSize;
-      if (m_fileSize > 0 && m_fileSize < g_advancedSettings.m_cacheMemSize && !(m_flags & READ_AUDIO_VIDEO))
+      if (m_fileSize > 0 && m_fileSize < CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_cacheMemSize && !(m_flags & READ_AUDIO_VIDEO))
       {
         // Cap cache size by filesize, but not for audio/video files as those may grow.
         // We don't need to take into account READ_MULTI_STREAM here as that's only used for audio/video
@@ -167,7 +168,7 @@ bool CFileCache::Open(const CURL& url)
       }
       else
       {
-        cacheSize = g_advancedSettings.m_cacheMemSize;
+        cacheSize = CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_cacheMemSize;
 
         // NOTE: READ_MULTI_STREAM is only used with READ_AUDIO_VIDEO
         if (m_flags & READ_MULTI_STREAM)
@@ -294,13 +295,13 @@ void CFileCache::Process()
 
     while (m_writeRate)
     {
-      if (m_writePos - m_readPos < m_writeRate * g_advancedSettings.m_cacheReadFactor)
+      if (m_writePos - m_readPos < m_writeRate * CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_cacheReadFactor)
       {
         limiter.Reset(m_writePos);
         break;
       }
 
-      if (limiter.Rate(m_writePos) < m_writeRate * g_advancedSettings.m_cacheReadFactor)
+      if (limiter.Rate(m_writePos) < m_writeRate * CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_cacheReadFactor)
         break;
 
       if (m_seekEvent.Wait(100ms))

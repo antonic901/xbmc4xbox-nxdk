@@ -8,11 +8,13 @@ SRCS += \
 	$(CURDIR)/xbmc/GUILargeTextureManager.cpp \
 	$(CURDIR)/xbmc/LangInfo.cpp \
 	$(CURDIR)/xbmc/ServiceBroker.cpp \
+	$(CURDIR)/xbmc/ServiceManager.cpp \
 	$(CURDIR)/xbmc/URL.cpp \
 	$(CURDIR)/xbmc/Util.cpp \
 	$(CURDIR)/xbmc/XBDateTime.cpp
 
 include $(CURDIR)/xbmc/addons/Makefile
+include $(CURDIR)/xbmc/application/Makefile
 include $(CURDIR)/xbmc/commons/Makefile
 include $(CURDIR)/xbmc/cores/Makefile
 include $(CURDIR)/xbmc/dbwrappers/Makefile

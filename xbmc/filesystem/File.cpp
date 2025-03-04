@@ -18,6 +18,7 @@
 #include "ServiceBroker.h"
 #include "commons/Exception.h"
 #include "settings/AdvancedSettings.h"
+#include "settings/SettingsComponent.h"
 #include "utils/BitstreamStats.h"
 #include "utils/Stopwatch.h"
 #include "utils/StringUtils.h"
@@ -284,7 +285,7 @@ bool CFile::Open(const CURL& file, const unsigned int flags)
           (m_flags & READ_AUDIO_VIDEO))
       {
         const unsigned int iCacheBufferMode =
-            g_advancedSettings.m_cacheBufferMode;
+            CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_cacheBufferMode;
         if ((iCacheBufferMode == CACHE_BUFFER_MODE_INTERNET &&
              URIUtils::IsInternetStream(pathToUrl, true)) ||
             (iCacheBufferMode == CACHE_BUFFER_MODE_TRUE_INTERNET &&

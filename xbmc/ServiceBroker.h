@@ -20,6 +20,9 @@ class CApplicationMessenger;
 }
 } // namespace KODI
 
+class CAppParams;
+class CSettingsComponent;
+class CFileExtensionProvider;
 class CJobManager;
 
 class CServiceBroker
@@ -27,6 +30,16 @@ class CServiceBroker
 public:
   CServiceBroker();
   ~CServiceBroker();
+
+  static std::shared_ptr<CAppParams> GetAppParams();
+  static void RegisterAppParams(const std::shared_ptr<CAppParams>& appParams);
+  static void UnregisterAppParams();
+
+  static CFileExtensionProvider& GetFileExtensionProvider();
+
+  static void RegisterSettingsComponent(const std::shared_ptr<CSettingsComponent>& settings);
+  static void UnregisterSettingsComponent();
+  static std::shared_ptr<CSettingsComponent> GetSettingsComponent();
 
   static void RegisterJobManager(const std::shared_ptr<CJobManager>& jobManager);
   static void UnregisterJobManager();
@@ -38,6 +51,8 @@ public:
   static std::shared_ptr<KODI::MESSAGING::CApplicationMessenger> GetAppMessenger();
 
 private:
+  std::shared_ptr<CAppParams> m_appParams;
+  std::shared_ptr<CSettingsComponent> m_pSettingsComponent;
   std::shared_ptr<CJobManager> m_jobManager;
   std::shared_ptr<KODI::MESSAGING::CApplicationMessenger> m_appMessenger;
 };

@@ -21,10 +21,12 @@
 #include "DummyVideoPlayer.h"
 
 #include "Application.h"
+#include "ServiceBroker.h"
 #include "guilib/GUIFont.h"
 #include "guilib/GUIFontManager.h"
 #include "guilib/GUITextLayout.h"
 #include "settings/AdvancedSettings.h"
+#include "settings/SettingsComponent.h"
 #include "utils/log.h"
 
 CDummyVideoPlayer::CDummyVideoPlayer(IPlayerCallback& callback) : IPlayer(callback), CThread("CDummyVideoPlayer")
@@ -143,13 +145,13 @@ bool CDummyVideoPlayer::CanSeek()
 
 void CDummyVideoPlayer::Seek(bool bPlus, bool bLargeStep, bool bChapterOverride)
 {
-  if (g_advancedSettings.m_videoUseTimeSeeking && GetTotalTime() > 2000*g_advancedSettings.m_videoTimeSeekForwardBig)
+  if (CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoUseTimeSeeking && GetTotalTime() > 2000*CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoTimeSeekForwardBig)
   {
     int seek = 0;
     if (bLargeStep)
-      seek = bPlus ? g_advancedSettings.m_videoTimeSeekForwardBig : g_advancedSettings.m_videoTimeSeekBackwardBig;
+      seek = bPlus ? CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoTimeSeekForwardBig : CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoTimeSeekBackwardBig;
     else
-      seek = bPlus ? g_advancedSettings.m_videoTimeSeekForward : g_advancedSettings.m_videoTimeSeekBackward;
+      seek = bPlus ? CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoTimeSeekForward : CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoTimeSeekBackward;
     // do the seek
     SeekTime(GetTime() + seek * 1000);
   }
@@ -157,9 +159,9 @@ void CDummyVideoPlayer::Seek(bool bPlus, bool bLargeStep, bool bChapterOverride)
   {
     float percent = GetPercentage();
     if (bLargeStep)
-      percent += bPlus ? g_advancedSettings.m_videoPercentSeekForwardBig : g_advancedSettings.m_videoPercentSeekBackwardBig;
+      percent += bPlus ? CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoPercentSeekForwardBig : CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoPercentSeekBackwardBig;
     else
-      percent += bPlus ? g_advancedSettings.m_videoPercentSeekForward : g_advancedSettings.m_videoPercentSeekBackward;
+      percent += bPlus ? CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoPercentSeekForward : CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoPercentSeekBackward;
 
     if (percent >= 0 && percent <= 100)
     {

@@ -9,6 +9,8 @@
 #include "URIUtils.h"
 #include "settings/AdvancedSettings.h"
 #include "URL.h"
+#include "utils/FileExtensionProvider.h"
+#include "ServiceBroker.h"
 #include "StringUtils.h"
 #include "utils/log.h"
 
@@ -18,6 +20,18 @@
 
 #include <algorithm>
 #include <cassert>
+
+const CAdvancedSettings* URIUtils::m_advancedSettings = nullptr;
+
+void URIUtils::RegisterAdvancedSettings(const CAdvancedSettings& advancedSettings)
+{
+  m_advancedSettings = &advancedSettings;
+}
+
+void URIUtils::UnregisterAdvancedSettings()
+{
+  m_advancedSettings = nullptr;
+}
 
 /* returns filename extension including period of filename */
 std::string URIUtils::GetExtension(const CURL& url)
@@ -103,10 +117,10 @@ void URIUtils::RemoveExtension(std::string& strFileName)
     strExtension += "|";
 
     std::string strFileMask;
-    strFileMask = g_advancedSettings.m_pictureExtensions;
-    strFileMask += "|" + g_advancedSettings.m_musicExtensions;
-    strFileMask += "|" + g_advancedSettings.m_videoExtensions;
-    strFileMask += "|" + g_advancedSettings.m_subtitlesExtensions;
+    strFileMask = CServiceBroker::GetFileExtensionProvider().GetPictureExtensions();
+    strFileMask += "|" + CServiceBroker::GetFileExtensionProvider().GetMusicExtensions();
+    strFileMask += "|" + CServiceBroker::GetFileExtensionProvider().GetVideoExtensions();
+    strFileMask += "|" + CServiceBroker::GetFileExtensionProvider().GetSubtitleExtensions();
 #if defined(TARGET_DARWIN)
     strFileMask += "|.py|.xml|.milk|.xbt|.cdg|.app|.applescript|.workflow";
 #else
@@ -444,7 +458,7 @@ CURL URIUtils::SubstitutePath(const CURL& url, bool reverse /* = false */)
 
 std::string URIUtils::SubstitutePath(const std::string& strPath, bool reverse /* = false */)
 {
-  for (const auto& pathPair : g_advancedSettings.m_pathSubstitutions)
+  for (const auto& pathPair : m_advancedSettings->m_pathSubstitutions)
   {
     const std::string fromPath = reverse ? pathPair.second : pathPair.first;
     std::string toPath = reverse ? pathPair.first : pathPair.second;

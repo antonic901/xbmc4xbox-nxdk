@@ -20,6 +20,8 @@
 
 #include "Application.h"
 
+#include "ServiceManager.h"
+
 #include "input/Key.h"
 
 CApplication::CApplication(void)
