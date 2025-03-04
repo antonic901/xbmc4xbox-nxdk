@@ -12,6 +12,11 @@
 
 #include <memory>
 
+namespace ADDON
+{
+class CAddonMgr;
+} // namespace ADDON
+
 namespace KODI
 {
 namespace MESSAGING
@@ -35,6 +40,7 @@ public:
   static void RegisterAppParams(const std::shared_ptr<CAppParams>& appParams);
   static void UnregisterAppParams();
 
+  static ADDON::CAddonMgr& GetAddonMgr();
   static CFileExtensionProvider& GetFileExtensionProvider();
 
   static void RegisterSettingsComponent(const std::shared_ptr<CSettingsComponent>& settings);

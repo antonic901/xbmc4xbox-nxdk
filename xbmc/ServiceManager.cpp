@@ -8,6 +8,7 @@
 
 #include "ServiceManager.h"
 
+#include "addons/AddonManager.h"
 #include "utils/FileExtensionProvider.h"
 #include "utils/log.h"
 
@@ -25,6 +26,13 @@ CServiceManager::~CServiceManager()
 
 bool CServiceManager::InitForTesting()
 {
+  m_addonMgr.reset(new ADDON::CAddonMgr());
+  if (!m_addonMgr->Init())
+  {
+    CLog::Log(LOGFATAL, "CServiceManager::{}: Unable to start CAddonMgr", __FUNCTION__);
+    return false;
+  }
+
   m_fileExtensionProvider.reset(new CFileExtensionProvider());
 
   init_level = 1;
@@ -35,6 +43,7 @@ void CServiceManager::DeinitTesting()
 {
   init_level = 0;
   m_fileExtensionProvider.reset();
+  m_addonMgr.reset();
 }
 
 bool CServiceManager::InitStageOne()
@@ -45,6 +54,13 @@ bool CServiceManager::InitStageOne()
 
 bool CServiceManager::InitStageTwo(const std::string& profilesUserDataFolder)
 {
+  m_addonMgr.reset(new ADDON::CAddonMgr());
+  if (!m_addonMgr->Init())
+  {
+    CLog::Log(LOGFATAL, "CServiceManager::{}: Unable to start CAddonMgr", __FUNCTION__);
+    return false;
+  }
+
   m_fileExtensionProvider.reset(new CFileExtensionProvider());
 
   init_level = 2;
@@ -68,11 +84,17 @@ void CServiceManager::DeinitStageTwo()
   init_level = 1;
 
   m_fileExtensionProvider.reset();
+  m_addonMgr.reset();
 }
 
 void CServiceManager::DeinitStageOne()
 {
   init_level = 0;
+}
+
+ADDON::CAddonMgr& CServiceManager::GetAddonMgr()
+{
+  return *m_addonMgr;
 }
 
 CFileExtensionProvider& CServiceManager::GetFileExtensionProvider()

@@ -10,6 +10,11 @@
 
 #include <memory>
 
+namespace ADDON
+{
+class CAddonMgr;
+} // namespace ADDON
+
 class CFileExtensionProvider;
 
 class CServiceManager
@@ -27,10 +32,13 @@ public:
   void DeinitStageTwo();
   void DeinitStageOne();
 
+  ADDON::CAddonMgr& GetAddonMgr();
+
   int init_level = 0;
 
   CFileExtensionProvider& GetFileExtensionProvider();
 
 protected:
+  std::unique_ptr<ADDON::CAddonMgr> m_addonMgr;
   std::unique_ptr<CFileExtensionProvider> m_fileExtensionProvider;
 };

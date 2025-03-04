@@ -18,10 +18,8 @@
 #include "addons/gui/GUIDialogAddonSettings.h"
 #include "addons/settings/SettingUrlEncodedString.h"
 #include "filesystem/Directory.h"
-#include "guilib/GUIComponent.h"
 #include "guilib/LocalizeStrings.h"
 #include "messaging/ApplicationMessenger.h"
-#include "settings/SettingAddon.h"
 #include "settings/SettingConditions.h"
 #include "settings/SettingControl.h"
 #include "settings/SettingDateTime.h"
@@ -53,7 +51,7 @@ bool InfoBool(const std::string& condition,
               const SettingConstPtr& setting,
               void* data)
 {
-  return CServiceBroker::GetGUI()->GetInfoManager().EvaluateBool(value, INFO::DEFAULT_CONTEXT);
+  return g_infoManager.EvaluateBool(value);
 }
 
 template<class TSetting>
@@ -89,8 +87,7 @@ SettingPtr InitializeFromOldSettingWithoutDefinition<CSettingString>(
 template<class TSetting>
 SettingPtr AddSettingWithoutDefinition(ADDON::CAddonSettings& settings,
                                        const std::string& settingId,
-                                       typename TSetting::Value defaultValue,
-                                       const Logger& logger)
+                                       typename TSetting::Value defaultValue)
 {
   if (settingId.empty())
     return nullptr;
@@ -98,7 +95,7 @@ SettingPtr AddSettingWithoutDefinition(ADDON::CAddonSettings& settings,
   // if necessary try to initialize the settings manager on-the-fly without any definitions
   if (!settings.IsInitialized() && !settings.Initialize(CXBMCTinyXML(), true))
   {
-    logger->warn("failed to initialize settings on-the-fly");
+    CLog::Log(LOGWARNING, "failed to initialize settings on-the-fly");
     return nullptr;
   }
 
@@ -132,14 +129,14 @@ SettingPtr AddSettingWithoutDefinition(ADDON::CAddonSettings& settings,
       InitializeFromOldSettingWithoutDefinition<TSetting>(settings, settingId, defaultValue);
   if (setting == nullptr)
   {
-    logger->warn("failed to create setting \"{}\" on-the-fly", settingId);
+    CLog::Log(LOGWARNING, "failed to create setting \"{}\" on-the-fly", settingId);
     return nullptr;
   }
 
   // add the setting (and if necessary the section, category and/or group)
   if (!settings.GetSettingsManager()->AddSetting(setting, section, category, group))
   {
-    logger->warn("failed to add setting \"{}\" on-the-fly", settingId);
+    CLog::Log(LOGWARNING, "failed to add setting \"{}\" on-the-fly", settingId);
     return nullptr;
   }
 
@@ -159,9 +156,7 @@ CAddonSettings::CAddonSettings(const std::shared_ptr<const IAddon>& addon,
     m_addonProfile(addon->Profile()),
     m_instanceId(instanceId),
     m_unidentifiedSettingId(0),
-    m_unknownSettingLabelId(UnknownSettingLabelIdStart),
-    m_logger(CServiceBroker::GetLogging().GetLogger(
-        StringUtils::Format("CAddonSettings[{}@{}]", m_instanceId, m_addonId)))
+    m_unknownSettingLabelId(UnknownSettingLabelIdStart)
 {
 }
 
@@ -319,7 +314,7 @@ bool CAddonSettings::Load(const CXBMCTinyXML& doc)
   uint32_t version = 0;
   if (!ParseSettingVersion(doc, version))
   {
-    m_logger->error("failed to determine setting values version");
+    CLog::Log(LOGERROR, "failed to determine setting values version");
     return false;
   }
 
@@ -377,7 +372,7 @@ bool CAddonSettings::Load(const CXBMCTinyXML& doc)
   // for old setting values do it manually
   else if (!LoadOldSettingValues(doc, settingValues))
   {
-    m_logger->error("failed to determine setting values from old format");
+    CLog::Log(LOGERROR, "failed to determine setting values from old format");
     return false;
   }
 
@@ -393,19 +388,18 @@ bool CAddonSettings::Load(const CXBMCTinyXML& doc)
     if (newSetting == nullptr)
     {
       // create a hidden/internal string setting on-the-fly
-      newSetting = AddSettingWithoutDefinition<CSettingString>(*this, setting.first, setting.second,
-                                                               m_logger);
+      newSetting = AddSettingWithoutDefinition<CSettingString>(*this, setting.first, setting.second);
     }
 
     // try to load the old setting value
     if (!newSetting)
     {
-      m_logger->error("had null newSetting for value \"{}\" for setting {}", setting.second,
+      CLog::Log(LOGERROR, "had null newSetting for value \"{}\" for setting {}", setting.second,
                       setting.first);
     }
     else if (!newSetting->FromString(setting.second))
     {
-      m_logger->warn("failed to load value \"{}\" for setting {}", setting.second, setting.first);
+      CLog::Log(LOGWARNING, "failed to load value \"{}\" for setting {}", setting.second, setting.first);
     }
   }
 
@@ -422,7 +416,7 @@ bool CAddonSettings::Save(CXBMCTinyXML& doc) const
 
   if (!SaveValuesToXml(doc))
   {
-    m_logger->error("failed to save settings");
+    CLog::Log(LOGERROR, "failed to save settings");
     return false;
   }
 
@@ -448,23 +442,23 @@ std::string CAddonSettings::GetSettingLabel(int label) const
 
 std::shared_ptr<CSetting> CAddonSettings::AddSetting(const std::string& settingId, bool value)
 {
-  return AddSettingWithoutDefinition<CSettingBool>(*this, settingId, value, m_logger);
+  return AddSettingWithoutDefinition<CSettingBool>(*this, settingId, value);
 }
 
 std::shared_ptr<CSetting> CAddonSettings::AddSetting(const std::string& settingId, int value)
 {
-  return AddSettingWithoutDefinition<CSettingInt>(*this, settingId, value, m_logger);
+  return AddSettingWithoutDefinition<CSettingInt>(*this, settingId, value);
 }
 
 std::shared_ptr<CSetting> CAddonSettings::AddSetting(const std::string& settingId, double value)
 {
-  return AddSettingWithoutDefinition<CSettingNumber>(*this, settingId, value, m_logger);
+  return AddSettingWithoutDefinition<CSettingNumber>(*this, settingId, value);
 }
 
 std::shared_ptr<CSetting> CAddonSettings::AddSetting(const std::string& settingId,
                                                      const std::string& value)
 {
-  return AddSettingWithoutDefinition<CSettingString>(*this, settingId, value, m_logger);
+  return AddSettingWithoutDefinition<CSettingString>(*this, settingId, value);
 }
 
 void CAddonSettings::InitializeSettingTypes()
@@ -507,7 +501,7 @@ bool CAddonSettings::InitializeDefinitions(const CXBMCTinyXML& doc)
   uint32_t version = 0;
   if (!ParseSettingVersion(doc, version))
   {
-    m_logger->error("failed to determine setting definitions version");
+    CLog::Log(LOGERROR, "failed to determine setting definitions version");
     return false;
   }
 
@@ -527,7 +521,7 @@ bool CAddonSettings::ParseSettingVersion(const CXBMCTinyXML& doc, uint32_t& vers
 
   if (!StringUtils::EqualsNoCase(root->ValueStr(), SETTING_XML_ROOT))
   {
-    m_logger->error("error reading setting definitions: no <settings> tag");
+    CLog::Log(LOGERROR, "error reading setting definitions: no <settings> tag");
     return false;
   }
 
@@ -635,7 +629,7 @@ std::shared_ptr<CSettingGroup> CAddonSettings::ParseOldSettingElement(
     }
     else
     {
-      m_logger->warn("failed to parse old setting definition for \"{}\" of type \"{}\"", settingId,
+      CLog::Log(LOGWARNING, "failed to parse old setting definition for \"{}\" of type \"{}\"", settingId,
                      settingType);
     }
 
@@ -746,7 +740,7 @@ std::shared_ptr<CSettingGroup> CAddonSettings::ParseOldSettingElement(
         setting.deps.push_back(dependencyEnable);
       else
       {
-        m_logger->warn(
+        CLog::Log(LOGWARNING, 
             "failed to parse enable condition \"{}\" of old setting definition for \"{}\"",
             setting.enableCondition, setting.setting->GetId());
       }
@@ -760,7 +754,7 @@ std::shared_ptr<CSettingGroup> CAddonSettings::ParseOldSettingElement(
         setting.deps.push_back(dependencyVisible);
       else
       {
-        m_logger->warn(
+        CLog::Log(LOGWARNING, 
             "failed to parse visible condition \"{}\" of old setting definition for \"{}\"",
             setting.visibleCondition, setting.setting->GetId());
       }
@@ -797,7 +791,7 @@ std::shared_ptr<CSettingCategory> CAddonSettings::ParseOldCategoryElement(
 
 bool CAddonSettings::InitializeFromOldSettingDefinitions(const CXBMCTinyXML& doc)
 {
-  m_logger->debug("trying to load setting definitions from old format...");
+  CLog::Log(LOGDEBUG, "trying to load setting definitions from old format...");
 
   const TiXmlElement* root = doc.RootElement();
   if (root == nullptr)
@@ -1123,7 +1117,7 @@ SettingPtr CAddonSettings::InitializeFromOldSettingSelect(
       setting = InitializeFromOldSettingFileWithSource(settingId, settingElement, defaultValue,
                                                        settingValues);
     else
-      m_logger->warn("failed to parse old setting definition for \"{}\" of type \"select\"",
+      CLog::Log(LOGWARNING, "failed to parse old setting definition for \"{}\" of type \"select\"",
                      settingId);
   }
 
@@ -1143,6 +1137,7 @@ SettingPtr CAddonSettings::InitializeFromOldSettingAddon(const std::string& sett
                                                          const std::string& defaultValue,
                                                          const int settingLabel)
 {
+#if 0
   // get addon types
   std::string addonTypeStr = XMLUtils::GetAttribute(settingElement, "addontype");
   const auto addonTypesStr = StringUtils::Split(addonTypeStr, ",");
@@ -1156,14 +1151,14 @@ SettingPtr CAddonSettings::InitializeFromOldSettingAddon(const std::string& sett
 
   if (addonTypes.empty())
   {
-    m_logger->error("missing addon type for addon setting \"{}\"", settingId);
+    CLog::Log(LOGERROR, "missing addon type for addon setting \"{}\"", settingId);
     return nullptr;
   }
 
   // TODO: support multiple addon types
   if (addonTypes.size() > 1)
   {
-    m_logger->error("multiple addon types are not supported (addon setting \"{}\")", settingId);
+    CLog::Log(LOGERROR, "multiple addon types are not supported (addon setting \"{}\")", settingId);
     return nullptr;
   }
 
@@ -1177,7 +1172,7 @@ SettingPtr CAddonSettings::InitializeFromOldSettingAddon(const std::string& sett
   // sanity check
   if (addonIds.size() > 1 && !multiselect)
   {
-    m_logger->warn("multiple default addon ids on non-multiselect addon setting \"{}\"", settingId);
+    CLog::Log(LOGWARNING, "multiple default addon ids on non-multiselect addon setting \"{}\"", settingId);
     addonIds.erase(++addonIds.begin(), addonIds.end());
   }
 
@@ -1204,6 +1199,8 @@ SettingPtr CAddonSettings::InitializeFromOldSettingAddon(const std::string& sett
   setting->SetControl(control);
 
   return setting;
+#endif
+  return nullptr;
 }
 
 SettingPtr CAddonSettings::InitializeFromOldSettingEnums(
@@ -1439,7 +1436,7 @@ SettingPtr CAddonSettings::InitializeFromOldSettingSlider(const std::string& set
     return setting;
   }
 
-  m_logger->warn("ignoring old setting definition for \"{}\" of type \"slider\" because of unknown "
+  CLog::Log(LOGWARNING, "ignoring old setting definition for \"{}\" of type \"slider\" because of unknown "
                  "option \"{}\"",
                  settingId, option);
 
@@ -1557,7 +1554,7 @@ bool CAddonSettings::ParseOldCondition(const std::shared_ptr<const CSetting>& se
                                 });
   if (settingIt == settings.cend())
   {
-    m_logger->warn("failed to parse old setting conditions \"{}\" for \"{}\"", condition,
+    CLog::Log(LOGWARNING, "failed to parse old setting conditions \"{}\" for \"{}\"", condition,
                    setting->GetId());
     return false;
   }
@@ -1589,7 +1586,7 @@ bool CAddonSettings::ParseOldCondition(const std::shared_ptr<const CSetting>& se
     // we cannot handle relative indices pointing to settings not belonging to the same category
     if (absoluteSettingIndex < 0 || static_cast<size_t>(absoluteSettingIndex) >= settings.size())
     {
-      m_logger->warn("cannot reference setting (relative index: {}; absolute index: {}) in another "
+      CLog::Log(LOGWARNING, "cannot reference setting (relative index: {}; absolute index: {}) in another "
                      "category in old setting condition \"{}\" for \"{}\"",
                      expression.m_relativeSettingIndex, absoluteSettingIndex, cond,
                      setting->GetId());
@@ -1600,7 +1597,7 @@ bool CAddonSettings::ParseOldCondition(const std::shared_ptr<const CSetting>& se
     const SettingConstPtr& referencedSetting = settings.at(absoluteSettingIndex);
     if (referencedSetting == nullptr)
     {
-      m_logger->warn(
+      CLog::Log(LOGWARNING, 
           "cannot reference separator setting in old setting condition \"{}\" for \"{}\"", cond,
           setting->GetId());
       error = true;

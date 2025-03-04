@@ -42,6 +42,11 @@ void CServiceBroker::UnregisterAppParams()
   g_serviceBroker.m_appParams.reset();
 }
 
+ADDON::CAddonMgr& CServiceBroker::GetAddonMgr()
+{
+  return g_application.m_ServiceManager->GetAddonMgr();
+}
+
 void CServiceBroker::RegisterSettingsComponent(const std::shared_ptr<CSettingsComponent>& settings)
 {
   g_serviceBroker.m_pSettingsComponent = settings;

@@ -17,9 +17,7 @@
 #include "addons/RepositoryUpdater.h"
 #include "addons/addoninfo/AddonInfo.h"
 #include "addons/addoninfo/AddonType.h"
-#include "filesystem/CurlFile.h"
 #include "filesystem/File.h"
-#include "filesystem/ZipFile.h"
 #include "messaging/helpers/DialogHelper.h"
 #include "utils/Base64.h"
 #include "utils/Digest.h"
@@ -63,13 +61,16 @@ CRepository::ResolveResult CRepository::ResolvePathAndHash(const AddonPtr& addon
   // Do not follow mirror redirect, we want the headers of the redirect response
   CURL url{path};
   url.SetProtocolOption("redirect-limit", "0");
+#if 0
   CCurlFile file;
   if (!file.Open(url))
+#endif
   {
     CLog::Log(LOGERROR, "Could not fetch addon location and hash from {}", path);
     return {};
   }
 
+#if 0
   std::string hashTypeStr = CDigest::TypeToString(dirIt->hashType);
 
   // Return the location from the header so we don't have to look it up again
@@ -97,6 +98,7 @@ CRepository::ResolveResult CRepository::ResolvePathAndHash(const AddonPtr& addon
   CLog::Log(LOGDEBUG, "Resolved addon path {} to {} hash {}", path, location, hash.value);
 
   return {location, hash};
+#endif
 }
 
 CRepository::CRepository(const AddonInfoPtr& addonInfo) : CAddon(addonInfo, AddonType::REPOSITORY)
@@ -202,15 +204,18 @@ bool CRepository::FetchIndex(const RepositoryDirInfo& repo,
                              std::string const& digest,
                              std::vector<AddonInfoPtr>& addons) noexcept
 {
+#if 0
   XFILE::CCurlFile http;
 
   std::string response;
   if (!http.Get(repo.info, response))
+#endif
   {
     CLog::Log(LOGERROR, "CRepository: failed to read {}", repo.info);
     return false;
   }
 
+#if 0
   if (repo.checksumType != CDigest::Type::INVALID)
   {
     std::string actualDigest = CDigest::Calculate(repo.checksumType, response);
@@ -235,6 +240,7 @@ bool CRepository::FetchIndex(const RepositoryDirInfo& repo,
   }
 
   return CServiceBroker::GetAddonMgr().AddonsFromRepoXML(repo, response, addons);
+#endif
 }
 
 CRepository::FetchStatus CRepository::FetchIfChanged(const std::string& oldChecksum,

@@ -20,6 +20,7 @@ public:
   static const char* GetAppName() { return "XBMC"; };
   static const char *GetSuffix();  // Git "Tag", e.g. alpha1
   static const char* GetSCMID();   // Git Revision
+  static std::string GetSharedLibrarySuffix() { return ".dll"; };
   static const char* GetCopyrightYears();
   static std::string GetBuildDate();
 };

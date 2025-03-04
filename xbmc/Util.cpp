@@ -10,6 +10,8 @@
 
 #include "FileItem.h"
 #include "filesystem/Directory.h"
+#include "URL.h"
+#include "guilib/GraphicContext.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
@@ -279,6 +281,50 @@ bool CUtil::MakeShortenPath(std::string StrInput, std::string& StrOutput, size_t
   }
   StrOutput = StrInput;
   return true;
+}
+
+void CUtil::GetSkinThemes(std::vector<std::string>& vecTheme)
+{
+#ifdef _XBOX
+  static const std::string TexturesXbt = "Textures.xpr";
+#else
+  static const std::string TexturesXbt = "Textures.xbt";
+#endif
+
+  std::string strPath = URIUtils::AddFileToFolder(g_graphicsContext.GetMediaDir(), "media");
+  CFileItemList items;
+  CDirectory::GetDirectory(strPath, items, "", DIR_FLAG_DEFAULTS);
+  // Search for Themes in the Current skin!
+  for (const auto &pItem : items)
+  {
+    if (!pItem->m_bIsFolder)
+    {
+      std::string strExtension = URIUtils::GetExtension(pItem->GetPath());
+      std::string strLabel = pItem->GetLabel();
+#ifdef _XBOX
+      if ((strExtension == ".xpr" && !StringUtils::EqualsNoCase(strLabel, TexturesXbt)))  
+#else
+      if ((strExtension == ".xbt" && !StringUtils::EqualsNoCase(strLabel, TexturesXbt)))
+#endif
+        vecTheme.push_back(StringUtils::Left(strLabel, strLabel.size() - strExtension.size()));
+    }
+    else
+    {
+      // check if this is an xbt:// VFS path
+      CURL itemUrl(pItem->GetPath());
+#ifdef _XBOX
+      if (!itemUrl.IsProtocol("xpr") || !itemUrl.GetFileName().empty())
+#else
+      if (!itemUrl.IsProtocol("xbt") || !itemUrl.GetFileName().empty())
+#endif
+        continue;
+
+      std::string strLabel = URIUtils::GetFileName(itemUrl.GetHostName());
+      if (!StringUtils::EqualsNoCase(strLabel, TexturesXbt))
+        vecTheme.push_back(StringUtils::Left(strLabel, strLabel.size() - URIUtils::GetExtension(strLabel).size()));
+    }
+  }
+  std::sort(vecTheme.begin(), vecTheme.end(), sortstringbyname());
 }
 
 int CUtil::GetRandomNumber()

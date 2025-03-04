@@ -55,6 +55,8 @@ public:
    */
   static void SplitParams(const std::string &paramString, std::vector<std::string> &parameters);
 
+  static void GetSkinThemes(std::vector<std::string>& vecTheme);
+
   static bool MakeShortenPath(std::string StrInput, std::string& StrOutput, size_t iTextMaxLength);
 
   /*!
