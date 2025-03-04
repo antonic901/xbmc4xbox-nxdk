@@ -7,6 +7,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/CharsetDetection.cpp \
 	$(CURDIR)/xbmc/utils/DatabaseUtils.cpp \
 	$(CURDIR)/xbmc/utils/FileExtensionProvider.cpp \
+	$(CURDIR)/xbmc/utils/FileOperationJob.cpp \
 	$(CURDIR)/xbmc/utils/JobManager.cpp \
 	$(CURDIR)/xbmc/utils/JSONVariantParser.cpp \
 	$(CURDIR)/xbmc/utils/JSONVariantWriter.cpp \
@@ -17,6 +18,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/md5.cpp \
 	$(CURDIR)/xbmc/utils/Observer.cpp \
 	$(CURDIR)/xbmc/utils/POUtils.cpp \
+	$(CURDIR)/xbmc/utils/ProgressJob.cpp \
 	$(CURDIR)/xbmc/utils/RegExp.cpp \
 	$(CURDIR)/xbmc/utils/SortUtils.cpp \
 	$(CURDIR)/xbmc/utils/Speed.cpp \

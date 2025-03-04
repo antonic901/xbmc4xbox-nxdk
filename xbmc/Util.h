@@ -14,6 +14,11 @@
 #include <string.h>
 #include <vector>
 
+// A list of filesystem types for LegalPath/FileName
+#define LEGAL_NONE            0
+#define LEGAL_WIN32_COMPAT    1
+#define LEGAL_FATX            2
+
 #define ARRAY_SIZE(X)         (sizeof(X)/sizeof((X)[0]))
 
 class CFileItem;
@@ -26,6 +31,12 @@ public:
   static std::string ValidatePath(const std::string &path, bool bFixDoubleSlashes = false); ///< return a validated path, with correct directory separators.
 
   static std::string GetNextFilename(const std::string &fn_template, int max);
+
+#if defined(TARGET_WINDOWS) || defined(_XBOX)
+  static std::string MakeLegalFileName(const std::string &strFile, int LegalType=LEGAL_WIN32_COMPAT);
+#else
+  static std::string MakeLegalFileName(const std::string &strFile, int LegalType=LEGAL_NONE);
+#endif
 
   /*! \brief Split a comma separated parameter list into separate parameters.
    Takes care of the case where we may have a quoted string containing commas, or we may

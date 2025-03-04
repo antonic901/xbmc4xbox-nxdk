@@ -43,6 +43,29 @@ std::string CUtil::GetNextFilename(const std::string &fn_template, int max)
   return "";
 }
 
+std::string CUtil::MakeLegalFileName(const std::string &strFile, int LegalType)
+{
+  std::string result = strFile;
+
+  StringUtils::Replace(result, '/', '_');
+  StringUtils::Replace(result, '\\', '_');
+  StringUtils::Replace(result, '?', '_');
+
+  if (LegalType == LEGAL_WIN32_COMPAT)
+  {
+    // just filter out some illegal characters on windows
+    StringUtils::Replace(result, ':', '_');
+    StringUtils::Replace(result, '*', '_');
+    StringUtils::Replace(result, '?', '_');
+    StringUtils::Replace(result, '\"', '_');
+    StringUtils::Replace(result, '<', '_');
+    StringUtils::Replace(result, '>', '_');
+    StringUtils::Replace(result, '|', '_');
+    StringUtils::TrimRight(result, ". ");
+  }
+  return result;
+}
+
 std::string CUtil::ValidatePath(const std::string &path, bool bFixDoubleSlashes /* = false */)
 {
   std::string result = path;
