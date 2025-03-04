@@ -11,7 +11,6 @@
 #include <memory>
 
 class CAdvancedSettings;
-class CProfileManager;
 class CSettings;
 
 namespace KODI
@@ -62,16 +61,11 @@ public:
    */
   std::shared_ptr<KODI::SUBTITLES::CSubtitlesSettings> GetSubtitlesSettings();
 
-  /*!
-   * @brief Get access to the profiles manager subcomponent.
-   * @return the profiles manager subcomponent.
-   */
-  std::shared_ptr<CProfileManager> GetProfileManager();
-
 private:
   bool InitDirectoriesLinux(bool bPlatformDirectories);
   bool InitDirectoriesOSX(bool bPlatformDirectories);
   bool InitDirectoriesWin32(bool bPlatformDirectories);
+  bool InitDirectoriesXbox(bool bPlatformDirectories);
   void CreateUserDirs() const;
 
   enum class State
@@ -85,5 +79,4 @@ private:
   std::shared_ptr<CSettings> m_settings;
   std::shared_ptr<CAdvancedSettings> m_advancedSettings;
   std::shared_ptr<KODI::SUBTITLES::CSubtitlesSettings> m_subtitlesSettings;
-  std::shared_ptr<CProfileManager> m_profileManager;
 };

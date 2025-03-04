@@ -8,7 +8,6 @@
 
 #include "GUIDialogSettingsManualBase.h"
 
-#include "settings/SettingAddon.h"
 #include "settings/SettingDateTime.h"
 #include "settings/SettingPath.h"
 #include "settings/SettingUtils.h"
@@ -324,40 +323,6 @@ std::shared_ptr<CSettingString> CGUIDialogSettingsManualBase::AddInfoLabelButton
     return NULL;
 
   setting->SetControl(GetButtonControl("infolabel", false));
-  setSettingDetails(setting, level, visible, help);
-
-  group->AddSetting(setting);
-  return setting;
-}
-
-std::shared_ptr<CSettingAddon> CGUIDialogSettingsManualBase::AddAddon(
-    const SettingGroupPtr& group,
-    const std::string& id,
-    int label,
-    SettingLevel level,
-    const std::string& value,
-    ADDON::AddonType addonType,
-    bool allowEmpty /* = false */,
-    int heading /* = -1 */,
-    bool hideValue /* = false */,
-    bool showInstalledAddons /* = true */,
-    bool showInstallableAddons /* = false */,
-    bool showMoreAddons /* = true */,
-    bool delayed /* = false */,
-    bool visible /* = true */,
-    int help /* = -1 */)
-{
-  if (group == NULL || id.empty() || label < 0 ||
-      GetSetting(id) != NULL)
-    return NULL;
-
-  std::shared_ptr<CSettingAddon> setting = std::make_shared<CSettingAddon>(id, label, value, GetSettingsManager());
-  if (setting == NULL)
-    return NULL;
-
-  setting->SetControl(GetButtonControl("addon", delayed, heading, hideValue, showInstalledAddons, showInstallableAddons, showMoreAddons));
-  setting->SetAddonType(addonType);
-  setting->SetAllowEmpty(allowEmpty);
   setSettingDetails(setting, level, visible, help);
 
   group->AddSetting(setting);

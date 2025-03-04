@@ -10,12 +10,14 @@
 #include "guilib/TextureManager.h"
 #include "GUIInfoManager.h"
 #include "filesystem/DirectoryCache.h"
+#include "utils/LangCodeExpander.h"
 #include "guilib/LocalizeStrings.h"
 
 // Guarantee that CSpecialProtocol is initialized before and uninitialized after ZipManager
 #include "filesystem/SpecialProtocol.h"
 std::map<std::string, std::string> CSpecialProtocol::m_pathMap;
 
+  CLangCodeExpander  g_LangCodeExpander;
   CLocalizeStrings   g_localizeStrings;
   CLocalizeStrings   g_localizeStringsTemp;
 

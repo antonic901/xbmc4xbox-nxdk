@@ -32,6 +32,7 @@ class CAction;
 class CFileItem;
 class CFileItemList;
 class CKey;
+class CServiceManager;
 
 #include "ApplicationPlayer.h"
 #include "FileItem.h"
@@ -60,6 +61,8 @@ public:
 
   // should be part of XBApplicationEx.h
   bool m_bStop = false;
+
+  std::unique_ptr<CServiceManager> m_ServiceManager;
 
 protected:
   CFileItemPtr m_itemCurrentFile;

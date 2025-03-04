@@ -8,10 +8,9 @@
 
 #include "SettingsComponent.h"
 
-#include "CompileInfo.h"
+#include "utils/CompileInfo.h"
 #include "ServiceBroker.h"
 #include "Util.h"
-#include "application/AppParams.h"
 #include "filesystem/Directory.h"
 #include "filesystem/SpecialProtocol.h"
 #ifdef TARGET_DARWIN_EMBEDDED
@@ -20,10 +19,8 @@
 #ifdef TARGET_WINDOWS
 #include "platform/Environment.h"
 #endif
-#include "profiles/ProfileManager.h"
 #include "settings/AdvancedSettings.h"
 #include "settings/Settings.h"
-#include "settings/SubtitlesSettings.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
@@ -33,9 +30,7 @@
 
 CSettingsComponent::CSettingsComponent()
   : m_settings(new CSettings()),
-    m_advancedSettings(new CAdvancedSettings()),
-    m_subtitlesSettings(new KODI::SUBTITLES::CSubtitlesSettings(m_settings)),
-    m_profileManager(new CProfileManager())
+    m_advancedSettings(new CAdvancedSettings())
 {
 }
 
@@ -47,6 +42,9 @@ void CSettingsComponent::Initialize()
 {
   if (m_state == State::DEINITED)
   {
+#ifdef _XBOX
+    InitDirectoriesXbox(true);
+#else
     const auto params = CServiceBroker::GetAppParams();
 
     // only the InitDirectories* for the current platform should return true
@@ -55,13 +53,12 @@ void CSettingsComponent::Initialize()
       inited = InitDirectoriesOSX(params->HasPlatformDirectories());
     if (!inited)
       inited = InitDirectoriesWin32(params->HasPlatformDirectories());
+#endif
 
     m_settings->Initialize();
 
     m_advancedSettings->Initialize(*m_settings->GetSettingsManager());
     URIUtils::RegisterAdvancedSettings(*m_advancedSettings);
-
-    m_profileManager->Initialize(m_settings);
 
     m_state = State::INITED;
   }
@@ -71,15 +68,6 @@ bool CSettingsComponent::Load()
 {
   if (m_state == State::INITED)
   {
-    if (!m_profileManager->Load())
-    {
-      CLog::Log(LOGFATAL, "unable to load profile");
-      return false;
-    }
-
-    CSpecialProtocol::RegisterProfileManager(*m_profileManager);
-    XFILE::IDirectory::RegisterProfileManager(*m_profileManager);
-
     if (!m_settings->Load())
     {
       CLog::Log(LOGFATAL, "unable to load settings");
@@ -110,11 +98,7 @@ void CSettingsComponent::Deinitialize()
       m_subtitlesSettings.reset();
 
       m_settings->Unload();
-
-      XFILE::IDirectory::UnregisterProfileManager();
-      CSpecialProtocol::UnregisterProfileManager();
     }
-    m_profileManager->Uninitialize();
 
     URIUtils::UnregisterAdvancedSettings();
     m_advancedSettings->Uninitialize(*m_settings->GetSettingsManager());
@@ -137,11 +121,6 @@ std::shared_ptr<CAdvancedSettings> CSettingsComponent::GetAdvancedSettings()
 std::shared_ptr<KODI::SUBTITLES::CSubtitlesSettings> CSettingsComponent::GetSubtitlesSettings()
 {
   return m_subtitlesSettings;
-}
-
-std::shared_ptr<CProfileManager> CSettingsComponent::GetProfileManager()
-{
-  return m_profileManager;
 }
 
 bool CSettingsComponent::InitDirectoriesLinux(bool bPlatformDirectories)
@@ -376,6 +355,27 @@ bool CSettingsComponent::InitDirectoriesWin32(bool bPlatformDirectories)
   return false;
 #endif
 }
+
+#ifdef _XBOX
+bool CSettingsComponent::InitDirectoriesXbox(bool bPlatformDirectories)
+{
+  // TODO: set XBMC path to be parent path of XBE path (or make sure that Q:\\ is mounted to dir where XBE is located)
+  std::string xbmcPath = "Q:\\";
+  CSpecialProtocol::SetXBMCBinPath(xbmcPath);
+  CSpecialProtocol::SetXBMCPath(xbmcPath);
+  CSpecialProtocol::SetXBMCBinAddonPath(xbmcPath + "addons");
+
+  std::string strWin32UserFolder = "Q:\\home";
+  CSpecialProtocol::SetLogPath(strWin32UserFolder);
+  CSpecialProtocol::SetHomePath(strWin32UserFolder);
+  CSpecialProtocol::SetMasterProfilePath(URIUtils::AddFileToFolder(strWin32UserFolder, "userdata"));
+  CSpecialProtocol::SetTempPath("Z:\\");
+
+  CreateUserDirs();
+
+  return true;
+}
+#endif
 
 void CSettingsComponent::CreateUserDirs() const
 {

@@ -8,24 +8,15 @@
 
 #include "Settings.h"
 
-#include "Autorun.h"
-#include "GUIPassword.h"
 #include "LangInfo.h"
-#include "addons/AddonSystemSettings.h"
 #include "addons/Skin.h"
-#include "application/AppParams.h"
-#include "cores/VideoPlayer/VideoRenderers/BaseRenderer.h"
 #include "filesystem/File.h"
 #include "guilib/GUIFontManager.h"
-#include "guilib/StereoscopicsManager.h"
-#include "input/KeyboardLayoutManager.h"
 
 #include <mutex>
 #if defined(TARGET_POSIX)
 #include "platform/posix/PosixTimezone.h"
 #endif // defined(TARGET_POSIX)
-#include "network/upnp/UPnPSettings.h"
-#include "network/WakeOnAccess.h"
 #if defined(TARGET_DARWIN_OSX)
 #include "platform/darwin/osx/XBMCHelper.h"
 #endif // defined(TARGET_DARWIN_OSX)
@@ -35,29 +26,19 @@
 #if defined(TARGET_DARWIN_EMBEDDED)
 #include "SettingAddon.h"
 #endif
-#include "DiscSettings.h"
-#include "SeekHandler.h"
 #include "ServiceBroker.h"
-#include "powermanagement/PowerTypes.h"
-#include "profiles/ProfileManager.h"
-#include "settings/DisplaySettings.h"
-#include "settings/MediaSettings.h"
-#include "settings/MediaSourceSettings.h"
 #include "settings/SettingConditions.h"
 #include "settings/SettingsComponent.h"
-#include "settings/SkinSettings.h"
-#include "settings/SubtitlesSettings.h"
 #include "settings/lib/SettingsManager.h"
 #include "utils/CharsetConverter.h"
-#include "utils/RssManager.h"
 #include "utils/StringUtils.h"
-#include "utils/SystemInfo.h"
 #include "utils/Variant.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/log.h"
-#include "view/ViewStateSettings.h"
 
 #define SETTINGS_XML_FOLDER "special://xbmc/system/settings/"
+
+#define SETTINGS_PROFILE_FILE "special://profile/guisettings.xml"
 
 using namespace KODI;
 using namespace XFILE;
@@ -504,9 +485,7 @@ void CSettings::UnregisterSubSettings(ISubSettings* subSettings)
 
 bool CSettings::Load()
 {
-  const std::shared_ptr<CProfileManager> profileManager = CServiceBroker::GetSettingsComponent()->GetProfileManager();
-
-  return Load(profileManager->GetSettingsFile());
+  return Load(SETTINGS_PROFILE_FILE);
 }
 
 bool CSettings::Load(const std::string &file)
@@ -539,9 +518,7 @@ bool CSettings::Load(const TiXmlElement* root)
 
 bool CSettings::Save()
 {
-  const std::shared_ptr<CProfileManager> profileManager = CServiceBroker::GetSettingsComponent()->GetProfileManager();
-
-  return Save(profileManager->GetSettingsFile());
+  return Save(SETTINGS_PROFILE_FILE);
 }
 
 bool CSettings::Save(const std::string &file)
@@ -757,29 +734,6 @@ void CSettings::InitializeDefaults()
       std::static_pointer_cast<CSettingBool>(setting)->SetDefault(false);
   }
 #endif
-
-  if (CServiceBroker::GetAppParams()->IsStandAlone())
-  {
-    auto setting =
-        GetSettingsManager()->GetSetting(CSettings::SETTING_POWERMANAGEMENT_SHUTDOWNSTATE);
-    if (!setting)
-      CLog::Log(LOGERROR, "Failed to load setting for: {}",
-                CSettings::SETTING_POWERMANAGEMENT_SHUTDOWNSTATE);
-    else
-      std::static_pointer_cast<CSettingInt>(setting)->SetDefault(POWERSTATE_SHUTDOWN);
-  }
-
-  // Initialize deviceUUID if not already set, used in zeroconf advertisements.
-  std::shared_ptr<CSettingString> deviceUUID = std::static_pointer_cast<CSettingString>(GetSettingsManager()->GetSetting(CSettings::SETTING_SERVICES_DEVICEUUID));
-  if (deviceUUID->GetValue().empty())
-  {
-    const std::string& uuid = StringUtils::CreateUUID();
-    auto setting = GetSettingsManager()->GetSetting(CSettings::SETTING_SERVICES_DEVICEUUID);
-    if (!setting)
-      CLog::Log(LOGERROR, "Failed to load setting for: {}", CSettings::SETTING_SERVICES_DEVICEUUID);
-    else
-      std::static_pointer_cast<CSettingString>(setting)->SetValue(uuid);
-  }
 }
 
 void CSettings::InitializeOptionFillers()
@@ -788,91 +742,18 @@ void CSettings::InitializeOptionFillers()
 #ifdef HAS_DVD_DRIVE
   GetSettingsManager()->RegisterSettingOptionsFiller("audiocdactions", MEDIA_DETECT::CAutorun::SettingOptionAudioCdActionsFiller);
 #endif
-  GetSettingsManager()->RegisterSettingOptionsFiller("charsets", CCharsetConverter::SettingOptionsCharsetsFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("fonts", GUIFontManager::SettingOptionsFontsFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller(
-      "subtitlesfonts", SUBTITLES::CSubtitlesSettings::SettingOptionsSubtitleFontsFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("languagenames", CLangInfo::SettingOptionsLanguageNamesFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("refreshchangedelays", CDisplaySettings::SettingOptionsRefreshChangeDelaysFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("refreshrates", CDisplaySettings::SettingOptionsRefreshRatesFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("regions", CLangInfo::SettingOptionsRegionsFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("shortdateformats", CLangInfo::SettingOptionsShortDateFormatsFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("longdateformats", CLangInfo::SettingOptionsLongDateFormatsFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("timeformats", CLangInfo::SettingOptionsTimeFormatsFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("24hourclockformats", CLangInfo::SettingOptions24HourClockFormatsFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("speedunits", CLangInfo::SettingOptionsSpeedUnitsFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("temperatureunits", CLangInfo::SettingOptionsTemperatureUnitsFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("rendermethods", CBaseRenderer::SettingOptionsRenderMethodsFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("modes", CDisplaySettings::SettingOptionsModesFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("resolutions", CDisplaySettings::SettingOptionsResolutionsFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("screens", CDisplaySettings::SettingOptionsDispModeFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("stereoscopicmodes", CDisplaySettings::SettingOptionsStereoscopicModesFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("preferedstereoscopicviewmodes", CDisplaySettings::SettingOptionsPreferredStereoscopicViewModesFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("monitors", CDisplaySettings::SettingOptionsMonitorsFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("cmsmodes", CDisplaySettings::SettingOptionsCmsModesFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("cmswhitepoints", CDisplaySettings::SettingOptionsCmsWhitepointsFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("cmsprimaries", CDisplaySettings::SettingOptionsCmsPrimariesFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("cmsgammamodes", CDisplaySettings::SettingOptionsCmsGammaModesFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("videoseeksteps", CSeekHandler::SettingOptionsSeekStepsFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("startupwindows", ADDON::CSkinInfo::SettingOptionsStartupWindowsFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("audiostreamlanguages", CLangInfo::SettingOptionsAudioStreamLanguagesFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("subtitlestreamlanguages", CLangInfo::SettingOptionsSubtitleStreamLanguagesFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("subtitledownloadlanguages", CLangInfo::SettingOptionsSubtitleDownloadlanguagesFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("iso6391languages", CLangInfo::SettingOptionsISO6391LanguagesFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("skincolors", ADDON::CSkinInfo::SettingOptionsSkinColorsFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("skinfonts", ADDON::CSkinInfo::SettingOptionsSkinFontsFiller);
-  GetSettingsManager()->RegisterSettingOptionsFiller("skinthemes", ADDON::CSkinInfo::SettingOptionsSkinThemesFiller);
 #ifdef TARGET_LINUX
   GetSettingsManager()->RegisterSettingOptionsFiller("timezonecountries", CPosixTimezone::SettingOptionsTimezoneCountriesFiller);
   GetSettingsManager()->RegisterSettingOptionsFiller("timezones", CPosixTimezone::SettingOptionsTimezonesFiller);
 #endif
-  GetSettingsManager()->RegisterSettingOptionsFiller("keyboardlayouts", CKeyboardLayoutManager::SettingOptionsKeyboardLayoutsFiller);
 }
 
 void CSettings::UninitializeOptionFillers()
 {
-  GetSettingsManager()->UnregisterSettingOptionsFiller("audiocdactions");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("audiocdencoders");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("charsets");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("fontheights");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("fonts");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("subtitlesfonts");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("languagenames");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("refreshchangedelays");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("refreshrates");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("regions");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("shortdateformats");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("longdateformats");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("timeformats");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("24hourclockformats");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("speedunits");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("temperatureunits");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("rendermethods");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("resolutions");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("screens");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("stereoscopicmodes");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("preferedstereoscopicviewmodes");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("monitors");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("cmsmodes");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("cmswhitepoints");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("cmsprimaries");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("cmsgammamodes");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("videoseeksteps");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("shutdownstates");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("startupwindows");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("audiostreamlanguages");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("subtitlestreamlanguages");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("subtitledownloadlanguages");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("iso6391languages");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("skincolors");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("skinfonts");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("skinthemes");
 #if defined(TARGET_LINUX)
   GetSettingsManager()->UnregisterSettingOptionsFiller("timezonecountries");
   GetSettingsManager()->UnregisterSettingOptionsFiller("timezones");
 #endif // defined(TARGET_LINUX)
-  GetSettingsManager()->UnregisterSettingOptionsFiller("verticalsyncs");
-  GetSettingsManager()->UnregisterSettingOptionsFiller("keyboardlayouts");
 }
 
 void CSettings::InitializeConditions()
@@ -899,53 +780,33 @@ void CSettings::InitializeISettingsHandlers()
 {
   // register ISettingsHandler implementations
   // The order of these matters! Handlers are processed in the order they were registered.
-  GetSettingsManager()->RegisterSettingsHandler(&CMediaSourceSettings::GetInstance());
 #ifdef HAS_UPNP
   GetSettingsManager()->RegisterSettingsHandler(&CUPnPSettings::GetInstance());
 #endif
-  GetSettingsManager()->RegisterSettingsHandler(&CWakeOnAccess::GetInstance());
-  GetSettingsManager()->RegisterSettingsHandler(&CRssManager::GetInstance());
-  GetSettingsManager()->RegisterSettingsHandler(&g_langInfo);
 #if defined(TARGET_LINUX) && !defined(TARGET_ANDROID) && !defined(__UCLIBC__)
   GetSettingsManager()->RegisterSettingsHandler(&g_timezone);
 #endif
-  GetSettingsManager()->RegisterSettingsHandler(&CMediaSettings::GetInstance());
 }
 
 void CSettings::UninitializeISettingsHandlers()
 {
   // unregister ISettingsHandler implementations
-  GetSettingsManager()->UnregisterSettingsHandler(&CMediaSettings::GetInstance());
 #if defined(TARGET_LINUX)
   GetSettingsManager()->UnregisterSettingsHandler(&g_timezone);
 #endif // defined(TARGET_LINUX)
-  GetSettingsManager()->UnregisterSettingsHandler(&g_langInfo);
-  GetSettingsManager()->UnregisterSettingsHandler(&CRssManager::GetInstance());
-  GetSettingsManager()->UnregisterSettingsHandler(&CWakeOnAccess::GetInstance());
 #ifdef HAS_UPNP
   GetSettingsManager()->UnregisterSettingsHandler(&CUPnPSettings::GetInstance());
 #endif
-  GetSettingsManager()->UnregisterSettingsHandler(&CMediaSourceSettings::GetInstance());
 }
 
 void CSettings::InitializeISubSettings()
 {
   // register ISubSettings implementations
-  RegisterSubSettings(&CDisplaySettings::GetInstance());
-  RegisterSubSettings(&CMediaSettings::GetInstance());
-  RegisterSubSettings(&CSkinSettings::GetInstance());
-  RegisterSubSettings(&g_sysinfo);
-  RegisterSubSettings(&CViewStateSettings::GetInstance());
 }
 
 void CSettings::UninitializeISubSettings()
 {
   // unregister ISubSettings implementations
-  UnregisterSubSettings(&CDisplaySettings::GetInstance());
-  UnregisterSubSettings(&CMediaSettings::GetInstance());
-  UnregisterSubSettings(&CSkinSettings::GetInstance());
-  UnregisterSubSettings(&g_sysinfo);
-  UnregisterSubSettings(&CViewStateSettings::GetInstance());
 }
 
 void CSettings::InitializeISettingCallbacks()
@@ -962,7 +823,6 @@ void CSettings::InitializeISettingCallbacks()
   settingSet.insert(CSettings::SETTING_VIDEOLIBRARY_IMPORT);
   settingSet.insert(CSettings::SETTING_VIDEOLIBRARY_EXPORT);
   settingSet.insert(CSettings::SETTING_VIDEOLIBRARY_SHOWUNWATCHEDPLOTS);
-  GetSettingsManager()->RegisterCallback(&CMediaSettings::GetInstance(), settingSet);
 
   settingSet.clear();
   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_SCREEN);
@@ -975,12 +835,10 @@ void CSettings::InitializeISettingCallbacks()
   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_BLANKDISPLAYS);
   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_WHITELIST);
   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_10BITSURFACES);
-  GetSettingsManager()->RegisterCallback(&CDisplaySettings::GetInstance(), settingSet);
 
   settingSet.clear();
   settingSet.insert(CSettings::SETTING_SUBTITLES_CHARSET);
   settingSet.insert(CSettings::SETTING_LOCALE_CHARSET);
-  GetSettingsManager()->RegisterCallback(&g_charsetConverter, settingSet);
 
   settingSet.clear();
   settingSet.insert(CSettings::SETTING_LOCALE_AUDIOLANGUAGE);
@@ -993,15 +851,12 @@ void CSettings::InitializeISettingCallbacks()
   settingSet.insert(CSettings::SETTING_LOCALE_USE24HOURCLOCK);
   settingSet.insert(CSettings::SETTING_LOCALE_TEMPERATUREUNIT);
   settingSet.insert(CSettings::SETTING_LOCALE_SPEEDUNIT);
-  GetSettingsManager()->RegisterCallback(&g_langInfo, settingSet);
 
   settingSet.clear();
   settingSet.insert(CSettings::SETTING_MASTERLOCK_LOCKCODE);
-  GetSettingsManager()->RegisterCallback(&g_passwordManager, settingSet);
 
   settingSet.clear();
   settingSet.insert(CSettings::SETTING_LOOKANDFEEL_RSSEDIT);
-  GetSettingsManager()->RegisterCallback(&CRssManager::GetInstance(), settingSet);
 
 #if defined(TARGET_LINUX)
   settingSet.clear();
@@ -1031,11 +886,9 @@ void CSettings::InitializeISettingCallbacks()
   settingSet.insert(CSettings::SETTING_ADDONS_MANAGE_DEPENDENCIES);
   settingSet.insert(CSettings::SETTING_ADDONS_REMOVE_ORPHANED_DEPENDENCIES);
   settingSet.insert(CSettings::SETTING_ADDONS_ALLOW_UNKNOWN_SOURCES);
-  GetSettingsManager()->RegisterCallback(&ADDON::CAddonSystemSettings::GetInstance(), settingSet);
 
   settingSet.clear();
   settingSet.insert(CSettings::SETTING_POWERMANAGEMENT_WAKEONACCESS);
-  GetSettingsManager()->RegisterCallback(&CWakeOnAccess::GetInstance(), settingSet);
 
 #ifdef HAVE_LIBBLURAY
   settingSet.clear();
@@ -1046,19 +899,12 @@ void CSettings::InitializeISettingCallbacks()
 
 void CSettings::UninitializeISettingCallbacks()
 {
-  GetSettingsManager()->UnregisterCallback(&CMediaSettings::GetInstance());
-  GetSettingsManager()->UnregisterCallback(&CDisplaySettings::GetInstance());
-  GetSettingsManager()->UnregisterCallback(&g_charsetConverter);
-  GetSettingsManager()->UnregisterCallback(&g_langInfo);
-  GetSettingsManager()->UnregisterCallback(&g_passwordManager);
-  GetSettingsManager()->UnregisterCallback(&CRssManager::GetInstance());
 #if defined(TARGET_LINUX)
   GetSettingsManager()->UnregisterCallback(&g_timezone);
 #endif // defined(TARGET_LINUX)
 #if defined(TARGET_DARWIN_OSX)
   GetSettingsManager()->UnregisterCallback(&XBMCHelper::GetInstance());
 #endif
-  GetSettingsManager()->UnregisterCallback(&CWakeOnAccess::GetInstance());
 #ifdef HAVE_LIBBLURAY
   GetSettingsManager()->UnregisterCallback(&CDiscSettings::GetInstance());
 #endif
@@ -1066,9 +912,7 @@ void CSettings::UninitializeISettingCallbacks()
 
 bool CSettings::Reset()
 {
-  const std::shared_ptr<CProfileManager> profileManager = CServiceBroker::GetSettingsComponent()->GetProfileManager();
-
-  const std::string settingsFile = profileManager->GetSettingsFile();
+  const std::string settingsFile = SETTINGS_PROFILE_FILE;
 
   // try to delete the settings file
   if (XFILE::CFile::Exists(settingsFile, false) && !XFILE::CFile::Delete(settingsFile))

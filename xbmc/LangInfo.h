@@ -30,6 +30,8 @@
 #endif // GetTimeFormat
 #endif // TARGET_WINDOWS
 
+class TiXmlNode;
+
 typedef enum MeridiemSymbol
 {
   MeridiemSymbolPM = 0,
@@ -151,6 +153,8 @@ public:
   static std::string GetLanguagePath(const std::string &language);
   static std::string GetLanguageInfoPath(const std::string &language);
   bool UseLocaleCollation();
+
+  static void LoadTokens(const TiXmlNode* pTokens, std::set<std::string>& vecTokens);
 
 protected:
   void SetDefaults();

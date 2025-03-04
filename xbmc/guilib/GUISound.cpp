@@ -171,7 +171,7 @@ bool CGUISound::CreateBuffer(LPWAVEFORMATEX wfx, int iLength)
 
   // Set the default mixbins headroom to appropriate level as set in the settings file (to allow the maximum volume)
   for (DWORD i = 0; i < mixbins.dwMixBinCount;i++)
-    directSound->SetMixBinHeadroom(i, DWORD(g_advancedSettings.m_audioHeadRoom / 6));
+    directSound->SetMixBinHeadroom(i, DWORD(CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_audioHeadRoom / 6));
 #endif
 
   return true;

@@ -13,6 +13,8 @@
 #include "settings/AdvancedSettings.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
+#include "utils/XBMCTinyXML.h"
+#include "utils/XMLUtils.h"
 #include "utils/log.h"
 
 #include <algorithm>
@@ -496,6 +498,29 @@ bool CLangInfo::UseLocaleCollation()
 #endif
   }
   return m_collationtype == 2;
+}
+
+void CLangInfo::LoadTokens(const TiXmlNode* pTokens, std::set<std::string>& vecTokens)
+{
+  if (pTokens && !pTokens->NoChildren())
+  {
+    const TiXmlElement *pToken = pTokens->FirstChildElement("token");
+    while (pToken)
+    {
+      std::string strSep= " ._";
+      if (pToken->Attribute("separators"))
+        strSep = pToken->Attribute("separators");
+      if (pToken->FirstChild() && pToken->FirstChild()->Value())
+      {
+        if (strSep.empty())
+          vecTokens.insert(pToken->FirstChild()->ValueStr());
+        else
+          for (unsigned int i=0;i<strSep.size();++i)
+            vecTokens.insert(pToken->FirstChild()->ValueStr() + strSep[i]);
+      }
+      pToken = pToken->NextSiblingElement();
+    }
+  }
 }
 
 void CLangInfo::SetDefaults()

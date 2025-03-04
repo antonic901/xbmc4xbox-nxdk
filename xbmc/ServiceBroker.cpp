@@ -8,6 +8,9 @@
 
 #include "ServiceBroker.h"
 
+#include "ServiceManager.h"
+#include "Application.h"
+#include "settings/SettingsComponent.h"
 #include "utils/log.h"
 
 #include <stdexcept>
@@ -19,6 +22,44 @@ CServiceBroker::CServiceBroker()
 
 CServiceBroker::~CServiceBroker()
 {
+}
+
+std::shared_ptr<CAppParams> CServiceBroker::GetAppParams()
+{
+  if (!g_serviceBroker.m_appParams)
+    throw std::logic_error("AppParams not yet available / not available anymore.");
+
+  return g_serviceBroker.m_appParams;
+}
+
+void CServiceBroker::RegisterAppParams(const std::shared_ptr<CAppParams>& appParams)
+{
+  g_serviceBroker.m_appParams = appParams;
+}
+
+void CServiceBroker::UnregisterAppParams()
+{
+  g_serviceBroker.m_appParams.reset();
+}
+
+void CServiceBroker::RegisterSettingsComponent(const std::shared_ptr<CSettingsComponent>& settings)
+{
+  g_serviceBroker.m_pSettingsComponent = settings;
+}
+
+void CServiceBroker::UnregisterSettingsComponent()
+{
+  g_serviceBroker.m_pSettingsComponent.reset();
+}
+
+std::shared_ptr<CSettingsComponent> CServiceBroker::GetSettingsComponent()
+{
+  return g_serviceBroker.m_pSettingsComponent;
+}
+
+CFileExtensionProvider& CServiceBroker::GetFileExtensionProvider()
+{
+  return g_application.m_ServiceManager->GetFileExtensionProvider();
 }
 
 void CServiceBroker::RegisterJobManager(const std::shared_ptr<CJobManager>& jobManager)

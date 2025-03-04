@@ -7,6 +7,7 @@ SRCS += \
 	$(CURDIR)/xbmc/settings/SettingCreator.cpp \
 	$(CURDIR)/xbmc/settings/SettingPath.cpp \
 	$(CURDIR)/xbmc/settings/Settings.cpp \
+	$(CURDIR)/xbmc/settings/SettingsBase.cpp \
 	$(CURDIR)/xbmc/settings/SettingsComponent.cpp \
 	$(CURDIR)/xbmc/settings/SettingsValueFlatJsonSerializer.cpp \
 	$(CURDIR)/xbmc/settings/SettingsValueXmlSerializer.cpp \

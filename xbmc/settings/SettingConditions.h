@@ -13,16 +13,11 @@
 #include <set>
 #include <string>
 
-class CProfile;
-class CProfileManager;
-
 class CSettingConditions
 {
 public:
   static void Initialize();
   static void Deinitialize();
-
-  static const CProfile& GetCurrentProfile();
 
   static const std::set<std::string>& GetSimpleConditions() { return m_simpleConditions; }
   static const std::map<std::string, SettingConditionCheck>& GetComplexConditions() { return m_complexConditions; }
@@ -33,8 +28,6 @@ public:
 
 private:
   // Initialization parameters
-  static const CProfileManager *m_profileManager;
-
   static std::set<std::string> m_simpleConditions;
   static std::map<std::string, SettingConditionCheck> m_complexConditions;
 };
