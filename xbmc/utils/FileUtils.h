@@ -11,8 +11,12 @@
 #include <memory>
 #include <string>
 
+class CFileItem;
+
 class CFileUtils
 {
 public:
+  static bool DeleteItem(const std::shared_ptr<CFileItem>& item);
+  static bool DeleteItem(const std::string &strPath);
   static bool Exists(const std::string& strFileName, bool bUseCache = true);
 };

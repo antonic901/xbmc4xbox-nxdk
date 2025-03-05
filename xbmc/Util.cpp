@@ -11,12 +11,37 @@
 #include "FileItem.h"
 #include "filesystem/Directory.h"
 #include "URL.h"
+#include "filesystem/File.h"
 #include "guilib/GraphicContext.h"
+#include "utils/Digest.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
 using namespace XFILE;
+using KODI::UTILITY::CDigest;
+
+std::string CUtil::GetFileDigest(const std::string& strPath, KODI::UTILITY::CDigest::Type type)
+{
+  CFile file;
+  std::string result;
+  if (file.Open(strPath))
+  {
+    CDigest digest{type};
+    char temp[1024];
+    while (true)
+    {
+      ssize_t read = file.Read(temp,1024);
+      if (read <= 0)
+        break;
+      digest.Update(temp,read);
+    }
+    result = digest.Finalize();
+    file.Close();
+  }
+
+  return result;
+}
 
 /*!
   \brief Finds next unused filename that matches padded int format identifier provided

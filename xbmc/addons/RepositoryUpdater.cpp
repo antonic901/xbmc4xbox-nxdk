@@ -9,7 +9,6 @@
 #include "RepositoryUpdater.h"
 
 #include "ServiceBroker.h"
-#include "TextureDatabase.h"
 #include "addons/AddonDatabase.h"
 #include "addons/AddonEvents.h"
 #include "addons/AddonInstaller.h"
@@ -20,9 +19,6 @@
 #include "addons/addoninfo/AddonType.h"
 #include "dialogs/GUIDialogExtendedProgressBar.h"
 #include "dialogs/GUIDialogKaiToast.h"
-#include "events/AddonManagementEvent.h"
-#include "events/EventLog.h"
-#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
 #include "settings/Settings.h"
@@ -91,6 +87,7 @@ bool CRepositoryUpdateJob::DoWork()
 
   //Invalidate art.
   {
+#if 0
     CTextureDatabase textureDB;
     textureDB.Open();
     textureDB.BeginMultipleExecute();
@@ -116,6 +113,7 @@ bool CRepositoryUpdateJob::DoWork()
       }
     }
     textureDB.CommitMultipleExecute();
+#endif
   }
 
   database.UpdateRepositoryContent(m_repo->ID(), m_repo->Version(), newChecksum, addons);
@@ -179,13 +177,6 @@ void CRepositoryUpdater::OnJobComplete(unsigned int jobID, bool success, CJob* j
           CGUIDialogKaiToast::QueueNotification(
               "", g_localizeStrings.Get(24001), g_localizeStrings.Get(24061),
               TOAST_DISPLAY_TIME, false, TOAST_DISPLAY_TIME);
-
-        auto eventLog = CServiceBroker::GetEventLog();
-        for (const auto &addon : updates)
-        {
-          if (eventLog)
-            eventLog->Add(EventPtr(new CAddonManagementEvent(addon, 24068)));
-        }
       }
     }
 
@@ -217,7 +208,7 @@ bool CRepositoryUpdater::CheckForUpdates(bool showProgress)
 
 static void SetProgressIndicator(CRepositoryUpdateJob* job)
 {
-  auto dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogExtendedProgressBar>(WINDOW_DIALOG_EXT_PROGRESS);
+  auto dialog = dynamic_cast<CGUIDialogExtendedProgressBar*>(g_windowManager.GetWindow(WINDOW_DIALOG_EXT_PROGRESS));
   if (dialog)
     job->SetProgressIndicators(dialog->GetHandle(g_localizeStrings.Get(24092)), nullptr);
 }
@@ -252,9 +243,9 @@ void CRepositoryUpdater::Await()
 void CRepositoryUpdater::OnTimeout()
 {
   //workaround
-  if (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_FULLSCREEN_VIDEO ||
-      CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_FULLSCREEN_GAME ||
-      CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_SLIDESHOW)
+  if (g_windowManager.GetActiveWindow() == WINDOW_FULLSCREEN_VIDEO ||
+      g_windowManager.GetActiveWindow() == WINDOW_FULLSCREEN_GAME ||
+      g_windowManager.GetActiveWindow() == WINDOW_SLIDESHOW)
   {
     CLog::Log(LOGDEBUG,"CRepositoryUpdater: busy playing. postponing scheduled update");
     m_timer.RestartAsync(2min);

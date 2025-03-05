@@ -26,6 +26,11 @@
 #include <utility>
 #include <vector>
 
+namespace ADDON
+{
+class IAddon;
+}
+
 class CURL;
 class CVariant;
 
@@ -59,6 +64,7 @@ public:
   explicit CFileItem(const char* strLabel);
   CFileItem(const CURL& path, bool bIsFolder);
   CFileItem(const std::string& strPath, bool bIsFolder);
+  explicit CFileItem(std::shared_ptr<const ADDON::IAddon> addonInfo);
 
   ~CFileItem(void);
   virtual CGUIListItem *Clone() const { return new CFileItem(*this); };
@@ -291,7 +297,8 @@ public:
     return false;
   }
 
-  bool HasAddonInfo() const { return false; }
+  bool HasAddonInfo() const { return m_addonInfo != nullptr; }
+  const std::shared_ptr<const ADDON::IAddon> GetAddonInfo() const { return m_addonInfo; }
 
   inline bool HasGameInfoTag() const
   {
@@ -494,6 +501,7 @@ private:
   std::string m_mimetype;
   std::string m_extrainfo;
   bool m_doContentLookup;
+  std::shared_ptr<const ADDON::IAddon> m_addonInfo;
   bool m_bIsAlbum;
   int64_t m_lStartOffset;
   int64_t m_lEndOffset;

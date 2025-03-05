@@ -8,7 +8,9 @@
 
 #include "ServiceManager.h"
 
+#include "ContextMenuManager.h"
 #include "addons/AddonManager.h"
+#include "addons/RepositoryUpdater.h"
 #include "utils/FileExtensionProvider.h"
 #include "utils/log.h"
 
@@ -61,6 +63,10 @@ bool CServiceManager::InitStageTwo(const std::string& profilesUserDataFolder)
     return false;
   }
 
+  m_repositoryUpdater.reset(new ADDON::CRepositoryUpdater(*m_addonMgr));
+
+  m_contextMenuManager.reset(new CContextMenuManager(*m_addonMgr));
+
   m_fileExtensionProvider.reset(new CFileExtensionProvider());
 
   init_level = 2;
@@ -70,6 +76,8 @@ bool CServiceManager::InitStageTwo(const std::string& profilesUserDataFolder)
 // stage 3 is called after successful initialization of WindowManager
 bool CServiceManager::InitStageThree()
 {
+  m_contextMenuManager->Init();
+
   init_level = 3;
   return true;
 }
@@ -77,6 +85,7 @@ bool CServiceManager::InitStageThree()
 void CServiceManager::DeinitStageThree()
 {
   init_level = 2;
+  m_contextMenuManager->Init();
 }
 
 void CServiceManager::DeinitStageTwo()
@@ -84,6 +93,8 @@ void CServiceManager::DeinitStageTwo()
   init_level = 1;
 
   m_fileExtensionProvider.reset();
+  m_contextMenuManager.reset();
+  m_repositoryUpdater.reset();
   m_addonMgr.reset();
 }
 
@@ -95,6 +106,16 @@ void CServiceManager::DeinitStageOne()
 ADDON::CAddonMgr& CServiceManager::GetAddonMgr()
 {
   return *m_addonMgr;
+}
+
+ADDON::CRepositoryUpdater& CServiceManager::GetRepositoryUpdater()
+{
+  return *m_repositoryUpdater;
+}
+
+CContextMenuManager& CServiceManager::GetContextMenuManager()
+{
+  return *m_contextMenuManager;
 }
 
 CFileExtensionProvider& CServiceManager::GetFileExtensionProvider()

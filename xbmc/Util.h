@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "utils/Digest.h"
+
 #include <climits>
 #include <cmath>
 #include <stdint.h>
@@ -28,6 +30,12 @@ class CUtil
 {
   CUtil() = delete;
 public:
+  /*! \brief retrieve MD5sum of a file
+   \param strPath - path to the file to MD5sum
+   \return md5 sum of the file
+   */
+  static std::string GetFileDigest(const std::string& strPath, KODI::UTILITY::CDigest::Type type);
+
   static std::string ValidatePath(const std::string &path, bool bFixDoubleSlashes = false); ///< return a validated path, with correct directory separators.
 
   static std::string GetNextFilename(const std::string &fn_template, int max);

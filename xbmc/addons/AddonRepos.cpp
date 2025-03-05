@@ -8,7 +8,7 @@
 
 #include "AddonRepos.h"
 
-#include "CompileInfo.h"
+#include "utils/CompileInfo.h"
 #include "ServiceBroker.h"
 #include "addons/Addon.h"
 #include "addons/AddonManager.h"

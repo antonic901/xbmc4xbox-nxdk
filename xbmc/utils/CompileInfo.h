@@ -9,6 +9,12 @@
 #pragma once
 
 #include <string>
+#include <vector>
+
+namespace ADDON
+{
+struct RepoInfo;
+}
 
 class CCompileInfo
 {
@@ -17,10 +23,15 @@ public:
   static int GetMinor();
   static const char* GetPackage();
   static const char* GetClass();
-  static const char* GetAppName() { return "XBMC"; };
-  static const char *GetSuffix();  // Git "Tag", e.g. alpha1
-  static const char* GetSCMID();   // Git Revision
-  static std::string GetSharedLibrarySuffix() { return ".dll"; };
+  static const char* GetAppName();
+  static const char* GetSuffix(); // Git "Tag", e.g. alpha1
+  static const char* GetSCMID(); // Git Revision
+  static std::string GetSharedLibrarySuffix();
   static const char* GetCopyrightYears();
   static std::string GetBuildDate();
+  static const char* GetVersionCode();
+  static std::vector<std::string> GetAvailableWindowSystems();
+  static std::vector<ADDON::RepoInfo> LoadOfficialRepoInfos();
+  static std::string GetPythonVersion();
+  static std::vector<std::string> GetWebserverExtraWhitelist();
 };

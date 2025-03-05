@@ -14,7 +14,6 @@
 #include "addons/gui/GUIDialogAddonSettings.h"
 #include "dialogs/GUIDialogKaiToast.h"
 #include "dialogs/GUIDialogYesNo.h"
-#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "messaging/ApplicationMessenger.h"
 #include "messaging/helpers/DialogOKHelper.h"
@@ -56,7 +55,7 @@ CAddonStatusHandler::CAddonStatusHandler(const std::string& addonID,
   CLog::Log(LOGINFO,
             "Called Add-on status handler for '{}' of clientName:{}, clientID:{}, instanceID:{} "
             "(same Thread={})",
-            status, m_addon->Name(), m_addon->ID(), m_instanceId, sameThread ? "yes" : "no");
+            (double)status, m_addon->Name(), m_addon->ID(), m_instanceId, sameThread ? "yes" : "no");
 
   m_status = status;
 
@@ -102,7 +101,7 @@ void CAddonStatusHandler::Process()
   /* Some required settings are missing/invalid */
   else if (m_status == ADDON_STATUS_NEED_SETTINGS)
   {
-    CGUIDialogYesNo* pDialogYesNo = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogYesNo>(WINDOW_DIALOG_YES_NO);
+    CGUIDialogYesNo* pDialogYesNo = dynamic_cast<CGUIDialogYesNo*>(g_windowManager.GetWindow(WINDOW_DIALOG_YES_NO));
     if (!pDialogYesNo) return;
 
     pDialogYesNo->SetHeading(CVariant{heading});

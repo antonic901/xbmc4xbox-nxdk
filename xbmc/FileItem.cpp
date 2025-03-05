@@ -75,6 +75,11 @@ CFileItem::CFileItem(const std::string& strPath, bool bIsFolder)
   FillInMimeType(false);
 }
 
+CFileItem::CFileItem(std::shared_ptr<const ADDON::IAddon> addonInfo) : m_addonInfo(std::move(addonInfo))
+{
+  Initialize();
+}
+
 CFileItem::~CFileItem(void)
 {
 }
