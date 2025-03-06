@@ -122,3 +122,8 @@ CFileExtensionProvider& CServiceManager::GetFileExtensionProvider()
 {
   return *m_fileExtensionProvider;
 }
+
+void CServiceManager::delete_contextMenuManager::operator()(CContextMenuManager* p) const
+{
+  delete p;
+}

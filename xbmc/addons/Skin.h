@@ -9,7 +9,9 @@
 #pragma once
 
 #include "addons/Addon.h"
+#if 0
 #include "addons/gui/skin/SkinTimerManager.h"
+#endif
 #include "guilib/GUIIncludes.h" // needed for the GUIInclude member
 #include "guilib/GraphicContext.h" // needed for the RESOLUTION members
 
@@ -282,8 +284,10 @@ protected:
   std::vector<CStartupWindow> m_startupWindows;
   bool m_debugging;
 
+#if 0
   /*! Manager/Owner of skin timers */
   CSkinTimerManager m_skinTimerManager;
+#endif
 
 private:
   std::map<int, CSkinSettingStringPtr> m_strings;

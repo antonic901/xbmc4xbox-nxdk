@@ -11,7 +11,6 @@
 #include "addons/AddonManager.h"
 #include "addons/IAddonManagerCallback.h"
 #include "addons/addoninfo/AddonInfo.h"
-#include "addons/gui/GUIDialogAddonSettings.h"
 #include "dialogs/GUIDialogKaiToast.h"
 #include "dialogs/GUIDialogYesNo.h"
 #include "guilib/GUIWindowManager.h"
@@ -114,6 +113,7 @@ void CAddonStatusHandler::Process()
     if (!m_addon->HasSettings(m_instanceId))
       return;
 
+#if 0
     if (CGUIDialogAddonSettings::ShowForAddon(m_addon))
     {
       //! @todo Doesn't dialogaddonsettings save these automatically? It should do this.
@@ -122,6 +122,7 @@ void CAddonStatusHandler::Process()
           .GetCallbackForType(m_addon->Type())
           ->RequestRestart(m_addon->ID(), m_instanceId, true);
     }
+#endif
   }
 }
 

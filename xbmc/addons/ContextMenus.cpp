@@ -14,9 +14,8 @@
 #include "addons/Repository.h"
 #include "addons/RepositoryUpdater.h"
 #include "addons/addoninfo/AddonType.h"
-#include "addons/gui/GUIDialogAddonInfo.h"
-#include "addons/gui/GUIDialogAddonSettings.h"
 #include "addons/gui/GUIHelpers.h"
+#include "addons/addoninfo/AddonInfo.h"
 
 namespace CONTEXTMENU
 {
@@ -30,7 +29,10 @@ bool CAddonInfo::IsVisible(const CFileItem& item) const
 
 bool CAddonInfo::Execute(const std::shared_ptr<CFileItem>& item) const
 {
+#if 0
   return CGUIDialogAddonInfo::ShowForItem(item);
+#endif
+  return false;
 }
 
 bool CAddonSettings::IsVisible(const CFileItem& item) const
@@ -45,9 +47,12 @@ bool CAddonSettings::IsVisible(const CFileItem& item) const
 bool CAddonSettings::Execute(const std::shared_ptr<CFileItem>& item) const
 {
   AddonPtr addon;
+#if 0
   return CServiceBroker::GetAddonMgr().GetAddon(item->GetAddonInfo()->ID(), addon,
                                                 OnlyEnabled::CHOICE_NO) &&
          CGUIDialogAddonSettings::ShowForAddon(addon);
+#endif
+  return false;
 }
 
 bool CCheckForUpdates::IsVisible(const CFileItem& item) const

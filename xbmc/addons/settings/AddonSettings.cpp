@@ -15,7 +15,6 @@
 #include "addons/addoninfo/AddonInfo.h"
 #include "addons/addoninfo/AddonType.h"
 #include "addons/binary-addons/AddonInstanceHandler.h"
-#include "addons/gui/GUIDialogAddonSettings.h"
 #include "addons/settings/SettingUrlEncodedString.h"
 #include "filesystem/Directory.h"
 #include "guilib/LocalizeStrings.h"
@@ -208,8 +207,10 @@ void CAddonSettings::OnSettingAction(const std::shared_ptr<const CSetting>& sett
   if (actionData.empty())
     return;
 
+#if 0
   if (closeDialog)
     CGUIDialogAddonSettings::SaveAndClose();
+#endif
 
   CServiceBroker::GetAppMessenger()->SendMsg(TMSG_EXECUTE_BUILT_IN, -1, -1, nullptr, actionData);
 }

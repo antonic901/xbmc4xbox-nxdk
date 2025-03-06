@@ -27,4 +27,5 @@ SRCS += \
 	$(CURDIR)/xbmc/addons/Webinterface.cpp
 
 include $(CURDIR)/xbmc/addons/addoninfo/Makefile
+include $(CURDIR)/xbmc/addons/gui/Makefile
 include $(CURDIR)/xbmc/addons/settings/Makefile
