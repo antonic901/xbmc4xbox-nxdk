@@ -21,14 +21,6 @@
 #include "md5.h"
 #include "utils/StringUtils.h"
 
-typedef unsigned char md5byte;
-
-static void MD5Init(struct MD5Context *context);
-static void MD5Update(struct MD5Context *context, md5byte const *buf, unsigned len);
-static void MD5Final(unsigned char digest[16], struct MD5Context *context);
-static void MD5Transform(uint32_t buf[4], uint32_t const in[16]);
-
-
 XBMC::XBMC_MD5::XBMC_MD5(void)
 {
   MD5Init(&m_ctx);
@@ -123,7 +115,7 @@ byteSwap(uint32_t *buf, unsigned words)
  * Start MD5 accumulation.  Set bit count to 0 and buffer to mysterious
  * initialization constants.
  */
-static void
+void
 MD5Init(struct MD5Context *ctx)
 {
 	ctx->buf[0] = 0x67452301;
@@ -139,7 +131,7 @@ MD5Init(struct MD5Context *ctx)
  * Update context to reflect the concatenation of another buffer full
  * of bytes.
  */
-static void
+void
 MD5Update(struct MD5Context *ctx, md5byte const *buf, unsigned len)
 {
 	uint32_t t;
@@ -179,7 +171,7 @@ MD5Update(struct MD5Context *ctx, md5byte const *buf, unsigned len)
  * Final wrapup - pad to 64-byte boundary with the bit pattern
  * 1 0* (64-bit count of bits processed, MSB-first)
  */
-static void
+void
 MD5Final(md5byte digest[16], struct MD5Context *ctx)
 {
 	int count = ctx->bytes[0] & 0x3f;	/* Number of bytes in ctx->in */
@@ -230,7 +222,7 @@ MD5Final(md5byte digest[16], struct MD5Context *ctx)
  * reflect the addition of 16 longwords of new data.  MD5Update blocks
  * the data and converts bytes into longwords for this routine.
  */
-static void
+void
 MD5Transform(uint32_t buf[4], uint32_t const in[16])
 {
 	uint32_t a, b, c, d;
