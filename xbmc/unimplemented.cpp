@@ -25,6 +25,11 @@ void* __RTDynamicCast(void* ptr, long, void*, bool)
   return ptr;
 }
 
+void* __RTtypeid(void * inptr)
+{
+  return nullptr;
+}
+
 int WideCharToMultiByte(unsigned int codePage, unsigned long flags,
                         const wchar_t* wideStr, int wideLen,
                         char* multiByteStr, int multiByteLen,

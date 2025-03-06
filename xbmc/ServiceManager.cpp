@@ -8,6 +8,9 @@
 
 #include "ServiceManager.h"
 
+#include "ContextMenuManager.h"
+#include "addons/AddonManager.h"
+#include "addons/RepositoryUpdater.h"
 #include "utils/FileExtensionProvider.h"
 #include "utils/log.h"
 
@@ -25,6 +28,13 @@ CServiceManager::~CServiceManager()
 
 bool CServiceManager::InitForTesting()
 {
+  m_addonMgr.reset(new ADDON::CAddonMgr());
+  if (!m_addonMgr->Init())
+  {
+    CLog::Log(LOGFATAL, "CServiceManager::{}: Unable to start CAddonMgr", __FUNCTION__);
+    return false;
+  }
+
   m_fileExtensionProvider.reset(new CFileExtensionProvider());
 
   init_level = 1;
@@ -35,6 +45,7 @@ void CServiceManager::DeinitTesting()
 {
   init_level = 0;
   m_fileExtensionProvider.reset();
+  m_addonMgr.reset();
 }
 
 bool CServiceManager::InitStageOne()
@@ -45,6 +56,17 @@ bool CServiceManager::InitStageOne()
 
 bool CServiceManager::InitStageTwo(const std::string& profilesUserDataFolder)
 {
+  m_addonMgr.reset(new ADDON::CAddonMgr());
+  if (!m_addonMgr->Init())
+  {
+    CLog::Log(LOGFATAL, "CServiceManager::{}: Unable to start CAddonMgr", __FUNCTION__);
+    return false;
+  }
+
+  m_repositoryUpdater.reset(new ADDON::CRepositoryUpdater(*m_addonMgr));
+
+  m_contextMenuManager.reset(new CContextMenuManager(*m_addonMgr));
+
   m_fileExtensionProvider.reset(new CFileExtensionProvider());
 
   init_level = 2;
@@ -54,6 +76,8 @@ bool CServiceManager::InitStageTwo(const std::string& profilesUserDataFolder)
 // stage 3 is called after successful initialization of WindowManager
 bool CServiceManager::InitStageThree()
 {
+  m_contextMenuManager->Init();
+
   init_level = 3;
   return true;
 }
@@ -61,6 +85,7 @@ bool CServiceManager::InitStageThree()
 void CServiceManager::DeinitStageThree()
 {
   init_level = 2;
+  m_contextMenuManager->Init();
 }
 
 void CServiceManager::DeinitStageTwo()
@@ -68,6 +93,9 @@ void CServiceManager::DeinitStageTwo()
   init_level = 1;
 
   m_fileExtensionProvider.reset();
+  m_contextMenuManager.reset();
+  m_repositoryUpdater.reset();
+  m_addonMgr.reset();
 }
 
 void CServiceManager::DeinitStageOne()
@@ -75,7 +103,27 @@ void CServiceManager::DeinitStageOne()
   init_level = 0;
 }
 
+ADDON::CAddonMgr& CServiceManager::GetAddonMgr()
+{
+  return *m_addonMgr;
+}
+
+ADDON::CRepositoryUpdater& CServiceManager::GetRepositoryUpdater()
+{
+  return *m_repositoryUpdater;
+}
+
+CContextMenuManager& CServiceManager::GetContextMenuManager()
+{
+  return *m_contextMenuManager;
+}
+
 CFileExtensionProvider& CServiceManager::GetFileExtensionProvider()
 {
   return *m_fileExtensionProvider;
+}
+
+void CServiceManager::delete_contextMenuManager::operator()(CContextMenuManager* p) const
+{
+  delete p;
 }

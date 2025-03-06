@@ -12,6 +12,12 @@
 
 #include <memory>
 
+namespace ADDON
+{
+class CAddonMgr;
+class CRepositoryUpdater;
+} // namespace ADDON
+
 namespace KODI
 {
 namespace MESSAGING
@@ -21,6 +27,7 @@ class CApplicationMessenger;
 } // namespace KODI
 
 class CAppParams;
+class CContextMenuManager;
 class CSettingsComponent;
 class CFileExtensionProvider;
 class CJobManager;
@@ -35,6 +42,9 @@ public:
   static void RegisterAppParams(const std::shared_ptr<CAppParams>& appParams);
   static void UnregisterAppParams();
 
+  static ADDON::CAddonMgr& GetAddonMgr();
+  static CContextMenuManager& GetContextMenuManager();
+  static ADDON::CRepositoryUpdater& GetRepositoryUpdater();
   static CFileExtensionProvider& GetFileExtensionProvider();
 
   static void RegisterSettingsComponent(const std::shared_ptr<CSettingsComponent>& settings);

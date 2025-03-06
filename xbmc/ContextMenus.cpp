@@ -1,0 +1,118 @@
+/*
+ *  Copyright (C) 2016-2018 Team Kodi
+ *  This file is part of Kodi - https://kodi.tv
+ *
+ *  SPDX-License-Identifier: GPL-2.0-or-later
+ *  See LICENSES/README.md for more information.
+ */
+
+#include "ContextMenus.h"
+
+#include "ServiceBroker.h"
+#include "guilib/GUIWindowManager.h"
+#include "guilib/LocalizeStrings.h"
+#include "utils/StringUtils.h"
+#include "utils/URIUtils.h"
+#include "utils/Variant.h"
+#include "FileItem.h"
+
+namespace CONTEXTMENU
+{
+
+  bool CEjectDisk::IsVisible(const CFileItem& item) const
+  {
+#ifdef HAS_DVD_DRIVE
+    return item.IsRemovable() && (item.IsDVD() || item.IsCDDA());
+#else
+    return false;
+#endif
+  }
+
+  bool CEjectDisk::Execute(const std::shared_ptr<CFileItem>& item) const
+  {
+#ifdef HAS_DVD_DRIVE
+    CServiceBroker::GetMediaManager().ToggleTray(
+        CServiceBroker::GetMediaManager().TranslateDevicePath(item->GetPath())[0]);
+#endif
+    return true;
+  }
+
+  bool CEjectDrive::IsVisible(const CFileItem& item) const
+  {
+#if 0
+    // Must be HDD
+    return item.IsRemovable() && !item.IsDVD() && !item.IsCDDA();
+#endif
+    return false;
+  }
+
+  bool CEjectDrive::Execute(const std::shared_ptr<CFileItem>& item) const
+  {
+#if 0
+    return CServiceBroker::GetMediaManager().Eject(item->GetPath());
+#endif
+    return false;
+  }
+
+namespace
+{
+
+int GetTargetWindowID(const CFileItem& item)
+{
+  int iTargetWindow = WINDOW_INVALID;
+
+  const std::string targetWindow = item.GetProperty("targetwindow").asString();
+  if (targetWindow.empty())
+    iTargetWindow = g_windowManager.GetActiveWindow();
+#if 0
+  else
+    iTargetWindow = CWindowTranslator::TranslateWindow(targetWindow);
+#endif
+
+  return iTargetWindow;
+}
+
+} // unnamed namespace
+
+std::string CAddRemoveFavourite::GetLabel(const CFileItem& item) const
+{
+#if 0
+  return g_localizeStrings.Get(CServiceBroker::GetFavouritesService().IsFavourited(item, GetTargetWindowID(item))
+                               ? 14077   /* Remove from favourites */
+                               : 14076); /* Add to favourites */
+#endif
+  return "Favorites not supported";
+}
+
+bool CAddRemoveFavourite::IsVisible(const CFileItem& item) const
+{
+#if 0
+  return (!item.GetPath().empty() && !item.IsParentFolder() && !item.IsPath("add") &&
+          !item.IsPath("newplaylist://") && !URIUtils::IsProtocol(item.GetPath(), "favourites") &&
+          !URIUtils::IsProtocol(item.GetPath(), "newsmartplaylist") &&
+          !URIUtils::IsProtocol(item.GetPath(), "newtag") &&
+          !URIUtils::IsProtocol(item.GetPath(), "musicsearch") &&
+          // Hide this item for all PVR EPG/timers/search except EPG/timer/timer rules/search root
+          // folders.
+          !StringUtils::StartsWith(item.GetPath(), "pvr://guide/") &&
+          !StringUtils::StartsWith(item.GetPath(), "pvr://timers/") &&
+          !StringUtils::StartsWith(item.GetPath(), "pvr://search/")) ||
+         item.GetPath() == "pvr://guide/tv/" || item.GetPath() == "pvr://guide/radio/" ||
+         item.GetPath() == "pvr://timers/tv/timers/" ||
+         item.GetPath() == "pvr://timers/radio/timers/" ||
+         item.GetPath() == "pvr://timers/tv/rules/" ||
+         item.GetPath() == "pvr://timers/radio/rules/" || item.GetPath() == "pvr://search/tv/" ||
+         item.GetPath() == "pvr://search/radio/";
+#endif
+  return false;
+}
+
+bool CAddRemoveFavourite::Execute(const std::shared_ptr<CFileItem>& item) const
+{
+#if 0
+  return CServiceBroker::GetFavouritesService().AddOrRemove(*item.get(), GetTargetWindowID(*item));
+#endif
+  return false;
+}
+
+} // namespace CONTEXTMENU

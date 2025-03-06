@@ -10,6 +10,14 @@
 
 #include <memory>
 
+namespace ADDON
+{
+class CAddonMgr;
+class CRepositoryUpdater;
+} // namespace ADDON
+
+class CContextMenuManager;
+
 class CFileExtensionProvider;
 
 class CServiceManager
@@ -27,10 +35,22 @@ public:
   void DeinitStageTwo();
   void DeinitStageOne();
 
+  ADDON::CAddonMgr& GetAddonMgr();
+  ADDON::CRepositoryUpdater& GetRepositoryUpdater();
+  CContextMenuManager& GetContextMenuManager();
+
   int init_level = 0;
 
   CFileExtensionProvider& GetFileExtensionProvider();
 
 protected:
+  struct delete_contextMenuManager
+  {
+    void operator()(CContextMenuManager* p) const;
+  };
+
+  std::unique_ptr<ADDON::CAddonMgr> m_addonMgr;
+  std::unique_ptr<ADDON::CRepositoryUpdater> m_repositoryUpdater;
+  std::unique_ptr<CContextMenuManager, delete_contextMenuManager> m_contextMenuManager;
   std::unique_ptr<CFileExtensionProvider> m_fileExtensionProvider;
 };

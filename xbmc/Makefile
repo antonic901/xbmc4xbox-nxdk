@@ -1,6 +1,9 @@
 SRCS += \
 	$(CURDIR)/xbmc/Application.cpp \
 	$(CURDIR)/xbmc/ApplicationPlayer.cpp \
+	$(CURDIR)/xbmc/ContextMenuItem.cpp \
+	$(CURDIR)/xbmc/ContextMenuManager.cpp \
+	$(CURDIR)/xbmc/ContextMenus.cpp \
 	$(CURDIR)/xbmc/DatabaseManager.cpp \
 	$(CURDIR)/xbmc/DbUrl.cpp \
 	$(CURDIR)/xbmc/FileItem.cpp \

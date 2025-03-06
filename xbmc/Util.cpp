@@ -10,11 +10,38 @@
 
 #include "FileItem.h"
 #include "filesystem/Directory.h"
+#include "URL.h"
+#include "filesystem/File.h"
+#include "guilib/GraphicContext.h"
+#include "utils/Digest.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
 using namespace XFILE;
+using KODI::UTILITY::CDigest;
+
+std::string CUtil::GetFileDigest(const std::string& strPath, KODI::UTILITY::CDigest::Type type)
+{
+  CFile file;
+  std::string result;
+  if (file.Open(strPath))
+  {
+    CDigest digest{type};
+    char temp[1024];
+    while (true)
+    {
+      ssize_t read = file.Read(temp,1024);
+      if (read <= 0)
+        break;
+      digest.Update(temp,read);
+    }
+    result = digest.Finalize();
+    file.Close();
+  }
+
+  return result;
+}
 
 /*!
   \brief Finds next unused filename that matches padded int format identifier provided
@@ -279,6 +306,50 @@ bool CUtil::MakeShortenPath(std::string StrInput, std::string& StrOutput, size_t
   }
   StrOutput = StrInput;
   return true;
+}
+
+void CUtil::GetSkinThemes(std::vector<std::string>& vecTheme)
+{
+#ifdef _XBOX
+  static const std::string TexturesXbt = "Textures.xpr";
+#else
+  static const std::string TexturesXbt = "Textures.xbt";
+#endif
+
+  std::string strPath = URIUtils::AddFileToFolder(g_graphicsContext.GetMediaDir(), "media");
+  CFileItemList items;
+  CDirectory::GetDirectory(strPath, items, "", DIR_FLAG_DEFAULTS);
+  // Search for Themes in the Current skin!
+  for (const auto &pItem : items)
+  {
+    if (!pItem->m_bIsFolder)
+    {
+      std::string strExtension = URIUtils::GetExtension(pItem->GetPath());
+      std::string strLabel = pItem->GetLabel();
+#ifdef _XBOX
+      if ((strExtension == ".xpr" && !StringUtils::EqualsNoCase(strLabel, TexturesXbt)))  
+#else
+      if ((strExtension == ".xbt" && !StringUtils::EqualsNoCase(strLabel, TexturesXbt)))
+#endif
+        vecTheme.push_back(StringUtils::Left(strLabel, strLabel.size() - strExtension.size()));
+    }
+    else
+    {
+      // check if this is an xbt:// VFS path
+      CURL itemUrl(pItem->GetPath());
+#ifdef _XBOX
+      if (!itemUrl.IsProtocol("xpr") || !itemUrl.GetFileName().empty())
+#else
+      if (!itemUrl.IsProtocol("xbt") || !itemUrl.GetFileName().empty())
+#endif
+        continue;
+
+      std::string strLabel = URIUtils::GetFileName(itemUrl.GetHostName());
+      if (!StringUtils::EqualsNoCase(strLabel, TexturesXbt))
+        vecTheme.push_back(StringUtils::Left(strLabel, strLabel.size() - URIUtils::GetExtension(strLabel).size()));
+    }
+  }
+  std::sort(vecTheme.begin(), vecTheme.end(), sortstringbyname());
 }
 
 int CUtil::GetRandomNumber()

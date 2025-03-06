@@ -1,14 +1,17 @@
 SRCS += \
 	$(CURDIR)/xbmc/utils/Archive.cpp \
 	$(CURDIR)/xbmc/utils/auto_buffer.cpp \
+	$(CURDIR)/xbmc/utils/Base64.cpp \
 	$(CURDIR)/xbmc/utils/BitstreamStats.cpp \
 	$(CURDIR)/xbmc/utils/BooleanLogic.cpp \
 	$(CURDIR)/xbmc/utils/CharsetConverter.cpp \
 	$(CURDIR)/xbmc/utils/CharsetDetection.cpp \
+	$(CURDIR)/xbmc/utils/CompileInfo.cpp \
 	$(CURDIR)/xbmc/utils/DatabaseUtils.cpp \
 	$(CURDIR)/xbmc/utils/Digest.cpp \
 	$(CURDIR)/xbmc/utils/FileExtensionProvider.cpp \
 	$(CURDIR)/xbmc/utils/FileOperationJob.cpp \
+	$(CURDIR)/xbmc/utils/FileUtils.cpp \
 	$(CURDIR)/xbmc/utils/JobManager.cpp \
 	$(CURDIR)/xbmc/utils/JSONVariantParser.cpp \
 	$(CURDIR)/xbmc/utils/JSONVariantWriter.cpp \
@@ -17,6 +20,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/Locale.cpp \
 	$(CURDIR)/xbmc/utils/log.cpp \
 	$(CURDIR)/xbmc/utils/md5.cpp \
+	$(CURDIR)/xbmc/utils/Mime.cpp \
 	$(CURDIR)/xbmc/utils/Observer.cpp \
 	$(CURDIR)/xbmc/utils/POUtils.cpp \
 	$(CURDIR)/xbmc/utils/ProgressJob.cpp \

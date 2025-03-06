@@ -42,6 +42,16 @@ void CServiceBroker::UnregisterAppParams()
   g_serviceBroker.m_appParams.reset();
 }
 
+ADDON::CAddonMgr& CServiceBroker::GetAddonMgr()
+{
+  return g_application.m_ServiceManager->GetAddonMgr();
+}
+
+CContextMenuManager& CServiceBroker::GetContextMenuManager()
+{
+  return g_application.m_ServiceManager->GetContextMenuManager();
+}
+
 void CServiceBroker::RegisterSettingsComponent(const std::shared_ptr<CSettingsComponent>& settings)
 {
   g_serviceBroker.m_pSettingsComponent = settings;
@@ -55,6 +65,11 @@ void CServiceBroker::UnregisterSettingsComponent()
 std::shared_ptr<CSettingsComponent> CServiceBroker::GetSettingsComponent()
 {
   return g_serviceBroker.m_pSettingsComponent;
+}
+
+ADDON::CRepositoryUpdater& CServiceBroker::GetRepositoryUpdater()
+{
+  return g_application.m_ServiceManager->GetRepositoryUpdater();
 }
 
 CFileExtensionProvider& CServiceBroker::GetFileExtensionProvider()
