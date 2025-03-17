@@ -18,6 +18,11 @@ class CAddonMgr;
 class CRepositoryUpdater;
 } // namespace ADDON
 
+namespace ANNOUNCEMENT
+{
+class CAnnouncementManager;
+}
+
 namespace KODI
 {
 namespace MESSAGING
@@ -42,6 +47,11 @@ public:
   static void RegisterAppParams(const std::shared_ptr<CAppParams>& appParams);
   static void UnregisterAppParams();
 
+  static std::shared_ptr<ANNOUNCEMENT::CAnnouncementManager> GetAnnouncementManager();
+  static void RegisterAnnouncementManager(
+      std::shared_ptr<ANNOUNCEMENT::CAnnouncementManager> announcementManager);
+  static void UnregisterAnnouncementManager();
+
   static ADDON::CAddonMgr& GetAddonMgr();
   static CContextMenuManager& GetContextMenuManager();
   static ADDON::CRepositoryUpdater& GetRepositoryUpdater();
@@ -62,6 +72,7 @@ public:
 
 private:
   std::shared_ptr<CAppParams> m_appParams;
+  std::shared_ptr<ANNOUNCEMENT::CAnnouncementManager> m_pAnnouncementManager;
   std::shared_ptr<CSettingsComponent> m_pSettingsComponent;
   std::shared_ptr<CJobManager> m_jobManager;
   std::shared_ptr<KODI::MESSAGING::CApplicationMessenger> m_appMessenger;

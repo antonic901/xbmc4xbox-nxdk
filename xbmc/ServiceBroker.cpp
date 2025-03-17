@@ -42,6 +42,22 @@ void CServiceBroker::UnregisterAppParams()
   g_serviceBroker.m_appParams.reset();
 }
 
+// announcement
+std::shared_ptr<ANNOUNCEMENT::CAnnouncementManager> CServiceBroker::GetAnnouncementManager()
+{
+  return g_serviceBroker.m_pAnnouncementManager;
+}
+void CServiceBroker::RegisterAnnouncementManager(
+    std::shared_ptr<ANNOUNCEMENT::CAnnouncementManager> port)
+{
+  g_serviceBroker.m_pAnnouncementManager = std::move(port);
+}
+
+void CServiceBroker::UnregisterAnnouncementManager()
+{
+  g_serviceBroker.m_pAnnouncementManager.reset();
+}
+
 ADDON::CAddonMgr& CServiceBroker::GetAddonMgr()
 {
   return g_application.m_ServiceManager->GetAddonMgr();
