@@ -13,6 +13,9 @@ SRCS += \
 	$(CURDIR)/xbmc/MediaSource.cpp \
 	$(CURDIR)/xbmc/ServiceBroker.cpp \
 	$(CURDIR)/xbmc/ServiceManager.cpp \
+	$(CURDIR)/xbmc/TextureCache.cpp \
+	$(CURDIR)/xbmc/TextureCacheJob.cpp \
+	$(CURDIR)/xbmc/TextureDatabase.cpp \
 	$(CURDIR)/xbmc/URL.cpp \
 	$(CURDIR)/xbmc/Util.cpp \
 	$(CURDIR)/xbmc/XBDateTime.cpp
