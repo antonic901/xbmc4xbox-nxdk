@@ -1,6 +1,7 @@
 SRCS += \
 	$(CURDIR)/xbmc/Application.cpp \
 	$(CURDIR)/xbmc/ApplicationPlayer.cpp \
+	$(CURDIR)/xbmc/BackgroundInfoLoader.cpp \
 	$(CURDIR)/xbmc/ContextMenuItem.cpp \
 	$(CURDIR)/xbmc/ContextMenuManager.cpp \
 	$(CURDIR)/xbmc/ContextMenus.cpp \
@@ -16,6 +17,7 @@ SRCS += \
 	$(CURDIR)/xbmc/TextureCache.cpp \
 	$(CURDIR)/xbmc/TextureCacheJob.cpp \
 	$(CURDIR)/xbmc/TextureDatabase.cpp \
+	$(CURDIR)/xbmc/ThumbLoader.cpp \
 	$(CURDIR)/xbmc/URL.cpp \
 	$(CURDIR)/xbmc/Util.cpp \
 	$(CURDIR)/xbmc/XBDateTime.cpp
