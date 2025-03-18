@@ -14,6 +14,15 @@ SRCS += \
 	$(CURDIR)/xbmc/filesystem/IFile.cpp \
 	$(CURDIR)/xbmc/filesystem/MultiPathDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/MultiPathFile.cpp \
+	$(CURDIR)/xbmc/filesystem/MusicDatabaseDirectory.cpp \
+	$(CURDIR)/xbmc/filesystem/MusicDatabaseFile.cpp \
+	$(CURDIR)/xbmc/filesystem/MusicFileDirectory.cpp \
+	$(CURDIR)/xbmc/filesystem/MusicSearchDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/OverrideFile.cpp \
 	$(CURDIR)/xbmc/filesystem/SpecialProtocol.cpp \
-	$(CURDIR)/xbmc/filesystem/StackDirectory.cpp
+	$(CURDIR)/xbmc/filesystem/StackDirectory.cpp \
+	$(CURDIR)/xbmc/filesystem/VideoDatabaseDirectory.cpp \
+	$(CURDIR)/xbmc/filesystem/VideoDatabaseFile.cpp
+
+include $(CURDIR)/xbmc/filesystem/MusicDatabaseDirectory/Makefile
+include $(CURDIR)/xbmc/filesystem/VideoDatabaseDirectory/Makefile
