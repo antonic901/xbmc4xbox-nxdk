@@ -10,6 +10,8 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/Crc32.cpp \
 	$(CURDIR)/xbmc/utils/DatabaseUtils.cpp \
 	$(CURDIR)/xbmc/utils/Digest.cpp \
+	$(CURDIR)/xbmc/utils/EmbeddedArt.cpp \
+	$(CURDIR)/xbmc/utils/Fanart.cpp \
 	$(CURDIR)/xbmc/utils/FileExtensionProvider.cpp \
 	$(CURDIR)/xbmc/utils/FileOperationJob.cpp \
 	$(CURDIR)/xbmc/utils/FileUtils.cpp \
@@ -33,8 +35,11 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/ProgressJob.cpp \
 	$(CURDIR)/xbmc/utils/RegExp.cpp \
 	$(CURDIR)/xbmc/utils/RingBuffer.cpp \
+	$(CURDIR)/xbmc/utils/ScraperUrl.cpp \
 	$(CURDIR)/xbmc/utils/SortUtils.cpp \
 	$(CURDIR)/xbmc/utils/Speed.cpp \
+	$(CURDIR)/xbmc/utils/StreamDetails.cpp \
+	$(CURDIR)/xbmc/utils/StreamUtils.cpp \
 	$(CURDIR)/xbmc/utils/StringUtils.cpp \
 	$(CURDIR)/xbmc/utils/StringValidation.cpp \
 	$(CURDIR)/xbmc/utils/Temperature.cpp \
