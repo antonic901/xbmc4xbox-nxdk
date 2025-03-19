@@ -10,6 +10,7 @@ SRCS += \
 	$(CURDIR)/xbmc/GUIInfoManager.cpp \
 	$(CURDIR)/xbmc/GUILargeTextureManager.cpp \
 	$(CURDIR)/xbmc/LangInfo.cpp \
+	$(CURDIR)/xbmc/MediaSource.cpp \
 	$(CURDIR)/xbmc/ServiceBroker.cpp \
 	$(CURDIR)/xbmc/ServiceManager.cpp \
 	$(CURDIR)/xbmc/URL.cpp \
