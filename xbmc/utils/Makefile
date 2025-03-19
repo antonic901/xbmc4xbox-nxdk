@@ -18,6 +18,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/JSONVariantWriter.cpp \
 	$(CURDIR)/xbmc/utils/LabelFormatter.cpp \
 	$(CURDIR)/xbmc/utils/LangCodeExpander.cpp \
+	$(CURDIR)/xbmc/utils/LegacyPathTranslation.cpp \
 	$(CURDIR)/xbmc/utils/Locale.cpp \
 	$(CURDIR)/xbmc/utils/log.cpp \
 	$(CURDIR)/xbmc/utils/md5.cpp \
