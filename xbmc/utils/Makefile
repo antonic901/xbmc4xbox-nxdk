@@ -31,6 +31,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/POUtils.cpp \
 	$(CURDIR)/xbmc/utils/ProgressJob.cpp \
 	$(CURDIR)/xbmc/utils/RegExp.cpp \
+	$(CURDIR)/xbmc/utils/RingBuffer.cpp \
 	$(CURDIR)/xbmc/utils/SortUtils.cpp \
 	$(CURDIR)/xbmc/utils/Speed.cpp \
 	$(CURDIR)/xbmc/utils/StringUtils.cpp \
