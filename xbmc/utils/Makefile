@@ -13,6 +13,10 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/FileExtensionProvider.cpp \
 	$(CURDIR)/xbmc/utils/FileOperationJob.cpp \
 	$(CURDIR)/xbmc/utils/FileUtils.cpp \
+	$(CURDIR)/xbmc/utils/HttpHeader.cpp \
+	$(CURDIR)/xbmc/utils/HttpParser.cpp \
+	$(CURDIR)/xbmc/utils/HttpRangeUtils.cpp \
+	$(CURDIR)/xbmc/utils/HttpResponse.cpp \
 	$(CURDIR)/xbmc/utils/JobManager.cpp \
 	$(CURDIR)/xbmc/utils/JSONVariantParser.cpp \
 	$(CURDIR)/xbmc/utils/JSONVariantWriter.cpp \
