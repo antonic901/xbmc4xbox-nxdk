@@ -66,6 +66,21 @@ public:
   static void GetSkinThemes(std::vector<std::string>& vecTheme);
 
   static bool MakeShortenPath(std::string StrInput, std::string& StrOutput, size_t iTextMaxLength);
+  /*! \brief Checks whether the supplied path supports Write file operations (e.g. Rename, Delete, ...)
+
+   \param strPath the path to be checked
+
+   \return true if Write file operations are supported, false otherwise
+   */
+  static bool SupportsWriteFileOperations(const std::string& strPath);
+  /*! \brief Checks whether the supplied path supports Read file operations (e.g. Copy, ...)
+
+   \param strPath the path to be checked
+
+   \return true if Read file operations are supported, false otherwise
+   */
+  static bool SupportsReadFileOperations(const std::string& strPath);
+  static std::string GetDefaultFolderThumb(const std::string &folderThumb);
 
   /*!
    * \brief Thread-safe random number generation

@@ -10,9 +10,12 @@
 
 #include "FileItem.h"
 #include "filesystem/Directory.h"
+#include "filesystem/MultiPathDirectory.h"
+#include "filesystem/StackDirectory.h"
 #include "URL.h"
 #include "filesystem/File.h"
 #include "guilib/GraphicContext.h"
+#include "guilib/TextureManager.h"
 #include "utils/Digest.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
@@ -306,6 +309,35 @@ bool CUtil::MakeShortenPath(std::string StrInput, std::string& StrOutput, size_t
   }
   StrOutput = StrInput;
   return true;
+}
+
+bool CUtil::SupportsWriteFileOperations(const std::string& strPath)
+{
+  // currently only hd, smb, nfs and dav support delete and rename
+  if (URIUtils::IsHD(strPath))
+    return true;
+  if (URIUtils::IsSmb(strPath))
+    return true;
+  if (URIUtils::IsDAV(strPath))
+    return true;
+  if (URIUtils::IsStack(strPath))
+    return SupportsWriteFileOperations(CStackDirectory::GetFirstStackedFile(strPath));
+  if (URIUtils::IsMultiPath(strPath))
+    return CMultiPathDirectory::SupportsWriteFileOperations(strPath);
+
+  return false;
+}
+
+bool CUtil::SupportsReadFileOperations(const std::string& strPath)
+{
+  return !URIUtils::IsVideoDb(strPath);
+}
+
+std::string CUtil::GetDefaultFolderThumb(const std::string &folderThumb)
+{
+  if (g_TextureManager.HasTexture(folderThumb))
+    return folderThumb;
+  return "";
 }
 
 void CUtil::GetSkinThemes(std::vector<std::string>& vecTheme)

@@ -10,5 +10,8 @@ SRCS += \
 	$(CURDIR)/xbmc/filesystem/FileFactory.cpp \
 	$(CURDIR)/xbmc/filesystem/IDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/IFile.cpp \
+	$(CURDIR)/xbmc/filesystem/MultiPathDirectory.cpp \
+	$(CURDIR)/xbmc/filesystem/MultiPathFile.cpp \
 	$(CURDIR)/xbmc/filesystem/OverrideFile.cpp \
-	$(CURDIR)/xbmc/filesystem/SpecialProtocol.cpp
+	$(CURDIR)/xbmc/filesystem/SpecialProtocol.cpp \
+	$(CURDIR)/xbmc/filesystem/StackDirectory.cpp
