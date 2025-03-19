@@ -30,11 +30,14 @@ include $(CURDIR)/xbmc/interfaces/Makefile
 include $(CURDIR)/xbmc/listproviders/Makefile
 include $(CURDIR)/xbmc/media/Makefile
 include $(CURDIR)/xbmc/messaging/Makefile
+include $(CURDIR)/xbmc/music/Makefile
 include $(CURDIR)/xbmc/network/Makefile
+include $(CURDIR)/xbmc/pictures/Makefile
 include $(CURDIR)/xbmc/platform/Makefile
 include $(CURDIR)/xbmc/profiles/Makefile
 include $(CURDIR)/xbmc/playlists/Makefile
 include $(CURDIR)/xbmc/settings/Makefile
 include $(CURDIR)/xbmc/threads/Makefile
 include $(CURDIR)/xbmc/utils/Makefile
+include $(CURDIR)/xbmc/video/Makefile
 include $(CURDIR)/xbmc/view/Makefile
