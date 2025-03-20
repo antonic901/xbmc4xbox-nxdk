@@ -32,9 +32,9 @@
 /*                                                                      */
 /************************************************************************/
 #if 0
-CBaseTexture::CBaseTexture(unsigned int width, unsigned int height, unsigned int format, IDirect3DTexture8* texture /* = NULL */, IDirect3DPalette8* palette /* = NULL */, bool packed /* = false */)
+CTexture::CTexture(unsigned int width, unsigned int height, unsigned int format, IDirect3DTexture8* texture /* = NULL */, IDirect3DPalette8* palette /* = NULL */, bool packed /* = false */)
 #else
-CBaseTexture::CBaseTexture(unsigned int width, unsigned int height, unsigned int format, void* texture /* = NULL */, void* palette /* = NULL */, bool packed /* = false */)
+CTexture::CTexture(unsigned int width, unsigned int height, unsigned int format, void* texture /* = NULL */, void* palette /* = NULL */, bool packed /* = false */)
 #endif
  : m_hasAlpha( true ),
    m_packed( packed )
@@ -48,7 +48,7 @@ CBaseTexture::CBaseTexture(unsigned int width, unsigned int height, unsigned int
   GetTextureInfo();
 }
 
-CBaseTexture::~CBaseTexture()
+CTexture::~CTexture()
 {
 #if 0
   if (m_packed)
@@ -81,7 +81,7 @@ CBaseTexture::~CBaseTexture()
 #endif
 }
 
-void CBaseTexture::Allocate(unsigned int width, unsigned int height, unsigned int format)
+void CTexture::Allocate(unsigned int width, unsigned int height, unsigned int format)
 {
   m_imageWidth = m_originalWidth = width;
   m_imageHeight = m_originalHeight = height;
@@ -94,7 +94,7 @@ void CBaseTexture::Allocate(unsigned int width, unsigned int height, unsigned in
   m_texCoordsArePixels = false;
 }
 
-bool CBaseTexture::GetTextureInfo()
+bool CTexture::GetTextureInfo()
 {
 #if 0
   if (!m_texture)
@@ -123,7 +123,7 @@ bool CBaseTexture::GetTextureInfo()
   return false;
 }
 
-CBaseTexture *CBaseTexture::LoadFromFile(const std::string& texturePath, unsigned int idealWidth, unsigned int idealHeight, bool autoRotate)
+std::unique_ptr<CTexture> CTexture::LoadFromFile(const std::string& texturePath, unsigned int idealWidth, unsigned int idealHeight, bool autoRotate)
 {
   CTexture *texture = new CTexture();
   if (texture->LoadFromFileInternal(texturePath, idealWidth, idealHeight, autoRotate))
@@ -132,7 +132,7 @@ CBaseTexture *CBaseTexture::LoadFromFile(const std::string& texturePath, unsigne
   return NULL;
 }
 
-CBaseTexture *CBaseTexture::LoadFromFileInMemory(unsigned char *buffer, size_t bufferSize, const std::string &mimeType, unsigned int idealWidth, unsigned int idealHeight)
+std::unique_ptr<CTexture> CTexture::LoadFromFileInMemory(unsigned char *buffer, size_t bufferSize, const std::string &mimeType, unsigned int idealWidth, unsigned int idealHeight)
 {
   CTexture *texture = new CTexture();
   if (texture->LoadFromFileInMem(buffer, bufferSize, mimeType, idealWidth, idealHeight))
@@ -141,7 +141,7 @@ CBaseTexture *CBaseTexture::LoadFromFileInMemory(unsigned char *buffer, size_t b
   return NULL;
 }
 
-bool CBaseTexture::LoadFromFileInternal(const std::string& texturePath, unsigned int maxWidth, unsigned int maxHeight, bool autoRotate)
+bool CTexture::LoadFromFileInternal(const std::string& texturePath, unsigned int maxWidth, unsigned int maxHeight, bool autoRotate)
 {
   unsigned int width = maxWidth ? std::min(maxWidth, (unsigned int)g_graphicsContext.GetMaxTextureSize()) : (unsigned int)g_graphicsContext.GetMaxTextureSize();
   unsigned int height = maxHeight ? std::min(maxHeight, (unsigned int)g_graphicsContext.GetMaxTextureSize()) : (unsigned int)g_graphicsContext.GetMaxTextureSize();
@@ -263,7 +263,7 @@ bool CBaseTexture::LoadFromFileInternal(const std::string& texturePath, unsigned
   return false;
 }
 
-bool CBaseTexture::LoadFromFileInMem(unsigned char* buffer, size_t size, const std::string& mimeType, unsigned int maxWidth, unsigned int maxHeight)
+bool CTexture::LoadFromFileInMem(unsigned char* buffer, size_t size, const std::string& mimeType, unsigned int maxWidth, unsigned int maxHeight)
 {
   if (!buffer || !size)
     return false;
@@ -333,7 +333,7 @@ bool CBaseTexture::LoadFromFileInMem(unsigned char* buffer, size_t size, const s
 }
 
 #if 0
-void CBaseTexture::LoadFromImage(ImageInfo &image, bool autoRotate)
+void CTexture::LoadFromImage(ImageInfo &image, bool autoRotate)
 {
   m_hasAlpha = NULL != image.alpha;
 
@@ -373,7 +373,7 @@ void CBaseTexture::LoadFromImage(ImageInfo &image, bool autoRotate)
     CLog::Log(LOGERROR, "%s - failed to create texture while loading image %s", __FUNCTION__);
 }
 
-bool CBaseTexture::LoadPaletted(unsigned int width, unsigned int height, unsigned int pitch, unsigned int format, const unsigned char *pixels, IDirect3DPalette8 *palette)
+bool CTexture::LoadPaletted(unsigned int width, unsigned int height, unsigned int pitch, unsigned int format, const unsigned char *pixels, IDirect3DPalette8 *palette)
 {
   m_imageWidth = width;
   m_imageHeight = height;
@@ -400,7 +400,7 @@ bool CBaseTexture::LoadPaletted(unsigned int width, unsigned int height, unsigne
 }
 #endif
 
-unsigned int CBaseTexture::PadPow2(unsigned int x)
+unsigned int CTexture::PadPow2(unsigned int x)
 {
   --x;
   x |= x >> 1;
@@ -411,7 +411,7 @@ unsigned int CBaseTexture::PadPow2(unsigned int x)
   return ++x;
 }
 
-unsigned int CBaseTexture::GetRows(unsigned int height) const
+unsigned int CTexture::GetRows(unsigned int height) const
 {
   switch (m_format)
   {
@@ -425,7 +425,7 @@ unsigned int CBaseTexture::GetRows(unsigned int height) const
   }
 }
 
-bool CBaseTexture::HasAlpha() const
+bool CTexture::HasAlpha() const
 {
   return m_hasAlpha;
 }

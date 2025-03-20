@@ -63,7 +63,7 @@ bool CImageLoader::DoWork()
   {
     // direct route - load the image
     auto start = std::chrono::steady_clock::now();
-    m_texture = CBaseTexture::LoadFromFile(loadPath, g_graphicsContext.GetWidth(), g_graphicsContext.GetHeight());
+    m_texture = CTexture::LoadFromFile(loadPath, g_graphicsContext.GetWidth(), g_graphicsContext.GetHeight());
 
     auto end = std::chrono::steady_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
@@ -138,7 +138,7 @@ bool CGUILargeTextureManager::CLargeTexture::DeleteIfRequired(bool deleteImmedia
   return false;
 }
 
-void CGUILargeTextureManager::CLargeTexture::SetTexture(CBaseTexture* texture)
+void CGUILargeTextureManager::CLargeTexture::SetTexture(CTexture* texture)
 {
   assert(!m_texture.size());
   if (texture)

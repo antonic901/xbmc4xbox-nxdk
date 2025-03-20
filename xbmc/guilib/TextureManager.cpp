@@ -89,7 +89,7 @@ void CTextureArray::Reset()
   m_texCoordsArePixels = false;
 }
 
-void CTextureArray::Add(CBaseTexture *texture, int delay)
+void CTextureArray::Add(CTexture *texture, int delay)
 {
   if (!texture)
     return;
@@ -106,7 +106,7 @@ void CTextureArray::Add(CBaseTexture *texture, int delay)
 #endif
 }
 
-void CTextureArray::Set(CBaseTexture *texture, int width, int height)
+void CTextureArray::Set(CTexture *texture, int width, int height)
 {
   assert(!m_textures.size()); // don't try and set a texture if we already have one!
   m_width = width;
@@ -219,7 +219,7 @@ bool CTextureMap::IsEmpty() const
   return m_texture.m_textures.empty();
 }
 
-void CTextureMap::Add(CBaseTexture* texture, int delay)
+void CTextureMap::Add(CTexture* texture, int delay)
 {
   m_texture.Add(texture, delay);
 
@@ -454,7 +454,7 @@ const CTextureArray& CGUITextureManager::Load(const std::string& strTextureName,
   {
 #if 0
     CTextureMap* pMap = nullptr;
-    CBaseTexture **pTextures = nullptr;
+    CTexture **pTextures = nullptr;
     int nLoops = 0, width = 0, height = 0;
     int* Delay = nullptr;
     int nImages = m_TexBundle[bundle].LoadAnim(strTextureName, &pTextures, width, height, nLoops, &Delay);
@@ -550,7 +550,7 @@ const CTextureArray& CGUITextureManager::Load(const std::string& strTextureName,
     return emptyTexture;
   }
 
-  CBaseTexture *pTexture = NULL;
+  CTexture *pTexture = NULL;
   int width = 0, height = 0;
   if (bundle >= 0)
   {
@@ -566,9 +566,9 @@ const CTextureArray& CGUITextureManager::Load(const std::string& strTextureName,
   {
 #ifdef HAS_XBOX_D3D
     bool isThumbnail = URIUtils::GetExtension(strPath).Equals(".tbn");
-    pTexture = CBaseTexture::LoadFromFile(strPath, isThumbnail ? CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->GetThumbSize() : 0, isThumbnail ? CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->GetThumbSize() : 0);
+    pTexture = CTexture::LoadFromFile(strPath, isThumbnail ? CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->GetThumbSize() : 0, isThumbnail ? CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->GetThumbSize() : 0);
 #else
-    pTexture = CBaseTexture::LoadFromFile(strPath);
+    pTexture = CTexture::LoadFromFile(strPath);
 #endif
     if (!pTexture)
       return emptyTexture;
