@@ -62,7 +62,7 @@ public:
    \param autoRotate whether the textures should be autorotated based on EXIF information (defaults to false).
    \return a CTexture pointer to the created texture - NULL if the texture failed to load.
    */
-  static CTexture *LoadFromFile(const std::string& texturePath, unsigned int idealWidth = 0, unsigned int idealHeight = 0,
+  static std::unique_ptr<CTexture> LoadFromFile(const std::string& texturePath, unsigned int idealWidth = 0, unsigned int idealHeight = 0,
                                     bool autoRotate = false);
 
   /*! \brief Load a texture from a file in memory
@@ -75,7 +75,7 @@ public:
    \param idealHeight the ideal height of the texture (defaults to 0, no ideal height).
    \return a CTexture pointer to the created texture - NULL if the texture failed to load.
    */
-  static CTexture *LoadFromFileInMemory(unsigned char* buffer, size_t bufferSize, const std::string& mimeType,
+  static std::unique_ptr<CTexture> LoadFromFileInMemory(unsigned char* buffer, size_t bufferSize, const std::string& mimeType,
                                             unsigned int idealWidth = 0, unsigned int idealHeight = 0);                                  
 
 #if 0

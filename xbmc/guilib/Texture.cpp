@@ -125,20 +125,20 @@ bool CTexture::GetTextureInfo()
 
 std::unique_ptr<CTexture> CTexture::LoadFromFile(const std::string& texturePath, unsigned int idealWidth, unsigned int idealHeight, bool autoRotate)
 {
-  CTexture *texture = new CTexture();
+  std::unique_ptr<CTexture> texture = std::make_unique<CTexture>();
   if (texture->LoadFromFileInternal(texturePath, idealWidth, idealHeight, autoRotate))
     return texture;
-  delete texture;
-  return NULL;
+  texture.reset(nullptr);
+  return nullptr;
 }
 
 std::unique_ptr<CTexture> CTexture::LoadFromFileInMemory(unsigned char *buffer, size_t bufferSize, const std::string &mimeType, unsigned int idealWidth, unsigned int idealHeight)
 {
-  CTexture *texture = new CTexture();
+  std::unique_ptr<CTexture> texture = std::make_unique<CTexture>();
   if (texture->LoadFromFileInMem(buffer, bufferSize, mimeType, idealWidth, idealHeight))
     return texture;
-  delete texture;
-  return NULL;
+  texture.reset(nullptr);
+  return nullptr;
 }
 
 bool CTexture::LoadFromFileInternal(const std::string& texturePath, unsigned int maxWidth, unsigned int maxHeight, bool autoRotate)
