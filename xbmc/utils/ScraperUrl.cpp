@@ -14,7 +14,6 @@
 #include "URL.h"
 #include "XMLUtils.h"
 #include "filesystem/CurlFile.h"
-#include "filesystem/ZipFile.h"
 #include "settings/AdvancedSettings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/CharsetDetection.h"
@@ -346,6 +345,7 @@ bool CScraperUrl::Get(const SUrlEntry& scrURL,
 
   if (ftype == CMime::FileTypeZip || ftype == CMime::FileTypeGZip)
   {
+#if 0
     XFILE::CZipFile file;
     std::string strBuffer;
     auto iSize = file.UnpackFromMemory(
@@ -356,6 +356,7 @@ bool CScraperUrl::Get(const SUrlEntry& scrURL,
       CLog::Log(LOGDEBUG, "{}: Archive \"{}\" was unpacked in memory", __FUNCTION__, scrURL.m_url);
     }
     else
+#endif
       CLog::Log(LOGWARNING, "{}: \"{}\" looks like archive but cannot be unpacked", __FUNCTION__,
                 scrURL.m_url);
   }

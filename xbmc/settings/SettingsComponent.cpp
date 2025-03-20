@@ -19,6 +19,7 @@
 #ifdef TARGET_WINDOWS
 #include "platform/Environment.h"
 #endif
+#include "profiles/ProfileManager.h"
 #include "settings/AdvancedSettings.h"
 #include "settings/Settings.h"
 #include "utils/StringUtils.h"
@@ -30,7 +31,8 @@
 
 CSettingsComponent::CSettingsComponent()
   : m_settings(new CSettings()),
-    m_advancedSettings(new CAdvancedSettings())
+    m_advancedSettings(new CAdvancedSettings()),
+    m_profileManager(new CProfileManager())
 {
 }
 
@@ -60,6 +62,8 @@ void CSettingsComponent::Initialize()
     m_advancedSettings->Initialize(*m_settings->GetSettingsManager());
     URIUtils::RegisterAdvancedSettings(*m_advancedSettings);
 
+    m_profileManager->Initialize(m_settings);
+
     m_state = State::INITED;
   }
 }
@@ -68,6 +72,15 @@ bool CSettingsComponent::Load()
 {
   if (m_state == State::INITED)
   {
+    if (!m_profileManager->Load())
+    {
+      CLog::Log(LOGFATAL, "unable to load profile");
+      return false;
+    }
+
+    CSpecialProtocol::RegisterProfileManager(*m_profileManager);
+    XFILE::IDirectory::RegisterProfileManager(*m_profileManager);
+
     if (!m_settings->Load())
     {
       CLog::Log(LOGFATAL, "unable to load settings");
@@ -98,7 +111,11 @@ void CSettingsComponent::Deinitialize()
       m_subtitlesSettings.reset();
 
       m_settings->Unload();
+
+      XFILE::IDirectory::UnregisterProfileManager();
+      CSpecialProtocol::UnregisterProfileManager();
     }
+    m_profileManager->Uninitialize();
 
     URIUtils::UnregisterAdvancedSettings();
     m_advancedSettings->Uninitialize(*m_settings->GetSettingsManager());
@@ -121,6 +138,11 @@ std::shared_ptr<CAdvancedSettings> CSettingsComponent::GetAdvancedSettings()
 std::shared_ptr<KODI::SUBTITLES::CSubtitlesSettings> CSettingsComponent::GetSubtitlesSettings()
 {
   return m_subtitlesSettings;
+}
+
+std::shared_ptr<CProfileManager> CSettingsComponent::GetProfileManager()
+{
+  return m_profileManager;
 }
 
 bool CSettingsComponent::InitDirectoriesLinux(bool bPlatformDirectories)

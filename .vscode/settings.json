@@ -115,7 +115,8 @@
     "thread": "cpp",
     "ranges": "cpp",
     "filesystem": "cpp",
-    "cerrno": "cpp"
+    "cerrno": "cpp",
+    "cassert": "cpp"
   },
   "editor.tabSize": 2
 }
