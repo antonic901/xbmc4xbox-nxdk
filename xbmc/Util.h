@@ -68,6 +68,7 @@ public:
    \param parameters the returned parameters
    */
   static void SplitParams(const std::string &paramString, std::vector<std::string> &parameters);
+  static std::string TranslateSpecialSource(const std::string &strSpecial);
 
   static void GetSkinThemes(std::vector<std::string>& vecTheme);
 

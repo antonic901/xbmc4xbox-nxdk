@@ -332,6 +332,37 @@ void CUtil::SplitParams(const std::string &paramString, std::vector<std::string>
     parameters.push_back(parameter);
 }
 
+std::string CUtil::TranslateSpecialSource(const std::string &strSpecial)
+{
+  if (!strSpecial.empty() && strSpecial[0] == '$')
+  {
+    if (StringUtils::StartsWithNoCase(strSpecial, "$home"))
+      return URIUtils::AddFileToFolder("special://home/", strSpecial.substr(5));
+    else if (StringUtils::StartsWithNoCase(strSpecial, "$subtitles"))
+      return URIUtils::AddFileToFolder("special://subtitles/", strSpecial.substr(10));
+    else if (StringUtils::StartsWithNoCase(strSpecial, "$userdata"))
+      return URIUtils::AddFileToFolder("special://userdata/", strSpecial.substr(9));
+    else if (StringUtils::StartsWithNoCase(strSpecial, "$database"))
+      return URIUtils::AddFileToFolder("special://database/", strSpecial.substr(9));
+    else if (StringUtils::StartsWithNoCase(strSpecial, "$thumbnails"))
+      return URIUtils::AddFileToFolder("special://thumbnails/", strSpecial.substr(11));
+    else if (StringUtils::StartsWithNoCase(strSpecial, "$recordings"))
+      return URIUtils::AddFileToFolder("special://recordings/", strSpecial.substr(11));
+    else if (StringUtils::StartsWithNoCase(strSpecial, "$screenshots"))
+      return URIUtils::AddFileToFolder("special://screenshots/", strSpecial.substr(12));
+    else if (StringUtils::StartsWithNoCase(strSpecial, "$musicplaylists"))
+      return URIUtils::AddFileToFolder("special://musicplaylists/", strSpecial.substr(15));
+    else if (StringUtils::StartsWithNoCase(strSpecial, "$videoplaylists"))
+      return URIUtils::AddFileToFolder("special://videoplaylists/", strSpecial.substr(15));
+    else if (StringUtils::StartsWithNoCase(strSpecial, "$cdrips"))
+      return URIUtils::AddFileToFolder("special://cdrips/", strSpecial.substr(7));
+    // this one will be removed post 2.0
+    else if (StringUtils::StartsWithNoCase(strSpecial, "$playlists"))
+      return URIUtils::AddFileToFolder(CServiceBroker::GetSettingsComponent()->GetSettings()->GetString(CSettings::SETTING_SYSTEM_PLAYLISTSPATH), strSpecial.substr(10));
+  }
+  return strSpecial;
+}
+
 bool CUtil::MakeShortenPath(std::string StrInput, std::string& StrOutput, size_t iTextMaxLength)
 {
   size_t iStrInputSize = StrInput.size();
