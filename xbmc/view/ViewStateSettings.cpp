@@ -116,6 +116,7 @@ bool CViewStateSettings::Load(const TiXmlNode *settings)
     else
       m_settingLevel = SettingLevel::Standard;
 
+#if 0
     const TiXmlNode* pEventLogNode = pElement->FirstChild(XML_EVENTLOG);
     if (pEventLogNode != NULL)
     {
@@ -128,6 +129,7 @@ bool CViewStateSettings::Load(const TiXmlNode *settings)
       if (!XMLUtils::GetBoolean(pEventLogNode, XML_EVENTLOG_LEVEL_HIGHER, m_eventShowHigherLevels))
         m_eventShowHigherLevels = true;
     }
+#endif
   }
 
   return true;
@@ -181,8 +183,10 @@ bool CViewStateSettings::Save(TiXmlNode *settings) const
       return false;
   }
 
+#if 0
   XMLUtils::SetInt(eventLogNode, XML_EVENTLOG_LEVEL, (int)m_eventLevel);
   XMLUtils::SetBoolean(eventLogNode, XML_EVENTLOG_LEVEL_HIGHER, (int)m_eventShowHigherLevels);
+#endif
 
   return true;
 }
@@ -235,6 +239,7 @@ SettingLevel CViewStateSettings::GetNextSettingLevel() const
   return level;
 }
 
+#if 0
 void CViewStateSettings::SetEventLevel(EventLevel eventLevel)
 {
   if (eventLevel < EventLevel::Basic)
@@ -257,6 +262,7 @@ EventLevel CViewStateSettings::GetNextEventLevel() const
     level = EventLevel::Basic;
   return level;
 }
+#endif
 
 void CViewStateSettings::AddViewState(const std::string& strTagName, int defaultView /* = DEFAULT_VIEW_LIST */, SortBy defaultSort /* = SortByLabel */)
 {

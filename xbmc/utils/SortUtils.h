@@ -37,7 +37,9 @@ typedef enum {
 typedef enum {
   SortAttributeNone           = 0x0,
   SortAttributeIgnoreArticle  = 0x1,
-  SortAttributeIgnoreFolders  = 0x2
+  SortAttributeIgnoreFolders  = 0x2,
+  SortAttributeUseArtistSortName = 0x4,
+  SortAttributeIgnoreLabel = 0x8
 } SortAttribute;
 
 typedef enum {
@@ -162,6 +164,22 @@ typedef enum {
   SortByLastUpdated,
   /// __52__ : Sort by last used                  <em>(String: <b><c>lastused</c></b>)</em>
   SortByLastUsed,
+  /// __53__ : Sort by client channel order       <em>(String: <b><c>ClientChannelOrder</c></b>)</em>
+  SortByClientChannelOrder,
+  /// __54__ : Sort by total number of discs      <em>(String: <b><c>totaldiscs</c></b>)</em>
+  SortByTotalDiscs,
+  /// __55__ : Sort by original release date      <em>(String: <b><c>Originaldate</c></b>)</em>
+  SortByOrigDate,
+  /// __56__ : Sort by BPM                        <em>(String: <b><c>bpm</c></b>)</em>
+  SortByBPM,
+  /// __57__ : Sort by original title             <em>(String: <b><c>OriginalTitle</c></b>)</em>
+  SortByOriginalTitle,
+  /// __58__ : Sort by provider                   <em>(String: <b><c>Provider</c></b>)</em>
+  /// @skinning_v20 <b>SortByProvider</b> New sort method added.
+  SortByProvider,
+  /// __59__ : Sort by user preference            <em>(String: <b><c>UserPreference</c></b>)</em>
+  /// @skinning_v20 <b>SortByUserPreference</b> New sort method added.
+  SortByUserPreference,
 } SortBy;
 ///@}
 
