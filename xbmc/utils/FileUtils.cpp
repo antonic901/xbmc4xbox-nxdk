@@ -11,6 +11,8 @@
 #include "FileOperationJob.h"
 #include "URIUtils.h"
 #include "filesystem/File.h"
+#include "filesystem/StackDirectory.h"
+#include "utils/log.h"
 
 using namespace XFILE;
 
@@ -44,4 +46,90 @@ bool CFileUtils::DeleteItem(const std::shared_ptr<CFileItem>& item)
 bool CFileUtils::Exists(const std::string& strFileName, bool bUseCache)
 {
   return CFile::Exists(strFileName, bUseCache);
+}
+
+CDateTime CFileUtils::GetModificationDate(const std::string& strFileNameAndPath,
+                                          const bool& bUseLatestDate)
+{
+  if (bUseLatestDate)
+    return GetModificationDate(1, strFileNameAndPath);
+  else
+    return GetModificationDate(0, strFileNameAndPath);
+}
+
+CDateTime CFileUtils::GetModificationDate(const int& code, const std::string& strFileNameAndPath)
+{
+  CDateTime dateAdded;
+  if (strFileNameAndPath.empty())
+  {
+    CLog::Log(LOGDEBUG, "{} empty strFileNameAndPath variable", __FUNCTION__);
+    return dateAdded;
+  }
+
+  try
+  {
+    std::string file = strFileNameAndPath;
+    if (URIUtils::IsStack(strFileNameAndPath))
+      file = CStackDirectory::GetFirstStackedFile(strFileNameAndPath);
+
+    if (URIUtils::IsInArchive(file))
+      file = CURL(file).GetHostName();
+
+    // Try to get ctime (creation on Windows, metadata change on Linux) and mtime (modification)
+    struct __stat64 buffer;
+    if (CFile::Stat(file, &buffer) == 0 && (buffer.st_mtime != 0 || buffer.st_ctime != 0))
+    {
+      time_t now = time(NULL);
+      time_t addedTime;
+      // Prefer the modification time if it's valid, fallback to ctime
+      if (code == 0)
+      {
+        if (buffer.st_mtime != 0 && static_cast<time_t>(buffer.st_mtime) <= now)
+          addedTime = static_cast<time_t>(buffer.st_mtime);
+        else
+          addedTime = static_cast<time_t>(buffer.st_ctime);
+      }
+      // Use the later of the ctime and mtime
+      else if (code == 1)
+      {
+        addedTime =
+            std::max(static_cast<time_t>(buffer.st_ctime), static_cast<time_t>(buffer.st_mtime));
+        // if the newer of the two dates is in the future, we try it with the older one
+        if (addedTime > now)
+          addedTime =
+              std::min(static_cast<time_t>(buffer.st_ctime), static_cast<time_t>(buffer.st_mtime));
+      }
+      // Prefer the earliest of ctime and mtime, fallback to other
+      else
+      {
+        addedTime =
+            std::min(static_cast<time_t>(buffer.st_ctime), static_cast<time_t>(buffer.st_mtime));
+        // if the older of the two dates is invalid, we try it with the newer one
+        if (addedTime == 0)
+          addedTime =
+              std::max(static_cast<time_t>(buffer.st_ctime), static_cast<time_t>(buffer.st_mtime));
+      }
+
+
+      // make sure the datetime does is not in the future
+      if (addedTime <= now)
+      {
+        struct tm* time;
+#ifdef HAVE_LOCALTIME_R
+        struct tm result = {};
+        time = localtime_r(&addedTime, &result);
+#else
+        time = localtime(&addedTime);
+#endif
+        if (time)
+          dateAdded = *time;
+      }
+    }
+  }
+  catch (...)
+  {
+    CLog::Log(LOGERROR, "{} unable to extract modification date for file ({})", __FUNCTION__,
+              strFileNameAndPath);
+  }
+  return dateAdded;
 }

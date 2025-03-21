@@ -27,31 +27,25 @@
 #include "dialogs/GUIDialogKaiToast.h"
 #include "dialogs/GUIDialogProgress.h"
 #include "dialogs/GUIDialogSelect.h"
-#include "events/EventLog.h"
-#include "events/NotificationEvent.h"
 #include "filesystem/Directory.h"
 #include "filesystem/DirectoryCache.h"
 #include "filesystem/File.h"
 #include "filesystem/MusicDatabaseDirectory/DirectoryNode.h"
-#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
-#include "guilib/guiinfo/GUIInfoLabels.h"
+#include "guiinfo/GUIInfoLabels.h"
 #include "interfaces/AnnouncementManager.h"
 #include "messaging/helpers/DialogHelper.h"
 #include "messaging/helpers/DialogOKHelper.h"
 #include "music/MusicDbUrl.h"
 #include "music/MusicLibraryQueue.h"
 #include "music/tags/MusicInfoTag.h"
-#include "network/Network.h"
-#include "network/cddb.h"
 #include "playlists/SmartPlayList.h"
 #include "profiles/ProfileManager.h"
 #include "settings/AdvancedSettings.h"
 #include "settings/MediaSourceSettings.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
-#include "storage/MediaManager.h"
 #include "utils/FileUtils.h"
 #include "utils/LegacyPathTranslation.h"
 #include "utils/MathUtils.h"
@@ -11423,10 +11417,12 @@ bool CMusicDatabase::CommitTransaction()
 {
   if (CDatabase::CommitTransaction())
   { // number of items in the db has likely changed, so reset the infomanager cache
+#if 0
     CGUIComponent* gui = CServiceBroker::GetGUI();
     if (gui)
+#endif
     {
-      gui->GetInfoManager().GetInfoProviders().GetLibraryInfoProvider().SetLibraryBool(
+      g_infoManager.SetLibraryBool(
           LIBRARY_HAS_MUSIC, GetSongsCount() > 0);
       return true;
     }
@@ -12279,9 +12275,11 @@ void CMusicDatabase::ImportFromXML(const std::string& xmlFile, CGUIDialogProgres
       if (!ImportSongHistory(xmlFile, songtotal, progressDialog))
         return;
 
+#if 0
     CGUIComponent* gui = CServiceBroker::GetGUI();
     if (gui)
-      gui->GetInfoManager().GetInfoProviders().GetLibraryInfoProvider().ResetLibraryBools();
+#endif
+      g_infoManager.ResetLibraryBools();
   }
   catch (...)
   {
@@ -12612,10 +12610,6 @@ bool CMusicDatabase::ImportSongHistory(const std::string& xmlFile,
     // "Importing song history {1} of {2} songs matched", total - unmatched, total)
     std::string strLine =
         StringUtils::Format(g_localizeStrings.Get(38353), total - unmatched, total);
-
-    auto eventLog = CServiceBroker::GetEventLog();
-    if (eventLog)
-      eventLog->Add(EventPtr(new CNotificationEvent(20197, strLine, EventLevel::Information)));
 
     return true;
   }

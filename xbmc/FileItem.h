@@ -646,6 +646,11 @@ public:
    */
   void Stack(bool stackFiles = true);
 
+  SortOrder GetSortOrder() const { return m_sortDescription.sortOrder; }
+  SortBy GetSortMethod() const { return m_sortDescription.sortBy; }
+  void SetSortOrder(SortOrder sortOrder) { m_sortDescription.sortOrder = sortOrder; }
+  void SetSortMethod(SortBy sortBy) { m_sortDescription.sortBy = sortBy; }
+
   /*! \brief load a CFileItemList out of the cache
 
    The file list may be cached based on which window we're viewing in, as different
@@ -741,6 +746,7 @@ private:
   MAPFILEITEMS m_map;
   bool m_ignoreURLOptions = false;
   bool m_fastLookup = false;
+  SortDescription m_sortDescription;
   bool m_sortIgnoreFolders = false;
   CACHE_TYPE m_cacheToDisc = CACHE_IF_SLOW;
   bool m_replaceListing = false;
