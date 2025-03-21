@@ -19,7 +19,9 @@
 #include "filesystem/CurlFile.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
+#if 0
 #include "filesystem/PluginDirectory.h"
+#endif
 #include "guilib/LocalizeStrings.h"
 #include "music/Album.h"
 #include "music/Artist.h"
@@ -41,7 +43,7 @@
 #include <algorithm>
 #include <sstream>
 
-#include <fstrcmp.h>
+#include <fstrcmp/fstrcmp.h>
 
 using namespace XFILE;
 using namespace MUSIC_GRABBER;
@@ -519,8 +521,10 @@ CScraperUrl CScraper::ResolveIDToUrl(const std::string &externalID)
 
     CFileItem item("resolve me", false);
 
+#if 0
     if (XFILE::CPluginDirectory::GetPluginResult(str.str(), item, false))
       scurlRet.ParseFromData(item.GetDynPath());
+#endif
 
     return scurlRet;
   }

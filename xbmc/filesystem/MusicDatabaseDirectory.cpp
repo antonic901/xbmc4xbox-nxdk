@@ -87,7 +87,7 @@ bool CMusicDatabaseDirectory::GetDirectory(const CURL& url, CFileItemList &items
     if (item->m_bIsFolder && !item->HasArt("icon") && !item->HasArt("thumb"))
     {
       std::string strImage = GetIcon(item->GetPath());
-      if (!strImage.empty() && CServiceBroker::GetGUI()->GetTextureManager().HasTexture(strImage))
+      if (!strImage.empty() && g_TextureManager.HasTexture(strImage))
         item->SetArt("icon", strImage);
     }
   }

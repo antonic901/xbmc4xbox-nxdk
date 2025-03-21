@@ -93,6 +93,21 @@ CFileExtensionProvider& CServiceBroker::GetFileExtensionProvider()
   return g_application.m_ServiceManager->GetFileExtensionProvider();
 }
 
+void CServiceBroker::RegisterTextureCache(const std::shared_ptr<CTextureCache>& cache)
+{
+  g_serviceBroker.m_textureCache = cache;
+}
+
+void CServiceBroker::UnregisterTextureCache()
+{
+  g_serviceBroker.m_textureCache.reset();
+}
+
+std::shared_ptr<CTextureCache> CServiceBroker::GetTextureCache()
+{
+  return g_serviceBroker.m_textureCache;
+}
+
 void CServiceBroker::RegisterJobManager(const std::shared_ptr<CJobManager>& jobManager)
 {
   g_serviceBroker.m_jobManager = jobManager;

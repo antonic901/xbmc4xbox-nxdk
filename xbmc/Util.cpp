@@ -6,6 +6,7 @@
  *  See LICENSES/README.md for more information.
  */
 
+#include "ServiceBroker.h"
 #include "Util.h"
 
 #include "FileItem.h"
@@ -16,6 +17,9 @@
 #include "filesystem/File.h"
 #include "guilib/GraphicContext.h"
 #include "guilib/TextureManager.h"
+#include "settings/AdvancedSettings.h"
+#include "settings/Settings.h"
+#include "settings/SettingsComponent.h"
 #include "utils/Digest.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
@@ -23,6 +27,86 @@
 
 using namespace XFILE;
 using KODI::UTILITY::CDigest;
+
+void CUtil::CleanString(const std::string& strFileName,
+                        std::string& strTitle,
+                        std::string& strTitleAndYear,
+                        std::string& strYear,
+                        bool bRemoveExtension /* = false */,
+                        bool bCleanChars /* = true */)
+{
+  strTitleAndYear = strFileName;
+
+  if (strFileName == "..")
+   return;
+
+  const std::shared_ptr<CAdvancedSettings> advancedSettings = CServiceBroker::GetSettingsComponent()->GetAdvancedSettings();
+  const std::vector<std::string> &regexps = advancedSettings->m_videoCleanStringRegExps;
+
+  CRegExp reTags(true, CRegExp::autoUtf8);
+  CRegExp reYear(false, CRegExp::autoUtf8);
+
+  if (!reYear.RegComp(advancedSettings->m_videoCleanDateTimeRegExp))
+  {
+    CLog::Log(LOGERROR, "{}: Invalid datetime clean RegExp:'{}'", __FUNCTION__,
+              advancedSettings->m_videoCleanDateTimeRegExp);
+  }
+  else
+  {
+    if (reYear.RegFind(strTitleAndYear.c_str()) >= 0)
+    {
+      strTitleAndYear = reYear.GetMatch(1);
+      strYear = reYear.GetMatch(2);
+    }
+  }
+
+  URIUtils::RemoveExtension(strTitleAndYear);
+
+  for (const auto &regexp : regexps)
+  {
+    if (!reTags.RegComp(regexp.c_str()))
+    { // invalid regexp - complain in logs
+      CLog::Log(LOGERROR, "{}: Invalid string clean RegExp:'{}'", __FUNCTION__, regexp);
+      continue;
+    }
+    int j=0;
+    if ((j=reTags.RegFind(strTitleAndYear.c_str())) > 0)
+      strTitleAndYear = strTitleAndYear.substr(0, j);
+  }
+
+  // final cleanup - special characters used instead of spaces:
+  // all '_' tokens should be replaced by spaces
+  // if the file contains no spaces, all '.' tokens should be replaced by
+  // spaces - one possibility of a mistake here could be something like:
+  // "Dr..StrangeLove" - hopefully no one would have anything like this.
+  if (bCleanChars)
+  {
+    bool initialDots = true;
+    bool alreadyContainsSpace = (strTitleAndYear.find(' ') != std::string::npos);
+
+    for (char &c : strTitleAndYear)
+    {
+      if (c != '.')
+        initialDots = false;
+
+      if ((c == '_') || ((!alreadyContainsSpace) && !initialDots && (c == '.')))
+      {
+        c = ' ';
+      }
+    }
+  }
+
+  StringUtils::Trim(strTitleAndYear);
+  strTitle = strTitleAndYear;
+
+  // append year
+  if (!strYear.empty())
+    strTitleAndYear = strTitle + " (" + strYear + ")";
+
+  // restore extension if needed
+  if (!bRemoveExtension)
+    strTitleAndYear += URIUtils::GetExtension(strFileName);
+}
 
 std::string CUtil::GetFileDigest(const std::string& strPath, KODI::UTILITY::CDigest::Type type)
 {

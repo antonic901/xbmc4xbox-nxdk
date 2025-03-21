@@ -30,6 +30,12 @@ class CUtil
 {
   CUtil() = delete;
 public:
+  static void CleanString(const std::string& strFileName,
+                          std::string& strTitle,
+                          std::string& strTitleAndYear,
+                          std::string& strYear,
+                          bool bRemoveExtension = false,
+                          bool bCleanChars = true);
   /*! \brief retrieve MD5sum of a file
    \param strPath - path to the file to MD5sum
    \return md5 sum of the file

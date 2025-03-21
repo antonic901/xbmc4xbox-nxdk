@@ -31,6 +31,18 @@ namespace ADDON
 class IAddon;
 }
 
+namespace MUSIC_INFO
+{
+  class CMusicInfoTag;
+}
+class CVideoInfoTag;
+class CPictureInfoTag;
+
+class CAlbum;
+class CArtist;
+class CSong;
+class CGenre;
+
 class CURL;
 class CVariant;
 
@@ -64,6 +76,14 @@ public:
   explicit CFileItem(const char* strLabel);
   CFileItem(const CURL& path, bool bIsFolder);
   CFileItem(const std::string& strPath, bool bIsFolder);
+  explicit CFileItem(const CSong& song);
+  CFileItem(const CSong& song, const MUSIC_INFO::CMusicInfoTag& music);
+  CFileItem(const CURL &path, const CAlbum& album);
+  CFileItem(const std::string &path, const CAlbum& album);
+  explicit CFileItem(const CArtist& artist);
+  explicit CFileItem(const CGenre& genre);
+  explicit CFileItem(const MUSIC_INFO::CMusicInfoTag& music);
+  explicit CFileItem(const CVideoInfoTag& movie);
   explicit CFileItem(std::shared_ptr<const ADDON::IAddon> addonInfo);
 
   ~CFileItem(void);
@@ -204,13 +224,27 @@ public:
   virtual void SetLabel(const std::string &strLabel);
   bool IsLabelPreformatted() const { return m_bLabelPreformatted; }
   void SetLabelPreformatted(bool bYesNo) { m_bLabelPreformatted=bYesNo; }
+  bool SortsOnTop() const { return m_specialSort == SortSpecialOnTop; }
+  bool SortsOnBottom() const { return m_specialSort == SortSpecialOnBottom; }
+  void SetSpecialSort(SortSpecial sort) { m_specialSort = sort; }
 
   inline bool HasMusicInfoTag() const
   {
     return false;
   }
 
+  MUSIC_INFO::CMusicInfoTag* GetMusicInfoTag();
+
+  inline const MUSIC_INFO::CMusicInfoTag* GetMusicInfoTag() const
+  {
+    return m_musicInfoTag;
+  }
+
   bool HasVideoInfoTag() const;
+
+  CVideoInfoTag* GetVideoInfoTag();
+
+  const CVideoInfoTag* GetVideoInfoTag() const;
 
   inline bool HasEPGInfoTag() const
   {
@@ -297,6 +331,11 @@ public:
     return false;
   }
 
+  inline const CPictureInfoTag* GetPictureInfoTag() const
+  {
+    return m_pictureInfoTag;
+  }
+
   bool HasAddonInfo() const { return m_addonInfo != nullptr; }
   const std::shared_ptr<const ADDON::IAddon> GetAddonInfo() const { return m_addonInfo; }
 
@@ -304,6 +343,8 @@ public:
   {
     return false;
   }
+
+  CPictureInfoTag* GetPictureInfoTag();
 
   /*!
    \brief Get the local fanart for this item if it exists
@@ -495,12 +536,16 @@ private:
   std::string m_strPath;            ///< complete path to item
   std::string m_strDynPath;
 
+  SortSpecial m_specialSort;
   bool m_bIsParentFolder;
   bool m_bCanQueue;
   bool m_bLabelPreformatted;
   std::string m_mimetype;
   std::string m_extrainfo;
   bool m_doContentLookup;
+  MUSIC_INFO::CMusicInfoTag* m_musicInfoTag;
+  CVideoInfoTag* m_videoInfoTag;
+  CPictureInfoTag* m_pictureInfoTag;
   std::shared_ptr<const ADDON::IAddon> m_addonInfo;
   bool m_bIsAlbum;
   int64_t m_lStartOffset;

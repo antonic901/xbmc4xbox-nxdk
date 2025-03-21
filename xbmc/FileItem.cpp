@@ -11,17 +11,64 @@
 #include "URL.h"
 #include "Util.h"
 #include "filesystem/File.h"
+#include "music/tags/MusicInfoTag.h"
+#include "pictures/PictureInfoTag.h"
 #include "settings/AdvancedSettings.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
+#include "video/VideoInfoTag.h"
 
 #include <algorithm>
 #include <cstdlib>
 #include <mutex>
 
 using namespace XFILE;
+using namespace MUSIC_INFO;
+
+CFileItem::CFileItem(const CSong& song)
+{
+  Initialize();
+}
+
+CFileItem::CFileItem(const CSong& song, const CMusicInfoTag& music)
+{
+  Initialize();
+  *GetMusicInfoTag() = music;
+}
+
+CFileItem::CFileItem(const CURL &url, const CAlbum& album)
+{
+  Initialize();
+
+  m_strPath = url.Get();
+  URIUtils::AddSlashAtEnd(m_strPath);
+}
+
+CFileItem::CFileItem(const std::string &path, const CAlbum& album)
+{
+  Initialize();
+
+  m_strPath = path;
+  URIUtils::AddSlashAtEnd(m_strPath);
+}
+
+CFileItem::CFileItem(const CMusicInfoTag& music)
+{
+  Initialize();
+  SetLabel(music.GetTitle());
+  m_strPath = music.GetURL();
+  m_bIsFolder = URIUtils::HasSlashAtEnd(m_strPath);
+  *GetMusicInfoTag() = music;
+  FillInDefaultIcon();
+  FillInMimeType(false);
+}
+
+CFileItem::CFileItem(const CVideoInfoTag& movie)
+{
+  Initialize();
+}
 
 CFileItem::CFileItem(const CFileItem& item)
 {
@@ -1369,6 +1416,35 @@ void CFileItemList::SetReplaceListing(bool replace)
 bool CFileItem::HasVideoInfoTag() const
 {
   return false;
+}
+
+CVideoInfoTag* CFileItem::GetVideoInfoTag()
+{
+  if (!m_videoInfoTag)
+    m_videoInfoTag = new CVideoInfoTag;
+
+  return m_videoInfoTag;
+}
+
+const CVideoInfoTag* CFileItem::GetVideoInfoTag() const
+{
+  return m_videoInfoTag;
+}
+
+CPictureInfoTag* CFileItem::GetPictureInfoTag()
+{
+  if (!m_pictureInfoTag)
+    m_pictureInfoTag = new CPictureInfoTag;
+
+  return m_pictureInfoTag;
+}
+
+MUSIC_INFO::CMusicInfoTag* CFileItem::GetMusicInfoTag()
+{
+  if (!m_musicInfoTag)
+    m_musicInfoTag = new MUSIC_INFO::CMusicInfoTag;
+
+  return m_musicInfoTag;
 }
 
 bool CFileItem::HasPVRChannelInfoTag() const
