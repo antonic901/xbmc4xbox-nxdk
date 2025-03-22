@@ -13,6 +13,8 @@ SRCS += \
 	$(CURDIR)/xbmc/InfoScanner.cpp \
 	$(CURDIR)/xbmc/LangInfo.cpp \
 	$(CURDIR)/xbmc/MediaSource.cpp \
+	$(CURDIR)/xbmc/PartyModeManager.cpp \
+	$(CURDIR)/xbmc/PlayListPlayer.cpp \
 	$(CURDIR)/xbmc/ServiceBroker.cpp \
 	$(CURDIR)/xbmc/ServiceManager.cpp \
 	$(CURDIR)/xbmc/TextureCache.cpp \
