@@ -1,6 +1,7 @@
 SRCS += \
 	$(CURDIR)/xbmc/dialogs/GUIDialogBoxBase.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogBusy.cpp \
+	$(CURDIR)/xbmc/dialogs/GUIDialogContextMenu.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogExtendedProgressBar.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogGamepad.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogKaiToast.cpp \
