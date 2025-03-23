@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "MediaSource.h" // Definition of VECSOURCES
 #include "utils/Digest.h"
 
 #include <climits>
@@ -43,6 +44,7 @@ public:
    \return md5 sum of the file
    */
   static std::string GetFileDigest(const std::string& strPath, KODI::UTILITY::CDigest::Type type);
+  static void GetDVDDriveIcon(const std::string& strPath, std::string& strIcon);
 
   static std::string ValidatePath(const std::string &path, bool bFixDoubleSlashes = false); ///< return a validated path, with correct directory separators.
 
@@ -70,12 +72,14 @@ public:
    \param parameters the returned parameters
    */
   static void SplitParams(const std::string &paramString, std::vector<std::string> &parameters);
+  static int GetMatchingSource(const std::string& strPath, VECSOURCES& VECSOURCES, bool& bIsSourceName);
   static std::string TranslateSpecialSource(const std::string &strSpecial);
   static void DeleteDirectoryCache(const std::string &prefix = "");
   static void DeleteMusicDatabaseDirectoryCache();
   static void DeleteVideoDatabaseDirectoryCache();
 
   static void GetSkinThemes(std::vector<std::string>& vecTheme);
+  static void ForceForwardSlashes(std::string& strPath);
 
   static double AlbumRelevance(const std::string& strAlbumTemp1, const std::string& strAlbum1, const std::string& strArtistTemp1, const std::string& strArtist1);
   static bool MakeShortenPath(std::string StrInput, std::string& StrOutput, size_t iTextMaxLength);

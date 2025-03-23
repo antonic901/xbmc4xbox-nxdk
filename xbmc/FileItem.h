@@ -49,6 +49,8 @@ class CVariant;
 
 class CFileItemList;
 
+class CMediaSource;
+
 enum EFileFolderType {
   EFILEFOLDER_TYPE_ALWAYS     = 1<<0,
   EFILEFOLDER_TYPE_ONCLICK    = 1<<1,
@@ -85,6 +87,7 @@ public:
   explicit CFileItem(const CGenre& genre);
   explicit CFileItem(const MUSIC_INFO::CMusicInfoTag& music);
   explicit CFileItem(const CVideoInfoTag& movie);
+  explicit CFileItem(const CMediaSource& share);
   explicit CFileItem(std::shared_ptr<const ADDON::IAddon> addonInfo);
 
   ~CFileItem(void);

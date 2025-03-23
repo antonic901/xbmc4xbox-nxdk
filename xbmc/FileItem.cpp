@@ -122,6 +122,30 @@ CFileItem::CFileItem(const std::string& strPath, bool bIsFolder)
   FillInMimeType(false);
 }
 
+CFileItem::CFileItem(const CMediaSource& share)
+{
+  Initialize();
+  m_bIsFolder = true;
+  m_bIsShareOrDrive = true;
+  m_strPath = share.strPath;
+  if (!IsRSS()) // no slash at end for rss feeds
+    URIUtils::AddSlashAtEnd(m_strPath);
+  std::string label = share.strName;
+  if (!share.strStatus.empty())
+    label = StringUtils::Format("{} ({})", share.strName, share.strStatus);
+  SetLabel(label);
+  m_iLockMode = share.m_iLockMode;
+  m_strLockCode = share.m_strLockCode;
+  m_iHasLock = share.m_iHasLock;
+  m_iBadPwdCount = share.m_iBadPwdCount;
+  m_iDriveType = share.m_iDriveType;
+  SetArt("thumb", share.m_strThumbnailImage);
+  SetLabelPreformatted(true);
+  if (IsDVD())
+    GetVideoInfoTag()->m_strFileNameAndPath = share.strDiskUniqueId; // share.strDiskUniqueId contains disc unique id
+  FillInMimeType(false);
+}
+
 CFileItem::CFileItem(std::shared_ptr<const ADDON::IAddon> addonInfo) : m_addonInfo(std::move(addonInfo))
 {
   Initialize();

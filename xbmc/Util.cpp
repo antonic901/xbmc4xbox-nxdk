@@ -155,6 +155,51 @@ std::string CUtil::GetFileDigest(const std::string& strPath, KODI::UTILITY::CDig
   return result;
 }
 
+void CUtil::GetDVDDriveIcon(const std::string& strPath, std::string& strIcon)
+{
+#if 0
+  if (!CServiceBroker::GetMediaManager().IsDiscInDrive(strPath))
+#endif
+  {
+    strIcon = "DefaultDVDEmpty.png";
+    return ;
+  }
+
+  CFileItem item = CFileItem(strPath, false);
+
+  if (item.IsBluray())
+  {
+    strIcon = "DefaultBluray.png";
+    return;
+  }
+
+  if ( URIUtils::IsDVD(strPath) )
+  {
+    strIcon = "DefaultDVDFull.png";
+    return ;
+  }
+
+  if ( URIUtils::IsISO9660(strPath) )
+  {
+#ifdef HAS_DVD_DRIVE
+    CCdInfo* pInfo = CServiceBroker::GetMediaManager().GetCdInfo();
+    if ( pInfo != NULL && pInfo->IsVideoCd( 1 ) )
+    {
+      strIcon = "DefaultVCD.png";
+      return ;
+    }
+#endif
+    strIcon = "DefaultDVDRom.png";
+    return ;
+  }
+
+  if ( URIUtils::IsCDDA(strPath) )
+  {
+    strIcon = "DefaultCDDA.png";
+    return ;
+  }
+}
+
 /*!
   \brief Finds next unused filename that matches padded int format identifier provided
   \param[in]  fn_template    filename template consisting of a padded int format identifier (eg screenshot%03d)
@@ -355,6 +400,151 @@ void CUtil::SplitParams(const std::string &paramString, std::vector<std::string>
   }
   if (!parameter.empty() || parameters.size())
     parameters.push_back(parameter);
+}
+
+int CUtil::GetMatchingSource(const std::string& strPath1, VECSOURCES& VECSOURCES, bool& bIsSourceName)
+{
+  if (strPath1.empty())
+    return -1;
+
+  // copy as we may change strPath
+  std::string strPath = strPath1;
+
+  // Check for special protocols
+  CURL checkURL(strPath);
+
+  if (StringUtils::StartsWith(strPath, "special://skin/"))
+    return 1;
+
+  // do not return early if URL protocol is "plugin"
+  // since video- and/or audio-plugins can be configured as mediasource
+
+  // stack://
+  if (checkURL.IsProtocol("stack"))
+    strPath.erase(0, 8); // remove the stack protocol
+
+  if (checkURL.IsProtocol("shout"))
+    strPath = checkURL.GetHostName();
+
+  if (checkURL.IsProtocol("multipath"))
+    strPath = CMultiPathDirectory::GetFirstPath(strPath);
+
+  bIsSourceName = false;
+  int iIndex = -1;
+
+  // we first test the NAME of a source
+  for (int i = 0; i < (int)VECSOURCES.size(); ++i)
+  {
+    const CMediaSource &share = VECSOURCES[i];
+    std::string strName = share.strName;
+
+    // special cases for dvds
+    if (URIUtils::IsOnDVD(share.strPath))
+    {
+      if (URIUtils::IsOnDVD(strPath))
+        return i;
+
+      // not a path, so we need to modify the source name
+      // since we add the drive status and disc name to the source
+      // "Name (Drive Status/Disc Name)"
+      size_t iPos = strName.rfind('(');
+      if (iPos != std::string::npos && iPos > 1)
+        strName = strName.substr(0, iPos - 1);
+    }
+    if (StringUtils::EqualsNoCase(strPath, strName))
+    {
+      bIsSourceName = true;
+      return i;
+    }
+  }
+
+  // now test the paths
+
+  // remove user details, and ensure path only uses forward slashes
+  // and ends with a trailing slash so as not to match a substring
+  CURL urlDest(strPath);
+  urlDest.SetOptions("");
+  urlDest.SetProtocolOptions("");
+  std::string strDest = urlDest.GetWithoutUserDetails();
+  ForceForwardSlashes(strDest);
+  if (!URIUtils::HasSlashAtEnd(strDest))
+    strDest += "/";
+
+  size_t iLength = 0;
+  size_t iLenPath = strDest.size();
+  for (int i = 0; i < (int)VECSOURCES.size(); ++i)
+  {
+    const CMediaSource &share = VECSOURCES[i];
+
+    // does it match a source name?
+    if (share.strPath.substr(0,8) == "shout://")
+    {
+      CURL url(share.strPath);
+      if (strPath == url.GetHostName())
+        return i;
+    }
+
+    // doesn't match a name, so try the source path
+    std::vector<std::string> vecPaths;
+
+    // add any concatenated paths if they exist
+    if (!share.vecPaths.empty())
+      vecPaths = share.vecPaths;
+
+    // add the actual share path at the front of the vector
+    vecPaths.insert(vecPaths.begin(), share.strPath);
+
+    // test each path
+    for (const auto &path : vecPaths)
+    {
+      // remove user details, and ensure path only uses forward slashes
+      // and ends with a trailing slash so as not to match a substring
+      CURL urlShare(path);
+      urlShare.SetOptions("");
+      urlShare.SetProtocolOptions("");
+      std::string strShare = urlShare.GetWithoutUserDetails();
+      ForceForwardSlashes(strShare);
+      if (!URIUtils::HasSlashAtEnd(strShare))
+        strShare += "/";
+      size_t iLenShare = strShare.size();
+
+      if ((iLenPath >= iLenShare) && StringUtils::StartsWithNoCase(strDest, strShare) && (iLenShare > iLength))
+      {
+        // if exact match, return it immediately
+        if (iLenPath == iLenShare)
+        {
+          // if the path EXACTLY matches an item in a concatenated path
+          // set source name to true to load the full virtualpath
+          bIsSourceName = false;
+          if (vecPaths.size() > 1)
+            bIsSourceName = true;
+          return i;
+        }
+        iIndex = i;
+        iLength = iLenShare;
+      }
+    }
+  }
+
+  // return the index of the share with the longest match
+  if (iIndex == -1)
+  {
+
+    // rar:// and zip://
+    // if archive wasn't mounted, look for a matching share for the archive instead
+    if( StringUtils::StartsWithNoCase(strPath, "rar://") || StringUtils::StartsWithNoCase(strPath, "zip://") )
+    {
+      // get the hostname portion of the url since it contains the archive file
+      strPath = checkURL.GetHostName();
+
+      bIsSourceName = false;
+      bool bDummy;
+      return GetMatchingSource(strPath, VECSOURCES, bDummy);
+    }
+
+    CLog::Log(LOGDEBUG, "CUtil::GetMatchingSource: no matching source found for [{}]", strPath1);
+  }
+  return iIndex;
 }
 
 std::string CUtil::TranslateSpecialSource(const std::string &strSpecial)
@@ -574,6 +764,16 @@ void CUtil::GetSkinThemes(std::vector<std::string>& vecTheme)
     }
   }
   std::sort(vecTheme.begin(), vecTheme.end(), sortstringbyname());
+}
+
+void CUtil::ForceForwardSlashes(std::string& strPath)
+{
+  size_t iPos = strPath.rfind('\\');
+  while (iPos != std::string::npos)
+  {
+    strPath.at(iPos) = '/';
+    iPos = strPath.rfind('\\');
+  }
 }
 
 int CUtil::GetRandomNumber()
