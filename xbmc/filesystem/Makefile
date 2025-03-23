@@ -1,4 +1,5 @@
 SRCS += \
+	$(CURDIR)/xbmc/filesystem/AddonsDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/CacheStrategy.cpp \
 	$(CURDIR)/xbmc/filesystem/CircularCache.cpp \
 	$(CURDIR)/xbmc/filesystem/CurlFile.cpp \
