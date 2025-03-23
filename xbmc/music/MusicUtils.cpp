@@ -9,19 +9,19 @@
 #include "MusicUtils.h"
 
 #include "FileItem.h"
+#if 0
 #include "GUIPassword.h"
+#endif
 #include "PartyModeManager.h"
 #include "PlayListPlayer.h"
 #include "ServiceBroker.h"
-#include "application/Application.h"
-#include "application/ApplicationComponents.h"
-#include "application/ApplicationPlayer.h"
+#include "Application.h"
+#include "ApplicationPlayer.h"
 #include "dialogs/GUIDialogBusy.h"
 #include "dialogs/GUIDialogKaiToast.h"
 #include "dialogs/GUIDialogSelect.h"
 #include "filesystem/Directory.h"
 #include "filesystem/MusicDatabaseDirectory.h"
-#include "guilib/GUIComponent.h"
 #include "guilib/GUIKeyboardFactory.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
@@ -150,8 +150,7 @@ public:
     }
 
     // Similarly update the art of the currently playing song so it shows on OSD
-    const auto& components = CServiceBroker::GetAppComponents();
-    const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+    const auto appPlayer = g_application.m_pPlayer;
     if (appPlayer->IsPlayingAudio() && g_application.CurrentFileItem().HasMusicInfoTag())
     {
       CFileItemPtr songitem = CFileItemPtr(new CFileItem(g_application.CurrentFileItem()));
@@ -310,8 +309,8 @@ std::string ShowSelectArtTypeDialog(CFileItemList& artitems)
 {
   // Prompt for choice
   CGUIDialogSelect* dialog =
-      CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(
-          WINDOW_DIALOG_SELECT);
+      dynamic_cast<CGUIDialogSelect*>(g_windowManager.GetWindow(
+          WINDOW_DIALOG_SELECT));
   if (!dialog)
     return "";
 
@@ -345,8 +344,8 @@ std::string ShowSelectArtTypeDialog(CFileItemList& artitems)
 int ShowSelectRatingDialog(int iSelected)
 {
   CGUIDialogSelect* dialog =
-      CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(
-          WINDOW_DIALOG_SELECT);
+      dynamic_cast<CGUIDialogSelect*>(g_windowManager.GetWindow(
+          WINDOW_DIALOG_SELECT));
   if (dialog)
   {
     dialog->SetHeading(CVariant{38023});
@@ -525,8 +524,10 @@ void CAsyncGetItemsForPlaylist::GetItemsForPlaylist(const std::shared_ptr<CFileI
     // Check if we add a locked share
     if (item->m_bIsShareOrDrive)
     {
+#if 0
       if (!g_passwordManager.IsItemUnlocked(item.get(), "music"))
         return;
+#endif
     }
 
     CFileItemList items;
@@ -554,7 +555,7 @@ void CAsyncGetItemsForPlaylist::GetItemsForPlaylist(const std::shared_ptr<CFileI
       }
 
       SortDescription sortDesc;
-      if (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_MUSIC_NAV)
+      if (g_windowManager.GetActiveWindow() == WINDOW_MUSIC_NAV)
         sortDesc = state->GetSortMethod();
       else
         sortDesc = GetSortDescription(*state, items);
@@ -693,8 +694,7 @@ void QueueItem(const std::shared_ptr<CFileItem>& itemIn, QueuePosition pos)
   PLAYLIST::Id playlistId = player.GetCurrentPlaylist();
   if (playlistId == PLAYLIST::TYPE_NONE)
   {
-    const auto& components = CServiceBroker::GetAppComponents();
-    playlistId = components.GetComponent<CApplicationPlayer>()->GetPreferredPlaylist();
+    playlistId = g_application.m_pPlayer->GetPreferredPlaylist();
   }
 
   if (playlistId == PLAYLIST::TYPE_NONE)
@@ -720,8 +720,7 @@ void QueueItem(const std::shared_ptr<CFileItem>& itemIn, QueuePosition pos)
     return;
   }
 
-  const auto& components = CServiceBroker::GetAppComponents();
-  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+  const auto appPlayer = g_application.m_pPlayer;
 
   if (pos == QueuePosition::POSITION_BEGIN && appPlayer->IsPlaying())
     player.Insert(playlistId, queuedItems,
@@ -733,7 +732,7 @@ void QueueItem(const std::shared_ptr<CFileItem>& itemIn, QueuePosition pos)
 
   if (!appPlayer->IsPlaying() && player.GetPlaylist(playlistId).size())
   {
-    const int winID = CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow();
+    const int winID = g_windowManager.GetActiveWindow();
     if (winID == WINDOW_MUSIC_NAV)
     {
       CGUIViewState* viewState = CGUIViewState::GetViewState(winID, queuedItems);
@@ -760,9 +759,9 @@ void QueueItem(const std::shared_ptr<CFileItem>& itemIn, QueuePosition pos)
 bool GetItemsForPlayList(const std::shared_ptr<CFileItem>& item, CFileItemList& queuedItems)
 {
   CAsyncGetItemsForPlaylist getItems(item, queuedItems);
-  return CGUIDialogBusy::Wait(&getItems,
+  return CGUIDialogBusy::Wait(&getItems/*,
                               500, // 500ms before busy dialog appears
-                              true); // can be cancelled
+                              true*/); // can be cancelled
 }
 
 bool IsItemPlayable(const CFileItem& item)
@@ -785,7 +784,7 @@ bool IsItemPlayable(const CFileItem& item)
     return false;
 
   // Exclude unwanted windows
-  if (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_MUSIC_PLAYLIST)
+  if (g_windowManager.GetActiveWindow() == WINDOW_MUSIC_PLAYLIST)
     return false;
 
   // Include playlists located at one of the possible music playlist locations
@@ -831,7 +830,7 @@ bool IsItemPlayable(const CFileItem& item)
   else if (item.m_bIsFolder)
   {
     // Not a music-specific folder (just file:// or nfs://). Allow play if context is Music window.
-    if (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_MUSIC_NAV &&
+    if (g_windowManager.GetActiveWindow() == WINDOW_MUSIC_NAV &&
         item.GetPath() != "add") // Exclude "Add music source" item
       return true;
   }

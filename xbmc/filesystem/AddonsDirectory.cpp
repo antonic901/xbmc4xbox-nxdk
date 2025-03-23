@@ -454,9 +454,7 @@ static void UserInstalledAddons(const CURL& path, CFileItemList &items)
     itemPath.SetFileName("all");
     item->SetPath(itemPath.Get());
     item->SetLabel(g_localizeStrings.Get(593));
-#if 0
     item->SetSpecialSort(SortSpecialOnTop);
-#endif
     items.Add(item);
   }
   else if (category == "all")
@@ -506,17 +504,13 @@ static void OutdatedAddons(const CURL& path, CFileItemList &items)
       const CFileItemPtr itemUpdateAllowed(
           std::make_shared<CFileItem>("addons://update_allowed/", false));
       itemUpdateAllowed->SetLabel(g_localizeStrings.Get(24137));
-#if 0
       itemUpdateAllowed->SetSpecialSort(SortSpecialOnTop);
-#endif
       items.Add(itemUpdateAllowed);
     }
 
     const CFileItemPtr itemUpdateAll(std::make_shared<CFileItem>("addons://update_all/", false));
     itemUpdateAll->SetLabel(g_localizeStrings.Get(24122));
-#if 0
     itemUpdateAll->SetSpecialSort(SortSpecialOnTop);
-#endif
     items.Add(itemUpdateAll);
   }
 }
@@ -606,9 +600,7 @@ static bool Repos(const CURL& path, CFileItemList &items)
     return Browse(CURL("addons://" + addons[0]->ID()), items);
   CFileItemPtr item(new CFileItem("addons://all/", true));
   item->SetLabel(g_localizeStrings.Get(24087));
-#if 0
   item->SetSpecialSort(SortSpecialOnTop);
-#endif
   items.Add(item);
   for (const auto& repo : addons)
   {

@@ -16,6 +16,11 @@ class CAddonMgr;
 class CRepositoryUpdater;
 } // namespace ADDON
 
+namespace PLAYLIST
+{
+class CPlayListPlayer;
+}
+
 class CContextMenuManager;
 
 class CFileExtensionProvider;
@@ -39,6 +44,7 @@ public:
   ADDON::CRepositoryUpdater& GetRepositoryUpdater();
   CContextMenuManager& GetContextMenuManager();
 
+  PLAYLIST::CPlayListPlayer& GetPlaylistPlayer();
   int init_level = 0;
 
   CFileExtensionProvider& GetFileExtensionProvider();
@@ -52,5 +58,6 @@ protected:
   std::unique_ptr<ADDON::CAddonMgr> m_addonMgr;
   std::unique_ptr<ADDON::CRepositoryUpdater> m_repositoryUpdater;
   std::unique_ptr<CContextMenuManager, delete_contextMenuManager> m_contextMenuManager;
+  std::unique_ptr<PLAYLIST::CPlayListPlayer> m_playlistPlayer;
   std::unique_ptr<CFileExtensionProvider> m_fileExtensionProvider;
 };

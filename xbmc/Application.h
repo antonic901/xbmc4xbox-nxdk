@@ -48,6 +48,8 @@ public:
   CFileItem& CurrentFileItem();
   std::shared_ptr<CFileItem> CurrentFileItemPtr();
 
+  void UpdateCurrentPlayArt();
+
   bool OnAction(const CAction &action);
 
   void ResetScreenSaver();

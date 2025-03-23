@@ -17,6 +17,7 @@
 #include "XBDateTime.h"
 #include "guilib/GUIListItem.h"
 #include "threads/CriticalSection.h"
+#include "utils/IArchivable.h"
 #include "utils/ISerializable.h"
 #include "utils/SortUtils.h"
 
@@ -66,7 +67,7 @@ enum EFileFolderType {
   \sa CFileItemList
   */
 class CFileItem :
-  public CGUIListItem, public ISerializable
+  public CGUIListItem, public IArchivable, public ISerializable
 {
 public:
   CFileItem(void);
@@ -107,6 +108,7 @@ public:
    */
   void Reset();
   CFileItem& operator=(const CFileItem& item);
+  void Archive(CArchive& ar) override;
   void Serialize(CVariant& value) const override;
   bool IsFileItem() const { return false; }
 
@@ -503,6 +505,31 @@ public:
   bool IsSamePath(const CFileItem *item) const;
 
   bool IsAlbum() const;
+
+  /*! \brief Sets details using the information from the CVideoInfoTag object
+   Sets the videoinfotag and uses its information to set the label and path.
+   \param video video details to use and set
+   */
+  void SetFromVideoInfoTag(const CVideoInfoTag &video);
+
+  /*! \brief Sets details using the information from the CMusicInfoTag object
+  Sets the musicinfotag and uses its information to set the label and path.
+  \param music music details to use and set
+  */
+  void SetFromMusicInfoTag(const MUSIC_INFO::CMusicInfoTag &music);
+
+  /*! \brief Sets details using the information from the CAlbum object
+   Sets the album in the music info tag and uses its information to set the
+   label and album-specific properties.
+   \param album album details to use and set
+   */
+  void SetFromAlbum(const CAlbum &album);
+  /*! \brief Sets details using the information from the CSong object
+   Sets the song in the music info tag and uses its information to set the
+   label, path, song-specific properties and artwork.
+   \param song song details to use and set
+   */
+  void SetFromSong(const CSong &song);
 
   bool m_bIsShareOrDrive;    ///< is this a root share/drive
   int m_iDriveType;     ///< If \e m_bIsShareOrDrive is \e true, use to get the share type. Types see: CMediaSource::m_iDriveType

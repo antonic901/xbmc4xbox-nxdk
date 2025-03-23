@@ -9,17 +9,14 @@
 #include "GUIDialogMusicInfo.h"
 
 #include "FileItem.h"
-#include "GUIPassword.h"
 #include "GUIUserMessages.h"
 #include "ServiceBroker.h"
 #include "TextureCache.h"
 #include "URL.h"
 #include "dialogs/GUIDialogBusy.h"
-#include "dialogs/GUIDialogFileBrowser.h"
 #include "dialogs/GUIDialogProgress.h"
 #include "filesystem/Directory.h"
 #include "filesystem/MusicDatabaseDirectory/QueryParams.h"
-#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
 #include "input/Key.h"
@@ -36,7 +33,6 @@
 #include "settings/MediaSourceSettings.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
-#include "storage/MediaManager.h"
 #include "utils/FileExtensionProvider.h"
 #include "utils/FileUtils.h"
 #include "utils/ProgressJob.h"
@@ -66,8 +62,8 @@ public:
   // Fetch full album/artist information including art types list
   bool DoWork() override
   {
-    CGUIDialogMusicInfo *dialog = CServiceBroker::GetGUI()->GetWindowManager().
-	  GetWindow<CGUIDialogMusicInfo>(WINDOW_DIALOG_MUSIC_INFO);
+    CGUIDialogMusicInfo *dialog = dynamic_cast<CGUIDialogMusicInfo*>(g_windowManager.
+    GetWindow(WINDOW_DIALOG_MUSIC_INFO));
     if (!dialog)
       return false;
     if (dialog->IsCancelled())
@@ -208,8 +204,8 @@ public:
   // Refresh album/artist information including art types list
   bool DoWork() override
   {
-    CGUIDialogMusicInfo *dialog = CServiceBroker::GetGUI()->GetWindowManager().
-	  GetWindow<CGUIDialogMusicInfo>(WINDOW_DIALOG_MUSIC_INFO);
+    CGUIDialogMusicInfo *dialog = dynamic_cast<CGUIDialogMusicInfo*>(g_windowManager.
+    GetWindow(WINDOW_DIALOG_MUSIC_INFO));
     if (!dialog)
       return false;
     if (dialog->IsCancelled())
@@ -348,7 +344,7 @@ bool CGUIDialogMusicInfo::OnMessage(CGUIMessage& message)
         // The music lib window item is updated to but changes to the rating when it is the sort
         // do not show on screen until refresh() that fetches the list from scratch, sorts etc.
         CGUIMessage msg(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_UPDATE_ITEM, 0, m_item);
-        CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
+        g_windowManager.SendMessage(msg);
       }
 
       CGUIMessage msg(GUI_MSG_LABEL_RESET, GetID(), CONTROL_LIST);
@@ -396,7 +392,7 @@ bool CGUIDialogMusicInfo::OnMessage(CGUIMessage& message)
         if (m_bArtistInfo && (ACTION_SELECT_ITEM == iAction || ACTION_MOUSE_LEFT_CLICK == iAction))
         {
           CGUIMessage msg(GUI_MSG_ITEM_SELECTED, GetID(), iControl);
-          CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
+          g_windowManager.SendMessage(msg);
           int iItem = msg.GetParam1();
           int id = -1;
           if (iItem >= 0 && iItem < m_albumSongs->Size())
@@ -420,7 +416,7 @@ bool CGUIDialogMusicInfo::OnMessage(CGUIMessage& message)
         else
         {
           CGUIMessage msg(GUI_MSG_ITEM_SELECTED, GetID(), iControl);
-          CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
+          g_windowManager.SendMessage(msg);
           const int iItem = msg.GetParam1();
           if (iItem >= 0 && iItem < m_albumSongs->Size())
           {
@@ -553,9 +549,11 @@ void CGUIDialogMusicInfo::Update()
 
   const std::shared_ptr<CProfileManager> profileManager = CServiceBroker::GetSettingsComponent()->GetProfileManager();
 
+#if 0
   // Disable the Choose Art button if the user isn't allowed it
   CONTROL_ENABLE_ON_CONDITION(CONTROL_BTN_GET_THUMB,
     profileManager->GetCurrentProfile().canWriteDatabases() || g_passwordManager.bMasterUser);
+#endif
 }
 
 void CGUIDialogMusicInfo::SetLabel(int iControl, const std::string& strLabel)
@@ -598,8 +596,10 @@ void CGUIDialogMusicInfo::RefreshInfo()
 {
   // Double check we have permission (button should be hidden when not)
   const std::shared_ptr<CProfileManager> profileManager = CServiceBroker::GetSettingsComponent()->GetProfileManager();
+#if 0
   if (!profileManager->GetCurrentProfile().canWriteDatabases() && !g_passwordManager.bMasterUser)
     return;
+#endif
 
   // Check if scanning
   if (CMusicLibraryQueue::GetInstance().IsScanningLibrary())
@@ -608,8 +608,8 @@ void CGUIDialogMusicInfo::RefreshInfo()
     return;
   }
 
-  CGUIDialogProgress* dlgProgress = CServiceBroker::GetGUI()->GetWindowManager().
-    GetWindow<CGUIDialogProgress>(WINDOW_DIALOG_PROGRESS);
+  CGUIDialogProgress* dlgProgress = dynamic_cast<CGUIDialogProgress*>(g_windowManager.
+    GetWindow(WINDOW_DIALOG_PROGRESS));
   if (!dlgProgress)
     return;
 
@@ -900,6 +900,7 @@ void CGUIDialogMusicInfo::OnGetArt()
   std::string result;
   VECSOURCES sources(*CMediaSourceSettings::GetInstance().GetSources("music"));
   CGUIDialogMusicInfo::AddItemPathToFileBrowserSources(sources, *m_item);
+#if 0
   CServiceBroker::GetMediaManager().GetLocalDrives(sources);
   if (CGUIDialogFileBrowser::ShowAndGetImage(items, sources, g_localizeStrings.Get(13511), result) &&
     result != "thumb://Current")
@@ -942,6 +943,7 @@ void CGUIDialogMusicInfo::OnGetArt()
     CGUIMessage msg(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_UPDATE_ITEM, 0, m_item);
     CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
   }
+#endif
 
   // Re-open the art type selection dialog as we come back from
   // the image selection dialog
@@ -1018,8 +1020,8 @@ void CGUIDialogMusicInfo::ShowFor(CFileItem* pItem)
     return; // nothing to do
 
 
-  CGUIDialogMusicInfo *pDlgMusicInfo = CServiceBroker::GetGUI()->GetWindowManager().
-	  GetWindow<CGUIDialogMusicInfo>(WINDOW_DIALOG_MUSIC_INFO);
+  CGUIDialogMusicInfo *pDlgMusicInfo = dynamic_cast<CGUIDialogMusicInfo*>(g_windowManager.
+    GetWindow(WINDOW_DIALOG_MUSIC_INFO));
     if (pDlgMusicInfo)
     {
       if (pDlgMusicInfo->SetItem(&musicitem))
@@ -1028,7 +1030,7 @@ void CGUIDialogMusicInfo::ShowFor(CFileItem* pItem)
         if (pItem->GetMusicInfoTag()->GetType() == MediaTypeAlbum &&
           pDlgMusicInfo->HasUpdatedUserrating())
         {
-          auto window = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIWindowMusicBase>(WINDOW_MUSIC_NAV);
+          auto window = dynamic_cast<CGUIWindowMusicBase*>(g_windowManager.GetWindow(WINDOW_MUSIC_NAV));
           if (window)
             window->RefreshContent("albums");
         }

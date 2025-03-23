@@ -68,6 +68,11 @@ CContextMenuManager& CServiceBroker::GetContextMenuManager()
   return g_application.m_ServiceManager->GetContextMenuManager();
 }
 
+PLAYLIST::CPlayListPlayer& CServiceBroker::GetPlaylistPlayer()
+{
+  return g_application.m_ServiceManager->GetPlaylistPlayer();
+}
+
 void CServiceBroker::RegisterSettingsComponent(const std::shared_ptr<CSettingsComponent>& settings)
 {
   g_serviceBroker.m_pSettingsComponent = settings;

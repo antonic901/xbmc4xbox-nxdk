@@ -9,6 +9,7 @@
 #include "ServiceManager.h"
 
 #include "ContextMenuManager.h"
+#include "PlayListPlayer.h"
 #include "addons/AddonManager.h"
 #include "addons/RepositoryUpdater.h"
 #include "utils/FileExtensionProvider.h"
@@ -50,6 +51,8 @@ void CServiceManager::DeinitTesting()
 
 bool CServiceManager::InitStageOne()
 {
+  m_playlistPlayer.reset(new PLAYLIST::CPlayListPlayer());
+
   init_level = 1;
   return true;
 }
@@ -101,6 +104,8 @@ void CServiceManager::DeinitStageTwo()
 void CServiceManager::DeinitStageOne()
 {
   init_level = 0;
+
+  m_playlistPlayer.reset();
 }
 
 ADDON::CAddonMgr& CServiceManager::GetAddonMgr()
@@ -116,6 +121,11 @@ ADDON::CRepositoryUpdater& CServiceManager::GetRepositoryUpdater()
 CContextMenuManager& CServiceManager::GetContextMenuManager()
 {
   return *m_contextMenuManager;
+}
+
+PLAYLIST::CPlayListPlayer& CServiceManager::GetPlaylistPlayer()
+{
+  return *m_playlistPlayer;
 }
 
 CFileExtensionProvider& CServiceManager::GetFileExtensionProvider()

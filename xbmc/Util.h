@@ -36,6 +36,8 @@ public:
                           std::string& strYear,
                           bool bRemoveExtension = false,
                           bool bCleanChars = true);
+  static bool ExcludeFileOrFolder(const std::string& strFileOrFolder, const std::vector<std::string>& regexps);
+
   /*! \brief retrieve MD5sum of a file
    \param strPath - path to the file to MD5sum
    \return md5 sum of the file
@@ -69,9 +71,13 @@ public:
    */
   static void SplitParams(const std::string &paramString, std::vector<std::string> &parameters);
   static std::string TranslateSpecialSource(const std::string &strSpecial);
+  static void DeleteDirectoryCache(const std::string &prefix = "");
+  static void DeleteMusicDatabaseDirectoryCache();
+  static void DeleteVideoDatabaseDirectoryCache();
 
   static void GetSkinThemes(std::vector<std::string>& vecTheme);
 
+  static double AlbumRelevance(const std::string& strAlbumTemp1, const std::string& strAlbum1, const std::string& strArtistTemp1, const std::string& strArtist1);
   static bool MakeShortenPath(std::string StrInput, std::string& StrOutput, size_t iTextMaxLength);
   /*! \brief Checks whether the supplied path supports Write file operations (e.g. Rename, Delete, ...)
 

@@ -19,6 +19,7 @@ SRCS += \
 	$(CURDIR)/xbmc/filesystem/MusicFileDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/MusicSearchDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/OverrideFile.cpp \
+	$(CURDIR)/xbmc/filesystem/SmartPlaylistDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/SpecialProtocol.cpp \
 	$(CURDIR)/xbmc/filesystem/StackDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/VideoDatabaseDirectory.cpp \

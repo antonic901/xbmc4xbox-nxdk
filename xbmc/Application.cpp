@@ -57,3 +57,8 @@ bool CApplication::IsCurrentThread() const
 {
   return true;
 }
+
+void CApplication::UpdateCurrentPlayArt()
+{
+
+}

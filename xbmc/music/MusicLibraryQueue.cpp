@@ -12,7 +12,6 @@
 #include "ServiceBroker.h"
 #include "Util.h"
 #include "dialogs/GUIDialogProgress.h"
-#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "music/infoscanner/MusicInfoScanner.h"
 #include "music/jobs/MusicLibraryCleaningJob.h"
@@ -49,7 +48,7 @@ void CMusicLibraryQueue::ExportLibrary(const CLibExportSettings& settings, bool 
   CGUIDialogProgress* progress = NULL;
   if (showDialog)
   {
-    progress = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogProgress>(WINDOW_DIALOG_PROGRESS);
+    progress = dynamic_cast<CGUIDialogProgress*>(g_windowManager.GetWindow(WINDOW_DIALOG_PROGRESS));
     if (progress)
     {
       progress->SetHeading(CVariant{ 20196 }); //"Export music library"
@@ -86,7 +85,7 @@ void CMusicLibraryQueue::ImportLibrary(const std::string& xmlFile, bool showDial
   CGUIDialogProgress* progress = nullptr;
   if (showDialog)
   {
-    progress = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogProgress>(WINDOW_DIALOG_PROGRESS);
+    progress = dynamic_cast<CGUIDialogProgress*>(g_windowManager.GetWindow(WINDOW_DIALOG_PROGRESS));
     if (progress)
     {
       progress->SetHeading(CVariant{ 20197 }); //"Import music library"
@@ -194,7 +193,7 @@ void CMusicLibraryQueue::CleanLibrary(bool showDialog /* = false */)
   CGUIDialogProgress* progress = NULL;
   if (showDialog)
   {
-    progress = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogProgress>(WINDOW_DIALOG_PROGRESS);
+    progress = dynamic_cast<CGUIDialogProgress*>(g_windowManager.GetWindow(WINDOW_DIALOG_PROGRESS));
     if (progress)
     {
       progress->SetHeading(CVariant{ 700 });
@@ -278,7 +277,7 @@ void CMusicLibraryQueue::Refresh()
 {
   CUtil::DeleteMusicDatabaseDirectoryCache();
   CGUIMessage msg(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_UPDATE);
-  CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
+  g_windowManager.SendThreadMessage(msg);
 }
 
 void CMusicLibraryQueue::OnJobComplete(unsigned int jobID, bool success, CJob *job)

@@ -10,10 +10,14 @@
 
 #include "MusicInfoTag.h"
 #include "ServiceBroker.h"
+#if 0
 #include "network/cddb.h"
+#endif
 #include "profiles/ProfileManager.h"
 #include "settings/SettingsComponent.h"
+#if 0
 #include "storage/MediaManager.h"
+#endif
 #include "utils/log.h"
 
 using namespace MUSIC_INFO;

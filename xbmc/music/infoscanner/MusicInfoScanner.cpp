@@ -25,13 +25,10 @@
 #include "dialogs/GUIDialogProgress.h"
 #include "dialogs/GUIDialogSelect.h"
 #include "dialogs/GUIDialogYesNo.h"
-#include "events/EventLog.h"
-#include "events/MediaLibraryEvent.h"
 #include "filesystem/Directory.h"
 #include "filesystem/MusicDatabaseDirectory.h"
 #include "filesystem/MusicDatabaseDirectory/DirectoryNode.h"
 #include "filesystem/SmartPlaylistDirectory.h"
-#include "guilib/GUIComponent.h"
 #include "guilib/GUIKeyboardFactory.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
@@ -82,7 +79,7 @@ void CMusicInfoScanner::Process()
     if (m_showDialog && !CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_MUSICLIBRARY_BACKGROUNDUPDATE))
     {
       CGUIDialogExtendedProgressBar* dialog =
-        CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogExtendedProgressBar>(WINDOW_DIALOG_EXT_PROGRESS);
+        dynamic_cast<CGUIDialogExtendedProgressBar*>(g_windowManager.GetWindow(WINDOW_DIALOG_EXT_PROGRESS));
       if (dialog)
         m_handle = dialog->GetHandle(g_localizeStrings.Get(314));
     }
@@ -168,7 +165,7 @@ void CMusicInfoScanner::Process()
 
       if (commit)
       {
-        CServiceBroker::GetGUI()->GetInfoManager().GetInfoProviders().GetLibraryInfoProvider().ResetLibraryBools();
+        g_infoManager.ResetLibraryBools();
 
         if (m_needsCleanup)
         {
@@ -279,7 +276,7 @@ void CMusicInfoScanner::Process()
   // we need to clear the musicdb cache and update any active lists
   CUtil::DeleteMusicDatabaseDirectoryCache();
   CGUIMessage msg(GUI_MSG_SCAN_FINISHED, 0, 0, 0);
-  CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
+  g_windowManager.SendThreadMessage(msg);
 
   if (m_handle)
     m_handle->MarkFinished();
@@ -455,7 +452,7 @@ static void OnDirectoryScanned(const std::string& strDirectory)
 {
   CGUIMessage msg(GUI_MSG_DIRECTORY_SCANNED, 0, 0, 0);
   msg.SetStringParam(strDirectory);
-  CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
+  g_windowManager.SendThreadMessage(msg);
 }
 
 static std::string Prettify(const std::string& strDirectory)
@@ -1318,16 +1315,6 @@ CMusicInfoScanner::UpdateDatabaseAlbumInfo(CAlbum& album,
           }
         }
       }
-      else
-      {
-        auto eventLog = CServiceBroker::GetEventLog();
-        if (eventLog)
-          eventLog->Add(EventPtr(new CMediaLibraryEvent(
-              MediaTypeAlbum, album.strPath, 24146,
-              StringUtils::Format(g_localizeStrings.Get(24147), MediaTypeAlbum, album.strAlbum),
-              CScraperUrl::GetThumbUrl(album.thumbURL.GetFirstUrlByType()),
-              CURL::GetRedacted(album.strPath), EventLevel::Warning)));
-      }
     }
   }
 
@@ -1387,16 +1374,6 @@ CMusicInfoScanner::UpdateDatabaseArtistInfo(CArtist& artist,
           artistDownloadStatus = INFO_CANCELLED;
         else
           stop = false;
-      }
-      else
-      {
-        auto eventLog = CServiceBroker::GetEventLog();
-        if (eventLog)
-          eventLog->Add(EventPtr(new CMediaLibraryEvent(
-              MediaTypeArtist, artist.strPath, 24146,
-              StringUtils::Format(g_localizeStrings.Get(24147), MediaTypeArtist, artist.strArtist),
-              CScraperUrl::GetThumbUrl(artist.thumbURL.GetFirstUrlByType()),
-              CURL::GetRedacted(artist.strPath), EventLevel::Warning)));
       }
     }
   }
@@ -1567,7 +1544,7 @@ CMusicInfoScanner::DownloadAlbumInfo(const CAlbum& album,
         //show dialog with all albums found
         if (pDialog)
         {
-          pDlg = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(WINDOW_DIALOG_SELECT);
+          pDlg = dynamic_cast<CGUIDialogSelect*>(g_windowManager.GetWindow(WINDOW_DIALOG_SELECT));
           pDlg->SetHeading(CVariant{g_localizeStrings.Get(181)});
           pDlg->Reset();
           pDlg->EnableButton(true, 413); // manual
@@ -1835,7 +1812,7 @@ CMusicInfoScanner::DownloadArtistInfo(const CArtist& artist,
       if (pDialog && scraper.GetArtistCount() > 1)
       {
         // if we found more then 1 album, let user choose one
-        CGUIDialogSelect *pDlg = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(WINDOW_DIALOG_SELECT);
+        CGUIDialogSelect *pDlg = dynamic_cast<CGUIDialogSelect*>(g_windowManager.GetWindow(WINDOW_DIALOG_SELECT));
         if (pDlg)
         {
           pDlg->SetHeading(CVariant{g_localizeStrings.Get(21890)});

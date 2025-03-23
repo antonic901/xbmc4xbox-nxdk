@@ -23,6 +23,11 @@ namespace ANNOUNCEMENT
 class CAnnouncementManager;
 }
 
+namespace PLAYLIST
+{
+class CPlayListPlayer;
+}
+
 namespace KODI
 {
 namespace MESSAGING
@@ -55,6 +60,7 @@ public:
 
   static ADDON::CAddonMgr& GetAddonMgr();
   static CContextMenuManager& GetContextMenuManager();
+  static PLAYLIST::CPlayListPlayer& GetPlaylistPlayer();
   static ADDON::CRepositoryUpdater& GetRepositoryUpdater();
   static CFileExtensionProvider& GetFileExtensionProvider();
 

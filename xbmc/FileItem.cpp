@@ -199,6 +199,12 @@ void CFileItem::Reset()
   Initialize();
 }
 
+// do not archive dynamic path
+void CFileItem::Archive(CArchive& ar)
+{
+  CGUIListItem::Archive(ar);
+}
+
 void CFileItem::Serialize(CVariant& value) const
 {
   //CGUIListItem::Serialize(value["CGUIListItem"]);
@@ -665,6 +671,22 @@ void CFileItem::UpdateInfo(const CFileItem &item, bool replaceLabels /*=true*/)
 }
 
 void CFileItem::MergeInfo(const CFileItem& item)
+{
+}
+
+void CFileItem::SetFromVideoInfoTag(const CVideoInfoTag &video)
+{
+}
+
+void CFileItem::SetFromMusicInfoTag(const MUSIC_INFO::CMusicInfoTag& music)
+{
+}
+
+void CFileItem::SetFromAlbum(const CAlbum &album)
+{
+}
+
+void CFileItem::SetFromSong(const CSong &song)
 {
 }
 

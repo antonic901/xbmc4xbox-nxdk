@@ -25,6 +25,8 @@
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
+#include <fstrcmp/fstrcmp.h>
+
 using namespace XFILE;
 using KODI::UTILITY::CDigest;
 
@@ -106,6 +108,29 @@ void CUtil::CleanString(const std::string& strFileName,
   // restore extension if needed
   if (!bRemoveExtension)
     strTitleAndYear += URIUtils::GetExtension(strFileName);
+}
+
+bool CUtil::ExcludeFileOrFolder(const std::string& strFileOrFolder, const std::vector<std::string>& regexps)
+{
+  if (strFileOrFolder.empty())
+    return false;
+
+  CRegExp regExExcludes(true, CRegExp::autoUtf8);  // case insensitive regex
+
+  for (const auto &regexp : regexps)
+  {
+    if (!regExExcludes.RegComp(regexp.c_str()))
+    { // invalid regexp - complain in logs
+      CLog::Log(LOGERROR, "{}: Invalid exclude RegExp:'{}'", __FUNCTION__, regexp);
+      continue;
+    }
+    if (regExExcludes.RegFind(strFileOrFolder) > -1)
+    {
+      CLog::LogF(LOGDEBUG, "File '{}' excluded. (Matches exclude rule RegExp: '{}')", CURL::GetRedacted(strFileOrFolder), regexp);
+      return true;
+    }
+  }
+  return false;
 }
 
 std::string CUtil::GetFileDigest(const std::string& strPath, KODI::UTILITY::CDigest::Type type)
@@ -361,6 +386,58 @@ std::string CUtil::TranslateSpecialSource(const std::string &strSpecial)
       return URIUtils::AddFileToFolder(CServiceBroker::GetSettingsComponent()->GetSettings()->GetString(CSettings::SETTING_SYSTEM_PLAYLISTSPATH), strSpecial.substr(10));
   }
   return strSpecial;
+}
+
+void CUtil::DeleteMusicDatabaseDirectoryCache()
+{
+  CUtil::DeleteDirectoryCache("mdb-");
+  CUtil::DeleteDirectoryCache("sp-"); // overkill as it will delete video smartplaylists, but as we can't differentiate based on URL...
+}
+
+void CUtil::DeleteVideoDatabaseDirectoryCache()
+{
+  CUtil::DeleteDirectoryCache("vdb-");
+  CUtil::DeleteDirectoryCache("sp-"); // overkill as it will delete music smartplaylists, but as we can't differentiate based on URL...
+}
+
+void CUtil::DeleteDirectoryCache(const std::string &prefix)
+{
+  std::string searchPath = "special://temp/";
+  CFileItemList items;
+  if (!XFILE::CDirectory::GetDirectory(searchPath, items, ".fi", DIR_FLAG_NO_FILE_DIRS))
+    return;
+
+  for (const auto &item : items)
+  {
+    if (item->m_bIsFolder)
+      continue;
+    std::string fileName = URIUtils::GetFileName(item->GetPath());
+    if (StringUtils::StartsWith(fileName, prefix))
+      XFILE::CFile::Delete(item->GetPath());
+  }
+}
+
+double CUtil::AlbumRelevance(const std::string& strAlbumTemp1, const std::string& strAlbum1, const std::string& strArtistTemp1, const std::string& strArtist1)
+{
+  // case-insensitive fuzzy string comparison on the album and artist for relevance
+  // weighting is identical, both album and artist are 50% of the total relevance
+  // a missing artist means the maximum relevance can only be 0.50
+  std::string strAlbumTemp = strAlbumTemp1;
+  StringUtils::ToLower(strAlbumTemp);
+  std::string strAlbum = strAlbum1;
+  StringUtils::ToLower(strAlbum);
+  double fAlbumPercentage = fstrcmp(strAlbumTemp.c_str(), strAlbum.c_str());
+  double fArtistPercentage = 0.0;
+  if (!strArtist1.empty())
+  {
+    std::string strArtistTemp = strArtistTemp1;
+    StringUtils::ToLower(strArtistTemp);
+    std::string strArtist = strArtist1;
+    StringUtils::ToLower(strArtist);
+    fArtistPercentage = fstrcmp(strArtistTemp.c_str(), strArtist.c_str());
+  }
+  double fRelevance = fAlbumPercentage * 0.5 + fArtistPercentage * 0.5;
+  return fRelevance;
 }
 
 bool CUtil::MakeShortenPath(std::string StrInput, std::string& StrOutput, size_t iTextMaxLength)

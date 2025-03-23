@@ -6,5 +6,4 @@ SRCS += \
 	$(CURDIR)/music/tags/MusicInfoTagLoaderFFmpeg.cpp \
 	$(CURDIR)/music/tags/MusicInfoTagLoaderShn.cpp \
 	$(CURDIR)/music/tags/ReplayGain.cpp \
-	$(CURDIR)/music/tags/TagLibVFSStream.cpp \
 	$(CURDIR)/music/tags/TagLoaderTagLib.cpp
