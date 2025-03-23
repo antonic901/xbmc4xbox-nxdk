@@ -154,6 +154,11 @@ public:
   void SetCurrentSlide(CFileItem &item);
   const CFileItem &GetCurrentSlide() const;
   void ResetCurrentSlide();
+  void SetCurrentSongTag(const MUSIC_INFO::CMusicInfoTag &tag);
+  void SetCurrentVideoTag(const CVideoInfoTag &tag);
+
+  const MUSIC_INFO::CMusicInfoTag *GetCurrentSongTag() const;
+  const CVideoInfoTag* GetCurrentMovieTag() const;
 
   std::string GetRadioRDSLabel(int item);
   std::string GetMusicLabel(int item);

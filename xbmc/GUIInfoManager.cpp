@@ -10980,27 +10980,28 @@ CGUIWindow *CGUIInfoManager::GetWindowWithCondition(int contextWindow, int condi
   return NULL;
 }
 
-#if 0
 void CGUIInfoManager::SetCurrentVideoTag(const CVideoInfoTag &tag)
 {
+#if 0
   *m_currentFile->GetVideoInfoTag() = tag;
   m_currentFile->m_lStartOffset = 0;
+#endif
 }
 
 void CGUIInfoManager::SetCurrentSongTag(const MUSIC_INFO::CMusicInfoTag &tag)
 {
+#if 0
   //CLog::Log(LOGDEBUG, "Asked to SetCurrentTag");
   *m_currentFile->GetMusicInfoTag() = tag;
   m_currentFile->m_lStartOffset = 0;
-}
 #endif
+}
 
 const CFileItem& CGUIInfoManager::GetCurrentSlide() const
 {
   return *m_currentSlide;
 }
 
-#if 0
 const MUSIC_INFO::CMusicInfoTag* CGUIInfoManager::GetCurrentSongTag() const
 {
   if (m_currentFile->HasMusicInfoTag())
@@ -11009,6 +11010,7 @@ const MUSIC_INFO::CMusicInfoTag* CGUIInfoManager::GetCurrentSongTag() const
   return NULL;
 }
 
+#if 0
 const PVR::CPVRRadioRDSInfoTagPtr CGUIInfoManager::GetCurrentRadioRDSInfoTag() const
 {
   if (m_currentFile->HasPVRRadioRDSInfoTag())
@@ -11017,6 +11019,7 @@ const PVR::CPVRRadioRDSInfoTagPtr CGUIInfoManager::GetCurrentRadioRDSInfoTag() c
   PVR::CPVRRadioRDSInfoTagPtr empty;
   return empty;
 }
+#endif
 
 const CVideoInfoTag* CGUIInfoManager::GetCurrentMovieTag() const
 {
@@ -11025,7 +11028,6 @@ const CVideoInfoTag* CGUIInfoManager::GetCurrentMovieTag() const
 
   return NULL;
 }
-#endif
 
 void GUIInfo::SetInfoFlag(uint32_t flag)
 {

@@ -13,8 +13,10 @@
 #include "filesystem/Directory.h"
 #include "filesystem/MultiPathDirectory.h"
 #include "filesystem/StackDirectory.h"
+#include "profiles/ProfileManager.h"
 #include "URL.h"
 #include "filesystem/File.h"
+#include "guilib/LocalizeStrings.h"
 #include "guilib/GraphicContext.h"
 #include "guilib/TextureManager.h"
 #include "settings/AdvancedSettings.h"
@@ -29,6 +31,86 @@
 
 using namespace XFILE;
 using KODI::UTILITY::CDigest;
+
+std::string CUtil::GetTitleFromPath(const std::string& strFileNameAndPath, bool bIsFolder /* = false */)
+{
+  CURL pathToUrl(strFileNameAndPath);
+  return GetTitleFromPath(pathToUrl, bIsFolder);
+}
+
+std::string CUtil::GetTitleFromPath(const CURL& url, bool bIsFolder /* = false */)
+{
+  // use above to get the filename
+  std::string path(url.Get());
+  URIUtils::RemoveSlashAtEnd(path);
+  std::string strFilename = URIUtils::GetFileName(path);
+
+#ifdef HAS_UPNP
+  // UPNP
+  if (url.IsProtocol("upnp"))
+    strFilename = CUPnPDirectory::GetFriendlyName(url);
+#endif
+
+  if (url.IsProtocol("rss") || url.IsProtocol("rsss"))
+  {
+#if 0
+    CRSSDirectory dir;
+    CFileItemList items;
+    if(dir.GetDirectory(url, items) && !items.m_strTitle.empty())
+      return items.m_strTitle;
+#endif
+  }
+
+  // Shoutcast
+  else if (url.IsProtocol("shout"))
+  {
+    const std::string strFileNameAndPath = url.Get();
+    const size_t genre = strFileNameAndPath.find_first_of('=');
+    if(genre == std::string::npos)
+      strFilename = g_localizeStrings.Get(260);
+    else
+      strFilename = g_localizeStrings.Get(260) + " - " + strFileNameAndPath.substr(genre+1).c_str();
+  }
+
+  // Windows SMB Network (SMB)
+  else if (url.IsProtocol("smb") && strFilename.empty())
+  {
+    if (url.GetHostName().empty())
+    {
+      strFilename = g_localizeStrings.Get(20171);
+    }
+    else
+    {
+      strFilename = url.GetHostName();
+    }
+  }
+
+  // Root file views
+  else if (url.IsProtocol("sources"))
+    strFilename = g_localizeStrings.Get(744);
+
+  // Music Playlists
+  else if (StringUtils::StartsWith(path, "special://musicplaylists"))
+    strFilename = g_localizeStrings.Get(136);
+
+  // Video Playlists
+  else if (StringUtils::StartsWith(path, "special://videoplaylists"))
+    strFilename = g_localizeStrings.Get(136);
+
+  else if (URIUtils::HasParentInHostname(url) && strFilename.empty())
+    strFilename = URIUtils::GetFileName(url.GetHostName());
+
+  // now remove the extension if needed
+  if (!CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_FILELISTS_SHOWEXTENSIONS) && !bIsFolder)
+  {
+    URIUtils::RemoveExtension(strFilename);
+    return strFilename;
+  }
+
+  // URLDecode since the original path may be an URL
+  strFilename = CURL::Decode(strFilename);
+  return strFilename;
+}
 
 void CUtil::CleanString(const std::string& strFileName,
                         std::string& strTitle,
@@ -197,6 +279,23 @@ void CUtil::GetDVDDriveIcon(const std::string& strPath, std::string& strIcon)
   {
     strIcon = "DefaultCDDA.png";
     return ;
+  }
+}
+
+void CUtil::RemoveTempFiles()
+{
+  const std::shared_ptr<CProfileManager> profileManager = CServiceBroker::GetSettingsComponent()->GetProfileManager();
+
+  std::string searchPath = profileManager->GetDatabaseFolder();
+  CFileItemList items;
+  if (!XFILE::CDirectory::GetDirectory(searchPath, items, ".tmp", DIR_FLAG_NO_FILE_DIRS))
+    return;
+
+  for (const auto &item : items)
+  {
+    if (item->m_bIsFolder)
+      continue;
+    XFILE::CFile::Delete(item->GetPath());
   }
 }
 
@@ -576,6 +675,24 @@ std::string CUtil::TranslateSpecialSource(const std::string &strSpecial)
       return URIUtils::AddFileToFolder(CServiceBroker::GetSettingsComponent()->GetSettings()->GetString(CSettings::SETTING_SYSTEM_PLAYLISTSPATH), strSpecial.substr(10));
   }
   return strSpecial;
+}
+
+std::string CUtil::MusicPlaylistsLocation()
+{
+  const std::string path = CServiceBroker::GetSettingsComponent()->GetSettings()->GetString(CSettings::SETTING_SYSTEM_PLAYLISTSPATH);
+  std::vector<std::string> vec;
+  vec.push_back(URIUtils::AddFileToFolder(path, "music"));
+  vec.push_back(URIUtils::AddFileToFolder(path, "mixed"));
+  return XFILE::CMultiPathDirectory::ConstructMultiPath(vec);
+}
+
+std::string CUtil::VideoPlaylistsLocation()
+{
+  const std::string path = CServiceBroker::GetSettingsComponent()->GetSettings()->GetString(CSettings::SETTING_SYSTEM_PLAYLISTSPATH);
+  std::vector<std::string> vec;
+  vec.push_back(URIUtils::AddFileToFolder(path, "video"));
+  vec.push_back(URIUtils::AddFileToFolder(path, "mixed"));
+  return XFILE::CMultiPathDirectory::ConstructMultiPath(vec);
 }
 
 void CUtil::DeleteMusicDatabaseDirectoryCache()

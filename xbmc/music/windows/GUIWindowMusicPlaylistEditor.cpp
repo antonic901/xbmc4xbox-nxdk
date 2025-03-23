@@ -8,12 +8,10 @@
 
 #include "GUIWindowMusicPlaylistEditor.h"
 
-#include "Autorun.h"
 #include "FileItem.h"
 #include "GUIUserMessages.h"
 #include "ServiceBroker.h"
 #include "Util.h"
-#include "dialogs/GUIDialogFileBrowser.h"
 #include "dialogs/GUIDialogKaiToast.h"
 #include "filesystem/PlaylistFileDirectory.h"
 #include "guilib/GUIKeyboardFactory.h"
@@ -339,12 +337,14 @@ void CGUIWindowMusicPlaylistEditor::OnMovePlaylistItem(int item, int direction)
 
 void CGUIWindowMusicPlaylistEditor::OnLoadPlaylist()
 {
+#if 0
   // Prompt user for file to load from music playlists folder
   std::string playlist;
   if (CGUIDialogFileBrowser::ShowAndGetFile("special://musicplaylists/",
                                             ".m3u|.pls|.b4s|.wpl|.xspf", g_localizeStrings.Get(656),
                                             playlist))
     LoadPlaylist(playlist);
+#endif
 }
 
 void CGUIWindowMusicPlaylistEditor::LoadPlaylist(const std::string &playlist)

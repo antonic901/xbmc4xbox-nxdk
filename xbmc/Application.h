@@ -20,6 +20,7 @@
  *
  */
 
+#include "playlists/PlayListTypes.h"
 #include "utils/GlobalsHandling.h"
 
 #include <atomic>
@@ -34,6 +35,11 @@ class CFileItemList;
 class CKey;
 class CServiceManager;
 
+namespace PLAYLIST
+{
+  class CPlayList;
+}
+
 #include "ApplicationPlayer.h"
 #include "FileItem.h"
 
@@ -47,6 +53,12 @@ public:
   bool IsCurrentThread() const;
   CFileItem& CurrentFileItem();
   std::shared_ptr<CFileItem> CurrentFileItemPtr();
+
+  bool ProcessAndStartPlaylist(const std::string& strPlayList,
+                               PLAYLIST::CPlayList& playlist,
+                               PLAYLIST::Id playlistId,
+                               int track = 0);
+  bool PlayFile(CFileItem item, const std::string& player, bool bRestart = false);
 
   void UpdateCurrentPlayArt();
 

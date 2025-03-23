@@ -20,7 +20,12 @@
 
 #include "Application.h"
 
+#include "PlayListPlayer.h"
 #include "ServiceManager.h"
+#include "playlists/PlayListFactory.h"
+
+#include "playlists/PlayList.h"
+#include "playlists/SmartPlayList.h"
 
 #include "input/Key.h"
 
@@ -43,6 +48,11 @@ void CApplication::ResetScreenSaver()
 {
 }
 
+bool CApplication::PlayFile(CFileItem item, const std::string& player, bool bRestart)
+{
+  return false;
+}
+
 std::shared_ptr<CFileItem> CApplication::CurrentFileItemPtr()
 {
   return m_itemCurrentFile;
@@ -61,4 +71,44 @@ bool CApplication::IsCurrentThread() const
 void CApplication::UpdateCurrentPlayArt()
 {
 
+}
+
+bool CApplication::ProcessAndStartPlaylist(const std::string& strPlayList,
+                                           PLAYLIST::CPlayList& playlist,
+                                           PLAYLIST::Id playlistId,
+                                           int track)
+{
+  CLog::Log(LOGDEBUG, "CApplication::ProcessAndStartPlaylist({}, {})", strPlayList, playlistId);
+
+#if 0
+  // initial exit conditions
+  // no songs in playlist just return
+  if (playlist.size() == 0)
+    return false;
+
+  // illegal playlist
+  if (playlistId == PLAYLIST::TYPE_NONE || playlistId == PLAYLIST::TYPE_PICTURE)
+    return false;
+
+  // setup correct playlist
+  CServiceBroker::GetPlaylistPlayer().ClearPlaylist(playlistId);
+
+  // if the playlist contains an internet stream, this file will be used
+  // to generate a thumbnail for musicplayer.cover
+  m_strPlayListFile = strPlayList;
+
+  // add the items to the playlist player
+  CServiceBroker::GetPlaylistPlayer().Add(playlistId, playlist);
+
+  // if we have a playlist
+  if (CServiceBroker::GetPlaylistPlayer().GetPlaylist(playlistId).size())
+  {
+    // start playing it
+    CServiceBroker::GetPlaylistPlayer().SetCurrentPlaylist(playlistId);
+    CServiceBroker::GetPlaylistPlayer().Reset();
+    CServiceBroker::GetPlaylistPlayer().Play(track, "");
+    return true;
+  }
+#endif
+  return false;
 }

@@ -37,6 +37,8 @@ public:
                           std::string& strYear,
                           bool bRemoveExtension = false,
                           bool bCleanChars = true);
+  static std::string GetTitleFromPath(const CURL& url, bool bIsFolder = false);
+  static std::string GetTitleFromPath(const std::string& strFileNameAndPath, bool bIsFolder = false);
   static bool ExcludeFileOrFolder(const std::string& strFileOrFolder, const std::vector<std::string>& regexps);
 
   /*! \brief retrieve MD5sum of a file
@@ -45,6 +47,7 @@ public:
    */
   static std::string GetFileDigest(const std::string& strPath, KODI::UTILITY::CDigest::Type type);
   static void GetDVDDriveIcon(const std::string& strPath, std::string& strIcon);
+  static void RemoveTempFiles();
 
   static std::string ValidatePath(const std::string &path, bool bFixDoubleSlashes = false); ///< return a validated path, with correct directory separators.
 
@@ -77,6 +80,8 @@ public:
   static void DeleteDirectoryCache(const std::string &prefix = "");
   static void DeleteMusicDatabaseDirectoryCache();
   static void DeleteVideoDatabaseDirectoryCache();
+  static std::string MusicPlaylistsLocation();
+  static std::string VideoPlaylistsLocation();
 
   static void GetSkinThemes(std::vector<std::string>& vecTheme);
   static void ForceForwardSlashes(std::string& strPath);
