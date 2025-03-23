@@ -24,9 +24,11 @@
 #include "guiinfo/GUIInfoLabels.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
-#include "threads/SingleLock.h"
+#include "threads/Event.h"
 #include "utils/log.h"
 #include "utils/Variant.h"
+
+#include <mutex>
 
 CGUIDialogProgress::CGUIDialogProgress(void)
     : CGUIDialogBoxBase(WINDOW_DIALOG_PROGRESS, "DialogConfirm.xml")
@@ -174,6 +176,15 @@ void CGUIDialogProgress::ShowProgressBar(bool bOnOff)
   std::unique_lock<CCriticalSection> lock(m_section);
   m_showProgress = bOnOff;
   SetInvalid();
+}
+
+bool CGUIDialogProgress::Wait(int progresstime /*= 10*/)
+{
+  CEvent m_done;
+  while (!m_done.Wait(std::chrono::milliseconds(progresstime)) && m_active && !IsCanceled())
+    Progress();
+
+  return !IsCanceled();
 }
 
 void CGUIDialogProgress::Process(unsigned int currentTime, CDirtyRegionList &dirtyregions)
