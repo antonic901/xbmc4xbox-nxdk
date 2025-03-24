@@ -8,6 +8,7 @@ SRCS += \
 	$(CURDIR)/xbmc/DatabaseManager.cpp \
 	$(CURDIR)/xbmc/DbUrl.cpp \
 	$(CURDIR)/xbmc/FileItem.cpp \
+	$(CURDIR)/xbmc/FileItemListModification.cpp \
 	$(CURDIR)/xbmc/GUIInfoManager.cpp \
 	$(CURDIR)/xbmc/GUILargeTextureManager.cpp \
 	$(CURDIR)/xbmc/GUIPassword.cpp \
