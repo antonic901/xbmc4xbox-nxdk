@@ -21,7 +21,7 @@
 #include "addons/AddonManager.h"
 #include "addons/PluginSource.h"
 #include "addons/addoninfo/AddonType.h"
-#include "application/Application.h"
+#include "Application.h"
 #include "messaging/ApplicationMessenger.h"
 #if defined(TARGET_ANDROID)
 #include "platform/android/activity/XBMCApp.h"
@@ -33,24 +33,19 @@
 #include "dialogs/GUIDialogSmartPlaylistEditor.h"
 #include "filesystem/FileDirectoryFactory.h"
 #include "filesystem/MultiPathDirectory.h"
-#include "filesystem/PluginDirectory.h"
 #include "filesystem/SmartPlaylistDirectory.h"
-#include "guilib/GUIComponent.h"
 #include "guilib/GUIEditControl.h"
 #include "guilib/GUIKeyboardFactory.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
-#include "input/actions/Action.h"
-#include "input/actions/ActionIDs.h"
+#include "input/Key.h"
 #include "interfaces/generic/ScriptInvocationManager.h"
 #include "messaging/helpers/DialogOKHelper.h"
-#include "network/Network.h"
 #include "playlists/PlayList.h"
 #include "profiles/ProfileManager.h"
 #include "settings/AdvancedSettings.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
-#include "storage/MediaManager.h"
 #include "threads/IRunnable.h"
 #include "utils/FileUtils.h"
 #include "utils/LabelFormatter.h"
@@ -857,7 +852,9 @@ bool CGUIMediaWindow::Update(const std::string &strDirectory, bool updateFilterP
   {
     // Removable sources
     VECSOURCES removables;
+#if 0
     CServiceBroker::GetMediaManager().GetRemovableDrives(removables);
+#endif
     for (const auto& s : removables)
     {
       if (URIUtils::CompareWithoutSlashAtEnd(s.strPath, m_vecItems->GetPath()))
@@ -1123,8 +1120,12 @@ bool CGUIMediaWindow::OnClick(int iItem, const std::string &player)
   }
   else if (pItem->IsPlugin() && !pItem->GetProperty("isplayable").asBoolean())
   {
+#if 0
     bool resume = pItem->GetStartOffset() == STARTOFFSET_RESUME;
     return XFILE::CPluginDirectory::RunScriptWithParams(pItem->GetPath(), resume);
+#else
+    return false;
+#endif
   }
 #if defined(TARGET_ANDROID)
   else if (pItem->IsAndroidApp())
@@ -1141,7 +1142,7 @@ bool CGUIMediaWindow::OnClick(int iItem, const std::string &player)
     if (pItem->GetPath() == "newplaylist://")
     {
       m_vecItems->RemoveDiscCache(GetID());
-      CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_MUSIC_PLAYLIST_EDITOR,"newplaylist://");
+      g_windowManager.ActivateWindow(WINDOW_MUSIC_PLAYLIST_EDITOR,"newplaylist://");
       return true;
     }
     else if (StringUtils::StartsWithNoCase(pItem->GetPath(), "newsmartplaylist://"))
@@ -1196,6 +1197,7 @@ bool CGUIMediaWindow::OnSelect(int item)
  */
 bool CGUIMediaWindow::HaveDiscOrConnection(const std::string& strPath, int iDriveType)
 {
+#if 0
   if (iDriveType==CMediaSource::SOURCE_TYPE_DVD)
   {
     if (!CServiceBroker::GetMediaManager().IsDiscInDrive(strPath))
@@ -1215,6 +1217,8 @@ bool CGUIMediaWindow::HaveDiscOrConnection(const std::string& strPath, int iDriv
   }
 
   return true;
+#endif
+  return false;
 }
 
 /*!
@@ -1634,8 +1638,10 @@ void CGUIMediaWindow::OnDeleteItem(int iItem)
       return;
   }
 
+#if 0
   CGUIComponent *gui = CServiceBroker::GetGUI();
-  if (gui && gui->ConfirmDelete(item->GetPath()))
+#endif
+  if (/*gui && gui->ConfirmDelete(item->GetPath())*/true)
   {
     if (!CFileUtils::DeleteItem(item))
       return;
@@ -1686,7 +1692,7 @@ void CGUIMediaWindow::OnInitWindow()
   else
   {
     CGUIMessage msg(GUI_MSG_WINDOW_INIT, 0, 0, WINDOW_INVALID, PLUGIN_REFRESH_DELAY);
-    CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg, GetID());
+    g_windowManager.SendThreadMessage(msg, GetID());
   }
 
   if (updateStartDirectory)
@@ -1846,10 +1852,11 @@ const CFileItemList& CGUIMediaWindow::CurrentDirectory() const
 
 bool CGUIMediaWindow::WaitForNetwork() const
 {
+#if 0
   if (CServiceBroker::GetNetwork().IsAvailable())
     return true;
 
-  CGUIDialogProgress *progress = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogProgress>(WINDOW_DIALOG_PROGRESS);
+  CGUIDialogProgress *progress = dynamic_cast<CGUIDialogProgress*>(g_windowManager.GetWindow(WINDOW_DIALOG_PROGRESS));
   if (!progress)
     return true;
 
@@ -1869,6 +1876,8 @@ bool CGUIMediaWindow::WaitForNetwork() const
   }
   progress->Close();
   return true;
+#endif
+  return false;
 }
 
 void CGUIMediaWindow::UpdateFilterPath(const std::string &strDirectory, const CFileItemList &items, bool updateFilterPath)
@@ -2216,7 +2225,8 @@ std::string CGUIMediaWindow::RemoveParameterFromPath(const std::string &strDirec
 
 bool CGUIMediaWindow::ProcessRenderLoop(bool renderOnly)
 {
-  return CServiceBroker::GetGUI()->GetWindowManager().ProcessRenderLoop(renderOnly);
+  g_windowManager.ProcessRenderLoop(renderOnly);
+  return true;
 }
 
 bool CGUIMediaWindow::GetDirectoryItems(CURL &url, CFileItemList &items, bool useDir)
@@ -2257,10 +2267,10 @@ bool CGUIMediaWindow::GetDirectoryItems(CURL &url, CFileItemList &items, bool us
 bool CGUIMediaWindow::WaitGetDirectoryItems(CGetDirectoryItems &items)
 {
   bool ret = true;
-  CGUIDialogBusy* dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogBusy>(WINDOW_DIALOG_BUSY);
+  CGUIDialogBusy* dialog = dynamic_cast<CGUIDialogBusy*>(g_windowManager.GetWindow(WINDOW_DIALOG_BUSY));
   if (dialog && !dialog->IsDialogRunning())
   {
-    if (!CGUIDialogBusy::Wait(&items, 100, true))
+    if (!CGUIDialogBusy::Wait(&items))
     {
       // cancelled
       ret = false;

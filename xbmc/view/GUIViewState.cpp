@@ -19,20 +19,13 @@
 #include "addons/AddonManager.h"
 #include "addons/PluginSource.h"
 #include "addons/addoninfo/AddonType.h"
-#include "addons/gui/GUIViewStateAddonBrowser.h"
 #include "dialogs/GUIDialogSelect.h"
-#include "events/windows/GUIViewStateEventLog.h"
-#include "favourites/GUIViewStateFavourites.h"
-#include "games/windows/GUIViewStateWindowGames.h"
-#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
 #include "guilib/TextureManager.h"
 #include "music/GUIViewStateMusic.h"
 #include "pictures/GUIViewStatePictures.h"
 #include "profiles/ProfileManager.h"
-#include "programs/GUIViewStatePrograms.h"
-#include "pvr/windows/GUIViewStatePVR.h"
 #include "settings/MediaSourceSettings.h"
 #include "settings/SettingUtils.h"
 #include "settings/Settings.h"
@@ -47,7 +40,9 @@
 
 using namespace KODI;
 using namespace ADDON;
+#if 0
 using namespace PVR;
+#endif
 
 std::string CGUIViewState::m_strPlaylistDirectory;
 VECSOURCES CGUIViewState::m_sources;
@@ -64,12 +59,14 @@ CGUIViewState* CGUIViewState::GetViewState(int windowId, const CFileItemList& it
   m_sources.clear();
 
   if (windowId == 0)
-    return GetViewState(CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow(),items);
+    return GetViewState(g_windowManager.GetActiveWindow(),items);
 
   const CURL url=items.GetURL();
 
+#if 0
   if (items.IsAddonsPath())
     return new CGUIViewStateAddonBrowser(items);
+#endif
 
   if (items.HasSortDetails())
     return new CGUIViewStateFromItems(items);
@@ -112,11 +109,13 @@ CGUIViewState* CGUIViewState::GetViewState(int windowId, const CFileItemList& it
   if (items.GetPath() == "special://musicplaylists/")
     return new CGUIViewStateWindowMusicNav(items);
 
+#if 0
   if (url.IsProtocol("androidapp"))
     return new CGUIViewStateWindowPrograms(items);
 
   if (url.IsProtocol("activities"))
     return new CGUIViewStateEventLog(items);
+#endif
 
   if (windowId == WINDOW_MUSIC_NAV)
     return new CGUIViewStateWindowMusicNav(items);
@@ -133,6 +132,7 @@ CGUIViewState* CGUIViewState::GetViewState(int windowId, const CFileItemList& it
   if (windowId == WINDOW_VIDEO_PLAYLIST)
     return new CGUIViewStateWindowVideoPlaylist(items);
 
+#if 0
   if (windowId == WINDOW_TV_CHANNELS)
     return new CGUIViewStateWindowPVRChannels(windowId, items);
 
@@ -168,10 +168,12 @@ CGUIViewState* CGUIViewState::GetViewState(int windowId, const CFileItemList& it
 
   if (windowId == WINDOW_RADIO_SEARCH)
     return new CGUIViewStateWindowPVRSearch(windowId, items);
+#endif
 
   if (windowId == WINDOW_PICTURES)
     return new CGUIViewStateWindowPictures(items);
 
+#if 0
   if (windowId == WINDOW_PROGRAMS)
     return new CGUIViewStateWindowPrograms(items);
 
@@ -186,6 +188,7 @@ CGUIViewState* CGUIViewState::GetViewState(int windowId, const CFileItemList& it
 
   if (windowId == WINDOW_FAVOURITES)
     return new CGUIViewStateFavourites(items);
+#endif
 
   //  Use as fallback/default
   return new CGUIViewStateGeneral(items);
@@ -365,7 +368,7 @@ void CGUIViewState::SetSortMethod(SortDescription sortDescription)
 bool CGUIViewState::ChooseSortMethod()
 {
 
-  CGUIDialogSelect *dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(WINDOW_DIALOG_SELECT);
+  CGUIDialogSelect *dialog = dynamic_cast<CGUIDialogSelect*>(g_windowManager.GetWindow(WINDOW_DIALOG_SELECT));
   if (!dialog)
     return false;
   dialog->Reset();
@@ -608,7 +611,7 @@ CGUIViewStateFromItems::CGUIViewStateFromItems(const CFileItemList &items) : CGU
     }
   }
 
-  LoadViewState(items.GetPath(), CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow());
+  LoadViewState(items.GetPath(), g_windowManager.GetActiveWindow());
 }
 
 bool CGUIViewStateFromItems::AutoPlayNextItem()
@@ -618,7 +621,7 @@ bool CGUIViewStateFromItems::AutoPlayNextItem()
 
 void CGUIViewStateFromItems::SaveViewState()
 {
-  SaveViewToDb(m_items.GetPath(), CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow());
+  SaveViewToDb(m_items.GetPath(), g_windowManager.GetActiveWindow());
 }
 
 CGUIViewStateLibrary::CGUIViewStateLibrary(const CFileItemList &items) : CGUIViewState(items)
@@ -628,10 +631,10 @@ CGUIViewStateLibrary::CGUIViewStateLibrary(const CFileItemList &items) : CGUIVie
 
   SetViewAsControl(DEFAULT_VIEW_LIST);
 
-  LoadViewState(items.GetPath(), CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow());
+  LoadViewState(items.GetPath(), g_windowManager.GetActiveWindow());
 }
 
 void CGUIViewStateLibrary::SaveViewState()
 {
-  SaveViewToDb(m_items.GetPath(), CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow());
+  SaveViewToDb(m_items.GetPath(), g_windowManager.GetActiveWindow());
 }

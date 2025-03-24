@@ -48,6 +48,12 @@ void CApplication::ResetScreenSaver()
 {
 }
 
+bool CApplication::PlayMedia(CFileItem& item, const std::string& player, PLAYLIST::Id playlistId)
+{
+  //nothing special just play
+  return PlayFile(item, player, false);
+}
+
 bool CApplication::PlayFile(CFileItem item, const std::string& player, bool bRestart)
 {
   return false;

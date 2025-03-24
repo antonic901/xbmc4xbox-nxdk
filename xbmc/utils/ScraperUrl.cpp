@@ -14,6 +14,7 @@
 #include "URL.h"
 #include "XMLUtils.h"
 #include "filesystem/CurlFile.h"
+#include "filesystem/File.h"
 #include "settings/AdvancedSettings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/CharsetDetection.h"

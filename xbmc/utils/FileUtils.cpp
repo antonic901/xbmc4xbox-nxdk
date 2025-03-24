@@ -11,7 +11,10 @@
 #include "FileOperationJob.h"
 #include "URIUtils.h"
 #include "filesystem/File.h"
+#include "filesystem/MultiPathDirectory.h"
 #include "filesystem/StackDirectory.h"
+#include "guilib/GUIKeyboardFactory.h"
+#include "guilib/LocalizeStrings.h"
 #include "utils/log.h"
 
 using namespace XFILE;
@@ -41,6 +44,37 @@ bool CFileUtils::DeleteItem(const std::shared_ptr<CFileItem>& item)
   CFileOperationJob op(CFileOperationJob::ActionDelete, items, "");
 
   return op.DoWork();
+}
+
+bool CFileUtils::RenameFile(const std::string &strFile)
+{
+  std::string strFileAndPath(strFile);
+  URIUtils::RemoveSlashAtEnd(strFileAndPath);
+  std::string strFileName = URIUtils::GetFileName(strFileAndPath);
+  std::string strPath = URIUtils::GetDirectory(strFileAndPath);
+  if (CGUIKeyboardFactory::ShowAndGetInput(strFileName, CVariant{g_localizeStrings.Get(16013)}, false))
+  {
+    strPath = URIUtils::AddFileToFolder(strPath, strFileName);
+    CLog::Log(LOGINFO, "FileUtils: rename {}->{}", strFileAndPath, strPath);
+    if (URIUtils::IsMultiPath(strFileAndPath))
+    { // special case for multipath renames - rename all the paths.
+      std::vector<std::string> paths;
+      CMultiPathDirectory::GetPaths(strFileAndPath, paths);
+      bool success = false;
+      for (unsigned int i = 0; i < paths.size(); ++i)
+      {
+        std::string filePath(paths[i]);
+        URIUtils::RemoveSlashAtEnd(filePath);
+        filePath = URIUtils::GetDirectory(filePath);
+        filePath = URIUtils::AddFileToFolder(filePath, strFileName);
+        if (CFile::Rename(paths[i], filePath))
+          success = true;
+      }
+      return success;
+    }
+    return CFile::Rename(strFileAndPath, strPath);
+  }
+  return false;
 }
 
 bool CFileUtils::Exists(const std::string& strFileName, bool bUseCache)

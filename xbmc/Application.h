@@ -54,6 +54,7 @@ public:
   CFileItem& CurrentFileItem();
   std::shared_ptr<CFileItem> CurrentFileItemPtr();
 
+  bool PlayMedia(CFileItem& item, const std::string& player, PLAYLIST::Id playlistId);
   bool ProcessAndStartPlaylist(const std::string& strPlayList,
                                PLAYLIST::CPlayList& playlist,
                                PLAYLIST::Id playlistId,

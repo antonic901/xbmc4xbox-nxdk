@@ -1,6 +1,7 @@
 SRCS += \
 	$(CURDIR)/xbmc/Application.cpp \
 	$(CURDIR)/xbmc/ApplicationPlayer.cpp \
+	$(CURDIR)/xbmc/AutoSwitch.cpp \
 	$(CURDIR)/xbmc/BackgroundInfoLoader.cpp \
 	$(CURDIR)/xbmc/ContextMenuItem.cpp \
 	$(CURDIR)/xbmc/ContextMenuManager.cpp \

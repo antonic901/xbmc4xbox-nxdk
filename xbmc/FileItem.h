@@ -49,6 +49,9 @@ class CVariant;
 
 class CFileItemList;
 
+/* special startoffset used to indicate that we wish to resume */
+#define STARTOFFSET_RESUME (-1)
+
 class CMediaSource;
 
 enum EFileFolderType {
@@ -730,6 +733,7 @@ public:
   bool UpdateItem(const CFileItem *item);
 
   bool HasSortDetails() const { return false; }
+  const std::vector<GUIViewSortDetails> &GetSortDetails() const { return m_sortDetails; }
 
   /*! \brief Specify whether this list should be sorted with folders separate from files
    By default we sort with folders listed (and sorted separately) except for those sort modes
@@ -781,6 +785,8 @@ private:
   CACHE_TYPE m_cacheToDisc = CACHE_IF_SLOW;
   bool m_replaceListing = false;
   std::string m_content;
+
+  std::vector<GUIViewSortDetails> m_sortDetails;
 
   mutable CCriticalSection m_lock;
 };
