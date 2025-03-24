@@ -5,6 +5,7 @@ SRCS += \
 	$(CURDIR)/xbmc/dialogs/GUIDialogExtendedProgressBar.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogGamepad.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogKaiToast.cpp \
+	$(CURDIR)/xbmc/dialogs/GUIDialogMediaFilter.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogNumeric.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogOK.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogProgress.cpp \
