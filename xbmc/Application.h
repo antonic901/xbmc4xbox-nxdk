@@ -59,6 +59,14 @@ public:
                                PLAYLIST::Id playlistId,
                                int track = 0);
   bool PlayFile(CFileItem item, const std::string& player, bool bRestart = false);
+  void StopPlaying();
+
+  bool SetLanguage(const std::string &strLanguage);
+  bool LoadLanguage(bool reload);
+
+  void SetLoggingIn(bool switchingProfiles);
+
+  void UpdateLibraries();
 
   void UpdateCurrentPlayArt();
 

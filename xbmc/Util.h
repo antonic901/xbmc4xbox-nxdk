@@ -39,6 +39,7 @@ public:
                           bool bCleanChars = true);
   static std::string GetTitleFromPath(const CURL& url, bool bIsFolder = false);
   static std::string GetTitleFromPath(const std::string& strFileNameAndPath, bool bIsFolder = false);
+  static void GetQualifiedFilename(const std::string &strBasePath, std::string &strFilename);
   static bool ExcludeFileOrFolder(const std::string& strFileOrFolder, const std::vector<std::string>& regexps);
 
   /*! \brief retrieve MD5sum of a file
@@ -55,8 +56,10 @@ public:
 
 #if defined(TARGET_WINDOWS) || defined(_XBOX)
   static std::string MakeLegalFileName(const std::string &strFile, int LegalType=LEGAL_WIN32_COMPAT);
+  static std::string MakeLegalPath(const std::string &strPath, int LegalType=LEGAL_WIN32_COMPAT);
 #else
   static std::string MakeLegalFileName(const std::string &strFile, int LegalType=LEGAL_NONE);
+  static std::string MakeLegalPath(const std::string &strPath, int LegalType=LEGAL_NONE);
 #endif
 
   /*! \brief Split a comma separated parameter list into separate parameters.
@@ -108,6 +111,11 @@ public:
    * \brief Thread-safe random number generation
    */
   static int GetRandomNumber();
+
+  static int64_t ConvertSecsToMilliSecs(double secs) { return static_cast<int64_t>(secs * 1000); }
+  static double ConvertMilliSecsToSecs(int64_t offset) { return offset / 1000.0; }
+  static int64_t ConvertMilliSecsToSecsInt(int64_t offset) { return offset / 1000; }
+  static int64_t ConvertMilliSecsToSecsIntRounded(int64_t offset) { return ConvertMilliSecsToSecsInt(offset + 499); }
 };
 
 

@@ -192,6 +192,47 @@ void CUtil::CleanString(const std::string& strFileName,
     strTitleAndYear += URIUtils::GetExtension(strFileName);
 }
 
+void CUtil::GetQualifiedFilename(const std::string &strBasePath, std::string &strFilename)
+{
+  // Check if the filename is a fully qualified URL such as protocol://path/to/file
+  CURL plItemUrl(strFilename);
+  if (!plItemUrl.GetProtocol().empty())
+    return;
+
+  // If the filename starts "x:", "\\" or "/" it's already fully qualified so return
+  if (strFilename.size() > 1)
+#ifdef TARGET_POSIX
+    if ( (strFilename[1] == ':') || (strFilename[0] == '/') )
+#else
+    if ( strFilename[1] == ':' || (strFilename[0] == '\\' && strFilename[1] == '\\'))
+#endif
+      return;
+
+  // add to base path and then clean
+  strFilename = URIUtils::AddFileToFolder(strBasePath, strFilename);
+
+  // get rid of any /./ or \.\ that happen to be there
+  StringUtils::Replace(strFilename, "\\.\\", "\\");
+  StringUtils::Replace(strFilename, "/./", "/");
+
+  // now find any "\\..\\" and remove them via GetParentPath
+  size_t pos;
+  while ((pos = strFilename.find("/../")) != std::string::npos)
+  {
+    std::string basePath = strFilename.substr(0, pos + 1);
+    strFilename.erase(0, pos + 4);
+    basePath = URIUtils::GetParentPath(basePath);
+    strFilename = URIUtils::AddFileToFolder(basePath, strFilename);
+  }
+  while ((pos = strFilename.find("\\..\\")) != std::string::npos)
+  {
+    std::string basePath = strFilename.substr(0, pos + 1);
+    strFilename.erase(0, pos + 4);
+    basePath = URIUtils::GetParentPath(basePath);
+    strFilename = URIUtils::AddFileToFolder(basePath, strFilename);
+  }
+}
+
 bool CUtil::ExcludeFileOrFolder(const std::string& strFileOrFolder, const std::vector<std::string>& regexps)
 {
   if (strFileOrFolder.empty())
@@ -347,6 +388,31 @@ std::string CUtil::MakeLegalFileName(const std::string &strFile, int LegalType)
     StringUtils::TrimRight(result, ". ");
   }
   return result;
+}
+
+// legalize entire path
+std::string CUtil::MakeLegalPath(const std::string &strPathAndFile, int LegalType)
+{
+  if (URIUtils::IsStack(strPathAndFile))
+    return MakeLegalPath(CStackDirectory::GetFirstStackedFile(strPathAndFile));
+  if (URIUtils::IsMultiPath(strPathAndFile))
+    return MakeLegalPath(CMultiPathDirectory::GetFirstPath(strPathAndFile));
+  if (!URIUtils::IsHD(strPathAndFile) && !URIUtils::IsSmb(strPathAndFile)/* && !URIUtils::IsNfs(strPathAndFile)*/)
+    return strPathAndFile; // we don't support writing anywhere except HD, SMB and NFS - no need to legalize path
+
+  bool trailingSlash = URIUtils::HasSlashAtEnd(strPathAndFile);
+  std::vector<std::string> dirs = URIUtils::SplitPath(strPathAndFile);
+  if (dirs.empty())
+    return strPathAndFile;
+  // we just add first token to path and don't legalize it - possible values:
+  // "X:" (local win32), "" (local unix - empty string before '/') or
+  // "protocol://domain"
+  std::string dir(dirs.front());
+  URIUtils::AddSlashAtEnd(dir);
+  for (std::vector<std::string>::const_iterator it = dirs.begin() + 1; it != dirs.end(); ++it)
+    dir = URIUtils::AddFileToFolder(dir, MakeLegalFileName(*it, LegalType));
+  if (trailingSlash) URIUtils::AddSlashAtEnd(dir);
+  return dir;
 }
 
 std::string CUtil::ValidatePath(const std::string &path, bool bFixDoubleSlashes /* = false */)

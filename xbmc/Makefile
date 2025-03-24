@@ -16,6 +16,7 @@ SRCS += \
 	$(CURDIR)/xbmc/MediaSource.cpp \
 	$(CURDIR)/xbmc/NfoFile.cpp \
 	$(CURDIR)/xbmc/PartyModeManager.cpp \
+	$(CURDIR)/xbmc/PasswordManager.cpp \
 	$(CURDIR)/xbmc/PlayListPlayer.cpp \
 	$(CURDIR)/xbmc/ServiceBroker.cpp \
 	$(CURDIR)/xbmc/ServiceManager.cpp \

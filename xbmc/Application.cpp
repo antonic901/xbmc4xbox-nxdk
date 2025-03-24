@@ -53,6 +53,10 @@ bool CApplication::PlayFile(CFileItem item, const std::string& player, bool bRes
   return false;
 }
 
+void CApplication::StopPlaying()
+{
+}
+
 std::shared_ptr<CFileItem> CApplication::CurrentFileItemPtr()
 {
   return m_itemCurrentFile;
@@ -111,4 +115,22 @@ bool CApplication::ProcessAndStartPlaylist(const std::string& strPlayList,
   }
 #endif
   return false;
+}
+
+void CApplication::UpdateLibraries()
+{
+}
+
+bool CApplication::SetLanguage(const std::string &strLanguage)
+{
+  return false;
+}
+
+bool CApplication::LoadLanguage(bool reload)
+{
+  return false;
+}
+
+void CApplication::SetLoggingIn(bool switchingProfiles)
+{
 }
