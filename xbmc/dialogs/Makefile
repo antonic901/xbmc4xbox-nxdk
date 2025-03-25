@@ -3,9 +3,11 @@ SRCS += \
 	$(CURDIR)/xbmc/dialogs/GUIDialogBusy.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogContextMenu.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogExtendedProgressBar.cpp \
+	$(CURDIR)/xbmc/dialogs/GUIDialogFileBrowser.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogGamepad.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogKaiToast.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogMediaFilter.cpp \
+	$(CURDIR)/xbmc/dialogs/GUIDialogMediaSource.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogNumeric.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogOK.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogPlayEject.cpp \
