@@ -41,6 +41,7 @@ class CContextMenuManager;
 class CSettingsComponent;
 class CFileExtensionProvider;
 class CPlayerCoreFactory;
+class CMediaManager;
 class CTextureCache;
 class CJobManager;
 
@@ -65,6 +66,7 @@ public:
   static ADDON::CRepositoryUpdater& GetRepositoryUpdater();
   static CFileExtensionProvider& GetFileExtensionProvider();
   static CPlayerCoreFactory& GetPlayerCoreFactory();
+  static CMediaManager& GetMediaManager();
 
   static void RegisterSettingsComponent(const std::shared_ptr<CSettingsComponent>& settings);
   static void UnregisterSettingsComponent();

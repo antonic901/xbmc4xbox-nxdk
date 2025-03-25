@@ -10,6 +10,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/Crc32.cpp \
 	$(CURDIR)/xbmc/utils/DatabaseUtils.cpp \
 	$(CURDIR)/xbmc/utils/Digest.cpp \
+	$(CURDIR)/xbmc/utils/DiscsUtils.cpp \
 	$(CURDIR)/xbmc/utils/EmbeddedArt.cpp \
 	$(CURDIR)/xbmc/utils/Fanart.cpp \
 	$(CURDIR)/xbmc/utils/FileExtensionProvider.cpp \

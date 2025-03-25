@@ -14,6 +14,7 @@
 #include "addons/RepositoryUpdater.h"
 #include "cores/playercorefactory/PlayerCoreFactory.h"
 #include "profiles/ProfileManager.h"
+#include "storage/MediaManager.h"
 #include "utils/FileExtensionProvider.h"
 #include "utils/log.h"
 
@@ -74,6 +75,9 @@ bool CServiceManager::InitStageTwo(const std::string& profilesUserDataFolder)
 
   m_fileExtensionProvider.reset(new CFileExtensionProvider());
 
+  m_mediaManager.reset(new CMediaManager());
+  m_mediaManager->Initialize();
+
   init_level = 2;
   return true;
 }
@@ -104,6 +108,9 @@ void CServiceManager::DeinitStageTwo()
   m_contextMenuManager.reset();
   m_repositoryUpdater.reset();
   m_addonMgr.reset();
+
+  m_mediaManager->Stop();
+  m_mediaManager.reset();
 }
 
 void CServiceManager::DeinitStageOne()
@@ -146,4 +153,9 @@ void CServiceManager::delete_contextMenuManager::operator()(CContextMenuManager*
 CPlayerCoreFactory& CServiceManager::GetPlayerCoreFactory()
 {
   return *m_playerCoreFactory;
+}
+
+CMediaManager& CServiceManager::GetMediaManager()
+{
+  return *m_mediaManager;
 }

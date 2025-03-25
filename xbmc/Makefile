@@ -50,6 +50,7 @@ include $(CURDIR)/xbmc/platform/Makefile
 include $(CURDIR)/xbmc/profiles/Makefile
 include $(CURDIR)/xbmc/playlists/Makefile
 include $(CURDIR)/xbmc/settings/Makefile
+include $(CURDIR)/xbmc/storage/Makefile
 include $(CURDIR)/xbmc/threads/Makefile
 include $(CURDIR)/xbmc/utils/Makefile
 include $(CURDIR)/xbmc/video/Makefile
