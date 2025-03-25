@@ -11,7 +11,8 @@ SRCS += \
 	$(CURDIR)/xbmc/settings/SettingsComponent.cpp \
 	$(CURDIR)/xbmc/settings/SettingsValueFlatJsonSerializer.cpp \
 	$(CURDIR)/xbmc/settings/SettingsValueXmlSerializer.cpp \
-	$(CURDIR)/xbmc/settings/SettingUtils.cpp
+	$(CURDIR)/xbmc/settings/SettingUtils.cpp \
+	$(CURDIR)/xbmc/settings/SkinSettings.cpp
 
 include $(CURDIR)/xbmc/settings/dialogs/Makefile
 include $(CURDIR)/xbmc/settings/lib/Makefile

@@ -29,6 +29,7 @@
 #include "ServiceBroker.h"
 #include "settings/SettingConditions.h"
 #include "settings/SettingsComponent.h"
+#include "settings/SkinSettings.h"
 #include "settings/lib/SettingsManager.h"
 #include "utils/CharsetConverter.h"
 #include "utils/StringUtils.h"
@@ -802,11 +803,13 @@ void CSettings::UninitializeISettingsHandlers()
 void CSettings::InitializeISubSettings()
 {
   // register ISubSettings implementations
+  RegisterSubSettings(&CSkinSettings::GetInstance());
 }
 
 void CSettings::UninitializeISubSettings()
 {
   // unregister ISubSettings implementations
+  UnregisterSubSettings(&CSkinSettings::GetInstance());
 }
 
 void CSettings::InitializeISettingCallbacks()
