@@ -24,6 +24,8 @@
 #include <memory>
 #include <vector>
 #include "IPlayerCallback.h"
+#include "Interface/StreamInfo.h"
+#include "VideoSettings.h"
 #include "guilib/Geometry.h"
 #include "guilib/GraphicContext.h"
 #include <string>
@@ -56,7 +58,7 @@ public:
     video_only = false;
   }
   double  starttime; /* start time in seconds */
-  double  startpercent; /* start time in percent */  
+  double  startpercent; /* start time in percent */
   bool    identify;  /* identify mode, used for checking format and length of a file */
   std::string state;  /* potential playerstate to restore to */
   bool    fullscreen; /* player is allowed to switch to fullscreen */
@@ -265,7 +267,7 @@ public:
   virtual float GetSubTitleDelay()    { return 0.0f; }
   virtual int  GetSubtitleCount()     { return 0; }
   virtual int  GetSubtitle()          { return -1; }
-  virtual void GetSubtitleStreamInfo(int index, SPlayerSubtitleStreamInfo &info){};
+  virtual void GetSubtitleStreamInfo(int index, SubtitleStreamInfo& info) const {}
   virtual void SetSubtitle(int iStream){};
   virtual bool GetSubtitleVisible(){ return false;};
   virtual void SetSubtitleVisible(bool bVisible){};
@@ -279,11 +281,11 @@ public:
   virtual int  GetAudioStreamCount()  { return 0; }
   virtual int  GetAudioStream()       { return -1; }
   virtual void SetAudioStream(int iStream){};
-  virtual void GetAudioStreamInfo(int index, SPlayerAudioStreamInfo &info){};
+  virtual void GetAudioStreamInfo(int index, AudioStreamInfo& info) const {}
 
   virtual int GetVideoStream() const { return -1; }
   virtual int GetVideoStreamCount() const { return 0; }
-  virtual void GetVideoStreamInfo(int streamId, SPlayerVideoStreamInfo &info) {}
+  virtual void GetVideoStreamInfo(int streamId, VideoStreamInfo& info) const {}
   virtual void SetVideoStream(int iStream) {}
 
   virtual TextCacheStruct_t* GetTeletextCache() { return NULL; };
@@ -310,8 +312,8 @@ public:
    */
   virtual int64_t GetTime() { return 0; }
   /*!
-   \brief Sets the current time. This 
-   can be used for injecting the current time. 
+   \brief Sets the current time. This
+   can be used for injecting the current time.
    This is not to be confused with a seek. It just
    can be used if endless streams contain multiple
    tracks in reality (like with airtunes)
@@ -350,7 +352,7 @@ public:
   //returns a state that is needed for resuming from a specific time
   virtual std::string GetPlayerState() { return ""; };
   virtual bool SetPlayerState(const std::string& state) { return false;};
-  
+
   virtual std::string GetPlayingTitle() { return ""; };
 
   virtual bool SwitchChannel(const PVR::CPVRChannelPtr &channel) { return false; }
@@ -370,7 +372,7 @@ public:
 
   virtual void FlushRenderer() {};
 
-  virtual void SetRenderViewMode(int mode) {};
+  virtual void SetRenderViewMode(int mode, float zoom, float par, float shift, bool stretch) {}
 
   virtual float GetRenderAspectRatio() { return 1.0; };
 
@@ -391,6 +393,10 @@ public:
   virtual void RenderCaptureRelease(unsigned int captureId) {};
   virtual void RenderCapture(unsigned int captureId, unsigned int width, unsigned int height, int flags) {};
   virtual bool RenderCaptureGetPixels(unsigned int captureId, unsigned int millis, uint8_t *buffer, unsigned int size) { return false; };
+
+  // video and audio settings
+  virtual CVideoSettings GetVideoSettings() const { return CVideoSettings(); }
+  virtual void SetVideoSettings(CVideoSettings& settings) {}
 
   std::string m_name;
   std::string m_type;

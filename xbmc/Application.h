@@ -43,6 +43,9 @@ namespace PLAYLIST
 #include "ApplicationPlayer.h"
 #include "FileItem.h"
 
+#define VOLUME_MINIMUM -6000  // -60dB
+#define VOLUME_MAXIMUM 0      // 0dB
+
 class CApplication
 {
   friend class CApplicationPlayer;
@@ -61,6 +64,9 @@ public:
                                int track = 0);
   bool PlayFile(CFileItem item, const std::string& player, bool bRestart = false);
   void StopPlaying();
+
+  int GetVolume(bool percentage = true) const;
+  void SetVolume(long iValue, bool isPercentage = true);
 
   bool SetLanguage(const std::string &strLanguage);
   bool LoadLanguage(bool reload);

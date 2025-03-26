@@ -11,10 +11,8 @@
 #include "GUIPassword.h"
 #include "ServiceBroker.h"
 #include "addons/Skin.h"
-#include "application/ApplicationComponents.h"
-#include "application/ApplicationPlayer.h"
-#include "application/ApplicationVolumeHandling.h"
-#include "cores/AudioEngine/Utils/AEUtil.h"
+#include "Application.h"
+#include "ApplicationPlayer.h"
 #include "cores/IPlayer.h"
 #include "dialogs/GUIDialogYesNo.h"
 #include "guilib/GUIMessage.h"
@@ -53,13 +51,17 @@ CGUIDialogAudioSettings::~CGUIDialogAudioSettings() = default;
 void CGUIDialogAudioSettings::FrameMove()
 {
   // update the volume setting if necessary
+#if 0
   const auto& components = CServiceBroker::GetAppComponents();
   const auto appVolume = components.GetComponent<CApplicationVolumeHandling>();
   float newVolume = appVolume->GetVolumeRatio();
+#else
+  float newVolume = g_application.GetVolume(false) * 0.01f;
+#endif
   if (newVolume != m_volume)
     GetSettingsManager()->SetNumber(SETTING_AUDIO_VOLUME, static_cast<double>(newVolume));
 
-  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+  const auto appPlayer = g_application.m_pPlayer;
   if (appPlayer->HasPlayer())
   {
     const CVideoSettings videoSettings = appPlayer->GetVideoSettings();
@@ -91,7 +93,12 @@ std::string CGUIDialogAudioSettings::FormatDecibel(float value)
 
 std::string CGUIDialogAudioSettings::FormatPercentAsDecibel(float value)
 {
+#if 0
   return StringUtils::Format(g_localizeStrings.Get(14054), CAEUtil::PercentToGain(value));
+#else
+  // TODO: calculate volume gain
+  return StringUtils::Format(g_localizeStrings.Get(14054).c_str(), value);
+#endif
 }
 
 void CGUIDialogAudioSettings::OnSettingChanged(const std::shared_ptr<const CSetting>& setting)
@@ -101,27 +108,32 @@ void CGUIDialogAudioSettings::OnSettingChanged(const std::shared_ptr<const CSett
 
   CGUIDialogSettingsManualBase::OnSettingChanged(setting);
 
-  auto& components = CServiceBroker::GetAppComponents();
-  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+  const auto appPlayer = g_application.m_pPlayer;
 
   const std::string &settingId = setting->GetId();
   if (settingId == SETTING_AUDIO_VOLUME)
   {
     m_volume = static_cast<float>(std::static_pointer_cast<const CSettingNumber>(setting)->GetValue());
+#if 0
     const auto appVolume = components.GetComponent<CApplicationVolumeHandling>();
     appVolume->SetVolume(m_volume, false); // false - value is not in percent
+#else
+    g_application.SetVolume(long(m_volume * 100.0f), false); // false - value is not in percent
+#endif
   }
   else if (settingId == SETTING_AUDIO_VOLUME_AMPLIFICATION)
   {
     float value = static_cast<float>(std::static_pointer_cast<const CSettingNumber>(setting)->GetValue());
     appPlayer->SetDynamicRangeCompression((long)(value * 100));
   }
+#if 0
   else if (settingId == SETTING_AUDIO_CENTERMIXLEVEL)
   {
     CVideoSettings vs = appPlayer->GetVideoSettings();
     vs.m_CenterMixLevel = std::static_pointer_cast<const CSettingInt>(setting)->GetValue();
     appPlayer->SetVideoSettings(vs);
   }
+#endif
   else if (settingId == SETTING_AUDIO_DELAY)
   {
     float value = static_cast<float>(std::static_pointer_cast<const CSettingNumber>(setting)->GetValue());
@@ -175,8 +187,7 @@ bool CGUIDialogAudioSettings::Save()
   db.EraseAllVideoSettings();
   db.Close();
 
-  const auto& components = CServiceBroker::GetAppComponents();
-  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+  const auto appPlayer = g_application.m_pPlayer;
   CMediaSettings::GetInstance().GetDefaultVideoSettings() = appPlayer->GetVideoSettings();
   CMediaSettings::GetInstance().GetDefaultVideoSettings().m_AudioStream = -1;
   CServiceBroker::GetSettingsComponent()->GetSettings()->Save();
@@ -227,8 +238,7 @@ void CGUIDialogAudioSettings::InitializeSettings()
 
   bool usePopup = g_SkinInfo->HasSkinFile("DialogSlider.xml");
 
-  const auto& components = CServiceBroker::GetAppComponents();
-  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+  const auto appPlayer = g_application.m_pPlayer;
 
   const CVideoSettings videoSettings = appPlayer->GetVideoSettings();
   if (appPlayer->HasPlayer())
@@ -248,13 +258,23 @@ void CGUIDialogAudioSettings::InitializeSettings()
 
   // audio settings
   // audio volume setting
+#if 0
   const auto appVolume = components.GetComponent<CApplicationVolumeHandling>();
   m_volume = appVolume->GetVolumeRatio();
+#else
+  m_volume = g_application.GetVolume(false) * 0.01f;
+#endif
   std::shared_ptr<CSettingNumber> settingAudioVolume =
       AddSlider(groupAudio, SETTING_AUDIO_VOLUME, 13376, SettingLevel::Basic, m_volume, 14054,
+#if 0
                 CApplicationVolumeHandling::VOLUME_MINIMUM,
                 CApplicationVolumeHandling::VOLUME_MAXIMUM / 100.0f,
                 CApplicationVolumeHandling::VOLUME_MAXIMUM);
+#else
+                VOLUME_MINIMUM * 0.01f,
+                (VOLUME_MAXIMUM - VOLUME_MINIMUM) * 0.0001f,
+                VOLUME_MAXIMUM * 0.01f);   
+#endif
   settingAudioVolume->SetDependencies(depsAudioOutputPassthroughDisabled);
   std::static_pointer_cast<CSettingControlSlider>(settingAudioVolume->GetControl())->SetFormatter(SettingFormatterPercentAsDecibel);
 
@@ -316,8 +336,7 @@ void CGUIDialogAudioSettings::AddAudioStreams(const std::shared_ptr<CSettingGrou
   if (group == NULL || settingId.empty())
     return;
 
-  auto& components = CServiceBroker::GetAppComponents();
-  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+  const auto appPlayer = g_application.m_pPlayer;
   m_audioStream = appPlayer->GetAudioStream();
   if (m_audioStream < 0)
     m_audioStream = 0;
@@ -330,8 +349,7 @@ bool CGUIDialogAudioSettings::IsPlayingPassthrough(const std::string& condition,
                                                    const SettingConstPtr& setting,
                                                    void* data)
 {
-  const auto& components = CServiceBroker::GetAppComponents();
-  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+  const auto appPlayer = g_application.m_pPlayer;
   return appPlayer->IsPassthrough();
 }
 
@@ -340,8 +358,7 @@ void CGUIDialogAudioSettings::AudioStreamsOptionFiller(const SettingConstPtr& se
                                                        int& current,
                                                        void* data)
 {
-  const auto& components = CServiceBroker::GetAppComponents();
-  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+  const auto appPlayer = g_application.m_pPlayer;
   int audioStreamCount = appPlayer->GetAudioStreamCount();
 
   std::string strFormat = "{:s} - {:s} - {:d} " + g_localizeStrings.Get(10127);
@@ -411,7 +428,12 @@ std::string CGUIDialogAudioSettings::SettingFormatterPercentAsDecibel(
   if (control->GetFormatLabel() > -1)
     formatString = g_localizeStrings.Get(control->GetFormatLabel());
 
+#if 0
   return StringUtils::Format(formatString, CAEUtil::PercentToGain(value.asFloat()));
+#else
+  // TODO: calculate volume gain
+  return StringUtils::Format(formatString.c_str(), value.asFloat());
+#endif
 }
 
 std::string CGUIDialogAudioSettings::FormatFlags(StreamFlags flags)

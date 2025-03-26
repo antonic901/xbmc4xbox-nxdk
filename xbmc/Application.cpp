@@ -73,6 +73,15 @@ CFileItem& CApplication::CurrentFileItem()
   return *m_itemCurrentFile;
 }
 
+void CApplication::SetVolume(long iValue, bool isPercentage /* = true */)
+{
+}
+
+int CApplication::GetVolume(bool percentage /* = true */) const
+{
+  return 0;
+}
+
 bool CApplication::IsCurrentThread() const
 {
   return true;
