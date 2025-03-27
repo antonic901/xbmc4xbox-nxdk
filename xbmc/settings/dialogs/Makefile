@@ -1,4 +1,5 @@
 SRCS += \
+	$(CURDIR)/xbmc/settings/dialogs/GUIDialogContentSettings.cpp \
 	$(CURDIR)/xbmc/settings/dialogs/GUIDialogLibExportSettings.cpp \
 	$(CURDIR)/xbmc/settings/dialogs/GUIDialogSettingsBase.cpp \
 	$(CURDIR)/xbmc/settings/dialogs/GUIDialogSettingsManagerBase.cpp \

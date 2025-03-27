@@ -395,6 +395,9 @@
 
 #define ACTION_VIDEO_NEXT_STREAM      250 //!< Cycle video streams. Used in videofullscreen.
 
+//! Used to queue an item to the next position in the playlist
+#define ACTION_QUEUE_ITEM_NEXT        251
+
 #define ACTION_TOUCH_TAP              401 //!< touch actions
 #define ACTION_TOUCH_TAP_TEN          410 //!< touch actions
 #define ACTION_TOUCH_LONGPRESS        411 //!< touch actions
