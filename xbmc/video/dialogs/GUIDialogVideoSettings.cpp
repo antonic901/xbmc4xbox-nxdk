@@ -11,10 +11,9 @@
 #include "GUIPassword.h"
 #include "ServiceBroker.h"
 #include "addons/Skin.h"
-#include "application/ApplicationComponents.h"
-#include "application/ApplicationPlayer.h"
+#include "Application.h"
+#include "ApplicationPlayer.h"
 #include "dialogs/GUIDialogYesNo.h"
-#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
 #include "profiles/ProfileManager.h"
@@ -72,8 +71,7 @@ void CGUIDialogVideoSettings::OnSettingChanged(const std::shared_ptr<const CSett
 
   CGUIDialogSettingsManualBase::OnSettingChanged(setting);
 
-  auto& components = CServiceBroker::GetAppComponents();
-  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+  const auto appPlayer = g_application.m_pPlayer;
 
   const std::string &settingId = setting->GetId();
   if (settingId == SETTING_VIDEO_INTERLACEMETHOD)
@@ -239,7 +237,7 @@ void CGUIDialogVideoSettings::OnSettingAction(const std::shared_ptr<const CSetti
         g_passwordManager.CheckSettingLevelLock(calibsetting->GetLevel()))
       return;
 
-    CServiceBroker::GetGUI()->GetWindowManager().ForceActivateWindow(WINDOW_SCREEN_CALIBRATION);
+    g_windowManager.ForceActivateWindow(WINDOW_SCREEN_CALIBRATION);
   }
   //! @todo implement
   else if (settingId == SETTING_VIDEO_MAKE_DEFAULT)
@@ -263,8 +261,7 @@ bool CGUIDialogVideoSettings::Save()
     db.EraseAllVideoSettings();
     db.Close();
 
-    const auto& components = CServiceBroker::GetAppComponents();
-    const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+    const auto appPlayer = g_application.m_pPlayer;
 
     CMediaSettings::GetInstance().GetDefaultVideoSettings() = appPlayer->GetVideoSettings();
     CMediaSettings::GetInstance().GetDefaultVideoSettings().m_SubtitleStream = -1;
@@ -324,8 +321,7 @@ void CGUIDialogVideoSettings::InitializeSettings()
 
   bool usePopup = g_SkinInfo->HasSkinFile("DialogSlider.xml");
 
-  const auto& components = CServiceBroker::GetAppComponents();
-  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+  const auto appPlayer = g_application.m_pPlayer;
 
   const CVideoSettings videoSettings = appPlayer->GetVideoSettings();
 
@@ -438,6 +434,7 @@ void CGUIDialogVideoSettings::InitializeSettings()
   if (appPlayer->Supports(RENDERFEATURE_NONLINSTRETCH))
     AddToggle(groupVideo, SETTING_VIDEO_NONLIN_STRETCH, 659, SettingLevel::Basic, videoSettings.m_CustomNonLinStretch);
 
+#if 0
   // tone mapping
   if (appPlayer->Supports(RENDERFEATURE_TONEMAP))
   {
@@ -464,6 +461,7 @@ void CGUIDialogVideoSettings::InitializeSettings()
   entries.push_back(TranslatableIntegerSettingOption(36504, RENDER_STEREO_MODE_SPLIT_VERTICAL));
   AddSpinner(groupStereoscopic, SETTING_VIDEO_STEREOSCOPICMODE, 36535, SettingLevel::Basic, videoSettings.m_StereoMode, entries);
   AddToggle(groupStereoscopic, SETTING_VIDEO_STEREOSCOPICINVERT, 36536, SettingLevel::Basic, videoSettings.m_StereoInvert);
+#endif
 
   // general settings
   AddButton(groupSaveAsDefault, SETTING_VIDEO_MAKE_DEFAULT, 12376, SettingLevel::Basic);
@@ -476,8 +474,7 @@ void CGUIDialogVideoSettings::AddVideoStreams(const std::shared_ptr<CSettingGrou
   if (group == NULL || settingId.empty())
     return;
 
-  auto& components = CServiceBroker::GetAppComponents();
-  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+  const auto appPlayer = g_application.m_pPlayer;
 
   m_videoStream = appPlayer->GetVideoStream();
   if (m_videoStream < 0)
@@ -492,8 +489,7 @@ void CGUIDialogVideoSettings::VideoStreamsOptionFiller(
     int& current,
     void* data)
 {
-  const auto& components = CServiceBroker::GetAppComponents();
-  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+  const auto appPlayer = g_application.m_pPlayer;
 
   int videoStreamCount = appPlayer->GetVideoStreamCount();
   // cycle through each video stream and add it to our list control

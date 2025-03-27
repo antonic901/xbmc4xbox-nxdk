@@ -18,6 +18,7 @@
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
+#include "video/VideoDatabase.h"
 #include "video/VideoInfoTag.h"
 
 #include <algorithm>
@@ -1501,6 +1502,11 @@ bool CFileItem::HasPVRChannelInfoTag() const
 std::string CFileItem::FindTrailer() const
 {
   return "";
+}
+
+VideoDbContentType CFileItem::GetVideoContentType() const
+{
+  return VideoDbContentType::MOVIES;
 }
 
 CFileItem CFileItem::GetItemToPlay() const

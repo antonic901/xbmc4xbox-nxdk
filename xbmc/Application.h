@@ -54,8 +54,11 @@ public:
   virtual ~CApplication(void);
 
   bool IsCurrentThread() const;
+  const std::string& CurrentFile();
   CFileItem& CurrentFileItem();
   std::shared_ptr<CFileItem> CurrentFileItemPtr();
+  CFileItem& CurrentUnstackedItem();
+  std::string GetCurrentPlayer();
 
   bool PlayMedia(CFileItem& item, const std::string& player, PLAYLIST::Id playlistId);
   bool ProcessAndStartPlaylist(const std::string& strPlayList,
@@ -64,6 +67,21 @@ public:
                                int track = 0);
   bool PlayFile(CFileItem item, const std::string& player, bool bRestart = false);
   void StopPlaying();
+
+  /*!
+   \brief Returns the total time in fractional seconds of the currently playing media
+
+   Beware that this method returns fractional seconds whereas IPlayer::GetTotalTime() returns milliseconds.
+   */
+  double GetTotalTime() const;
+  /*!
+   \brief Returns the current time in fractional seconds of the currently playing media
+
+   Beware that this method returns fractional seconds whereas IPlayer::GetTime() returns milliseconds.
+   */
+  double GetTime() const;
+
+  void SeekTime( double dTime = 0.0 );
 
   int GetVolume(bool percentage = true) const;
   void SetVolume(long iValue, bool isPercentage = true);

@@ -10,12 +10,10 @@
 
 #include "GUIUserMessages.h"
 #include "ServiceBroker.h"
-#include "application/Application.h"
-#include "guilib/GUIComponent.h"
+#include "Application.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/WindowIDs.h"
-#include "input/InputManager.h"
-#include "input/actions/ActionIDs.h"
+#include "input/Key.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 
@@ -34,15 +32,14 @@ void CGUIDialogVideoOSD::FrameMove()
   if (m_autoClosing)
   {
     // check for movement of mouse or a submenu open
-    if (CServiceBroker::GetInputManager().IsMouseActive()
-                           || CServiceBroker::GetGUI()->GetWindowManager().IsWindowActive(WINDOW_DIALOG_AUDIO_OSD_SETTINGS)
-                           || CServiceBroker::GetGUI()->GetWindowManager().IsWindowActive(WINDOW_DIALOG_SUBTITLE_OSD_SETTINGS)
-                           || CServiceBroker::GetGUI()->GetWindowManager().IsWindowActive(WINDOW_DIALOG_VIDEO_OSD_SETTINGS)
-                           || CServiceBroker::GetGUI()->GetWindowManager().IsWindowActive(WINDOW_DIALOG_CMS_OSD_SETTINGS)
-                           || CServiceBroker::GetGUI()->GetWindowManager().IsWindowActive(WINDOW_DIALOG_VIDEO_BOOKMARKS)
-                           || CServiceBroker::GetGUI()->GetWindowManager().IsWindowActive(WINDOW_DIALOG_PVR_OSD_CHANNELS)
-                           || CServiceBroker::GetGUI()->GetWindowManager().IsWindowActive(WINDOW_DIALOG_PVR_CHANNEL_GUIDE)
-                           || CServiceBroker::GetGUI()->GetWindowManager().IsWindowActive(WINDOW_DIALOG_OSD_TELETEXT))
+    if (g_windowManager.IsWindowActive(WINDOW_DIALOG_AUDIO_OSD_SETTINGS)
+                           || g_windowManager.IsWindowActive(WINDOW_DIALOG_SUBTITLE_OSD_SETTINGS)
+                           || g_windowManager.IsWindowActive(WINDOW_DIALOG_VIDEO_OSD_SETTINGS)
+                           || g_windowManager.IsWindowActive(WINDOW_DIALOG_CMS_OSD_SETTINGS)
+                           || g_windowManager.IsWindowActive(WINDOW_DIALOG_VIDEO_BOOKMARKS)
+                           || g_windowManager.IsWindowActive(WINDOW_DIALOG_PVR_OSD_CHANNELS)
+                           || g_windowManager.IsWindowActive(WINDOW_DIALOG_PVR_CHANNEL_GUIDE)
+                           || g_windowManager.IsWindowActive(WINDOW_DIALOG_OSD_TELETEXT))
       // extend show time by original value
       SetAutoClose(m_showDuration);
   }
@@ -87,10 +84,10 @@ bool CGUIDialogVideoOSD::OnMessage(CGUIMessage& message)
   case GUI_MSG_WINDOW_DEINIT:  // fired when OSD is hidden
     {
       // Remove our subdialogs if visible
-      CGUIDialog *pDialog = CServiceBroker::GetGUI()->GetWindowManager().GetDialog(WINDOW_DIALOG_AUDIO_OSD_SETTINGS);
+      CGUIDialog *pDialog = dynamic_cast<CGUIDialog*>(g_windowManager.GetWindow(WINDOW_DIALOG_AUDIO_OSD_SETTINGS));
       if (pDialog && pDialog->IsDialogRunning())
         pDialog->Close(true);
-      pDialog = CServiceBroker::GetGUI()->GetWindowManager().GetDialog(WINDOW_DIALOG_SUBTITLE_OSD_SETTINGS);
+      pDialog = dynamic_cast<CGUIDialog*>(g_windowManager.GetWindow(WINDOW_DIALOG_SUBTITLE_OSD_SETTINGS));
       if (pDialog && pDialog->IsDialogRunning())
         pDialog->Close(true);
     }

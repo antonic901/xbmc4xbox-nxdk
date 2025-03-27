@@ -230,6 +230,7 @@ public:
   void FillInDefaultIcon();
   void SetFileSizeLabel();
   virtual void SetLabel(const std::string &strLabel);
+  VideoDbContentType GetVideoContentType() const;
   bool IsLabelPreformatted() const { return m_bLabelPreformatted; }
   void SetLabelPreformatted(bool bYesNo) { m_bLabelPreformatted=bYesNo; }
   bool SortsOnTop() const { return m_specialSort == SortSpecialOnTop; }

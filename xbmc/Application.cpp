@@ -63,6 +63,11 @@ void CApplication::StopPlaying()
 {
 }
 
+const std::string& CApplication::CurrentFile()
+{
+  return "";
+}
+
 std::shared_ptr<CFileItem> CApplication::CurrentFileItemPtr()
 {
   return m_itemCurrentFile;
@@ -71,6 +76,37 @@ std::shared_ptr<CFileItem> CApplication::CurrentFileItemPtr()
 CFileItem& CApplication::CurrentFileItem()
 {
   return *m_itemCurrentFile;
+}
+
+CFileItem& CApplication::CurrentUnstackedItem()
+{
+  return *CFileItemPtr();
+}
+
+// Returns the total time in seconds of the current media.  Fractional
+// portions of a second are possible - but not necessarily supported by the
+// player class.  This returns a double to be consistent with GetTime() and
+// SeekTime().
+double CApplication::GetTotalTime() const
+{
+  return 0.0;
+}
+
+// Returns the current time in seconds of the currently playing media.
+// Fractional portions of a second are possible.  This returns a double to
+// be consistent with GetTotalTime() and SeekTime().
+double CApplication::GetTime() const
+{
+  return 0.0;
+}
+
+// Sets the current position of the currently playing media to the specified
+// time in seconds.  Fractional portions of a second are valid.  The passed
+// time is the time offset from the beginning of the file as opposed to a
+// delta from the current position.  This method accepts a double to be
+// consistent with GetTime() and GetTotalTime().
+void CApplication::SeekTime( double dTime )
+{
 }
 
 void CApplication::SetVolume(long iValue, bool isPercentage /* = true */)
@@ -130,6 +166,11 @@ bool CApplication::ProcessAndStartPlaylist(const std::string& strPlayList,
   }
 #endif
   return false;
+}
+
+std::string CApplication::GetCurrentPlayer()
+{
+  return m_pPlayer->GetCurrentPlayer();
 }
 
 void CApplication::UpdateLibraries()

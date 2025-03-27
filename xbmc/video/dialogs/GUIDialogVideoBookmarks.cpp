@@ -12,16 +12,13 @@
 #include "ServiceBroker.h"
 #include "TextureCache.h"
 #include "Util.h"
-#include "application/Application.h"
-#include "application/ApplicationComponents.h"
-#include "application/ApplicationPlayer.h"
+#include "Application.h"
+#include "ApplicationPlayer.h"
 #include "dialogs/GUIDialogContextMenu.h"
 #include "dialogs/GUIDialogKaiToast.h"
-#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
-#include "input/actions/Action.h"
-#include "input/actions/ActionIDs.h"
+#include "input/Key.h"
 #include "messaging/ApplicationMessenger.h"
 #include "pictures/Picture.h"
 #include "profiles/ProfileManager.h"
@@ -78,8 +75,7 @@ bool CGUIDialogVideoBookmarks::OnMessage(CGUIMessage& message)
   case GUI_MSG_WINDOW_INIT:
     {
       // don't init this dialog if we don't playback a file
-      const auto& components = CServiceBroker::GetAppComponents();
-      const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+      const auto appPlayer = g_application.m_pPlayer;
       if (!appPlayer->IsPlaying())
         return false;
 
@@ -267,8 +263,7 @@ void CGUIDialogVideoBookmarks::OnRefreshList()
   }
 
   // add chapters if around
-  const auto& components = CServiceBroker::GetAppComponents();
-  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+  const auto appPlayer = g_application.m_pPlayer;
   for (int i = 1; i <= appPlayer->GetChapterCount(); ++i)
   {
     std::string chapterName;
@@ -366,8 +361,7 @@ void CGUIDialogVideoBookmarks::Clear()
 
 void CGUIDialogVideoBookmarks::GotoBookmark(int item)
 {
-  auto& components = CServiceBroker::GetAppComponents();
-  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+  const auto appPlayer = g_application.m_pPlayer;
   if (item < 0 || item >= m_vecItems->Size() || !appPlayer->HasPlayer())
     return;
 
@@ -406,8 +400,7 @@ bool CGUIDialogVideoBookmarks::AddBookmark(CVideoInfoTag* tag)
   bookmark.timeInSeconds = (int)g_application.GetTime();
   bookmark.totalTimeInSeconds = (int)g_application.GetTotalTime();
 
-  auto& components = CServiceBroker::GetAppComponents();
-  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+  const auto appPlayer = g_application.m_pPlayer;
 
   if (appPlayer->HasPlayer())
     bookmark.playerState = appPlayer->GetPlayerState();
@@ -537,7 +530,7 @@ bool CGUIDialogVideoBookmarks::OnAddBookmark()
 
   if (CGUIDialogVideoBookmarks::AddBookmark())
   {
-    CServiceBroker::GetGUI()->GetWindowManager().SendMessage(GUI_MSG_REFRESH_LIST, 0, WINDOW_DIALOG_VIDEO_BOOKMARKS);
+    g_windowManager.SendMessage(GUI_MSG_REFRESH_LIST, 0, WINDOW_DIALOG_VIDEO_BOOKMARKS);
     CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info,
                                           g_localizeStrings.Get(298),   // "Bookmarks"
                                           g_localizeStrings.Get(21362));// "Bookmark created"
@@ -560,7 +553,7 @@ bool CGUIDialogVideoBookmarks::OnAddEpisodeBookmark()
       bReturn = CGUIDialogVideoBookmarks::AddEpisodeBookmark();
       if(bReturn)
       {
-        CServiceBroker::GetGUI()->GetWindowManager().SendMessage(GUI_MSG_REFRESH_LIST, 0, WINDOW_DIALOG_VIDEO_BOOKMARKS);
+        g_windowManager.SendMessage(GUI_MSG_REFRESH_LIST, 0, WINDOW_DIALOG_VIDEO_BOOKMARKS);
         CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info,
                                               g_localizeStrings.Get(298),   // "Bookmarks"
                                               g_localizeStrings.Get(21363));// "Episode Bookmark created"
