@@ -11,7 +11,6 @@
 #include "GUIUserMessages.h"
 #include "ServiceBroker.h"
 #include "Util.h"
-#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "video/jobs/VideoLibraryCleaningJob.h"
 #include "video/jobs/VideoLibraryJob.h"
@@ -232,7 +231,7 @@ void CVideoLibraryQueue::Refresh()
 {
   CUtil::DeleteVideoDatabaseDirectoryCache();
   CGUIMessage msg(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_UPDATE);
-  CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
+  g_windowManager.SendThreadMessage(msg);
 }
 
 void CVideoLibraryQueue::OnJobComplete(unsigned int jobID, bool success, CJob *job)

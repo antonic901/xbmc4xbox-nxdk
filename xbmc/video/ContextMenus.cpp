@@ -8,15 +8,15 @@
 
 #include "ContextMenus.h"
 
+#ifdef HAS_DVD_DRIVE
 #include "Autorun.h"
+#endif
 #include "GUIUserMessages.h"
 #include "PlayListPlayer.h"
 #include "ServiceBroker.h"
-#include "application/Application.h"
-#include "application/ApplicationComponents.h"
-#include "application/ApplicationPlayer.h"
+#include "Application.h"
+#include "ApplicationPlayer.h"
 #include "filesystem/Directory.h"
-#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
 #include "playlists/PlayList.h"
@@ -147,17 +147,15 @@ bool CVideoBrowse::Execute(const std::shared_ptr<CFileItem>& item) const
   else
     target = WINDOW_VIDEO_NAV;
 
-  auto& windowMgr = CServiceBroker::GetGUI()->GetWindowManager();
-
-  if (target == windowMgr.GetActiveWindow())
+  if (target == g_windowManager.GetActiveWindow())
   {
     CGUIMessage msg(GUI_MSG_NOTIFY_ALL, target, 0, GUI_MSG_UPDATE);
     msg.SetStringParam(item->GetPath());
-    windowMgr.SendMessage(msg);
+    g_windowManager.SendMessage(msg);
   }
   else
   {
-    windowMgr.ActivateWindow(target, {item->GetPath(), "return"});
+    g_windowManager.ActivateWindow(target, {item->GetPath(), "return"});
   }
   return true;
 }
@@ -213,7 +211,7 @@ void AddRecordingsToPlayListAndSort(const std::shared_ptr<CFileItem>& item,
 
   if (!queuedItems.IsEmpty())
   {
-    const int windowId = CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow();
+    const int windowId = g_windowManager.GetActiveWindow();
     if (windowId == WINDOW_TV_RECORDINGS || windowId == WINDOW_RADIO_RECORDINGS)
     {
       std::unique_ptr<CGUIViewState> viewState(CGUIViewState::GetViewState(windowId, queuedItems));
@@ -326,18 +324,17 @@ namespace
 {
 void SelectNextItem(int windowID)
 {
-  auto& windowMgr = CServiceBroker::GetGUI()->GetWindowManager();
-  CGUIWindow* window = windowMgr.GetWindow(windowID);
+  CGUIWindow* window = g_windowManager.GetWindow(windowID);
   if (window)
   {
     const int viewContainerID = window->GetViewContainerID();
     if (viewContainerID > 0)
     {
       CGUIMessage msg1(GUI_MSG_ITEM_SELECTED, windowID, viewContainerID);
-      windowMgr.SendMessage(msg1, windowID);
+      g_windowManager.SendMessage(msg1, windowID);
 
       CGUIMessage msg2(GUI_MSG_ITEM_SELECT, windowID, viewContainerID, msg1.GetParam1() + 1);
-      windowMgr.SendMessage(msg2, windowID);
+      g_windowManager.SendMessage(msg2, windowID);
     }
   }
 }
@@ -345,7 +342,7 @@ void SelectNextItem(int windowID)
 
 bool CVideoQueue::IsVisible(const CFileItem& item) const
 {
-  if (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_VIDEO_PLAYLIST)
+  if (g_windowManager.GetActiveWindow() == WINDOW_VIDEO_PLAYLIST)
     return false; // Already queued
 
   if (!item.CanQueue())
@@ -356,7 +353,7 @@ bool CVideoQueue::IsVisible(const CFileItem& item) const
 
 bool CVideoQueue::Execute(const std::shared_ptr<CFileItem>& item) const
 {
-  const int windowID = CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow();
+  const int windowID = g_windowManager.GetActiveWindow();
   if (windowID == WINDOW_VIDEO_PLAYLIST)
     return false; // Already queued
 
@@ -370,7 +367,7 @@ bool CVideoQueue::Execute(const std::shared_ptr<CFileItem>& item) const
 
 bool CVideoPlayNext::IsVisible(const CFileItem& item) const
 {
-  if (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_VIDEO_PLAYLIST)
+  if (g_windowManager.GetActiveWindow() == WINDOW_VIDEO_PLAYLIST)
     return false; // Already queued
 
   if (!item.CanQueue())
@@ -381,7 +378,7 @@ bool CVideoPlayNext::IsVisible(const CFileItem& item) const
 
 bool CVideoPlayNext::Execute(const std::shared_ptr<CFileItem>& item) const
 {
-  if (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_VIDEO_PLAYLIST)
+  if (g_windowManager.GetActiveWindow() == WINDOW_VIDEO_PLAYLIST)
     return false; // Already queued
 
   VIDEO_UTILS::QueueItem(item, VIDEO_UTILS::QueuePosition::POSITION_BEGIN);
@@ -390,7 +387,7 @@ bool CVideoPlayNext::Execute(const std::shared_ptr<CFileItem>& item) const
 
 bool CVideoPlayAndQueue::IsVisible(const CFileItem& item) const
 {
-  const int windowId = CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow();
+  const int windowId = g_windowManager.GetActiveWindow();
   if (windowId == WINDOW_VIDEO_PLAYLIST)
     return false; // Already queued
 
@@ -403,7 +400,7 @@ bool CVideoPlayAndQueue::IsVisible(const CFileItem& item) const
 
 bool CVideoPlayAndQueue::Execute(const std::shared_ptr<CFileItem>& item) const
 {
-  const int windowId = CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow();
+  const int windowId = g_windowManager.GetActiveWindow();
   if (windowId == WINDOW_VIDEO_PLAYLIST)
     return false; // Already queued
 

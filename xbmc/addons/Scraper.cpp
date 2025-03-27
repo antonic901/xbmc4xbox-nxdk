@@ -859,7 +859,9 @@ static bool PythonDetails(const std::string &ID,
 
   CFileItem item(url, false);
 
+#if 0
   if (!XFILE::CPluginDirectory::GetPluginResult(str.str(), item, false))
+#endif
     return false;
 
   DetailsFromFileItem(item, result);

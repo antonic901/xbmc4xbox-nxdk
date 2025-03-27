@@ -220,6 +220,11 @@
 
 #define ACTION_PLAY                   68  //!< Unused at the moment
 #define ACTION_PLAYER_PROCESS_INFO    69 //!< show player process info (video decoder, pixel format, pvr signal strength and the like
+
+#define ACTION_PLAYER_PROGRAM_SELECT  70
+
+#define ACTION_PLAYER_RESOLUTION_SELECT 71
+
 #define ACTION_SMALL_STEP_BACK        76  //!< jumps a few seconds back during playback of movie. Can b used in videoFullScreen.xml window id=2005
 
 #define ACTION_PLAYER_FORWARD         77  //!< FF in current file played. global action, can be used anywhere
@@ -387,6 +392,8 @@
 #define ACTION_INPUT_TEXT             244
 #define ACTION_VOLUME_SET             245
 #define ACTION_TOGGLE_COMMSKIP        246
+
+#define ACTION_VIDEO_NEXT_STREAM      250 //!< Cycle video streams. Used in videofullscreen.
 
 #define ACTION_TOUCH_TAP              401 //!< touch actions
 #define ACTION_TOUCH_TAP_TEN          410 //!< touch actions

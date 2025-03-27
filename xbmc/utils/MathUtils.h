@@ -189,6 +189,22 @@ namespace MathUtils
     MathUtils::abs(0);
   }
 
+  /*!
+   * \brief Round a floating point number to nearest multiple
+   * \param value The value to round
+   * \param multiple The multiple
+   * \return The rounded value
+   */
+  template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+  inline T RoundF(const T value, const T multiple)
+  {
+    if (multiple == 0)
+      return value;
+
+    return static_cast<T>(std::round(static_cast<double>(value) / static_cast<double>(multiple)) *
+                          static_cast<double>(multiple));
+  }
+
 #if 0
   /*! \brief test routine for round_int and truncate_int
    Must return true on all platforms.

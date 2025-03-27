@@ -16,6 +16,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/FileExtensionProvider.cpp \
 	$(CURDIR)/xbmc/utils/FileOperationJob.cpp \
 	$(CURDIR)/xbmc/utils/FileUtils.cpp \
+	$(CURDIR)/xbmc/utils/GroupUtils.cpp \
 	$(CURDIR)/xbmc/utils/HTMLUtil.cpp \
 	$(CURDIR)/xbmc/utils/HttpHeader.cpp \
 	$(CURDIR)/xbmc/utils/HttpParser.cpp \
@@ -31,6 +32,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/log.cpp \
 	$(CURDIR)/xbmc/utils/md5.cpp \
 	$(CURDIR)/xbmc/utils/Mime.cpp \
+	$(CURDIR)/xbmc/utils/MovingSpeed.cpp \
 	$(CURDIR)/xbmc/utils/Observer.cpp \
 	$(CURDIR)/xbmc/utils/POUtils.cpp \
 	$(CURDIR)/xbmc/utils/ProgressJob.cpp \

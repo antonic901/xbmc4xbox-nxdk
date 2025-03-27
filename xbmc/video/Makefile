@@ -3,7 +3,6 @@ SRCS += \
 	$(CURDIR)/xbmc/video/ContextMenus.cpp \
 	$(CURDIR)/xbmc/video/GUIViewStateVideo.cpp \
 	$(CURDIR)/xbmc/video/PlayerController.cpp \
-	$(CURDIR)/xbmc/video/Teletext.cpp \
 	$(CURDIR)/xbmc/video/VideoDatabase.cpp \
 	$(CURDIR)/xbmc/video/VideoDbUrl.cpp \
 	$(CURDIR)/xbmc/video/VideoInfoDownloader.cpp \

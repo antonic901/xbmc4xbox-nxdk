@@ -949,6 +949,146 @@ void CUtil::GetSkinThemes(std::vector<std::string>& vecTheme)
   std::sort(vecTheme.begin(), vecTheme.end(), sortstringbyname());
 }
 
+int CUtil::LookupRomanDigit(char roman_digit)
+{
+  switch (roman_digit)
+  {
+    case 'i':
+    case 'I':
+      return 1;
+    case 'v':
+    case 'V':
+      return 5;
+    case 'x':
+    case 'X':
+      return 10;
+    case 'l':
+    case 'L':
+      return 50;
+    case 'c':
+    case 'C':
+      return 100;
+    case 'd':
+    case 'D':
+      return 500;
+    case 'm':
+    case 'M':
+      return 1000;
+    default:
+      return 0;
+  }
+}
+
+int CUtil::TranslateRomanNumeral(const char* roman_numeral)
+{
+
+  int decimal = -1;
+
+  if (roman_numeral && roman_numeral[0])
+  {
+    int temp_sum  = 0,
+        last      = 0,
+        repeat    = 0,
+        trend     = 1;
+    decimal = 0;
+    while (*roman_numeral)
+    {
+      int digit = CUtil::LookupRomanDigit(*roman_numeral);
+      int test  = last;
+
+      // General sanity checks
+
+      // numeral not in LUT
+      if (!digit)
+        return -1;
+
+      while (test > 5)
+        test /= 10;
+
+      // N = 10^n may not precede (N+1) > 10^(N+1)
+      if (test == 1 && digit > last * 10)
+        return -1;
+
+      // N = 5*10^n may not precede (N+1) >= N
+      if (test == 5 && digit >= last)
+        return -1;
+
+      // End general sanity checks
+
+      if (last < digit)
+      {
+        // smaller numerals may not repeat before a larger one
+        if (repeat)
+          return -1;
+
+        temp_sum += digit;
+
+        repeat  = 0;
+        trend   = 0;
+      }
+      else if (last == digit)
+      {
+        temp_sum += digit;
+        repeat++;
+        trend = 1;
+      }
+      else
+      {
+        if (!repeat)
+          decimal += 2 * last - temp_sum;
+        else
+          decimal += temp_sum;
+
+        temp_sum = digit;
+
+        trend   = 1;
+        repeat  = 0;
+      }
+      // Post general sanity checks
+
+      // numerals may not repeat more than thrice
+      if (repeat == 3)
+        return -1;
+
+      last = digit;
+      roman_numeral++;
+    }
+
+    if (trend)
+      decimal += temp_sum;
+    else
+      decimal += 2 * last - temp_sum;
+  }
+  return decimal;
+}
+
+void CUtil::GetRecursiveListing(const std::string& strPath, CFileItemList& items, const std::string& strMask, unsigned int flags /* = DIR_FLAG_DEFAULTS */)
+{
+  CFileItemList myItems;
+  CDirectory::GetDirectory(strPath,myItems,strMask,flags);
+  for (const auto &item : myItems)
+  {
+    if (item->m_bIsFolder)
+      CUtil::GetRecursiveListing(item->GetPath(),items,strMask,flags);
+    else
+      items.Add(item);
+  }
+}
+
+void CUtil::GetRecursiveDirsListing(const std::string& strPath, CFileItemList& item, unsigned int flags /* = DIR_FLAG_DEFAULTS */)
+{
+  CFileItemList myItems;
+  CDirectory::GetDirectory(strPath,myItems,"",flags);
+  for (const auto &i : myItems)
+  {
+    if (i->m_bIsFolder && !i->IsPath(".."))
+    {
+      item.Add(i);
+      CUtil::GetRecursiveDirsListing(i->GetPath(),item,flags);
+    }
+  }
+}
+
 void CUtil::ForceForwardSlashes(std::string& strPath)
 {
   size_t iPos = strPath.rfind('\\');

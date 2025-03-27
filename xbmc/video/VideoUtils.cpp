@@ -15,12 +15,11 @@
 #include "ServiceBroker.h"
 #include "URL.h"
 #include "Util.h"
-#include "application/ApplicationComponents.h"
-#include "application/ApplicationPlayer.h"
+#include "Application.h"
+#include "ApplicationPlayer.h"
 #include "dialogs/GUIDialogBusy.h"
 #include "filesystem/Directory.h"
 #include "filesystem/VideoDatabaseDirectory.h"
-#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "playlists/PlayList.h"
 #include "playlists/PlayListFactory.h"
@@ -174,7 +173,7 @@ void CAsyncGetItemsForPlaylist::GetItemsForPlaylist(const std::shared_ptr<CFileI
       }
 
       SortDescription sortDesc;
-      if (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == viewStateWindowId)
+      if (g_windowManager.GetActiveWindow() == viewStateWindowId)
         sortDesc = state->GetSortMethod();
       else
         sortDesc = GetSortDescription(*state, items);
@@ -367,12 +366,11 @@ void QueueItem(const std::shared_ptr<CFileItem>& itemIn, QueuePosition pos)
   }
 
   auto& player = CServiceBroker::GetPlaylistPlayer();
-  const auto& components = CServiceBroker::GetAppComponents();
 
   // Determine the proper list to queue this element
   PLAYLIST::Id playlistId = player.GetCurrentPlaylist();
   if (playlistId == PLAYLIST::TYPE_NONE)
-    playlistId = components.GetComponent<CApplicationPlayer>()->GetPreferredPlaylist();
+    playlistId = g_application.m_pPlayer->GetPreferredPlaylist();
 
   if (playlistId == PLAYLIST::TYPE_NONE)
     playlistId = PLAYLIST::TYPE_VIDEO;
@@ -388,7 +386,7 @@ void QueueItem(const std::shared_ptr<CFileItem>& itemIn, QueuePosition pos)
   }
 
   if (pos == QueuePosition::POSITION_BEGIN &&
-      components.GetComponent<CApplicationPlayer>()->IsPlaying())
+      g_application.m_pPlayer->IsPlaying())
     player.Insert(playlistId, queuedItems, player.GetCurrentSong() + 1);
   else
     player.Add(playlistId, queuedItems);
@@ -401,9 +399,7 @@ void QueueItem(const std::shared_ptr<CFileItem>& itemIn, QueuePosition pos)
 bool GetItemsForPlayList(const std::shared_ptr<CFileItem>& item, CFileItemList& queuedItems)
 {
   CAsyncGetItemsForPlaylist getItems(item, queuedItems);
-  return CGUIDialogBusy::Wait(&getItems,
-                              500, // 500ms before busy dialog appears
-                              true); // can be cancelled
+  return CGUIDialogBusy::Wait(&getItems);
 }
 
 bool IsItemPlayable(const CFileItem& item)
@@ -431,7 +427,7 @@ bool IsItemPlayable(const CFileItem& item)
     return false;
 
   // Exclude unwanted windows
-  if (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_VIDEO_PLAYLIST)
+  if (g_windowManager.GetActiveWindow() == WINDOW_VIDEO_PLAYLIST)
     return false;
 
   // Exclude special items
@@ -492,7 +488,7 @@ bool IsItemPlayable(const CFileItem& item)
   else if (item.m_bIsFolder)
   {
     // Not a video-specific folder (like file:// or nfs://). Allow play if context is Video window.
-    if (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_VIDEO_NAV &&
+    if (g_windowManager.GetActiveWindow() == WINDOW_VIDEO_NAV &&
         item.GetPath() != "add") // Exclude "Add video source" item
       return true;
   }
