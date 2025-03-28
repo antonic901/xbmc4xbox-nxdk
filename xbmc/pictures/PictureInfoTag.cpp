@@ -10,9 +10,8 @@
 
 #include "ServiceBroker.h"
 #include "addons/ExtsMimeSupportList.h"
-#include "addons/ImageDecoder.h"
 #include "addons/addoninfo/AddonType.h"
-#include "guilib/guiinfo/GUIInfoLabels.h"
+#include "guiinfo/GUIInfoLabels.h"
 #include "utils/Archive.h"
 #include "utils/CharsetConverter.h"
 #include "utils/StringUtils.h"
@@ -130,6 +129,7 @@ bool CPictureInfoTag::Load(const std::string &path)
 {
   m_isLoaded = false;
 
+#if 0
   // Get file extensions to find addon related to it.
   std::string strExtension = URIUtils::GetExtension(path);
   StringUtils::ToLower(strExtension);
@@ -151,6 +151,7 @@ bool CPictureInfoTag::Load(const std::string &path)
       }
     }
   }
+#endif
 
   // Load by Kodi's included own way
   if (!m_isLoaded)

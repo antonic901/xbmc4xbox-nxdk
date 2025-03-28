@@ -6,6 +6,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/BooleanLogic.cpp \
 	$(CURDIR)/xbmc/utils/CharsetConverter.cpp \
 	$(CURDIR)/xbmc/utils/CharsetDetection.cpp \
+	$(CURDIR)/xbmc/utils/ColorUtils.cpp \
 	$(CURDIR)/xbmc/utils/CompileInfo.cpp \
 	$(CURDIR)/xbmc/utils/Crc32.cpp \
 	$(CURDIR)/xbmc/utils/DatabaseUtils.cpp \

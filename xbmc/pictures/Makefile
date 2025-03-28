@@ -10,6 +10,5 @@ SRCS += \
 	$(CURDIR)/xbmc/pictures/Picture.cpp \
 	$(CURDIR)/xbmc/pictures/PictureInfoLoader.cpp \
 	$(CURDIR)/xbmc/pictures/PictureInfoTag.cpp \
-	$(CURDIR)/xbmc/pictures/PictureScalingAlgorithm.cpp \
 	$(CURDIR)/xbmc/pictures/PictureThumbLoader.cpp \
 	$(CURDIR)/xbmc/pictures/SlideShowPicture.cpp

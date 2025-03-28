@@ -16,7 +16,6 @@
 #include "URL.h"
 #include "filesystem/Directory.h"
 #include "filesystem/MultiPathDirectory.h"
-#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "settings/AdvancedSettings.h"
 #include "settings/Settings.h"
@@ -119,7 +118,7 @@ void CPictureThumbLoader::OnJobComplete(unsigned int jobID, bool success, CJob* 
     loader->m_item.SetPath(loader->m_listpath);
     CFileItemPtr pItem(new CFileItem(loader->m_item));
     CGUIMessage msg(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_UPDATE_ITEM, 0, pItem);
-    CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
+    g_windowManager.SendThreadMessage(msg);
   }
   CJobQueue::OnJobComplete(jobID, success, job);
 }

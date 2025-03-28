@@ -95,6 +95,8 @@ public:
 
   void UpdateCurrentPlayArt();
 
+  inline bool IsInScreenSaver() { return false; };
+
   bool OnAction(const CAction &action);
 
   void ResetScreenSaver();

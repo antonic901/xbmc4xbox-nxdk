@@ -56,6 +56,7 @@ SRCS += \
 	$(CURDIR)/xbmc/guilib/GUIWindow.cpp \
 	$(CURDIR)/xbmc/guilib/GUIWindowManager.cpp \
 	$(CURDIR)/xbmc/guilib/GUIWrappingListContainer.cpp \
+	$(CURDIR)/xbmc/guilib/imagefactory.cpp \
 	$(CURDIR)/xbmc/guilib/IWindowManagerCallback.cpp \
 	$(CURDIR)/xbmc/guilib/LocalizeStrings.cpp \
 	$(CURDIR)/xbmc/guilib/Texture.cpp \
