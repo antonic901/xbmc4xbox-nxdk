@@ -21,6 +21,7 @@ NXDK_CXXFLAGS +=	-Ilib \
 									-Ixbmc/platform/xbox \
 									-Wno-deprecated-declarations \
 									-Wno-inconsistent-missing-override \
+									-Wno-invalid-offsetof \
 									-D_CRT_RAND_S \
 									-D_XBOX
 
