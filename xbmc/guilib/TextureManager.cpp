@@ -89,12 +89,12 @@ void CTextureArray::Reset()
   m_texCoordsArePixels = false;
 }
 
-void CTextureArray::Add(CTexture *texture, int delay)
+void CTextureArray::Add(std::shared_ptr<CTexture> texture, int delay)
 {
   if (!texture)
     return;
 
-  m_textures.push_back(texture);
+  m_textures.emplace_back(std::move(texture));
   m_delays.push_back(delay);
 
   m_texWidth = texture->GetTextureWidth();
@@ -106,13 +106,13 @@ void CTextureArray::Add(CTexture *texture, int delay)
 #endif
 }
 
-void CTextureArray::Set(CTexture *texture, int width, int height)
+void CTextureArray::Set(std::shared_ptr<CTexture> texture, int width, int height)
 {
   assert(!m_textures.size()); // don't try and set a texture if we already have one!
   m_width = width;
   m_height = height;
   m_orientation = texture ? texture->GetOrientation() : 0;
-  Add(texture, 2);
+  Add(std::move(texture), 2);
 }
 
 void CTextureArray::Free()
@@ -120,7 +120,7 @@ void CTextureArray::Free()
   std::unique_lock<CCriticalSection> lock(g_graphicsContext);
   for (unsigned int i = 0; i < m_textures.size(); i++)
   {
-    delete m_textures[i];
+    m_textures[i].reset();
   }
 
   m_textures.clear();
@@ -219,9 +219,9 @@ bool CTextureMap::IsEmpty() const
   return m_texture.m_textures.empty();
 }
 
-void CTextureMap::Add(CTexture* texture, int delay)
+void CTextureMap::Add(std::unique_ptr<CTexture> texture, int delay)
 {
-  m_texture.Add(texture, delay);
+  m_texture.Add(std::move(texture), delay);
 
   if (texture)
 #ifdef HAS_XBOX_D3D
@@ -550,7 +550,7 @@ const CTextureArray& CGUITextureManager::Load(const std::string& strTextureName,
     return emptyTexture;
   }
 
-  CTexture *pTexture = NULL;
+  std::unique_ptr<CTexture> pTexture;
   int width = 0, height = 0;
   if (bundle >= 0)
   {
@@ -579,7 +579,7 @@ const CTextureArray& CGUITextureManager::Load(const std::string& strTextureName,
   if (!pTexture) return emptyTexture;
 
   CTextureMap* pMap = new CTextureMap(strTextureName, width, height, 0);
-  pMap->Add(pTexture, 100);
+  pMap->Add(std::move(pTexture), 100);
   m_vecTextures.push_back(pMap);
 
 #ifdef _DEBUG_TEXTURES

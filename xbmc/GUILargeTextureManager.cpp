@@ -34,13 +34,13 @@
 CImageLoader::CImageLoader(const std::string &path, const bool useCache):
   m_path(path)
 {
-  m_texture = NULL;
+  m_texture = nullptr;
   m_use_cache = useCache;
 }
 
 CImageLoader::~CImageLoader()
 {
-  delete(m_texture);
+  m_texture.reset();
 }
 
 bool CImageLoader::DoWork()
@@ -138,11 +138,11 @@ bool CGUILargeTextureManager::CLargeTexture::DeleteIfRequired(bool deleteImmedia
   return false;
 }
 
-void CGUILargeTextureManager::CLargeTexture::SetTexture(CTexture* texture)
+void CGUILargeTextureManager::CLargeTexture::SetTexture(std::unique_ptr<CTexture> texture)
 {
   assert(!m_texture.size());
   if (texture)
-    m_texture.Set(texture, texture->GetWidth(), texture->GetHeight());
+    m_texture.Set(std::move(texture), texture->GetWidth(), texture->GetHeight());
 }
 
 CGUILargeTextureManager::CGUILargeTextureManager()
@@ -251,7 +251,7 @@ void CGUILargeTextureManager::OnJobComplete(unsigned int jobID, bool success, CJ
     { // found our job
       CImageLoader *loader = (CImageLoader *)job;
       CLargeTexture *image = it->second;
-      image->SetTexture(loader->m_texture);
+      image->SetTexture(std::move(loader->m_texture));
       loader->m_texture = NULL; // we want to keep the texture, and jobs are auto-deleted.
       m_queued.erase(it);
       m_allocated.push_back(image);
