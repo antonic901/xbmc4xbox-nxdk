@@ -36,12 +36,6 @@ typedef enum
   PLAYBACK_OK = 1,
 } PlayBackRet;
 
-namespace PVR
-{
-  class CPVRChannel;
-  typedef std::shared_ptr<PVR::CPVRChannel> CPVRChannelPtr;
-}
-
 class CAction;
 class CPlayerOptions;
 class CStreamDetails;
@@ -172,7 +166,6 @@ public:
   void  SetTotalTime(int64_t time);
   void  SetVideoStream(int iStream);
   void  SetVolume(float volume);
-  bool  SwitchChannel(const PVR::CPVRChannelPtr &channel);
   void  SetSpeed(float speed);
   bool SupportsTempo();
 

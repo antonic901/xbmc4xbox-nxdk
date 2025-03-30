@@ -18,6 +18,7 @@ SRCS += \
 
 NXDK_CXXFLAGS +=	-Ilib \
 									-Ixbmc \
+									-Ixbmc/cores/VideoPlayer \
 									-Ixbmc/platform/xbox \
 									-Wno-deprecated-declarations \
 									-Wno-inconsistent-missing-override \

@@ -13,18 +13,13 @@
 #include "PartyModeManager.h"
 #include "ServiceBroker.h"
 #include "URL.h"
-#include "application/Application.h"
-#include "application/ApplicationComponents.h"
-#include "application/ApplicationPlayer.h"
-#include "application/ApplicationPowerHandling.h"
+#include "Application.h"
+#include "ApplicationPlayer.h"
 #include "dialogs/GUIDialogKaiToast.h"
-#include "filesystem/PluginDirectory.h"
 #include "filesystem/VideoDatabaseFile.h"
-#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
-#include "input/actions/Action.h"
-#include "input/actions/ActionIDs.h"
+#include "input/Key.h"
 #include "interfaces/AnnouncementManager.h"
 #include "messaging/ApplicationMessenger.h"
 #include "messaging/helpers/DialogOKHelper.h"
@@ -98,7 +93,7 @@ bool CPlayListPlayer::OnMessage(CGUIMessage &message)
       if (m_iCurrentPlayList != TYPE_NONE && m_bPlaybackStarted)
       {
         CGUIMessage msg(GUI_MSG_PLAYLISTPLAYER_STOPPED, 0, 0, m_iCurrentPlayList, m_iCurrentSong);
-        CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
+        g_windowManager.SendThreadMessage(msg);
         Reset();
         m_iCurrentPlayList = TYPE_NONE;
         return true;
@@ -163,7 +158,7 @@ int CPlayListPlayer::GetNextSong()
       CLog::Log(LOGERROR, "Playlist Player: RepeatOne stuck on unplayable item: {}, path [{}]",
                 m_iCurrentSong, playlist[m_iCurrentSong]->GetPath());
       CGUIMessage msg(GUI_MSG_PLAYLISTPLAYER_STOPPED, 0, 0, m_iCurrentPlayList, m_iCurrentSong);
-      CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
+      g_windowManager.SendThreadMessage(msg);
       Reset();
       m_iCurrentPlayList = TYPE_NONE;
       return -1;
@@ -191,7 +186,7 @@ bool CPlayListPlayer::PlayNext(int offset, bool bAutoPlay)
       CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, g_localizeStrings.Get(559), g_localizeStrings.Get(34201));
 
     CGUIMessage msg(GUI_MSG_PLAYLISTPLAYER_STOPPED, 0, 0, m_iCurrentPlayList, m_iCurrentSong);
-    CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
+    g_windowManager.SendThreadMessage(msg);
     Reset();
     m_iCurrentPlayList = TYPE_NONE;
     return false;
@@ -362,7 +357,7 @@ bool CPlayListPlayer::Play(int iSong,
       HELPERS::ShowOKDialogText(CVariant{16026}, CVariant{16027});
 
       CGUIMessage msg(GUI_MSG_PLAYLISTPLAYER_STOPPED, 0, 0, m_iCurrentPlayList, m_iCurrentSong);
-      CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
+      g_windowManager.SendThreadMessage(msg);
       Reset();
       GetPlaylist(m_iCurrentPlayList).Clear();
       m_iCurrentPlayList = TYPE_NONE;
@@ -381,7 +376,7 @@ bool CPlayListPlayer::Play(int iSong,
     {
       CLog::Log(LOGDEBUG,"Playlist Player: no more playable items... aborting playback");
       CGUIMessage msg(GUI_MSG_PLAYLISTPLAYER_STOPPED, 0, 0, m_iCurrentPlayList, m_iCurrentSong);
-      CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
+      g_windowManager.SendThreadMessage(msg);
       Reset();
       m_iCurrentPlayList = TYPE_NONE;
       return false;
@@ -443,7 +438,7 @@ void CPlayListPlayer::ClearPlaylist(Id playlistId)
 
   // its likely that the playlist changed
   CGUIMessage msg(GUI_MSG_PLAYLIST_CHANGED, 0, 0);
-  CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
+  g_windowManager.SendMessage(msg);
 }
 
 CPlayList& CPlayListPlayer::GetPlaylist(Id playlistId)
@@ -496,7 +491,7 @@ void CPlayListPlayer::Reset()
 
   // its likely that the playlist changed
   CGUIMessage msg(GUI_MSG_PLAYLIST_CHANGED, 0, 0);
-  CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
+  g_windowManager.SendMessage(msg);
 }
 
 bool CPlayListPlayer::HasPlayedFirstFile() const
@@ -564,10 +559,12 @@ void CPlayListPlayer::SetShuffle(Id playlistId, bool bYesNo, bool bNotify /* = f
   }
 
   // its likely that the playlist changed
+#if 0
   if (CServiceBroker::GetGUI() != nullptr)
+#endif
   {
     CGUIMessage msg(GUI_MSG_PLAYLIST_CHANGED, 0, 0);
-    CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
+    g_windowManager.SendMessage(msg);
   }
 
   AnnouncePropertyChanged(playlistId, "shuffled", IsShuffled(playlistId));
@@ -624,10 +621,12 @@ void CPlayListPlayer::SetRepeat(Id playlistId, RepeatState state, bool bNotify /
   }
 
   // its likely that the playlist changed
+#if 0
   if (CServiceBroker::GetGUI() != nullptr)
+#endif
   {
     CGUIMessage msg(GUI_MSG_PLAYLIST_CHANGED, 0, 0);
-    CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
+    g_windowManager.SendMessage(msg);
   }
 
   AnnouncePropertyChanged(playlistId, "repeat", data);
@@ -653,8 +652,7 @@ void CPlayListPlayer::ReShuffle(Id playlistId, int iPosition)
   // so we shuffle starting at two positions below the current item
   else if (playlistId == m_iCurrentPlayList)
   {
-    const auto& components = CServiceBroker::GetAppComponents();
-    const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+    const auto appPlayer = g_application.m_pPlayer;
     if ((appPlayer->IsPlayingAudio() && playlistId == TYPE_MUSIC) ||
         (appPlayer->IsPlayingVideo() && playlistId == TYPE_VIDEO))
     {
@@ -703,7 +701,7 @@ void CPlayListPlayer::Add(Id playlistId, const CFileItemList& items)
 
   // its likely that the playlist changed
   CGUIMessage msg(GUI_MSG_PLAYLIST_CHANGED, 0, 0);
-  CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
+  g_windowManager.SendMessage(msg);
 }
 
 void CPlayListPlayer::Insert(Id playlistId, const CPlayList& playlist, int iIndex)
@@ -746,7 +744,7 @@ void CPlayListPlayer::Insert(Id playlistId, const CFileItemList& items, int iInd
 
   // its likely that the playlist changed
   CGUIMessage msg(GUI_MSG_PLAYLIST_CHANGED, 0, 0);
-  CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
+  g_windowManager.SendMessage(msg);
 }
 
 void CPlayListPlayer::Remove(Id playlistId, int iPosition)
@@ -760,7 +758,7 @@ void CPlayListPlayer::Remove(Id playlistId, int iPosition)
 
   // its likely that the playlist changed
   CGUIMessage msg(GUI_MSG_PLAYLIST_CHANGED, 0, 0);
-  CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
+  g_windowManager.SendMessage(msg);
 }
 
 void CPlayListPlayer::Clear()
@@ -789,15 +787,14 @@ void CPlayListPlayer::Swap(Id playlistId, int indexItem1, int indexItem2)
 
   // its likely that the playlist changed
   CGUIMessage msg(GUI_MSG_PLAYLIST_CHANGED, 0, 0);
-  CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
+  g_windowManager.SendMessage(msg);
 }
 
 void CPlayListPlayer::AnnouncePropertyChanged(Id playlistId,
                                               const std::string& strProperty,
                                               const CVariant& value)
 {
-  const auto& components = CServiceBroker::GetAppComponents();
-  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+  const auto appPlayer = g_application.m_pPlayer;
 
   if (strProperty.empty() || value.isNull() ||
       (playlistId == TYPE_VIDEO && !appPlayer->IsPlayingVideo()) ||
@@ -818,14 +815,18 @@ int PLAYLIST::CPlayListPlayer::GetMessageMask()
 
 void PLAYLIST::CPlayListPlayer::OnApplicationMessage(KODI::MESSAGING::ThreadMessage* pMsg)
 {
-  auto& components = CServiceBroker::GetAppComponents();
-  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+  const auto appPlayer = g_application.m_pPlayer;
 
   auto wakeScreensaver = []() {
+#if 0
     auto& components = CServiceBroker::GetAppComponents();
     const auto appPower = components.GetComponent<CApplicationPowerHandling>();
     appPower->ResetScreenSaver();
     appPower->WakeUpScreenSaverAndDPMS();
+#else
+    g_application.ResetScreenSaver();
+    g_application.ResetScreenSaverWindow();
+#endif
   };
 
   switch (pMsg->dwMessage)
@@ -952,12 +953,14 @@ void PLAYLIST::CPlayListPlayer::OnApplicationMessage(KODI::MESSAGING::ThreadMess
         if (list->Size() == 1 && !(*list)[0]->IsPlayList())
         {
           CFileItemPtr item = (*list)[0];
+#if 0
           // if the item is a plugin we need to resolve the URL to ensure the infotags are filled.
           if (URIUtils::HasPluginPath(*item) &&
               !XFILE::CPluginDirectory::GetResolvedPluginResult(*item))
           {
             return;
           }
+#endif
           if (item->IsAudio() || item->IsVideo())
             Play(item, pMsg->strParam);
           else
@@ -1009,11 +1012,11 @@ void PLAYLIST::CPlayListPlayer::OnApplicationMessage(KODI::MESSAGING::ThreadMess
       stopMusic = (playlistId == TYPE_MUSIC);
     }
 
-    if ((stopSlideshow && CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_SLIDESHOW) ||
-      (stopVideo && CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_FULLSCREEN_VIDEO) ||
-      (stopVideo && CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_FULLSCREEN_GAME) ||
-      (stopMusic && CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_VISUALISATION))
-      CServiceBroker::GetGUI()->GetWindowManager().PreviousWindow();
+    if ((stopSlideshow && g_windowManager.GetActiveWindow() == WINDOW_SLIDESHOW) ||
+      (stopVideo && g_windowManager.GetActiveWindow() == WINDOW_FULLSCREEN_VIDEO) ||
+      (stopVideo && g_windowManager.GetActiveWindow() == WINDOW_FULLSCREEN_GAME) ||
+      (stopMusic && g_windowManager.GetActiveWindow() == WINDOW_VISUALISATION))
+      g_windowManager.PreviousWindow();
 
     wakeScreensaver();
 

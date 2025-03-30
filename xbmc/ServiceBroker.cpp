@@ -103,6 +103,11 @@ CPlayerCoreFactory& CServiceBroker::GetPlayerCoreFactory()
   return g_application.m_ServiceManager->GetPlayerCoreFactory();
 }
 
+CDatabaseManager& CServiceBroker::GetDatabaseManager()
+{
+  return g_application.m_ServiceManager->GetDatabaseManager();
+}
+
 CMediaManager& CServiceBroker::GetMediaManager()
 {
   return g_application.m_ServiceManager->GetMediaManager();

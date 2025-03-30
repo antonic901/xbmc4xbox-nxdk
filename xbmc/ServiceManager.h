@@ -25,6 +25,7 @@ class CContextMenuManager;
 
 class CFileExtensionProvider;
 class CPlayerCoreFactory;
+class CDatabaseManager;
 class CProfileManager;
 class CMediaManager;
 
@@ -54,6 +55,8 @@ public:
 
   CPlayerCoreFactory& GetPlayerCoreFactory();
 
+  CDatabaseManager& GetDatabaseManager();
+
   CMediaManager& GetMediaManager();
 
 protected:
@@ -68,5 +71,6 @@ protected:
   std::unique_ptr<PLAYLIST::CPlayListPlayer> m_playlistPlayer;
   std::unique_ptr<CFileExtensionProvider> m_fileExtensionProvider;
   std::unique_ptr<CPlayerCoreFactory> m_playerCoreFactory;
+  std::unique_ptr<CDatabaseManager> m_databaseManager;
   std::unique_ptr<CMediaManager> m_mediaManager;
 };

@@ -12,6 +12,7 @@
 #include <string>
 
 class CFileItem;
+class CDateTime;
 
 class CFileUtils
 {

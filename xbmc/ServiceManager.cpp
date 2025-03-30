@@ -9,6 +9,7 @@
 #include "ServiceManager.h"
 
 #include "ContextMenuManager.h"
+#include "DatabaseManager.h"
 #include "PlayListPlayer.h"
 #include "addons/AddonManager.h"
 #include "addons/RepositoryUpdater.h"
@@ -32,6 +33,8 @@ CServiceManager::~CServiceManager()
 
 bool CServiceManager::InitForTesting()
 {
+  m_databaseManager.reset(new CDatabaseManager);
+
   m_addonMgr.reset(new ADDON::CAddonMgr());
   if (!m_addonMgr->Init())
   {
@@ -50,6 +53,7 @@ void CServiceManager::DeinitTesting()
   init_level = 0;
   m_fileExtensionProvider.reset();
   m_addonMgr.reset();
+  m_databaseManager.reset();
 }
 
 bool CServiceManager::InitStageOne()
@@ -62,6 +66,9 @@ bool CServiceManager::InitStageOne()
 
 bool CServiceManager::InitStageTwo(const std::string& profilesUserDataFolder)
 {
+  // Initialize the addon database (must be before the addon manager is init'd)
+  m_databaseManager.reset(new CDatabaseManager);
+
   m_addonMgr.reset(new ADDON::CAddonMgr());
   if (!m_addonMgr->Init())
   {
@@ -108,6 +115,7 @@ void CServiceManager::DeinitStageTwo()
   m_contextMenuManager.reset();
   m_repositoryUpdater.reset();
   m_addonMgr.reset();
+  m_databaseManager.reset();
 
   m_mediaManager->Stop();
   m_mediaManager.reset();
@@ -153,6 +161,11 @@ void CServiceManager::delete_contextMenuManager::operator()(CContextMenuManager*
 CPlayerCoreFactory& CServiceManager::GetPlayerCoreFactory()
 {
   return *m_playerCoreFactory;
+}
+
+CDatabaseManager& CServiceManager::GetDatabaseManager()
+{
+  return *m_databaseManager;
 }
 
 CMediaManager& CServiceManager::GetMediaManager()

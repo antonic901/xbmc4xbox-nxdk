@@ -67,6 +67,7 @@ public:
                                int track = 0);
   bool PlayFile(CFileItem item, const std::string& player, bool bRestart = false);
   void StopPlaying();
+  void Restart(bool bSamePosition = true);
 
   /*!
    \brief Returns the total time in fractional seconds of the currently playing media
@@ -95,11 +96,14 @@ public:
 
   void UpdateCurrentPlayArt();
 
+  std::string m_strPlayListFile;
+
   inline bool IsInScreenSaver() { return false; };
 
   bool OnAction(const CAction &action);
 
   void ResetScreenSaver();
+  bool ResetScreenSaverWindow(); // this is MAYBE WakeUpScreenSaverAndDPMS
 
   CApplicationPlayer* m_pPlayer;
 

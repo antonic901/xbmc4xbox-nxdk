@@ -26,6 +26,7 @@
 
 class CFileItem;
 class CFileItemList;
+class CURL;
 
 class CUtil
 {
