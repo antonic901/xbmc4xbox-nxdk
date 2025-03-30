@@ -15,8 +15,6 @@
 #include "addons/Scraper.h"
 #include "dialogs/GUIDialogSelect.h"
 #include "dialogs/GUIDialogYesNo.h"
-#include "filesystem/PluginDirectory.h"
-#include "guilib/GUIComponent.h"
 #include "guilib/GUIKeyboardFactory.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
@@ -30,7 +28,6 @@
 #include "video/VideoInfoScanner.h"
 #include "video/tags/IVideoInfoTagLoader.h"
 #include "video/tags/VideoInfoTagLoaderFactory.h"
-#include "video/tags/VideoTagLoaderPlugin.h"
 
 #include <utility>
 
@@ -75,6 +72,7 @@ bool CVideoLibraryRefreshingJob::Work(CVideoDatabase &db)
   if (scraper == nullptr)
     return false;
 
+#if 0
   if (URIUtils::IsPlugin(m_item->GetPath()) && !XFILE::CPluginDirectory::IsMediaLibraryScanningAllowed(ADDON::TranslateContent(scraper->Content()), m_item->GetPath()))
   {
     CLog::Log(LOGINFO,
@@ -83,6 +81,7 @@ bool CVideoLibraryRefreshingJob::Work(CVideoDatabase &db)
               CURL::GetRedacted(m_item->GetPath()));
     return false;
   }
+#endif
 
   // copy the scraper in case we need it again
   ADDON::ScraperPtr originalScraper(scraper);
@@ -122,9 +121,11 @@ bool CVideoLibraryRefreshingJob::Work(CVideoDatabase &db)
             // preserve show_id for episode
             tag->m_iIdShow = m_item->GetVideoInfoTag()->m_iIdShow;
           pluginTag = std::move(tag);
+#if 0
           CVideoTagLoaderPlugin* nfo = dynamic_cast<CVideoTagLoaderPlugin*>(loader.get());
           if (nfo && nfo->GetArt())
             pluginArt = std::move(nfo->GetArt());
+#endif
         }
         else if (nfoResult == CInfoScanner::URL_NFO)
           scraperUrl = loader->ScraperUrl();
@@ -192,7 +193,7 @@ bool CVideoLibraryRefreshingJob::Work(CVideoDatabase &db)
           else
           {
             // ask the user what to do
-            CGUIDialogSelect* selectDialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(WINDOW_DIALOG_SELECT);
+            CGUIDialogSelect* selectDialog = dynamic_cast<CGUIDialogSelect*>(g_windowManager.GetWindow(WINDOW_DIALOG_SELECT));
             selectDialog->Reset();
             selectDialog->SetHeading(scraper->Content() == CONTENT_TVSHOWS ? 20356 : 196);
             for (const auto& itemResult : itemResultList)

@@ -62,24 +62,6 @@ struct ColorFloats
   float alpha;
 };
 
-//! \brief W3C HTML 16 basic color list
-constexpr auto HTML_BASIC_COLORS = make_map<std::string_view, Color>({{"white", WHITE},
-                                                                      {"silver", SILVER},
-                                                                      {"gray", GRAY},
-                                                                      {"black", BLACK},
-                                                                      {"red", RED},
-                                                                      {"maroon", MAROON},
-                                                                      {"yellow", YELLOW},
-                                                                      {"olive", OLIVE},
-                                                                      {"lime", LIME},
-                                                                      {"green", GREEN},
-                                                                      {"aqua", AQUA},
-                                                                      {"teal", TEAL},
-                                                                      {"blue", BLUE},
-                                                                      {"navy", NAVY},
-                                                                      {"fuchsia", FUCHSIA},
-                                                                      {"purple", PURPLE}});
-
 /*!
  * \brief Change the opacity of a given ARGB color
  * \param color The original color

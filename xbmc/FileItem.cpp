@@ -71,6 +71,28 @@ CFileItem::CFileItem(const CVideoInfoTag& movie)
   Initialize();
 }
 
+CFileItem::CFileItem(const CArtist& artist)
+{
+  Initialize();
+  SetLabel(artist.strArtist);
+  m_strPath = artist.strArtist;
+  m_bIsFolder = true;
+  URIUtils::AddSlashAtEnd(m_strPath);
+  GetMusicInfoTag()->SetArtist(artist);
+  FillInMimeType(false);
+}
+
+CFileItem::CFileItem(const CGenre& genre)
+{
+  Initialize();
+  SetLabel(genre.strGenre);
+  m_strPath = genre.strGenre;
+  m_bIsFolder = true;
+  URIUtils::AddSlashAtEnd(m_strPath);
+  GetMusicInfoTag()->SetGenre(genre.strGenre);
+  FillInMimeType(false);
+}
+
 CFileItem::CFileItem(const CFileItem& item)
 {
   *this = item;
@@ -248,6 +270,11 @@ bool CFileItem::Exists(bool bUseCache /* = true */) const
 }
 
 bool CFileItem::IsVideo() const
+{
+  return false;
+}
+
+bool CFileItem::IsDiscStub() const
 {
   return false;
 }
@@ -1458,6 +1485,13 @@ bool CFileItemList::UpdateItem(const CFileItem *item)
 void CFileItemList::SetReplaceListing(bool replace)
 {
   m_replaceListing = replace;
+}
+
+void CFileItemList::ClearSortState()
+{
+  m_sortDescription.sortBy = SortByNone;
+  m_sortDescription.sortOrder = SortOrderNone;
+  m_sortDescription.sortAttributes = SortAttributeNone;
 }
 
 bool CFileItem::HasVideoInfoTag() const

@@ -301,7 +301,7 @@ bool CProfileManager::LoadProfile(unsigned int index)
 
   CreateProfileFolders();
 
-  CDatabaseManager::GetInstance().Initialize();
+  CServiceBroker::GetDatabaseManager().Initialize();
 
 #if 0
   CGUIComponent* gui = CServiceBroker::GetGUI();

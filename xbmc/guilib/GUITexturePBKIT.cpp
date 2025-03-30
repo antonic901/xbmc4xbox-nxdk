@@ -31,7 +31,7 @@ CGUITexturePBKIT::CGUITexturePBKIT(float posX, float posY, float width, float he
 
 void CGUITexturePBKIT::Begin(color_t color)
 {
-  CTexture* texture = m_texture.m_textures[m_currentFrame];
+  std::shared_ptr<CTexture> texture = m_texture.m_textures[m_currentFrame];
 #if 0
   LPDIRECT3DDEVICE8 p3DDevice = g_graphicsContext.Get3DDevice();
 

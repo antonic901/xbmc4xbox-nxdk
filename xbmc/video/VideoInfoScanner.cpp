@@ -477,7 +477,7 @@ namespace VIDEO
         CLog::Log(LOGWARNING,
                   "VideoInfoScanner: Error {} occurred while retrieving"
                   "information for {}.",
-                  ret, CURL::GetRedacted(pItem->GetPath()));
+                  static_cast<int>(ret), CURL::GetRedacted(pItem->GetPath()));
         FoundSomeInfo = false;
         break;
       }

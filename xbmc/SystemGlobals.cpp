@@ -10,7 +10,9 @@
 #include "guilib/TextureManager.h"
 #include "GUIInfoManager.h"
 #include "filesystem/DirectoryCache.h"
+#include "GUIPassword.h"
 #include "utils/LangCodeExpander.h"
+#include "PartyModeManager.h"
 #include "guilib/LocalizeStrings.h"
 
 // Guarantee that CSpecialProtocol is initialized before and uninitialized after ZipManager
@@ -22,6 +24,10 @@ std::map<std::string, std::string> CSpecialProtocol::m_pathMap;
   CLocalizeStrings   g_localizeStringsTemp;
 
   XFILE::CDirectoryCache g_directoryCache;
+
+  CGUIPassword       g_passwordManager;
+
+  CPartyModeManager     g_partyModeManager;
 
   CGUITextureManager g_TextureManager;
   CGUILargeTextureManager g_largeTextureManager;

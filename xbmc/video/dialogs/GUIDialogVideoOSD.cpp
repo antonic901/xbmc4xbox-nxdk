@@ -17,8 +17,6 @@
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 
-using namespace PVR;
-
 CGUIDialogVideoOSD::CGUIDialogVideoOSD(void)
     : CGUIDialog(WINDOW_DIALOG_VIDEO_OSD, "VideoOSD.xml")
 {
