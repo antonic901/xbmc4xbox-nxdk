@@ -124,17 +124,14 @@ CGUIMediaWindow::~CGUIMediaWindow()
   delete m_unfilteredItems;
 }
 
-bool CGUIMediaWindow::Load(TiXmlElement *pRootElement)
+void CGUIMediaWindow::LoadAdditionalTags(TiXmlElement *root)
 {
-  bool retVal = CGUIWindow::Load(pRootElement);
-
-  if (!retVal)
-    return false;
+  CGUIWindow::LoadAdditionalTags(root);
 
   // configure our view control
   m_viewControl.Reset();
   m_viewControl.SetParentWindow(GetID());
-  TiXmlElement *element = pRootElement->FirstChildElement("views");
+  TiXmlElement *element = root->FirstChildElement("views");
   if (element && element->FirstChild())
   { // format is <views>50,29,51,95</views>
     const std::string &allViews = element->FirstChild()->ValueStr();
@@ -148,8 +145,6 @@ bool CGUIMediaWindow::Load(TiXmlElement *pRootElement)
     }
   }
   m_viewControl.SetViewControlID(CONTROL_BTNVIEWASICONS);
-
-  return true;
 }
 
 void CGUIMediaWindow::OnWindowLoaded()
