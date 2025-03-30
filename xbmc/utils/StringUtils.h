@@ -35,7 +35,7 @@
 #include "utils/params_check_macros.h"
 
 #include <fmt/format.h>
-#if FMT_VERSION >= 80000 && !defined(NXDK)
+#if FMT_VERSION >= 80000
 #include <fmt/xchar.h>
 #endif
 
