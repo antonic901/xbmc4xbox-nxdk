@@ -13,6 +13,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/FileExtensionProvider.cpp \
 	$(CURDIR)/xbmc/utils/FileOperationJob.cpp \
 	$(CURDIR)/xbmc/utils/FileUtils.cpp \
+	$(CURDIR)/xbmc/utils/HTMLUtil.cpp \
 	$(CURDIR)/xbmc/utils/HttpHeader.cpp \
 	$(CURDIR)/xbmc/utils/HttpParser.cpp \
 	$(CURDIR)/xbmc/utils/HttpRangeUtils.cpp \
