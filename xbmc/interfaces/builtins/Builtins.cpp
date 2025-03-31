@@ -15,7 +15,6 @@
 #include "GUIControlBuiltins.h"
 #include "LibraryBuiltins.h"
 #include "OpticalBuiltins.h"
-#include "PVRBuiltins.h"
 #include "PictureBuiltins.h"
 #include "PlayerBuiltins.h"
 #include "ProfileBuiltins.h"
@@ -23,8 +22,6 @@
 #include "SkinBuiltins.h"
 #include "SystemBuiltins.h"
 #include "WeatherBuiltins.h"
-#include "input/InputManager.h"
-#include "powermanagement/PowerTypes.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/ExecString.h"
@@ -51,7 +48,6 @@ CBuiltins::CBuiltins()
   RegisterCommands<CPictureBuiltins>();
   RegisterCommands<CPlayerBuiltins>();
   RegisterCommands<CProfileBuiltins>();
-  RegisterCommands<CPVRBuiltins>();
   RegisterCommands<CSkinBuiltins>();
   RegisterCommands<CSystemBuiltins>();
   RegisterCommands<CWeatherBuiltins>();
@@ -82,8 +78,10 @@ bool CBuiltins::HasCommand(const std::string& execString)
   const std::string function = exec.GetFunction();
   const std::vector<std::string> parameters = exec.GetParams();
 
+#if 0
   if (CServiceBroker::GetInputManager().HasBuiltin(function))
     return true;
+#endif
 
   const auto& it = m_command.find(function);
   if (it != m_command.end())
@@ -115,6 +113,7 @@ bool CBuiltins::IsSystemPowerdownCommand(const std::string& execString)
   }
   else if (execute == "shutdown")
   {
+#ifndef _XBOX
     switch (CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_POWERMANAGEMENT_SHUTDOWNSTATE))
     {
       case POWERSTATE_SHUTDOWN:
@@ -125,6 +124,9 @@ bool CBuiltins::IsSystemPowerdownCommand(const std::string& execString)
       default:
         return false;
     }
+#else
+    return true;
+#endif
   }
   return false;
 }
@@ -164,5 +166,8 @@ int CBuiltins::Execute(const std::string& execString)
     }
   }
   else
+#if 0
     return CServiceBroker::GetInputManager().ExecuteBuiltin(execute, params);
+#endif
+    return -1;
 }

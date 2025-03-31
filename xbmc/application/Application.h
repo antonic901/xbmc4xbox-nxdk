@@ -88,11 +88,15 @@ public:
 
   int GetVolume(bool percentage = true) const;
   void SetVolume(long iValue, bool isPercentage = true);
+  void ToggleMute(void);
 
   bool SetLanguage(const std::string &strLanguage);
   bool LoadLanguage(bool reload);
 
   void SetLoggingIn(bool switchingProfiles);
+
+  void SeekPercentage(float percent);
+  void SeekTime( double dTime = 0.0 );
 
   void UpdateLibraries();
 

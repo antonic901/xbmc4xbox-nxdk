@@ -118,6 +118,14 @@ void CApplication::SeekTime( double dTime )
 {
 }
 
+void CApplication::SeekPercentage(float percent)
+{
+}
+
+void CApplication::ToggleMute(void)
+{
+}
+
 void CApplication::SetVolume(long iValue, bool isPercentage /* = true */)
 {
 }

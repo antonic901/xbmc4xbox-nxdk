@@ -14,6 +14,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/Digest.cpp \
 	$(CURDIR)/xbmc/utils/DiscsUtils.cpp \
 	$(CURDIR)/xbmc/utils/EmbeddedArt.cpp \
+	$(CURDIR)/xbmc/utils/ExecString.cpp \
 	$(CURDIR)/xbmc/utils/Fanart.cpp \
 	$(CURDIR)/xbmc/utils/FileExtensionProvider.cpp \
 	$(CURDIR)/xbmc/utils/FileOperationJob.cpp \

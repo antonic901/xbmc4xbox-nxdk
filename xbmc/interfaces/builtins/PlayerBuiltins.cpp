@@ -18,15 +18,10 @@
 #include "application/Application.h"
 #include "application/ApplicationComponents.h"
 #include "application/ApplicationPlayer.h"
-#include "application/ApplicationPowerHandling.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "music/MusicUtils.h"
 #include "playlists/PlayList.h"
-#include "pvr/PVRManager.h"
-#include "pvr/channels/PVRChannel.h"
-#include "pvr/guilib/PVRGUIActionsChannels.h"
-#include "pvr/recordings/PVRRecording.h"
 #include "settings/MediaSettings.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
@@ -116,9 +111,14 @@ static int PlayOffset(const std::vector<std::string>& params)
 static int PlayerControl(const std::vector<std::string>& params)
 {
   auto& components = CServiceBroker::GetAppComponents();
+#if 0
   const auto appPower = components.GetComponent<CApplicationPowerHandling>();
   appPower->ResetScreenSaver();
   appPower->WakeUpScreenSaverAndDPMS();
+#else
+  g_application.ResetScreenSaver();
+  g_application.ResetScreenSaverWindow();
+#endif
 
   std::string paramlow(params[0]);
   StringUtils::ToLower(paramlow);
@@ -373,6 +373,7 @@ static int PlayerControl(const std::vector<std::string>& params)
   }
   else if (StringUtils::StartsWithNoCase(params[0], "resumelivetv"))
   {
+#if 0
     CFileItem& fileItem(g_application.CurrentFileItem());
     std::shared_ptr<PVR::CPVRChannel> channel = fileItem.HasPVRRecordingInfoTag() ? fileItem.GetPVRRecordingInfoTag()->Channel() : std::shared_ptr<PVR::CPVRChannel>();
 
@@ -395,6 +396,8 @@ static int PlayerControl(const std::vector<std::string>& params)
         return false;
       }
     }
+#endif
+    return false;
   }
   else if (paramlow == "reset")
   {
@@ -443,9 +446,14 @@ int PlayOrQueueMedia(const std::vector<std::string>& params, bool forcePlay)
 
   // reset screensaver
   auto& components = CServiceBroker::GetAppComponents();
+#if 0
   const auto appPower = components.GetComponent<CApplicationPowerHandling>();
   appPower->ResetScreenSaver();
   appPower->WakeUpScreenSaverAndDPMS();
+#else
+  g_application.ResetScreenSaver();
+  g_application.ResetScreenSaverWindow();
+#endif
 
   CFileItem item(params[0], URIUtils::HasSlashAtEnd(params[0], true));
 

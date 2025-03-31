@@ -11,7 +11,6 @@ SRCS += \
 	$(CURDIR)/xbmc/interfaces/builtins/PictureBuiltins.cpp \
 	$(CURDIR)/xbmc/interfaces/builtins/PlayerBuiltins.cpp \
 	$(CURDIR)/xbmc/interfaces/builtins/ProfileBuiltins.cpp \
-	$(CURDIR)/xbmc/interfaces/builtins/PVRBuiltins.cpp \
 	$(CURDIR)/xbmc/interfaces/builtins/SkinBuiltins.cpp \
 	$(CURDIR)/xbmc/interfaces/builtins/SystemBuiltins.cpp \
 	$(CURDIR)/xbmc/interfaces/builtins/WeatherBuiltins.cpp

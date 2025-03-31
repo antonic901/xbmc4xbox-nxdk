@@ -393,6 +393,8 @@
 #define ACTION_VOLUME_SET             245
 #define ACTION_TOGGLE_COMMSKIP        246
 
+#define ACTION_PLAYER_RESET           248 //!< Send a reset command to the active game
+
 #define ACTION_VIDEO_NEXT_STREAM      250 //!< Cycle video streams. Used in videofullscreen.
 
 //! Used to queue an item to the next position in the playlist
