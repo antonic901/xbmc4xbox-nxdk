@@ -24,6 +24,11 @@
 #include "GUIControl.h"
 #include "GUIInfoManager.h"
 
+namespace
+{
+constexpr int DEFAULT_CONTROL_ID = 0;
+}
+
 CGUIAction::CGUIAction()
 {
   m_sendThreadMessages = false;
@@ -33,6 +38,11 @@ CGUIAction::CGUIAction(int controlID)
 {
   m_sendThreadMessages = false;
   SetNavigation(controlID);
+}
+
+bool CGUIAction::ExecuteActions() const
+{
+  return ExecuteActions(DEFAULT_CONTROL_ID, DEFAULT_CONTROL_ID);
 }
 
 bool CGUIAction::ExecuteActions(int controlID, int parentID, const CGUIListItemPtr &item /* = NULL */) const

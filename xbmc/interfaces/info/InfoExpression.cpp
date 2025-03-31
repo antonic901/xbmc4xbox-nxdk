@@ -1,56 +1,52 @@
 /*
- *      Copyright (C) 2005-2013 Team XBMC
- *      http://xbmc.org
+ *  Copyright (C) 2005-2018 Team Kodi
+ *  This file is part of Kodi - https://kodi.tv
  *
- *  This Program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2, or (at your option)
- *  any later version.
- *
- *  This Program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XBMC; see the file COPYING.  If not, see
- *  <http://www.gnu.org/licenses/>.
- *
+ *  SPDX-License-Identifier: GPL-2.0-or-later
+ *  See LICENSES/README.md for more information.
  */
 
 #include "InfoExpression.h"
-#include <stack>
-#include "utils/log.h"
+
 #include "GUIInfoManager.h"
+#include "ServiceBroker.h"
+#include "guilib/GUIComponent.h"
+#include "utils/log.h"
+
 #include <list>
 #include <memory>
+#include <stack>
 
 using namespace INFO;
 
-InfoSingle::InfoSingle(const std::string &expression, int context)
-: InfoBool(expression, context)
+void InfoSingle::Initialize()
 {
-  m_condition = g_infoManager.TranslateSingleString(expression, m_listItemDependent);
+  m_condition = CServiceBroker::GetGUI()->GetInfoManager().TranslateSingleString(m_expression, m_listItemDependent);
 }
 
-void InfoSingle::Update(const CGUIListItem *item)
+void InfoSingle::Update(int contextWindow, const CGUIListItem* item)
 {
-  m_value = g_infoManager.GetBool(m_condition, m_context, item);
+  // use propagated context in case this info has the default context (i.e. if not tied to a specific window)
+  // its value might depend on the context in which the evaluation was called
+  int context = m_context == DEFAULT_CONTEXT ? contextWindow : m_context;
+  m_value = CServiceBroker::GetGUI()->GetInfoManager().GetBool(m_condition, context, item);
 }
 
-InfoExpression::InfoExpression(const std::string &expression, int context)
-: InfoBool(expression, context)
+void InfoExpression::Initialize()
 {
-  if (!Parse(expression))
+  if (!Parse(m_expression))
   {
-    CLog::Log(LOGERROR, "Error parsing boolean expression %s", expression.c_str());
-    m_expression_tree = std::make_shared<InfoLeaf>(g_infoManager.Register("false", 0), false);
+    CLog::Log(LOGERROR, "Error parsing boolean expression {}", m_expression);
+    m_expression_tree = std::make_shared<InfoLeaf>(CServiceBroker::GetGUI()->GetInfoManager().Register("false", 0), false);
   }
 }
 
-void InfoExpression::Update(const CGUIListItem *item)
+void InfoExpression::Update(int contextWindow, const CGUIListItem* item)
 {
-  m_value = m_expression_tree->Evaluate(item);
+  // use propagated context in case this info expression has the default context (i.e. if not tied to a specific window)
+  // its value might depend on the context in which the evaluation was called
+  int context = m_context == DEFAULT_CONTEXT ? contextWindow : m_context;
+  m_value = m_expression_tree->Evaluate(context, item);
 }
 
 /* Expressions are rewritten at parse time into a form which favours the
@@ -71,9 +67,9 @@ void InfoExpression::Update(const CGUIListItem *item)
  *    operations. So [A|B]|[C|D+[[E|F]|G] becomes A|B|C|[D+[E|F|G]].
  */
 
-bool InfoExpression::InfoLeaf::Evaluate(const CGUIListItem *item)
+bool InfoExpression::InfoLeaf::Evaluate(int contextWindow, const CGUIListItem* item)
 {
-  return m_invert ^ m_info->Get(item);
+  return m_invert ^ m_info->Get(contextWindow, item);
 }
 
 InfoExpression::InfoAssociativeGroup::InfoAssociativeGroup(
@@ -91,12 +87,12 @@ void InfoExpression::InfoAssociativeGroup::AddChild(const InfoSubexpressionPtr &
   m_children.push_front(child); // largely undoes the effect of parsing right-associative
 }
 
-void InfoExpression::InfoAssociativeGroup::Merge(std::shared_ptr<InfoAssociativeGroup> other)
+void InfoExpression::InfoAssociativeGroup::Merge(const std::shared_ptr<InfoAssociativeGroup>& other)
 {
   m_children.splice(m_children.end(), other->m_children);
 }
 
-bool InfoExpression::InfoAssociativeGroup::Evaluate(const CGUIListItem *item)
+bool InfoExpression::InfoAssociativeGroup::Evaluate(int contextWindow, const CGUIListItem* item)
 {
   /* Handle either AND or OR by using the relation
    * A AND B == !(!A OR !B)
@@ -105,10 +101,10 @@ bool InfoExpression::InfoAssociativeGroup::Evaluate(const CGUIListItem *item)
   std::list<InfoSubexpressionPtr>::iterator last = m_children.end();
   std::list<InfoSubexpressionPtr>::iterator it = m_children.begin();
   bool use_and = (m_type == NODE_AND);
-  bool result = use_and ^ (*it)->Evaluate(item);
+  bool result = use_and ^ (*it)->Evaluate(contextWindow, item);
   while (!result && ++it != last)
   {
-    result = use_and ^ (*it)->Evaluate(item);
+    result = use_and ^ (*it)->Evaluate(contextWindow, item);
     if (result)
     {
       /* Move this child to the head of the list so we evaluate faster next time */
@@ -218,9 +214,13 @@ bool InfoExpression::Parse(const std::string &expression)
   bool after_binaryoperator = true;
   int bracket_count = 0;
 
+  CGUIInfoManager& infoMgr = CServiceBroker::GetGUI()->GetInfoManager();
+
   char c;
   // Skip leading whitespace - don't want it to count as an operand if that's all there is
-  while (isspace((unsigned char)(c=*s))) s++;
+  while (isspace((unsigned char)(c=*s)))
+    s++;
+
   while ((c = *s++) != '\0')
   {
     operator_t op;
@@ -230,7 +230,7 @@ bool InfoExpression::Parse(const std::string &expression)
       if ((!after_binaryoperator && (c == '!' || c == '[')) ||
           (after_binaryoperator && (c == ']' || c == '+' || c == '|')))
       {
-        CLog::Log(LOGERROR, "Misplaced %c", c);
+        CLog::Log(LOGERROR, "Misplaced {}", c);
         return false;
       }
       if (c == '[')
@@ -242,10 +242,10 @@ bool InfoExpression::Parse(const std::string &expression)
       }
       if (!operand.empty())
       {
-        InfoPtr info = g_infoManager.Register(operand, m_context);
+        InfoPtr info = infoMgr.Register(operand, m_context);
         if (!info)
         {
-          CLog::Log(LOGERROR, "Bad operand '%s'", operand.c_str());
+          CLog::Log(LOGERROR, "Bad operand '{}'", operand);
           return false;
         }
         /* Propagate any listItem dependency from the operand to the expression */
@@ -293,10 +293,10 @@ bool InfoExpression::Parse(const std::string &expression)
   }
   if (!operand.empty())
   {
-    InfoPtr info = g_infoManager.Register(operand, m_context);
+    InfoPtr info = infoMgr.Register(operand, m_context);
     if (!info)
     {
-      CLog::Log(LOGERROR, "Bad operand '%s'", operand.c_str());
+      CLog::Log(LOGERROR, "Bad operand '{}'", operand);
       return false;
     }
     /* Propagate any listItem dependency from the operand to the expression */

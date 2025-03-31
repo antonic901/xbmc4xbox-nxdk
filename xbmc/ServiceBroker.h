@@ -48,6 +48,14 @@ class CMediaManager;
 class CTextureCache;
 class CJobManager;
 
+namespace KODI
+{
+namespace ADDONS
+{
+class CExtsMimeSupportList;
+}
+} // namespace KODI
+
 class CServiceBroker
 {
 public:
@@ -64,6 +72,7 @@ public:
   static void UnregisterAnnouncementManager();
 
   static ADDON::CAddonMgr& GetAddonMgr();
+  static KODI::ADDONS::CExtsMimeSupportList& GetExtsMimeSupportList();
   static CContextMenuManager& GetContextMenuManager();
   static CDataCacheCore& GetDataCacheCore();
   static PLAYLIST::CPlayListPlayer& GetPlaylistPlayer();

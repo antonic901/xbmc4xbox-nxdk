@@ -12,6 +12,7 @@
 #include "DatabaseManager.h"
 #include "PlayListPlayer.h"
 #include "addons/AddonManager.h"
+#include "addons/ExtsMimeSupportList.h"
 #include "addons/RepositoryUpdater.h"
 #include "cores/DataCacheCore.h"
 #include "cores/playercorefactory/PlayerCoreFactory.h"
@@ -19,6 +20,8 @@
 #include "storage/MediaManager.h"
 #include "utils/FileExtensionProvider.h"
 #include "utils/log.h"
+
+using namespace KODI;
 
 CServiceManager::CServiceManager() = default;
 
@@ -43,6 +46,7 @@ bool CServiceManager::InitForTesting()
     return false;
   }
 
+  m_extsMimeSupportList.reset(new ADDONS::CExtsMimeSupportList(*m_addonMgr));
   m_fileExtensionProvider.reset(new CFileExtensionProvider());
 
   init_level = 1;
@@ -53,6 +57,7 @@ void CServiceManager::DeinitTesting()
 {
   init_level = 0;
   m_fileExtensionProvider.reset();
+  m_extsMimeSupportList.reset();
   m_addonMgr.reset();
   m_databaseManager.reset();
 }
@@ -78,6 +83,8 @@ bool CServiceManager::InitStageTwo(const std::string& profilesUserDataFolder)
   }
 
   m_repositoryUpdater.reset(new ADDON::CRepositoryUpdater(*m_addonMgr));
+
+  m_extsMimeSupportList.reset(new ADDONS::CExtsMimeSupportList(*m_addonMgr));
 
   m_dataCacheCore.reset(new CDataCacheCore());
 
@@ -117,6 +124,7 @@ void CServiceManager::DeinitStageTwo()
   m_fileExtensionProvider.reset();
   m_contextMenuManager.reset();
   m_dataCacheCore.reset();
+  m_extsMimeSupportList.reset();
   m_repositoryUpdater.reset();
   m_addonMgr.reset();
   m_databaseManager.reset();
@@ -135,6 +143,11 @@ void CServiceManager::DeinitStageOne()
 ADDON::CAddonMgr& CServiceManager::GetAddonMgr()
 {
   return *m_addonMgr;
+}
+
+ADDONS::CExtsMimeSupportList& CServiceManager::GetExtsMimeSupportList()
+{
+  return *m_extsMimeSupportList;
 }
 
 ADDON::CRepositoryUpdater& CServiceManager::GetRepositoryUpdater()

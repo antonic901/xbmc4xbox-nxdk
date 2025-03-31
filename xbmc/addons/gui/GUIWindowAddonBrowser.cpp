@@ -31,7 +31,6 @@
 #include "guilib/LocalizeStrings.h"
 #include "input/Key.h"
 #include "messaging/helpers/DialogHelper.h"
-#include "platform/Platform.h"
 #include "settings/MediaSourceSettings.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
@@ -229,13 +228,13 @@ bool CGUIWindowAddonBrowser::OnClick(int iItem, const std::string& player)
   if (item->GetPath() == "addons://update_all/")
   {
     UpdateAddons updater;
-    CGUIDialogBusy::Wait(&updater, 100, true);
+    CGUIDialogBusy::Wait(&updater);
     return true;
   }
   if (item->GetPath() == "addons://update_allowed/")
   {
     UpdateAllowedAddons updater;
-    CGUIDialogBusy::Wait(&updater, 100, true);
+    CGUIDialogBusy::Wait(&updater);
     return true;
   }
   if (!item->m_bIsFolder)
@@ -442,8 +441,8 @@ int CGUIWindowAddonBrowser::SelectAddonID(const std::vector<AddonType>& types,
     showMore = false;
 
   CGUIDialogSelect* dialog =
-      CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(
-          WINDOW_DIALOG_SELECT);
+      dynamic_cast<CGUIDialogSelect*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(
+          WINDOW_DIALOG_SELECT));
   if (!dialog)
     return -1;
 
@@ -631,7 +630,7 @@ std::string CGUIWindowAddonBrowser::GetStartFolder(const std::string& dir)
   {
     if (StringUtils::StartsWith(dir, "addons://default_binary_addons_source/"))
     {
-      const bool all = CServiceBroker::GetPlatform().SupportsUserInstalledBinaryAddons();
+      const bool all = true/*CServiceBroker::GetPlatform().SupportsUserInstalledBinaryAddons()*/;
       std::string startDir = dir;
       StringUtils::Replace(startDir, "/default_binary_addons_source/", all ? "/all/" : "/user/");
       return startDir;

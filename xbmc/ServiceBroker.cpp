@@ -16,6 +16,8 @@
 #include <stdexcept>
 #include <utility>
 
+using namespace KODI;
+
 CServiceBroker::CServiceBroker()
   : m_pGUI(nullptr)
 {
@@ -62,6 +64,11 @@ void CServiceBroker::UnregisterAnnouncementManager()
 ADDON::CAddonMgr& CServiceBroker::GetAddonMgr()
 {
   return g_application.m_ServiceManager->GetAddonMgr();
+}
+
+ADDONS::CExtsMimeSupportList& CServiceBroker::GetExtsMimeSupportList()
+{
+  return g_application.m_ServiceManager->GetExtsMimeSupportList();
 }
 
 CContextMenuManager& CServiceBroker::GetContextMenuManager()
