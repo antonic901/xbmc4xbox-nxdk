@@ -20,7 +20,7 @@
 
 #include "GUIWindowManager.h"
 #include "GUIDialog.h"
-#include "Application.h"
+#include "application/Application.h"
 #include "ServiceBroker.h"
 #include "messaging/ApplicationMessenger.h"
 #include "messaging/helpers/DialogHelper.h"

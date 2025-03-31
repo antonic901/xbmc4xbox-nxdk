@@ -12,7 +12,7 @@
 #include "GUIUserMessages.h"
 #include "PlayListPlayer.h"
 #include "ServiceBroker.h"
-#include "Application.h"
+#include "application/Application.h"
 #include "dialogs/GUIDialogProgress.h"
 #include "guilib/GUIWindowManager.h"
 #include "interfaces/AnnouncementManager.h"

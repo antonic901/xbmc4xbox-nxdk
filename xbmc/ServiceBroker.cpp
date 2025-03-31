@@ -9,7 +9,7 @@
 #include "ServiceBroker.h"
 
 #include "ServiceManager.h"
-#include "Application.h"
+#include "application/Application.h"
 #include "settings/SettingsComponent.h"
 #include "utils/log.h"
 

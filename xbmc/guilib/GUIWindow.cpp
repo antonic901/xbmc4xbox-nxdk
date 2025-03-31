@@ -34,7 +34,7 @@
 #include "input/ButtonTranslator.h"
 #include "utils/XMLUtils.h"
 #include "GUIAudioManager.h"
-#include "Application.h"
+#include "application/Application.h"
 #include "messaging/ApplicationMessenger.h"
 #include "utils/Variant.h"
 #include "utils/StringUtils.h"

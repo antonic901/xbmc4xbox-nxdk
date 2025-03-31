@@ -16,7 +16,7 @@
 #include "ServiceBroker.h"
 #include "Util.h"
 #include "addons/Skin.h"
-#include "Application.h" //! @todo Remove me
+#include "application/Application.h" //! @todo Remove me
 #include "dialogs/GUIDialogKaiToast.h"
 #include "dialogs/GUIDialogYesNo.h"
 #include "filesystem/Directory.h"

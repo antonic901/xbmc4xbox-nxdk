@@ -23,7 +23,7 @@
 #include "GUILabelControl.h"
 #include "threads/SingleLock.h"
 #include "utils/TimeUtils.h"
-#include "Application.h"
+#include "application/Application.h"
 #include "messaging/ApplicationMessenger.h"
 #include "input/Key.h"
 #include "ServiceBroker.h"

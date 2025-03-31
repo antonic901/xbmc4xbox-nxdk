@@ -20,7 +20,7 @@
 
 #include "GraphicContext.h"
 #include "ServiceBroker.h"
-#include "Application.h"
+#include "application/Application.h"
 #include "messaging/ApplicationMessenger.h"
 #include "TextureManager.h"
 #include "utils/MathUtils.h"

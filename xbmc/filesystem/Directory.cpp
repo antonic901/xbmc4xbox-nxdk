@@ -19,7 +19,7 @@
 #include "utils/JobManager.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
-#include "Application.h"
+#include "application/Application.h"
 
 using namespace XFILE;
 using namespace std::chrono_literals;
