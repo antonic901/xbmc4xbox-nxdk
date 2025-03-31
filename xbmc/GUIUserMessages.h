@@ -75,6 +75,9 @@
 //  Player has requested the next item for caching purposes (PAPlayer)
 #define GUI_MSG_QUEUE_NEXT_ITEM         GUI_MSG_USER + 16
 
+//  Playback request for the trailer of a given item
+#define GUI_MSG_PLAY_TRAILER            GUI_MSG_USER + 17
+
 // Visualisation messages when loading/unloading
 #define GUI_MSG_VISUALISATION_UNLOADING GUI_MSG_USER + 117 // sent by vis
 #define GUI_MSG_VISUALISATION_LOADED    GUI_MSG_USER + 118 // sent by vis
@@ -113,6 +116,10 @@
 
 // Message sent to tell the GUI to update a single item
 #define GUI_MSG_UPDATE_ITEM           GUI_MSG_USER + 29
+
+// Flags for GUI_MSG_UPDATE_ITEM message
+#define GUI_MSG_FLAG_UPDATE_LIST   0x00000001
+#define GUI_MSG_FLAG_FORCE_UPDATE  0x00000002
 
 // Message sent to tell the GUI to change view mode
 #define GUI_MSG_CHANGE_VIEW_MODE      GUI_MSG_USER + 30

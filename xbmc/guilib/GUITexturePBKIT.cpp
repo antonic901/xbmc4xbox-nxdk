@@ -31,7 +31,7 @@ CGUITexturePBKIT::CGUITexturePBKIT(float posX, float posY, float width, float he
 
 void CGUITexturePBKIT::Begin(color_t color)
 {
-  CBaseTexture* texture = m_texture.m_textures[m_currentFrame];
+  std::shared_ptr<CTexture> texture = m_texture.m_textures[m_currentFrame];
 #if 0
   LPDIRECT3DDEVICE8 p3DDevice = g_graphicsContext.Get3DDevice();
 
@@ -205,7 +205,7 @@ void CGUITexturePBKIT::Draw(float *x, float *y, float *z, const CRect &texture, 
 #endif
 }
 
-void CGUITexturePBKIT::DrawQuad(const CRect &rect, color_t color, CBaseTexture *texture, const CRect *texCoords)
+void CGUITexturePBKIT::DrawQuad(const CRect &rect, color_t color, CTexture *texture, const CRect *texCoords)
 {
 #if 0
   struct CUSTOMVERTEX {

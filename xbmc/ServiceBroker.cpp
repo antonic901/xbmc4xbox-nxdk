@@ -68,6 +68,11 @@ CContextMenuManager& CServiceBroker::GetContextMenuManager()
   return g_application.m_ServiceManager->GetContextMenuManager();
 }
 
+PLAYLIST::CPlayListPlayer& CServiceBroker::GetPlaylistPlayer()
+{
+  return g_application.m_ServiceManager->GetPlaylistPlayer();
+}
+
 void CServiceBroker::RegisterSettingsComponent(const std::shared_ptr<CSettingsComponent>& settings)
 {
   g_serviceBroker.m_pSettingsComponent = settings;
@@ -91,6 +96,36 @@ ADDON::CRepositoryUpdater& CServiceBroker::GetRepositoryUpdater()
 CFileExtensionProvider& CServiceBroker::GetFileExtensionProvider()
 {
   return g_application.m_ServiceManager->GetFileExtensionProvider();
+}
+
+CPlayerCoreFactory& CServiceBroker::GetPlayerCoreFactory()
+{
+  return g_application.m_ServiceManager->GetPlayerCoreFactory();
+}
+
+CDatabaseManager& CServiceBroker::GetDatabaseManager()
+{
+  return g_application.m_ServiceManager->GetDatabaseManager();
+}
+
+CMediaManager& CServiceBroker::GetMediaManager()
+{
+  return g_application.m_ServiceManager->GetMediaManager();
+}
+
+void CServiceBroker::RegisterTextureCache(const std::shared_ptr<CTextureCache>& cache)
+{
+  g_serviceBroker.m_textureCache = cache;
+}
+
+void CServiceBroker::UnregisterTextureCache()
+{
+  g_serviceBroker.m_textureCache.reset();
+}
+
+std::shared_ptr<CTextureCache> CServiceBroker::GetTextureCache()
+{
+  return g_serviceBroker.m_textureCache;
 }
 
 void CServiceBroker::RegisterJobManager(const std::shared_ptr<CJobManager>& jobManager)

@@ -20,7 +20,12 @@
 
 #include "Application.h"
 
+#include "PlayListPlayer.h"
 #include "ServiceManager.h"
+#include "playlists/PlayListFactory.h"
+
+#include "playlists/PlayList.h"
+#include "playlists/SmartPlayList.h"
 
 #include "input/Key.h"
 
@@ -43,6 +48,35 @@ void CApplication::ResetScreenSaver()
 {
 }
 
+bool CApplication::ResetScreenSaverWindow()
+{
+  return false;
+}
+
+bool CApplication::PlayMedia(CFileItem& item, const std::string& player, PLAYLIST::Id playlistId)
+{
+  //nothing special just play
+  return PlayFile(item, player, false);
+}
+
+bool CApplication::PlayFile(CFileItem item, const std::string& player, bool bRestart)
+{
+  return false;
+}
+
+void CApplication::StopPlaying()
+{
+}
+
+void CApplication::Restart(bool bSamePosition)
+{
+}
+
+const std::string& CApplication::CurrentFile()
+{
+  return "";
+}
+
 std::shared_ptr<CFileItem> CApplication::CurrentFileItemPtr()
 {
   return m_itemCurrentFile;
@@ -53,7 +87,115 @@ CFileItem& CApplication::CurrentFileItem()
   return *m_itemCurrentFile;
 }
 
+CFileItem& CApplication::CurrentUnstackedItem()
+{
+  return *CFileItemPtr();
+}
+
+// Returns the total time in seconds of the current media.  Fractional
+// portions of a second are possible - but not necessarily supported by the
+// player class.  This returns a double to be consistent with GetTime() and
+// SeekTime().
+double CApplication::GetTotalTime() const
+{
+  return 0.0;
+}
+
+// Returns the current time in seconds of the currently playing media.
+// Fractional portions of a second are possible.  This returns a double to
+// be consistent with GetTotalTime() and SeekTime().
+double CApplication::GetTime() const
+{
+  return 0.0;
+}
+
+// Sets the current position of the currently playing media to the specified
+// time in seconds.  Fractional portions of a second are valid.  The passed
+// time is the time offset from the beginning of the file as opposed to a
+// delta from the current position.  This method accepts a double to be
+// consistent with GetTime() and GetTotalTime().
+void CApplication::SeekTime( double dTime )
+{
+}
+
+void CApplication::SetVolume(long iValue, bool isPercentage /* = true */)
+{
+}
+
+int CApplication::GetVolume(bool percentage /* = true */) const
+{
+  return 0;
+}
+
 bool CApplication::IsCurrentThread() const
 {
   return true;
+}
+
+void CApplication::UpdateCurrentPlayArt()
+{
+
+}
+
+bool CApplication::ProcessAndStartPlaylist(const std::string& strPlayList,
+                                           PLAYLIST::CPlayList& playlist,
+                                           PLAYLIST::Id playlistId,
+                                           int track)
+{
+  CLog::Log(LOGDEBUG, "CApplication::ProcessAndStartPlaylist({}, {})", strPlayList, playlistId);
+
+#if 0
+  // initial exit conditions
+  // no songs in playlist just return
+  if (playlist.size() == 0)
+    return false;
+
+  // illegal playlist
+  if (playlistId == PLAYLIST::TYPE_NONE || playlistId == PLAYLIST::TYPE_PICTURE)
+    return false;
+
+  // setup correct playlist
+  CServiceBroker::GetPlaylistPlayer().ClearPlaylist(playlistId);
+
+  // if the playlist contains an internet stream, this file will be used
+  // to generate a thumbnail for musicplayer.cover
+  m_strPlayListFile = strPlayList;
+
+  // add the items to the playlist player
+  CServiceBroker::GetPlaylistPlayer().Add(playlistId, playlist);
+
+  // if we have a playlist
+  if (CServiceBroker::GetPlaylistPlayer().GetPlaylist(playlistId).size())
+  {
+    // start playing it
+    CServiceBroker::GetPlaylistPlayer().SetCurrentPlaylist(playlistId);
+    CServiceBroker::GetPlaylistPlayer().Reset();
+    CServiceBroker::GetPlaylistPlayer().Play(track, "");
+    return true;
+  }
+#endif
+  return false;
+}
+
+std::string CApplication::GetCurrentPlayer()
+{
+  return m_pPlayer->GetCurrentPlayer();
+}
+
+void CApplication::UpdateLibraries()
+{
+}
+
+bool CApplication::SetLanguage(const std::string &strLanguage)
+{
+  return false;
+}
+
+bool CApplication::LoadLanguage(bool reload)
+{
+  return false;
+}
+
+void CApplication::SetLoggingIn(bool switchingProfiles)
+{
 }

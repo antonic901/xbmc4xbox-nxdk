@@ -514,16 +514,16 @@ void CApplicationPlayer::OnNothingToQueueNotify()
     player->OnNothingToQueueNotify();
 }
 
-void CApplicationPlayer::GetVideoStreamInfo(int streamId, SPlayerVideoStreamInfo &info)
+void CApplicationPlayer::GetVideoStreamInfo(int streamId, VideoStreamInfo& info) const
 {
-  std::shared_ptr<IPlayer> player = GetInternal();
+  const std::shared_ptr<const IPlayer> player = GetInternal();
   if (player)
     player->GetVideoStreamInfo(streamId, info);
 }
 
-void CApplicationPlayer::GetAudioStreamInfo(int index, SPlayerAudioStreamInfo &info)
+void CApplicationPlayer::GetAudioStreamInfo(int index, AudioStreamInfo& info) const
 {
-  std::shared_ptr<IPlayer> player = GetInternal();
+  const std::shared_ptr<const IPlayer> player = GetInternal();
   if (player)
     player->GetAudioStreamInfo(index, info);
 }
@@ -588,9 +588,9 @@ void CApplicationPlayer::SetAudioStream(int iStream)
   }
 }
 
-void CApplicationPlayer::GetSubtitleStreamInfo(int index, SPlayerSubtitleStreamInfo &info)
+void CApplicationPlayer::GetSubtitleStreamInfo(int index, SubtitleStreamInfo& info) const
 {
-  std::shared_ptr<IPlayer> player = GetInternal();
+  const std::shared_ptr<const IPlayer> player = GetInternal();
   if (player)
     player->GetSubtitleStreamInfo(index, info);
 }
@@ -676,12 +676,6 @@ void CApplicationPlayer::SetDynamicRangeCompression(long drc)
   std::shared_ptr<IPlayer> player = GetInternal();
   if (player)
     player->SetDynamicRangeCompression(drc);
-}
-
-bool CApplicationPlayer::SwitchChannel(const PVR::CPVRChannelPtr &channel)
-{
-  std::shared_ptr<IPlayer> player = GetInternal();
-  return (player && player->SwitchChannel(channel));
 }
 
 void CApplicationPlayer::LoadPage(int p, int sp, unsigned char* buffer)
@@ -773,11 +767,11 @@ void CApplicationPlayer::FlushRenderer()
     player->FlushRenderer();
 }
 
-void CApplicationPlayer::SetRenderViewMode(int mode)
+void CApplicationPlayer::SetRenderViewMode(int mode, float zoom, float par, float shift, bool stretch)
 {
   std::shared_ptr<IPlayer> player = GetInternal();
   if (player)
-    player->SetRenderViewMode(mode);
+    player->SetRenderViewMode(mode, zoom, par, shift, stretch);
 }
 
 float CApplicationPlayer::GetRenderAspectRatio()
@@ -900,4 +894,23 @@ bool CApplicationPlayer::IsExternalPlaying()
       return true;
   }
   return false;
+}
+
+CVideoSettings CApplicationPlayer::GetVideoSettings() const
+{
+  std::shared_ptr<const IPlayer> player = GetInternal();
+  if (player)
+  {
+    return player->GetVideoSettings();
+  }
+  return CVideoSettings();
+}
+
+void CApplicationPlayer::SetVideoSettings(CVideoSettings& settings)
+{
+  std::shared_ptr<IPlayer> player = GetInternal();
+  if (player)
+  {
+    return player->SetVideoSettings(settings);
+  }
 }

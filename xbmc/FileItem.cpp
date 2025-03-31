@@ -11,17 +11,87 @@
 #include "URL.h"
 #include "Util.h"
 #include "filesystem/File.h"
+#include "music/tags/MusicInfoTag.h"
+#include "pictures/PictureInfoTag.h"
 #include "settings/AdvancedSettings.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
+#include "video/VideoDatabase.h"
+#include "video/VideoInfoTag.h"
 
 #include <algorithm>
 #include <cstdlib>
 #include <mutex>
 
 using namespace XFILE;
+using namespace MUSIC_INFO;
+
+CFileItem::CFileItem(const CSong& song)
+{
+  Initialize();
+}
+
+CFileItem::CFileItem(const CSong& song, const CMusicInfoTag& music)
+{
+  Initialize();
+  *GetMusicInfoTag() = music;
+}
+
+CFileItem::CFileItem(const CURL &url, const CAlbum& album)
+{
+  Initialize();
+
+  m_strPath = url.Get();
+  URIUtils::AddSlashAtEnd(m_strPath);
+}
+
+CFileItem::CFileItem(const std::string &path, const CAlbum& album)
+{
+  Initialize();
+
+  m_strPath = path;
+  URIUtils::AddSlashAtEnd(m_strPath);
+}
+
+CFileItem::CFileItem(const CMusicInfoTag& music)
+{
+  Initialize();
+  SetLabel(music.GetTitle());
+  m_strPath = music.GetURL();
+  m_bIsFolder = URIUtils::HasSlashAtEnd(m_strPath);
+  *GetMusicInfoTag() = music;
+  FillInDefaultIcon();
+  FillInMimeType(false);
+}
+
+CFileItem::CFileItem(const CVideoInfoTag& movie)
+{
+  Initialize();
+}
+
+CFileItem::CFileItem(const CArtist& artist)
+{
+  Initialize();
+  SetLabel(artist.strArtist);
+  m_strPath = artist.strArtist;
+  m_bIsFolder = true;
+  URIUtils::AddSlashAtEnd(m_strPath);
+  GetMusicInfoTag()->SetArtist(artist);
+  FillInMimeType(false);
+}
+
+CFileItem::CFileItem(const CGenre& genre)
+{
+  Initialize();
+  SetLabel(genre.strGenre);
+  m_strPath = genre.strGenre;
+  m_bIsFolder = true;
+  URIUtils::AddSlashAtEnd(m_strPath);
+  GetMusicInfoTag()->SetGenre(genre.strGenre);
+  FillInMimeType(false);
+}
 
 CFileItem::CFileItem(const CFileItem& item)
 {
@@ -72,6 +142,30 @@ CFileItem::CFileItem(const std::string& strPath, bool bIsFolder)
   m_bIsFolder = bIsFolder;
   if (m_bIsFolder && !m_strPath.empty() && !IsFileFolder())
     URIUtils::AddSlashAtEnd(m_strPath);
+  FillInMimeType(false);
+}
+
+CFileItem::CFileItem(const CMediaSource& share)
+{
+  Initialize();
+  m_bIsFolder = true;
+  m_bIsShareOrDrive = true;
+  m_strPath = share.strPath;
+  if (!IsRSS()) // no slash at end for rss feeds
+    URIUtils::AddSlashAtEnd(m_strPath);
+  std::string label = share.strName;
+  if (!share.strStatus.empty())
+    label = StringUtils::Format("{} ({})", share.strName, share.strStatus);
+  SetLabel(label);
+  m_iLockMode = share.m_iLockMode;
+  m_strLockCode = share.m_strLockCode;
+  m_iHasLock = share.m_iHasLock;
+  m_iBadPwdCount = share.m_iBadPwdCount;
+  m_iDriveType = share.m_iDriveType;
+  SetArt("thumb", share.m_strThumbnailImage);
+  SetLabelPreformatted(true);
+  if (IsDVD())
+    GetVideoInfoTag()->m_strFileNameAndPath = share.strDiskUniqueId; // share.strDiskUniqueId contains disc unique id
   FillInMimeType(false);
 }
 
@@ -152,6 +246,12 @@ void CFileItem::Reset()
   Initialize();
 }
 
+// do not archive dynamic path
+void CFileItem::Archive(CArchive& ar)
+{
+  CGUIListItem::Archive(ar);
+}
+
 void CFileItem::Serialize(CVariant& value) const
 {
   //CGUIListItem::Serialize(value["CGUIListItem"]);
@@ -170,6 +270,11 @@ bool CFileItem::Exists(bool bUseCache /* = true */) const
 }
 
 bool CFileItem::IsVideo() const
+{
+  return false;
+}
+
+bool CFileItem::IsDiscStub() const
 {
   return false;
 }
@@ -618,6 +723,22 @@ void CFileItem::UpdateInfo(const CFileItem &item, bool replaceLabels /*=true*/)
 }
 
 void CFileItem::MergeInfo(const CFileItem& item)
+{
+}
+
+void CFileItem::SetFromVideoInfoTag(const CVideoInfoTag &video)
+{
+}
+
+void CFileItem::SetFromMusicInfoTag(const MUSIC_INFO::CMusicInfoTag& music)
+{
+}
+
+void CFileItem::SetFromAlbum(const CAlbum &album)
+{
+}
+
+void CFileItem::SetFromSong(const CSong &song)
 {
 }
 
@@ -1366,9 +1487,45 @@ void CFileItemList::SetReplaceListing(bool replace)
   m_replaceListing = replace;
 }
 
+void CFileItemList::ClearSortState()
+{
+  m_sortDescription.sortBy = SortByNone;
+  m_sortDescription.sortOrder = SortOrderNone;
+  m_sortDescription.sortAttributes = SortAttributeNone;
+}
+
 bool CFileItem::HasVideoInfoTag() const
 {
   return false;
+}
+
+CVideoInfoTag* CFileItem::GetVideoInfoTag()
+{
+  if (!m_videoInfoTag)
+    m_videoInfoTag = new CVideoInfoTag;
+
+  return m_videoInfoTag;
+}
+
+const CVideoInfoTag* CFileItem::GetVideoInfoTag() const
+{
+  return m_videoInfoTag;
+}
+
+CPictureInfoTag* CFileItem::GetPictureInfoTag()
+{
+  if (!m_pictureInfoTag)
+    m_pictureInfoTag = new CPictureInfoTag;
+
+  return m_pictureInfoTag;
+}
+
+MUSIC_INFO::CMusicInfoTag* CFileItem::GetMusicInfoTag()
+{
+  if (!m_musicInfoTag)
+    m_musicInfoTag = new MUSIC_INFO::CMusicInfoTag;
+
+  return m_musicInfoTag;
 }
 
 bool CFileItem::HasPVRChannelInfoTag() const
@@ -1379,6 +1536,11 @@ bool CFileItem::HasPVRChannelInfoTag() const
 std::string CFileItem::FindTrailer() const
 {
   return "";
+}
+
+VideoDbContentType CFileItem::GetVideoContentType() const
+{
+  return VideoDbContentType::MOVIES;
 }
 
 CFileItem CFileItem::GetItemToPlay() const

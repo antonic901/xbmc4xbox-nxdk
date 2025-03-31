@@ -6,13 +6,18 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/BooleanLogic.cpp \
 	$(CURDIR)/xbmc/utils/CharsetConverter.cpp \
 	$(CURDIR)/xbmc/utils/CharsetDetection.cpp \
+	$(CURDIR)/xbmc/utils/ColorUtils.cpp \
 	$(CURDIR)/xbmc/utils/CompileInfo.cpp \
 	$(CURDIR)/xbmc/utils/Crc32.cpp \
 	$(CURDIR)/xbmc/utils/DatabaseUtils.cpp \
 	$(CURDIR)/xbmc/utils/Digest.cpp \
+	$(CURDIR)/xbmc/utils/DiscsUtils.cpp \
+	$(CURDIR)/xbmc/utils/EmbeddedArt.cpp \
+	$(CURDIR)/xbmc/utils/Fanart.cpp \
 	$(CURDIR)/xbmc/utils/FileExtensionProvider.cpp \
 	$(CURDIR)/xbmc/utils/FileOperationJob.cpp \
 	$(CURDIR)/xbmc/utils/FileUtils.cpp \
+	$(CURDIR)/xbmc/utils/GroupUtils.cpp \
 	$(CURDIR)/xbmc/utils/HTMLUtil.cpp \
 	$(CURDIR)/xbmc/utils/HttpHeader.cpp \
 	$(CURDIR)/xbmc/utils/HttpParser.cpp \
@@ -28,13 +33,18 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/log.cpp \
 	$(CURDIR)/xbmc/utils/md5.cpp \
 	$(CURDIR)/xbmc/utils/Mime.cpp \
+	$(CURDIR)/xbmc/utils/MovingSpeed.cpp \
 	$(CURDIR)/xbmc/utils/Observer.cpp \
 	$(CURDIR)/xbmc/utils/POUtils.cpp \
 	$(CURDIR)/xbmc/utils/ProgressJob.cpp \
 	$(CURDIR)/xbmc/utils/RegExp.cpp \
 	$(CURDIR)/xbmc/utils/RingBuffer.cpp \
+	$(CURDIR)/xbmc/utils/ScraperParser.cpp \
+	$(CURDIR)/xbmc/utils/ScraperUrl.cpp \
 	$(CURDIR)/xbmc/utils/SortUtils.cpp \
 	$(CURDIR)/xbmc/utils/Speed.cpp \
+	$(CURDIR)/xbmc/utils/StreamDetails.cpp \
+	$(CURDIR)/xbmc/utils/StreamUtils.cpp \
 	$(CURDIR)/xbmc/utils/StringUtils.cpp \
 	$(CURDIR)/xbmc/utils/StringValidation.cpp \
 	$(CURDIR)/xbmc/utils/Temperature.cpp \

@@ -17,6 +17,7 @@
 #include "XBDateTime.h"
 #include "guilib/GUIListItem.h"
 #include "threads/CriticalSection.h"
+#include "utils/IArchivable.h"
 #include "utils/ISerializable.h"
 #include "utils/SortUtils.h"
 
@@ -31,10 +32,27 @@ namespace ADDON
 class IAddon;
 }
 
+namespace MUSIC_INFO
+{
+  class CMusicInfoTag;
+}
+class CVideoInfoTag;
+class CPictureInfoTag;
+
+class CAlbum;
+class CArtist;
+class CSong;
+class CGenre;
+
 class CURL;
 class CVariant;
 
 class CFileItemList;
+
+/* special startoffset used to indicate that we wish to resume */
+#define STARTOFFSET_RESUME (-1)
+
+class CMediaSource;
 
 enum EFileFolderType {
   EFILEFOLDER_TYPE_ALWAYS     = 1<<0,
@@ -54,7 +72,7 @@ enum EFileFolderType {
   \sa CFileItemList
   */
 class CFileItem :
-  public CGUIListItem, public ISerializable
+  public CGUIListItem, public IArchivable, public ISerializable
 {
 public:
   CFileItem(void);
@@ -64,6 +82,15 @@ public:
   explicit CFileItem(const char* strLabel);
   CFileItem(const CURL& path, bool bIsFolder);
   CFileItem(const std::string& strPath, bool bIsFolder);
+  explicit CFileItem(const CSong& song);
+  CFileItem(const CSong& song, const MUSIC_INFO::CMusicInfoTag& music);
+  CFileItem(const CURL &path, const CAlbum& album);
+  CFileItem(const std::string &path, const CAlbum& album);
+  explicit CFileItem(const CArtist& artist);
+  explicit CFileItem(const CGenre& genre);
+  explicit CFileItem(const MUSIC_INFO::CMusicInfoTag& music);
+  explicit CFileItem(const CVideoInfoTag& movie);
+  explicit CFileItem(const CMediaSource& share);
   explicit CFileItem(std::shared_ptr<const ADDON::IAddon> addonInfo);
 
   ~CFileItem(void);
@@ -87,6 +114,7 @@ public:
    */
   void Reset();
   CFileItem& operator=(const CFileItem& item);
+  void Archive(CArchive& ar) override;
   void Serialize(CVariant& value) const override;
   bool IsFileItem() const { return false; }
 
@@ -202,15 +230,30 @@ public:
   void FillInDefaultIcon();
   void SetFileSizeLabel();
   virtual void SetLabel(const std::string &strLabel);
+  VideoDbContentType GetVideoContentType() const;
   bool IsLabelPreformatted() const { return m_bLabelPreformatted; }
   void SetLabelPreformatted(bool bYesNo) { m_bLabelPreformatted=bYesNo; }
+  bool SortsOnTop() const { return m_specialSort == SortSpecialOnTop; }
+  bool SortsOnBottom() const { return m_specialSort == SortSpecialOnBottom; }
+  void SetSpecialSort(SortSpecial sort) { m_specialSort = sort; }
 
   inline bool HasMusicInfoTag() const
   {
     return false;
   }
 
+  MUSIC_INFO::CMusicInfoTag* GetMusicInfoTag();
+
+  inline const MUSIC_INFO::CMusicInfoTag* GetMusicInfoTag() const
+  {
+    return m_musicInfoTag;
+  }
+
   bool HasVideoInfoTag() const;
+
+  CVideoInfoTag* GetVideoInfoTag();
+
+  const CVideoInfoTag* GetVideoInfoTag() const;
 
   inline bool HasEPGInfoTag() const
   {
@@ -297,6 +340,11 @@ public:
     return false;
   }
 
+  inline const CPictureInfoTag* GetPictureInfoTag() const
+  {
+    return m_pictureInfoTag;
+  }
+
   bool HasAddonInfo() const { return m_addonInfo != nullptr; }
   const std::shared_ptr<const ADDON::IAddon> GetAddonInfo() const { return m_addonInfo; }
 
@@ -304,6 +352,8 @@ public:
   {
     return false;
   }
+
+  CPictureInfoTag* GetPictureInfoTag();
 
   /*!
    \brief Get the local fanart for this item if it exists
@@ -463,6 +513,31 @@ public:
 
   bool IsAlbum() const;
 
+  /*! \brief Sets details using the information from the CVideoInfoTag object
+   Sets the videoinfotag and uses its information to set the label and path.
+   \param video video details to use and set
+   */
+  void SetFromVideoInfoTag(const CVideoInfoTag &video);
+
+  /*! \brief Sets details using the information from the CMusicInfoTag object
+  Sets the musicinfotag and uses its information to set the label and path.
+  \param music music details to use and set
+  */
+  void SetFromMusicInfoTag(const MUSIC_INFO::CMusicInfoTag &music);
+
+  /*! \brief Sets details using the information from the CAlbum object
+   Sets the album in the music info tag and uses its information to set the
+   label and album-specific properties.
+   \param album album details to use and set
+   */
+  void SetFromAlbum(const CAlbum &album);
+  /*! \brief Sets details using the information from the CSong object
+   Sets the song in the music info tag and uses its information to set the
+   label, path, song-specific properties and artwork.
+   \param song song details to use and set
+   */
+  void SetFromSong(const CSong &song);
+
   bool m_bIsShareOrDrive;    ///< is this a root share/drive
   int m_iDriveType;     ///< If \e m_bIsShareOrDrive is \e true, use to get the share type. Types see: CMediaSource::m_iDriveType
   CDateTime m_dateTime;             ///< file creation date & time
@@ -495,12 +570,16 @@ private:
   std::string m_strPath;            ///< complete path to item
   std::string m_strDynPath;
 
+  SortSpecial m_specialSort;
   bool m_bIsParentFolder;
   bool m_bCanQueue;
   bool m_bLabelPreformatted;
   std::string m_mimetype;
   std::string m_extrainfo;
   bool m_doContentLookup;
+  MUSIC_INFO::CMusicInfoTag* m_musicInfoTag;
+  CVideoInfoTag* m_videoInfoTag;
+  CPictureInfoTag* m_pictureInfoTag;
   std::shared_ptr<const ADDON::IAddon> m_addonInfo;
   bool m_bIsAlbum;
   int64_t m_lStartOffset;
@@ -601,6 +680,11 @@ public:
    */
   void Stack(bool stackFiles = true);
 
+  SortOrder GetSortOrder() const { return m_sortDescription.sortOrder; }
+  SortBy GetSortMethod() const { return m_sortDescription.sortBy; }
+  void SetSortOrder(SortOrder sortOrder) { m_sortDescription.sortOrder = sortOrder; }
+  void SetSortMethod(SortBy sortBy) { m_sortDescription.sortBy = sortBy; }
+
   /*! \brief load a CFileItemList out of the cache
 
    The file list may be cached based on which window we're viewing in, as different
@@ -650,6 +734,7 @@ public:
   bool UpdateItem(const CFileItem *item);
 
   bool HasSortDetails() const { return false; }
+  const std::vector<GUIViewSortDetails> &GetSortDetails() const { return m_sortDetails; }
 
   /*! \brief Specify whether this list should be sorted with folders separate from files
    By default we sort with folders listed (and sorted separately) except for those sort modes
@@ -696,10 +781,13 @@ private:
   MAPFILEITEMS m_map;
   bool m_ignoreURLOptions = false;
   bool m_fastLookup = false;
+  SortDescription m_sortDescription;
   bool m_sortIgnoreFolders = false;
   CACHE_TYPE m_cacheToDisc = CACHE_IF_SLOW;
   bool m_replaceListing = false;
   std::string m_content;
+
+  std::vector<GUIViewSortDetails> m_sortDetails;
 
   mutable CCriticalSection m_lock;
 };

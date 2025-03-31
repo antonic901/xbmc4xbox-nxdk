@@ -36,12 +36,6 @@ typedef enum
   PLAYBACK_OK = 1,
 } PlayBackRet;
 
-namespace PVR
-{
-  class CPVRChannel;
-  typedef std::shared_ptr<PVR::CPVRChannel> CPVRChannelPtr;
-}
-
 class CAction;
 class CPlayerOptions;
 class CStreamDetails;
@@ -85,7 +79,7 @@ public:
   void FrameMove();
   void Render(bool clear, uint32_t alpha = 255, bool gui = true);
   void FlushRenderer();
-  void SetRenderViewMode(int mode);
+  void SetRenderViewMode(int mode, float zoom, float par, float shift, bool stretch);
   float GetRenderAspectRatio();
   void TriggerUpdateResolution();
   bool IsRenderingVideo();
@@ -110,7 +104,7 @@ public:
   void  GetAudioCapabilities(std::vector<int> &audioCaps);
   int   GetAudioStream();
   int   GetAudioStreamCount();
-  void  GetAudioStreamInfo(int index, SPlayerAudioStreamInfo &info);
+  void  GetAudioStreamInfo(int index, AudioStreamInfo& info) const;
   int   GetCacheLevel() const;
   float GetCachePercentage() const;
   int   GetChapterCount();
@@ -125,7 +119,7 @@ public:
   int   GetSubtitle();
   void  GetSubtitleCapabilities(std::vector<int> &subCaps);
   int   GetSubtitleCount();
-  void  GetSubtitleStreamInfo(int index, SPlayerSubtitleStreamInfo &info);
+  void  GetSubtitleStreamInfo(int index, SubtitleStreamInfo& info) const;
   bool  GetSubtitleVisible();
   TextCacheStruct_t* GetTeletextCache();
   std::string GetRadioText(unsigned int line);
@@ -133,7 +127,7 @@ public:
   int64_t GetTotalTime() const;
   int   GetVideoStream();
   int   GetVideoStreamCount();
-  void  GetVideoStreamInfo(int streamId, SPlayerVideoStreamInfo &info);
+  void  GetVideoStreamInfo(int streamId, VideoStreamInfo& info) const;
   bool  HasAudio() const;
   bool  HasMenu() const;
   bool  HasVideo() const;
@@ -172,9 +166,11 @@ public:
   void  SetTotalTime(int64_t time);
   void  SetVideoStream(int iStream);
   void  SetVolume(float volume);
-  bool  SwitchChannel(const PVR::CPVRChannelPtr &channel);
   void  SetSpeed(float speed);
   bool SupportsTempo();
+
+  CVideoSettings GetVideoSettings() const;
+  void SetVideoSettings(CVideoSettings& settings);
 
   protected:
     std::shared_ptr<IPlayer> GetInternal() const;

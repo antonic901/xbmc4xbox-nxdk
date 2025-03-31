@@ -21,6 +21,7 @@ SRCS += \
 	$(CURDIR)/xbmc/addons/PluginSource.cpp \
 	$(CURDIR)/xbmc/addons/Repository.cpp \
 	$(CURDIR)/xbmc/addons/RepositoryUpdater.cpp \
+	$(CURDIR)/xbmc/addons/Scraper.cpp \
 	$(CURDIR)/xbmc/addons/Service.cpp \
 	$(CURDIR)/xbmc/addons/Skin.cpp \
 	$(CURDIR)/xbmc/addons/UISoundsResource.cpp \

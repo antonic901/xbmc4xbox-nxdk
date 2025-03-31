@@ -23,6 +23,11 @@ namespace ANNOUNCEMENT
 class CAnnouncementManager;
 }
 
+namespace PLAYLIST
+{
+class CPlayListPlayer;
+}
+
 namespace KODI
 {
 namespace MESSAGING
@@ -35,6 +40,10 @@ class CAppParams;
 class CContextMenuManager;
 class CSettingsComponent;
 class CFileExtensionProvider;
+class CPlayerCoreFactory;
+class CDatabaseManager;
+class CMediaManager;
+class CTextureCache;
 class CJobManager;
 
 class CServiceBroker
@@ -54,12 +63,20 @@ public:
 
   static ADDON::CAddonMgr& GetAddonMgr();
   static CContextMenuManager& GetContextMenuManager();
+  static PLAYLIST::CPlayListPlayer& GetPlaylistPlayer();
   static ADDON::CRepositoryUpdater& GetRepositoryUpdater();
   static CFileExtensionProvider& GetFileExtensionProvider();
+  static CPlayerCoreFactory& GetPlayerCoreFactory();
+  static CDatabaseManager& GetDatabaseManager();
+  static CMediaManager& GetMediaManager();
 
   static void RegisterSettingsComponent(const std::shared_ptr<CSettingsComponent>& settings);
   static void UnregisterSettingsComponent();
   static std::shared_ptr<CSettingsComponent> GetSettingsComponent();
+
+  static void RegisterTextureCache(const std::shared_ptr<CTextureCache>& cache);
+  static void UnregisterTextureCache();
+  static std::shared_ptr<CTextureCache> GetTextureCache();
 
   static void RegisterJobManager(const std::shared_ptr<CJobManager>& jobManager);
   static void UnregisterJobManager();
@@ -74,6 +91,7 @@ private:
   std::shared_ptr<CAppParams> m_appParams;
   std::shared_ptr<ANNOUNCEMENT::CAnnouncementManager> m_pAnnouncementManager;
   std::shared_ptr<CSettingsComponent> m_pSettingsComponent;
+  std::shared_ptr<CTextureCache> m_textureCache;
   std::shared_ptr<CJobManager> m_jobManager;
   std::shared_ptr<KODI::MESSAGING::CApplicationMessenger> m_appMessenger;
 };

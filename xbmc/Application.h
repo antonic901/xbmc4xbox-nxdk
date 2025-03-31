@@ -20,6 +20,7 @@
  *
  */
 
+#include "playlists/PlayListTypes.h"
 #include "utils/GlobalsHandling.h"
 
 #include <atomic>
@@ -34,8 +35,16 @@ class CFileItemList;
 class CKey;
 class CServiceManager;
 
+namespace PLAYLIST
+{
+  class CPlayList;
+}
+
 #include "ApplicationPlayer.h"
 #include "FileItem.h"
+
+#define VOLUME_MINIMUM -6000  // -60dB
+#define VOLUME_MAXIMUM 0      // 0dB
 
 class CApplication
 {
@@ -45,12 +54,56 @@ public:
   virtual ~CApplication(void);
 
   bool IsCurrentThread() const;
+  const std::string& CurrentFile();
   CFileItem& CurrentFileItem();
   std::shared_ptr<CFileItem> CurrentFileItemPtr();
+  CFileItem& CurrentUnstackedItem();
+  std::string GetCurrentPlayer();
+
+  bool PlayMedia(CFileItem& item, const std::string& player, PLAYLIST::Id playlistId);
+  bool ProcessAndStartPlaylist(const std::string& strPlayList,
+                               PLAYLIST::CPlayList& playlist,
+                               PLAYLIST::Id playlistId,
+                               int track = 0);
+  bool PlayFile(CFileItem item, const std::string& player, bool bRestart = false);
+  void StopPlaying();
+  void Restart(bool bSamePosition = true);
+
+  /*!
+   \brief Returns the total time in fractional seconds of the currently playing media
+
+   Beware that this method returns fractional seconds whereas IPlayer::GetTotalTime() returns milliseconds.
+   */
+  double GetTotalTime() const;
+  /*!
+   \brief Returns the current time in fractional seconds of the currently playing media
+
+   Beware that this method returns fractional seconds whereas IPlayer::GetTime() returns milliseconds.
+   */
+  double GetTime() const;
+
+  void SeekTime( double dTime = 0.0 );
+
+  int GetVolume(bool percentage = true) const;
+  void SetVolume(long iValue, bool isPercentage = true);
+
+  bool SetLanguage(const std::string &strLanguage);
+  bool LoadLanguage(bool reload);
+
+  void SetLoggingIn(bool switchingProfiles);
+
+  void UpdateLibraries();
+
+  void UpdateCurrentPlayArt();
+
+  std::string m_strPlayListFile;
+
+  inline bool IsInScreenSaver() { return false; };
 
   bool OnAction(const CAction &action);
 
   void ResetScreenSaver();
+  bool ResetScreenSaverWindow(); // this is MAYBE WakeUpScreenSaverAndDPMS
 
   CApplicationPlayer* m_pPlayer;
 

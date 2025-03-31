@@ -8,9 +8,13 @@
 
 #include "SpecialProtocol.h"
 
+#include "ServiceBroker.h"
 #include "URL.h"
 #include "Util.h"
+#include "profiles/ProfileManager.h"
 #include "settings/AdvancedSettings.h"
+#include "settings/Settings.h"
+#include "settings/SettingsComponent.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
@@ -21,6 +25,18 @@
 #include <dirent.h>
 #include "utils/StringUtils.h"
 #endif
+
+const CProfileManager *CSpecialProtocol::m_profileManager = nullptr;
+
+void CSpecialProtocol::RegisterProfileManager(const CProfileManager &profileManager)
+{
+  m_profileManager = &profileManager;
+}
+
+void CSpecialProtocol::UnregisterProfileManager()
+{
+  m_profileManager = nullptr;
+}
 
 void CSpecialProtocol::SetProfilePath(const std::string &dir)
 {
@@ -134,10 +150,19 @@ std::string CSpecialProtocol::TranslatePath(const CURL &url)
   else
     RootDir = FullFileName;
 
+  if (RootDir == "subtitles")
+    translatedPath = URIUtils::AddFileToFolder(CServiceBroker::GetSettingsComponent()->GetSettings()->GetString(CSettings::SETTING_SUBTITLES_CUSTOMPATH), FileName);
+  else if (RootDir == "userdata" && m_profileManager)
+    translatedPath = URIUtils::AddFileToFolder(m_profileManager->GetUserDataFolder(), FileName);
+  else if (RootDir == "database" && m_profileManager)
+    translatedPath = URIUtils::AddFileToFolder(m_profileManager->GetDatabaseFolder(), FileName);
+  else if (RootDir == "thumbnails" && m_profileManager)
+    translatedPath = URIUtils::AddFileToFolder(m_profileManager->GetThumbnailsFolder(), FileName);
+
   // TODO: add translation for musicplaylist, videoplaylist etc.
 
   // from here on, we have our "real" special paths
-  if (     RootDir == "xbmc" ||
+  else if (RootDir == "xbmc" ||
            RootDir == "xbmcbin" ||
            RootDir == "xbmcbinaddons" ||
            RootDir == "xbmcaltbinaddons" ||
