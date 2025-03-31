@@ -62,3 +62,5 @@ SRCS += \
 	$(CURDIR)/xbmc/guilib/Texture.cpp \
 	$(CURDIR)/xbmc/guilib/TextureManager.cpp \
 	$(CURDIR)/xbmc/guilib/VisibleEffect.cpp
+
+include $(CURDIR)/xbmc/guilib/guiinfo/Makefile
