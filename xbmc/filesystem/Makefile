@@ -22,6 +22,7 @@ SRCS += \
 	$(CURDIR)/xbmc/filesystem/OverrideFile.cpp \
 	$(CURDIR)/xbmc/filesystem/PlaylistDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/PlaylistFileDirectory.cpp \
+	$(CURDIR)/xbmc/filesystem/PluginDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/SmartPlaylistDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/SourcesDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/SpecialProtocol.cpp \

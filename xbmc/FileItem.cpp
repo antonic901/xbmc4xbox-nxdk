@@ -1482,6 +1482,30 @@ bool CFileItemList::UpdateItem(const CFileItem *item)
   return false;
 }
 
+void CFileItemList::AddSortMethod(SortBy sortBy, int buttonLabel, const LABEL_MASKS &labelMasks, SortAttribute sortAttributes /* = SortAttributeNone */)
+{
+  AddSortMethod(sortBy, sortAttributes, buttonLabel, labelMasks);
+}
+
+void CFileItemList::AddSortMethod(SortBy sortBy, SortAttribute sortAttributes, int buttonLabel, const LABEL_MASKS &labelMasks)
+{
+  SortDescription sorting;
+  sorting.sortBy = sortBy;
+  sorting.sortAttributes = sortAttributes;
+
+  AddSortMethod(sorting, buttonLabel, labelMasks);
+}
+
+void CFileItemList::AddSortMethod(SortDescription sortDescription, int buttonLabel, const LABEL_MASKS &labelMasks)
+{
+  GUIViewSortDetails sort;
+  sort.m_sortDescription = sortDescription;
+  sort.m_buttonLabel = buttonLabel;
+  sort.m_labelMasks = labelMasks;
+
+  m_sortDetails.push_back(sort);
+}
+
 void CFileItemList::SetReplaceListing(bool replace)
 {
   m_replaceListing = replace;

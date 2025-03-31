@@ -733,6 +733,9 @@ public:
    */
   bool UpdateItem(const CFileItem *item);
 
+  void AddSortMethod(SortBy sortBy, int buttonLabel, const LABEL_MASKS &labelMasks, SortAttribute sortAttributes = SortAttributeNone);
+  void AddSortMethod(SortBy sortBy, SortAttribute sortAttributes, int buttonLabel, const LABEL_MASKS &labelMasks);
+  void AddSortMethod(SortDescription sortDescription, int buttonLabel, const LABEL_MASKS &labelMasks);
   bool HasSortDetails() const { return false; }
   const std::vector<GUIViewSortDetails> &GetSortDetails() const { return m_sortDetails; }
 
