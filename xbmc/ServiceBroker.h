@@ -43,6 +43,7 @@ class CSettingsComponent;
 class CFileExtensionProvider;
 class CPlayerCoreFactory;
 class CDatabaseManager;
+class CGUIComponent;
 class CMediaManager;
 class CTextureCache;
 class CJobManager;
@@ -72,6 +73,10 @@ public:
   static CDatabaseManager& GetDatabaseManager();
   static CMediaManager& GetMediaManager();
 
+  static CGUIComponent* GetGUI();
+  static void RegisterGUI(CGUIComponent* gui);
+  static void UnregisterGUI();
+
   static void RegisterSettingsComponent(const std::shared_ptr<CSettingsComponent>& settings);
   static void UnregisterSettingsComponent();
   static std::shared_ptr<CSettingsComponent> GetSettingsComponent();
@@ -92,6 +97,7 @@ public:
 private:
   std::shared_ptr<CAppParams> m_appParams;
   std::shared_ptr<ANNOUNCEMENT::CAnnouncementManager> m_pAnnouncementManager;
+  CGUIComponent* m_pGUI;
   std::shared_ptr<CSettingsComponent> m_pSettingsComponent;
   std::shared_ptr<CTextureCache> m_textureCache;
   std::shared_ptr<CJobManager> m_jobManager;

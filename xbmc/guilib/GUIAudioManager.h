@@ -23,6 +23,8 @@
 #include <map>
 #include <string>
 
+#include "GUIComponent.h"
+#include "ServiceBroker.h"
 #include "threads/CriticalSection.h"
 
 // forward definitions
@@ -80,5 +82,3 @@ private:
 
   CCriticalSection    m_cs;
 };
-
-extern CGUIAudioManager g_audioManager;

@@ -34,8 +34,6 @@
 using namespace std;
 using namespace XFILE;
 
-CGUIAudioManager g_audioManager;
-
 CGUIAudioManager::CGUIAudioManager()
 {
   m_actionSound=NULL;

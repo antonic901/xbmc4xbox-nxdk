@@ -37,6 +37,9 @@
 #include <map>
 #include <string>
 
+#include "GUIComponent.h"
+#include "ServiceBroker.h"
+
 class CXBMCTinyXML;
 
 typedef uint32_t color_t;
@@ -60,10 +63,4 @@ protected:
   typedef std::map<std::string, color_t>::iterator iColor;
   typedef std::map<std::string, color_t>::const_iterator icColor;
 };
-
-/*!
- \ingroup textures
- \brief
- */
-extern CGUIColorManager g_colorManager;
 #endif

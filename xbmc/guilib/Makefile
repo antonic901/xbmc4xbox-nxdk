@@ -8,6 +8,7 @@ SRCS += \
 	$(CURDIR)/xbmc/guilib/GUIBorderedImage.cpp \
 	$(CURDIR)/xbmc/guilib/GUIButtonControl.cpp \
 	$(CURDIR)/xbmc/guilib/GUIColorManager.cpp \
+	$(CURDIR)/xbmc/guilib/GUIComponent.cpp \
 	$(CURDIR)/xbmc/guilib/GUIControl.cpp \
 	$(CURDIR)/xbmc/guilib/GUIControlFactory.cpp \
 	$(CURDIR)/xbmc/guilib/GUIControlGroup.cpp \
