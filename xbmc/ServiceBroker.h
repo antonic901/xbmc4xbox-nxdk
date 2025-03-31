@@ -38,6 +38,7 @@ class CApplicationMessenger;
 
 class CAppParams;
 class CContextMenuManager;
+class CDataCacheCore;
 class CSettingsComponent;
 class CFileExtensionProvider;
 class CPlayerCoreFactory;
@@ -63,6 +64,7 @@ public:
 
   static ADDON::CAddonMgr& GetAddonMgr();
   static CContextMenuManager& GetContextMenuManager();
+  static CDataCacheCore& GetDataCacheCore();
   static PLAYLIST::CPlayListPlayer& GetPlaylistPlayer();
   static ADDON::CRepositoryUpdater& GetRepositoryUpdater();
   static CFileExtensionProvider& GetFileExtensionProvider();

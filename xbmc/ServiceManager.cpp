@@ -13,6 +13,7 @@
 #include "PlayListPlayer.h"
 #include "addons/AddonManager.h"
 #include "addons/RepositoryUpdater.h"
+#include "cores/DataCacheCore.h"
 #include "cores/playercorefactory/PlayerCoreFactory.h"
 #include "profiles/ProfileManager.h"
 #include "storage/MediaManager.h"
@@ -78,6 +79,8 @@ bool CServiceManager::InitStageTwo(const std::string& profilesUserDataFolder)
 
   m_repositoryUpdater.reset(new ADDON::CRepositoryUpdater(*m_addonMgr));
 
+  m_dataCacheCore.reset(new CDataCacheCore());
+
   m_contextMenuManager.reset(new CContextMenuManager(*m_addonMgr));
 
   m_fileExtensionProvider.reset(new CFileExtensionProvider());
@@ -113,6 +116,7 @@ void CServiceManager::DeinitStageTwo()
 
   m_fileExtensionProvider.reset();
   m_contextMenuManager.reset();
+  m_dataCacheCore.reset();
   m_repositoryUpdater.reset();
   m_addonMgr.reset();
   m_databaseManager.reset();
@@ -143,6 +147,11 @@ CContextMenuManager& CServiceManager::GetContextMenuManager()
   return *m_contextMenuManager;
 }
 
+CDataCacheCore& CServiceManager::GetDataCacheCore()
+{
+  return *m_dataCacheCore;
+}
+
 PLAYLIST::CPlayListPlayer& CServiceManager::GetPlaylistPlayer()
 {
   return *m_playlistPlayer;
@@ -151,6 +160,12 @@ PLAYLIST::CPlayListPlayer& CServiceManager::GetPlaylistPlayer()
 CFileExtensionProvider& CServiceManager::GetFileExtensionProvider()
 {
   return *m_fileExtensionProvider;
+}
+
+// deleters for unique_ptr
+void CServiceManager::delete_dataCacheCore::operator()(CDataCacheCore* p) const
+{
+  delete p;
 }
 
 void CServiceManager::delete_contextMenuManager::operator()(CContextMenuManager* p) const

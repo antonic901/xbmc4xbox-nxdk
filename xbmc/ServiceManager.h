@@ -22,6 +22,7 @@ class CPlayListPlayer;
 }
 
 class CContextMenuManager;
+class CDataCacheCore;
 
 class CFileExtensionProvider;
 class CPlayerCoreFactory;
@@ -47,6 +48,7 @@ public:
   ADDON::CAddonMgr& GetAddonMgr();
   ADDON::CRepositoryUpdater& GetRepositoryUpdater();
   CContextMenuManager& GetContextMenuManager();
+  CDataCacheCore& GetDataCacheCore();
 
   PLAYLIST::CPlayListPlayer& GetPlaylistPlayer();
   int init_level = 0;
@@ -60,6 +62,11 @@ public:
   CMediaManager& GetMediaManager();
 
 protected:
+  struct delete_dataCacheCore
+  {
+    void operator()(CDataCacheCore* p) const;
+  };
+
   struct delete_contextMenuManager
   {
     void operator()(CContextMenuManager* p) const;
@@ -68,6 +75,7 @@ protected:
   std::unique_ptr<ADDON::CAddonMgr> m_addonMgr;
   std::unique_ptr<ADDON::CRepositoryUpdater> m_repositoryUpdater;
   std::unique_ptr<CContextMenuManager, delete_contextMenuManager> m_contextMenuManager;
+  std::unique_ptr<CDataCacheCore, delete_dataCacheCore> m_dataCacheCore;
   std::unique_ptr<PLAYLIST::CPlayListPlayer> m_playlistPlayer;
   std::unique_ptr<CFileExtensionProvider> m_fileExtensionProvider;
   std::unique_ptr<CPlayerCoreFactory> m_playerCoreFactory;
