@@ -20,6 +20,7 @@
  *
  */
 
+#include "application/ApplicationComponents.h"
 #include "playlists/PlayListTypes.h"
 #include "utils/GlobalsHandling.h"
 
@@ -46,7 +47,8 @@ namespace PLAYLIST
 #define VOLUME_MINIMUM -6000  // -60dB
 #define VOLUME_MAXIMUM 0      // 0dB
 
-class CApplication
+class CApplication :
+                      public CApplicationComponents
 {
   friend class CApplicationPlayer;
 public:

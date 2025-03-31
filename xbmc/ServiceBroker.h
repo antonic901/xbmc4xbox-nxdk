@@ -37,13 +37,16 @@ class CApplicationMessenger;
 } // namespace KODI
 
 class CAppParams;
+template<class T>
+class CComponentContainer;
 class CContextMenuManager;
 class CDataCacheCore;
-class CSettingsComponent;
+class IApplicationComponent;
 class CFileExtensionProvider;
 class CPlayerCoreFactory;
 class CDatabaseManager;
 class CGUIComponent;
+class CSettingsComponent;
 class CMediaManager;
 class CTextureCache;
 class CJobManager;
@@ -81,6 +84,7 @@ public:
   static CPlayerCoreFactory& GetPlayerCoreFactory();
   static CDatabaseManager& GetDatabaseManager();
   static CMediaManager& GetMediaManager();
+  static CComponentContainer<IApplicationComponent>& GetAppComponents();
 
   static CGUIComponent* GetGUI();
   static void RegisterGUI(CGUIComponent* gui);
