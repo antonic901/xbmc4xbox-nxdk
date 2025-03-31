@@ -1,4 +1,5 @@
 SRCS += \
+	$(CURDIR)/xbmc/utils/AlarmClock.cpp \
 	$(CURDIR)/xbmc/utils/Archive.cpp \
 	$(CURDIR)/xbmc/utils/auto_buffer.cpp \
 	$(CURDIR)/xbmc/utils/Base64.cpp \
