@@ -40,6 +40,7 @@ class CAppParams;
 class CContextMenuManager;
 class CSettingsComponent;
 class CFileExtensionProvider;
+class CPlayerCoreFactory;
 class CTextureCache;
 class CJobManager;
 
@@ -63,6 +64,7 @@ public:
   static PLAYLIST::CPlayListPlayer& GetPlaylistPlayer();
   static ADDON::CRepositoryUpdater& GetRepositoryUpdater();
   static CFileExtensionProvider& GetFileExtensionProvider();
+  static CPlayerCoreFactory& GetPlayerCoreFactory();
 
   static void RegisterSettingsComponent(const std::shared_ptr<CSettingsComponent>& settings);
   static void UnregisterSettingsComponent();

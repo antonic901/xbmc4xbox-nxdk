@@ -24,6 +24,8 @@ class CPlayListPlayer;
 class CContextMenuManager;
 
 class CFileExtensionProvider;
+class CPlayerCoreFactory;
+class CProfileManager;
 
 class CServiceManager
 {
@@ -34,7 +36,7 @@ public:
   bool InitForTesting();
   bool InitStageOne();
   bool InitStageTwo(const std::string& profilesUserDataFolder);
-  bool InitStageThree();
+  bool InitStageThree(const std::shared_ptr<CProfileManager>& profileManager);
   void DeinitTesting();
   void DeinitStageThree();
   void DeinitStageTwo();
@@ -49,6 +51,8 @@ public:
 
   CFileExtensionProvider& GetFileExtensionProvider();
 
+  CPlayerCoreFactory& GetPlayerCoreFactory();
+
 protected:
   struct delete_contextMenuManager
   {
@@ -60,4 +64,5 @@ protected:
   std::unique_ptr<CContextMenuManager, delete_contextMenuManager> m_contextMenuManager;
   std::unique_ptr<PLAYLIST::CPlayListPlayer> m_playlistPlayer;
   std::unique_ptr<CFileExtensionProvider> m_fileExtensionProvider;
+  std::unique_ptr<CPlayerCoreFactory> m_playerCoreFactory;
 };

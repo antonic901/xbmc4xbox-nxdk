@@ -12,6 +12,8 @@
 #include "PlayListPlayer.h"
 #include "addons/AddonManager.h"
 #include "addons/RepositoryUpdater.h"
+#include "cores/playercorefactory/PlayerCoreFactory.h"
+#include "profiles/ProfileManager.h"
 #include "utils/FileExtensionProvider.h"
 #include "utils/log.h"
 
@@ -77,9 +79,11 @@ bool CServiceManager::InitStageTwo(const std::string& profilesUserDataFolder)
 }
 
 // stage 3 is called after successful initialization of WindowManager
-bool CServiceManager::InitStageThree()
+bool CServiceManager::InitStageThree(const std::shared_ptr<CProfileManager>& profileManager)
 {
   m_contextMenuManager->Init();
+
+  m_playerCoreFactory.reset(new CPlayerCoreFactory(*profileManager));
 
   init_level = 3;
   return true;
@@ -88,6 +92,7 @@ bool CServiceManager::InitStageThree()
 void CServiceManager::DeinitStageThree()
 {
   init_level = 2;
+  m_playerCoreFactory.reset();
   m_contextMenuManager->Init();
 }
 
@@ -136,4 +141,9 @@ CFileExtensionProvider& CServiceManager::GetFileExtensionProvider()
 void CServiceManager::delete_contextMenuManager::operator()(CContextMenuManager* p) const
 {
   delete p;
+}
+
+CPlayerCoreFactory& CServiceManager::GetPlayerCoreFactory()
+{
+  return *m_playerCoreFactory;
 }

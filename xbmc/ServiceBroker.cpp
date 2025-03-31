@@ -98,6 +98,11 @@ CFileExtensionProvider& CServiceBroker::GetFileExtensionProvider()
   return g_application.m_ServiceManager->GetFileExtensionProvider();
 }
 
+CPlayerCoreFactory& CServiceBroker::GetPlayerCoreFactory()
+{
+  return g_application.m_ServiceManager->GetPlayerCoreFactory();
+}
+
 void CServiceBroker::RegisterTextureCache(const std::shared_ptr<CTextureCache>& cache)
 {
   g_serviceBroker.m_textureCache = cache;
