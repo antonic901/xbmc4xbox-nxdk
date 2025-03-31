@@ -20,6 +20,7 @@ SRCS += \
 	$(CURDIR)/xbmc/PartyModeManager.cpp \
 	$(CURDIR)/xbmc/PasswordManager.cpp \
 	$(CURDIR)/xbmc/PlayListPlayer.cpp \
+	$(CURDIR)/xbmc/SeekHandler.cpp \
 	$(CURDIR)/xbmc/ServiceBroker.cpp \
 	$(CURDIR)/xbmc/ServiceManager.cpp \
 	$(CURDIR)/xbmc/TextureCache.cpp \
