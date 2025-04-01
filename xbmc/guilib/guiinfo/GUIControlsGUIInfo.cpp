@@ -11,7 +11,9 @@
 #include "FileItem.h"
 #include "ServiceBroker.h"
 #include "URL.h"
+#if 0
 #include "dialogs/GUIDialogKeyboardGeneric.h"
+#endif
 #include "dialogs/GUIDialogNumeric.h"
 #include "dialogs/GUIDialogProgress.h"
 #include "guilib/GUIComponent.h"
@@ -313,7 +315,7 @@ bool CGUIControlsGUIInfo::GetLabel(std::string& value, const CFileItem *item, in
     // SYSTEM_*
     ///////////////////////////////////////////////////////////////////////////////////////////////
     case SYSTEM_CURRENT_WINDOW:
-      value = g_localizeStrings.Get(CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindowOrDialog());
+      value = g_localizeStrings.Get(CServiceBroker::GetGUI()->GetWindowManager().GetFocusedWindow());
       return true;
     case SYSTEM_STARTUP_WINDOW:
       value = std::to_string(CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(
@@ -322,7 +324,7 @@ bool CGUIControlsGUIInfo::GetLabel(std::string& value, const CFileItem *item, in
     case SYSTEM_CURRENT_CONTROL:
     case SYSTEM_CURRENT_CONTROL_ID:
     {
-      CGUIWindow *window = CServiceBroker::GetGUI()->GetWindowManager().GetWindow(CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindowOrDialog());
+      CGUIWindow *window = CServiceBroker::GetGUI()->GetWindowManager().GetWindow(CServiceBroker::GetGUI()->GetWindowManager().GetFocusedWindow());
       if (window)
       {
         CGUIControl *control = window->GetFocusedControl();
@@ -339,7 +341,7 @@ bool CGUIControlsGUIInfo::GetLabel(std::string& value, const CFileItem *item, in
     }
     case SYSTEM_PROGRESS_BAR:
     {
-      CGUIDialogProgress *bar = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogProgress>(WINDOW_DIALOG_PROGRESS);
+      CGUIDialogProgress *bar = dynamic_cast<CGUIDialogProgress*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PROGRESS));
       if (bar && bar->IsDialogRunning())
         value = std::to_string(bar->GetPercentage());
       return true;
@@ -402,7 +404,7 @@ bool CGUIControlsGUIInfo::GetInt(int& value, const CGUIListItem *gitem, int cont
     ///////////////////////////////////////////////////////////////////////////////////////////////
     case SYSTEM_PROGRESS_BAR:
     {
-      CGUIDialogProgress *bar = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogProgress>(WINDOW_DIALOG_PROGRESS);
+      CGUIDialogProgress *bar = dynamic_cast<CGUIDialogProgress*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PROGRESS));
       if (bar && bar->IsDialogRunning())
         value = bar->GetPercentage();
       return true;
@@ -704,7 +706,7 @@ bool CGUIControlsGUIInfo::GetBool(bool& value, const CGUIListItem *gitem, int co
         if (!window)
         {
           // try topmost dialog
-          window = windowMgr.GetWindow(windowMgr.GetTopmostModalDialog());
+          window = windowMgr.GetWindow(windowMgr.GetTopMostModalDialogID());
           if (!window)
           {
             // try active window
@@ -735,6 +737,7 @@ bool CGUIControlsGUIInfo::GetBool(bool& value, const CGUIListItem *gitem, int co
         value = CServiceBroker::GetGUI()->GetWindowManager().IsWindowActive(info.GetData3());
       return true;
     }
+#if 0
     case WINDOW_IS_DIALOG_TOPMOST:
     {
       if (info.GetData1())
@@ -751,6 +754,7 @@ bool CGUIControlsGUIInfo::GetBool(bool& value, const CGUIListItem *gitem, int co
         value = CServiceBroker::GetGUI()->GetWindowManager().IsModalDialogTopmost(info.GetData3());
       return true;
     }
+#endif
     case WINDOW_NEXT:
     {
       if (info.GetData1())
@@ -792,20 +796,26 @@ bool CGUIControlsGUIInfo::GetBool(bool& value, const CGUIListItem *gitem, int co
     // SYSTEM_*
     ///////////////////////////////////////////////////////////////////////////////////////////////
     case SYSTEM_HAS_ACTIVE_MODAL_DIALOG:
-      value = CServiceBroker::GetGUI()->GetWindowManager().HasModalDialog(true);
+      value = CServiceBroker::GetGUI()->GetWindowManager().HasModalDialog();
       return true;
+#if 0
     case SYSTEM_HAS_VISIBLE_MODAL_DIALOG:
       value = CServiceBroker::GetGUI()->GetWindowManager().HasVisibleModalDialog();
       return true;
+#endif
     case SYSTEM_HAS_INPUT_HIDDEN:
     {
-      CGUIDialogNumeric *pNumeric = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogNumeric>(WINDOW_DIALOG_NUMERIC);
+      CGUIDialogNumeric *pNumeric = dynamic_cast<CGUIDialogNumeric*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_NUMERIC));
+#if 0
       CGUIDialogKeyboardGeneric *pKeyboard = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogKeyboardGeneric>(WINDOW_DIALOG_KEYBOARD);
+#endif
 
       if (pNumeric && pNumeric->IsActive())
         value = pNumeric->IsInputHidden();
+#if 0
       else if (pKeyboard && pKeyboard->IsActive())
         value = pKeyboard->IsInputHidden();
+#endif
       return true;
     }
   }

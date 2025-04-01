@@ -16,8 +16,6 @@
 #include "application/Application.h"
 #include "application/ApplicationComponents.h"
 #include "application/ApplicationPlayer.h"
-#include "application/ApplicationVolumeHandling.h"
-#include "cores/AudioEngine/Utils/AEUtil.h"
 #include "cores/DataCacheCore.h"
 #include "cores/EdlEdit.h"
 #include "guilib/GUIComponent.h"
@@ -182,7 +180,7 @@ bool CPlayerGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
       return true;
     case PLAYER_VOLUME:
       value =
-          StringUtils::Format("{:2.1f} dB", CAEUtil::PercentToGain(m_appVolume->GetVolumeRatio()));
+          StringUtils::Format("{:2.1f} dB", static_cast<float>(g_application.GetVolume(false) + g_application.GetDynamicRangeCompressionLevel()) * 0.01f);
       return true;
     case PLAYER_SUBTITLE_DELAY:
       value = StringUtils::Format("{:2.3f} s", m_appPlayer->GetVideoSettings().m_SubtitleDelay);
@@ -362,7 +360,7 @@ bool CPlayerGUIInfo::GetInt(int& value, const CGUIListItem *gitem, int contextWi
     // PLAYER_*
     ///////////////////////////////////////////////////////////////////////////////////////////////
     case PLAYER_VOLUME:
-      value = static_cast<int>(m_appVolume->GetVolumePercent());
+      value = static_cast<int>(g_application.GetVolume());
       return true;
     case PLAYER_PROGRESS:
       value = std::lrintf(g_application.GetPercentage());
@@ -411,8 +409,8 @@ bool CPlayerGUIInfo::GetBool(bool& value, const CGUIListItem *gitem, int context
       value = m_playerShowTime;
       return true;
     case PLAYER_MUTED:
-      value = (m_appVolume->IsMuted() ||
-               m_appVolume->GetVolumeRatio() <= CApplicationVolumeHandling::VOLUME_MINIMUM);
+      value = (g_application.IsMuted() ||
+               g_application.GetVolume(false) <= VOLUME_MINIMUM);
       return true;
     case PLAYER_HAS_MEDIA:
       value = m_appPlayer->IsPlaying();
@@ -485,7 +483,7 @@ bool CPlayerGUIInfo::GetBool(bool& value, const CGUIListItem *gitem, int context
       return true;
     case PLAYER_SEEKBAR:
     {
-      CGUIDialog *seekBar = CServiceBroker::GetGUI()->GetWindowManager().GetDialog(WINDOW_DIALOG_SEEK_BAR);
+      CGUIDialog *seekBar = dynamic_cast<CGUIDialog*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_SEEK_BAR));
       value = seekBar ? seekBar->IsDialogRunning() : false;
       return true;
     }
@@ -520,10 +518,12 @@ bool CPlayerGUIInfo::GetBool(bool& value, const CGUIListItem *gitem, int context
     case PLAYER_HAS_PROGRAMS:
       value = (m_appPlayer->GetProgramsCount() > 1) ? true : false;
       return true;
+#if 0
     case PLAYER_HAS_RESOLUTIONS:
       value = CServiceBroker::GetWinSystem()->GetGfxContext().IsFullScreenRoot() &&
               CResolutionUtils::HasWhitelist();
       return true;
+#endif
     case PLAYER_HASDURATION:
       value = g_application.GetTotalTime() > 0;
       return true;

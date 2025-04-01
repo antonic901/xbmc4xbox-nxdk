@@ -98,7 +98,7 @@ CGUIWindow* GetWindowWithCondition(int contextWindow, int condition)
     return window;
 
   // try topmost dialog
-  window = windowMgr.GetWindow(windowMgr.GetTopmostModalDialog());
+  window = windowMgr.GetWindow(windowMgr.GetTopMostModalDialogID());
   if (CheckWindowCondition(window, condition))
     return window;
 

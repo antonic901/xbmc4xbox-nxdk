@@ -6,7 +6,6 @@ SRCS += \
 	$(CURDIR)/xbmc/guilib/guiinfo/GUIInfoBool.cpp \
 	$(CURDIR)/xbmc/guilib/guiinfo/GUIInfoColor.cpp \
 	$(CURDIR)/xbmc/guilib/guiinfo/AddonsGUIInfo.cpp \
-	$(CURDIR)/xbmc/guilib/guiinfo/GamesGUIInfo.cpp \
 	$(CURDIR)/xbmc/guilib/guiinfo/GUIControlsGUIInfo.cpp \
 	$(CURDIR)/xbmc/guilib/guiinfo/LibraryGUIInfo.cpp \
 	$(CURDIR)/xbmc/guilib/guiinfo/MusicGUIInfo.cpp \

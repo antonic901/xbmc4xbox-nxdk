@@ -179,7 +179,7 @@ bool CPicturesGUIInfo::GetLabel(std::string& value, const CFileItem *item, int c
       }
       case SLIDESHOW_INDEX:
       {
-        CGUIWindowSlideShow *slideshow = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIWindowSlideShow>(WINDOW_SLIDESHOW);
+        CGUIWindowSlideShow *slideshow = dynamic_cast<CGUIWindowSlideShow*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_SLIDESHOW));
         if (slideshow && slideshow->NumSlides())
         {
           value = StringUtils::Format("{}/{}", slideshow->CurrentSlide(), slideshow->NumSlides());
@@ -231,25 +231,25 @@ bool CPicturesGUIInfo::GetBool(bool& value, const CGUIListItem *gitem, int conte
     ///////////////////////////////////////////////////////////////////////////////////////////////
     case SLIDESHOW_ISPAUSED:
     {
-      CGUIWindowSlideShow *slideShow = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIWindowSlideShow>(WINDOW_SLIDESHOW);
+      CGUIWindowSlideShow *slideShow = dynamic_cast<CGUIWindowSlideShow*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_SLIDESHOW));
       value = (slideShow && slideShow->IsPaused());
       return true;
     }
     case SLIDESHOW_ISRANDOM:
     {
-      CGUIWindowSlideShow *slideShow = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIWindowSlideShow>(WINDOW_SLIDESHOW);
+      CGUIWindowSlideShow *slideShow = dynamic_cast<CGUIWindowSlideShow*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_SLIDESHOW));
       value = (slideShow && slideShow->IsShuffled());
       return true;
     }
     case SLIDESHOW_ISACTIVE:
     {
-      CGUIWindowSlideShow *slideShow = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIWindowSlideShow>(WINDOW_SLIDESHOW);
+      CGUIWindowSlideShow *slideShow = dynamic_cast<CGUIWindowSlideShow*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_SLIDESHOW));
       value = (slideShow && slideShow->InSlideShow());
       return true;
     }
     case SLIDESHOW_ISVIDEO:
     {
-      CGUIWindowSlideShow *slideShow = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIWindowSlideShow>(WINDOW_SLIDESHOW);
+      CGUIWindowSlideShow *slideShow = dynamic_cast<CGUIWindowSlideShow*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_SLIDESHOW));
       value = (slideShow && slideShow->GetCurrentSlide() && slideShow->GetCurrentSlide()->IsVideo());
       return true;
     }

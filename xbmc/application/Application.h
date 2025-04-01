@@ -83,11 +83,17 @@ public:
    Beware that this method returns fractional seconds whereas IPlayer::GetTime() returns milliseconds.
    */
   double GetTime() const;
+  float GetPercentage() const;
+
+  // Get the percentage of data currently cached/buffered (aq/vq + FileCache) from the input stream if applicable.
+  float GetCachePercentage() const;
 
   void SeekTime( double dTime = 0.0 );
 
   int GetVolume(bool percentage = true) const;
   void SetVolume(long iValue, bool isPercentage = true);
+  int GetDynamicRangeCompressionLevel() { return 0; };
+  bool IsMuted() const;
   void ToggleMute(void);
 
   bool SetLanguage(const std::string &strLanguage);

@@ -118,8 +118,23 @@ void CApplication::SeekTime( double dTime )
 {
 }
 
+float CApplication::GetPercentage() const
+{
+  return 0.0f;
+}
+
+float CApplication::GetCachePercentage() const
+{
+  return 0.0f;
+}
+
 void CApplication::SeekPercentage(float percent)
 {
+}
+
+bool CApplication::IsMuted() const
+{
+  return false;
 }
 
 void CApplication::ToggleMute(void)

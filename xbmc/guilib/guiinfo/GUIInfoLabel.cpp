@@ -10,6 +10,7 @@
 
 #include "FileItem.h"
 #include "GUIInfoManager.h"
+#include "ServiceBroker.h"
 #include "addons/Skin.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIListItem.h"
