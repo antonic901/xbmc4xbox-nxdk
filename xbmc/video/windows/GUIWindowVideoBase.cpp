@@ -32,6 +32,7 @@
 #include "filesystem/MultiPathDirectory.h"
 #include "filesystem/StackDirectory.h"
 #include "filesystem/VideoDatabaseDirectory.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIKeyboardFactory.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
@@ -101,7 +102,7 @@ bool CGUIWindowVideoBase::OnAction(const CAction &action)
     if (CServiceBroker::GetPlaylistPlayer().GetCurrentPlaylist() == PLAYLIST::TYPE_VIDEO ||
         CServiceBroker::GetPlaylistPlayer().GetPlaylist(PLAYLIST::TYPE_VIDEO).size() > 0)
     {
-      g_windowManager.ActivateWindow(WINDOW_VIDEO_PLAYLIST);
+      CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_VIDEO_PLAYLIST);
       return true;
     }
   }
@@ -122,7 +123,7 @@ bool CGUIWindowVideoBase::OnMessage(CGUIMessage& message)
   case GUI_MSG_WINDOW_INIT:
     {
       m_database.Open();
-      m_dlgProgress = dynamic_cast<CGUIDialogProgress*>(g_windowManager.GetWindow(WINDOW_DIALOG_PROGRESS));
+      m_dlgProgress = dynamic_cast<CGUIDialogProgress*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PROGRESS));
       return CGUIMediaWindow::OnMessage(message);
     }
     break;
@@ -275,7 +276,7 @@ bool CGUIWindowVideoBase::OnItemInfo(const CFileItem& fileItem, ADDON::ScraperPt
 
   bool modified = ShowIMDB(CFileItemPtr(new CFileItem(item)), scraper, fromDB);
   if (modified &&
-     (g_windowManager.GetActiveWindow() == WINDOW_VIDEO_NAV)) // since we can be called from the music library we need this check
+     (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_VIDEO_NAV)) // since we can be called from the music library we need this check
   {
     int itemNumber = m_viewControl.GetSelectedItem();
     Refresh();
@@ -315,9 +316,9 @@ bool CGUIWindowVideoBase::ShowIMDB(CFileItemPtr item, const ScraperPtr &info2, b
   CLog::Log(LOGDEBUG,"  bFolder   = [{}]", ((int)bFolder ? "true" : "false"));
   */
 
-  CGUIDialogProgress* pDlgProgress = dynamic_cast<CGUIDialogProgress*>(g_windowManager.GetWindow(WINDOW_DIALOG_PROGRESS));
-  CGUIDialogSelect* pDlgSelect = dynamic_cast<CGUIDialogSelect*>(g_windowManager.GetWindow(WINDOW_DIALOG_SELECT));
-  CGUIDialogVideoInfo* pDlgInfo = dynamic_cast<CGUIDialogVideoInfo*>(g_windowManager.GetWindow(WINDOW_DIALOG_VIDEO_INFO));
+  CGUIDialogProgress* pDlgProgress = dynamic_cast<CGUIDialogProgress*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PROGRESS));
+  CGUIDialogSelect* pDlgSelect = dynamic_cast<CGUIDialogSelect*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_SELECT));
+  CGUIDialogVideoInfo* pDlgInfo = dynamic_cast<CGUIDialogVideoInfo*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_VIDEO_INFO));
 
   const ScraperPtr& info(info2); // use this as nfo might change it..
 
@@ -918,7 +919,7 @@ bool CGUIWindowVideoBase::OnPlayStackPart(int iItem)
   for (int i = 0; i < parts.Size(); i++)
     parts[i]->SetLabel(StringUtils::Format(g_localizeStrings.Get(23051), i + 1));
 
-  CGUIDialogSelect* pDialog = dynamic_cast<CGUIDialogSelect*>(g_windowManager.GetWindow(WINDOW_DIALOG_SELECT));
+  CGUIDialogSelect* pDialog = dynamic_cast<CGUIDialogSelect*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_SELECT));
 
   pDialog->Reset();
   pDialog->SetHeading(CVariant{20324});
@@ -1174,10 +1175,8 @@ void CGUIWindowVideoBase::OnDeleteItem(const CFileItemPtr& item)
        m_vecItems->IsPath("special://videoplaylists/")) &&
       CUtil::SupportsWriteFileOperations(item->GetPath()))
   {
-#if 0
     CGUIComponent *gui = CServiceBroker::GetGUI();
     if (gui && gui->ConfirmDelete(item->GetPath()))
-#endif
       CFileUtils::DeleteItem(item);
   }
 }
@@ -1401,7 +1400,7 @@ void CGUIWindowVideoBase::OnSearch()
 
   if (items.Size())
   {
-    CGUIDialogSelect* pDlgSelect = dynamic_cast<CGUIDialogSelect*>(g_windowManager.GetWindow(WINDOW_DIALOG_SELECT));
+    CGUIDialogSelect* pDlgSelect = dynamic_cast<CGUIDialogSelect*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_SELECT));
     pDlgSelect->Reset();
     pDlgSelect->SetHeading(CVariant{283});
 
@@ -1540,7 +1539,7 @@ bool CGUIWindowVideoBase::OnUnAssignContent(const std::string &path, int header,
   db.Open();
   if (CGUIDialogYesNo::ShowAndGetInput(CVariant{header}, CVariant{text}, bCanceled, CVariant{ "" }, CVariant{ "" }, CGUIDialogYesNo::NO_TIMEOUT))
   {
-    CGUIDialogProgress *progress = dynamic_cast<CGUIDialogProgress*>(g_windowManager.GetWindow(WINDOW_DIALOG_PROGRESS));
+    CGUIDialogProgress *progress = dynamic_cast<CGUIDialogProgress*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PROGRESS));
     db.RemoveContentForPath(path, progress);
     db.Close();
     CUtil::DeleteVideoDatabaseDirectoryCache();

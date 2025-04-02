@@ -12,6 +12,7 @@
 #include "Util.h"
 #include "dialogs/GUIDialogFileBrowser.h"
 #include "filesystem/Directory.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
 #include "messaging/helpers/DialogHelper.h"
@@ -43,7 +44,7 @@ CGUIDialogLibExportSettings::CGUIDialogLibExportSettings()
 
 bool CGUIDialogLibExportSettings::Show(CLibExportSettings& settings)
 {
-  CGUIDialogLibExportSettings *dialog = dynamic_cast<CGUIDialogLibExportSettings*>(g_windowManager.GetWindow(WINDOW_DIALOG_LIBEXPORT_SETTINGS));
+  CGUIDialogLibExportSettings *dialog = dynamic_cast<CGUIDialogLibExportSettings*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_LIBEXPORT_SETTINGS));
   if (!dialog)
     return false;
 
@@ -214,7 +215,7 @@ void CGUIDialogLibExportSettings::OnOK()
       {
         m_confirmed = false;
         Close();
-        g_windowManager.ActivateWindow(WINDOW_SETTINGS_MEDIA, CSettings::SETTING_MUSICLIBRARY_ARTISTSFOLDER);
+        CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_SETTINGS_MEDIA, CSettings::SETTING_MUSICLIBRARY_ARTISTSFOLDER);
       }
       return;
     }

@@ -26,6 +26,7 @@
 #include "filesystem/File.h"
 #include "filesystem/SpecialProtocol.h"
 #include "filesystem/StackDirectory.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIKeyboardFactory.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
@@ -667,7 +668,7 @@ void CGUIDialogSubtitles::OnDownloadComplete(const CFileItemList *items, const s
 
   // Notify window manager that a subtitle was downloaded
   CGUIMessage msg(GUI_MSG_SUBTITLE_DOWNLOADED, 0, 0);
-  g_windowManager.SendThreadMessage(msg);
+  CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
 
   // Close the window
   Close();

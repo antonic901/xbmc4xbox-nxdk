@@ -29,6 +29,7 @@
 #include "filesystem/MusicDatabaseDirectory.h"
 #include "filesystem/MusicDatabaseDirectory/DirectoryNode.h"
 #include "filesystem/SmartPlaylistDirectory.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIKeyboardFactory.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
@@ -79,7 +80,7 @@ void CMusicInfoScanner::Process()
     if (m_showDialog && !CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_MUSICLIBRARY_BACKGROUNDUPDATE))
     {
       CGUIDialogExtendedProgressBar* dialog =
-        dynamic_cast<CGUIDialogExtendedProgressBar*>(g_windowManager.GetWindow(WINDOW_DIALOG_EXT_PROGRESS));
+        dynamic_cast<CGUIDialogExtendedProgressBar*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_EXT_PROGRESS));
       if (dialog)
         m_handle = dialog->GetHandle(g_localizeStrings.Get(314));
     }
@@ -276,7 +277,7 @@ void CMusicInfoScanner::Process()
   // we need to clear the musicdb cache and update any active lists
   CUtil::DeleteMusicDatabaseDirectoryCache();
   CGUIMessage msg(GUI_MSG_SCAN_FINISHED, 0, 0, 0);
-  g_windowManager.SendThreadMessage(msg);
+  CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
 
   if (m_handle)
     m_handle->MarkFinished();
@@ -452,7 +453,7 @@ static void OnDirectoryScanned(const std::string& strDirectory)
 {
   CGUIMessage msg(GUI_MSG_DIRECTORY_SCANNED, 0, 0, 0);
   msg.SetStringParam(strDirectory);
-  g_windowManager.SendThreadMessage(msg);
+  CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
 }
 
 static std::string Prettify(const std::string& strDirectory)
@@ -1544,7 +1545,7 @@ CMusicInfoScanner::DownloadAlbumInfo(const CAlbum& album,
         //show dialog with all albums found
         if (pDialog)
         {
-          pDlg = dynamic_cast<CGUIDialogSelect*>(g_windowManager.GetWindow(WINDOW_DIALOG_SELECT));
+          pDlg = dynamic_cast<CGUIDialogSelect*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_SELECT));
           pDlg->SetHeading(CVariant{g_localizeStrings.Get(181)});
           pDlg->Reset();
           pDlg->EnableButton(true, 413); // manual
@@ -1812,7 +1813,7 @@ CMusicInfoScanner::DownloadArtistInfo(const CArtist& artist,
       if (pDialog && scraper.GetArtistCount() > 1)
       {
         // if we found more then 1 album, let user choose one
-        CGUIDialogSelect *pDlg = dynamic_cast<CGUIDialogSelect*>(g_windowManager.GetWindow(WINDOW_DIALOG_SELECT));
+        CGUIDialogSelect *pDlg = dynamic_cast<CGUIDialogSelect*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_SELECT));
         if (pDlg)
         {
           pDlg->SetHeading(CVariant{g_localizeStrings.Get(21890)});

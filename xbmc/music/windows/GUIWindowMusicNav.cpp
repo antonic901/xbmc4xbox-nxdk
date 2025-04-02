@@ -19,6 +19,7 @@
 #include "dialogs/GUIDialogYesNo.h"
 #include "filesystem/MusicDatabaseDirectory.h"
 #include "filesystem/VideoDatabaseDirectory.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIEditControl.h"
 #include "guilib/GUIKeyboardFactory.h"
 #include "guilib/GUIWindowManager.h"
@@ -753,7 +754,7 @@ bool CGUIWindowMusicNav::OnContextButton(int itemNumber, CONTEXT_BUTTON button)
       strPath = StringUtils::Format(
           "videodb://musicvideos/artists/{}/",
           database.GetMatchingMusicVideo(item->GetMusicInfoTag()->GetArtistString()));
-      g_windowManager.ActivateWindow(WINDOW_VIDEO_NAV,strPath);
+      CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_VIDEO_NAV,strPath);
       return true;
     }
 
@@ -781,10 +782,8 @@ bool CGUIWindowMusicNav::OnContextButton(int itemNumber, CONTEXT_BUTTON button)
     if (item->IsPlayList() || item->IsSmartPlayList())
     {
       item->m_bIsFolder = false;
-#if 0
       CGUIComponent *gui = CServiceBroker::GetGUI();
       if (gui && gui->ConfirmDelete(item->GetPath()))
-#endif
         CFileUtils::DeleteItem(item);
     }
     else if (!item->IsVideoDb())

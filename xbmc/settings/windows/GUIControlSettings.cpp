@@ -13,6 +13,7 @@
 #include "Util.h"
 #include "dialogs/GUIDialogSelect.h"
 #include "dialogs/GUIDialogSlider.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIEditControl.h"
 #include "guilib/GUIImage.h"
 #include "guilib/GUIKeyboardFactory.h"
@@ -576,7 +577,7 @@ bool CGUIControlListSetting::OnClick()
     return false;
 
   CGUIDialogSelect* dialog =
-      dynamic_cast<CGUIDialogSelect*>(g_windowManager.GetWindow(
+      dynamic_cast<CGUIDialogSelect*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(
           WINDOW_DIALOG_SELECT));
   if (dialog == NULL)
     return false;

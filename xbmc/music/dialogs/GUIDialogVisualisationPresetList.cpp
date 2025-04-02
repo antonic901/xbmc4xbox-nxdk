@@ -11,8 +11,8 @@
 #include "FileItem.h"
 #include "GUIUserMessages.h"
 #include "ServiceBroker.h"
-#if 0
 #include "guilib/GUIComponent.h"
+#if 0
 #include "guilib/GUIVisualisationControl.h"
 #endif
 #include "guilib/GUIWindowManager.h"
@@ -94,7 +94,7 @@ void CGUIDialogVisualisationPresetList::SetVisualisation(CGUIVisualisationContro
 void CGUIDialogVisualisationPresetList::OnInitWindow()
 {
   CGUIMessage msg(GUI_MSG_GET_VISUALISATION, 0, 0);
-  g_windowManager.SendMessage(msg);
+  CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
 #if 0
   SetVisualisation(static_cast<CGUIVisualisationControl*>(msg.GetPointer()));
 #endif

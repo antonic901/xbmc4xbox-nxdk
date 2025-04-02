@@ -34,6 +34,7 @@
 #include "filesystem/FileDirectoryFactory.h"
 #include "filesystem/MultiPathDirectory.h"
 #include "filesystem/SmartPlaylistDirectory.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIEditControl.h"
 #include "guilib/GUIKeyboardFactory.h"
 #include "guilib/GUIWindowManager.h"
@@ -1137,7 +1138,7 @@ bool CGUIMediaWindow::OnClick(int iItem, const std::string &player)
     if (pItem->GetPath() == "newplaylist://")
     {
       m_vecItems->RemoveDiscCache(GetID());
-      g_windowManager.ActivateWindow(WINDOW_MUSIC_PLAYLIST_EDITOR,"newplaylist://");
+      CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_MUSIC_PLAYLIST_EDITOR,"newplaylist://");
       return true;
     }
     else if (StringUtils::StartsWithNoCase(pItem->GetPath(), "newsmartplaylist://"))
@@ -1633,10 +1634,8 @@ void CGUIMediaWindow::OnDeleteItem(int iItem)
       return;
   }
 
-#if 0
   CGUIComponent *gui = CServiceBroker::GetGUI();
-#endif
-  if (/*gui && gui->ConfirmDelete(item->GetPath())*/true)
+  if (gui && gui->ConfirmDelete(item->GetPath()))
   {
     if (!CFileUtils::DeleteItem(item))
       return;
@@ -1687,7 +1686,7 @@ void CGUIMediaWindow::OnInitWindow()
   else
   {
     CGUIMessage msg(GUI_MSG_WINDOW_INIT, 0, 0, WINDOW_INVALID, PLUGIN_REFRESH_DELAY);
-    g_windowManager.SendThreadMessage(msg, GetID());
+    CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg, GetID());
   }
 
   if (updateStartDirectory)
@@ -1851,7 +1850,7 @@ bool CGUIMediaWindow::WaitForNetwork() const
   if (CServiceBroker::GetNetwork().IsAvailable())
     return true;
 
-  CGUIDialogProgress *progress = dynamic_cast<CGUIDialogProgress*>(g_windowManager.GetWindow(WINDOW_DIALOG_PROGRESS));
+  CGUIDialogProgress *progress = dynamic_cast<CGUIDialogProgress*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PROGRESS));
   if (!progress)
     return true;
 
@@ -2220,7 +2219,7 @@ std::string CGUIMediaWindow::RemoveParameterFromPath(const std::string &strDirec
 
 bool CGUIMediaWindow::ProcessRenderLoop(bool renderOnly)
 {
-  g_windowManager.ProcessRenderLoop(renderOnly);
+  CServiceBroker::GetGUI()->GetWindowManager().ProcessRenderLoop(renderOnly);
   return true;
 }
 
@@ -2262,7 +2261,7 @@ bool CGUIMediaWindow::GetDirectoryItems(CURL &url, CFileItemList &items, bool us
 bool CGUIMediaWindow::WaitGetDirectoryItems(CGetDirectoryItems &items)
 {
   bool ret = true;
-  CGUIDialogBusy* dialog = dynamic_cast<CGUIDialogBusy*>(g_windowManager.GetWindow(WINDOW_DIALOG_BUSY));
+  CGUIDialogBusy* dialog = dynamic_cast<CGUIDialogBusy*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_BUSY));
   if (dialog && !dialog->IsDialogRunning())
   {
     if (!CGUIDialogBusy::Wait(&items))

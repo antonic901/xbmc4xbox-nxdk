@@ -22,6 +22,7 @@
 #include "dialogs/GUIDialogSelect.h"
 #include "filesystem/Directory.h"
 #include "filesystem/MusicDatabaseDirectory.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIKeyboardFactory.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
@@ -309,7 +310,7 @@ std::string ShowSelectArtTypeDialog(CFileItemList& artitems)
 {
   // Prompt for choice
   CGUIDialogSelect* dialog =
-      dynamic_cast<CGUIDialogSelect*>(g_windowManager.GetWindow(
+      dynamic_cast<CGUIDialogSelect*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(
           WINDOW_DIALOG_SELECT));
   if (!dialog)
     return "";
@@ -344,7 +345,7 @@ std::string ShowSelectArtTypeDialog(CFileItemList& artitems)
 int ShowSelectRatingDialog(int iSelected)
 {
   CGUIDialogSelect* dialog =
-      dynamic_cast<CGUIDialogSelect*>(g_windowManager.GetWindow(
+      dynamic_cast<CGUIDialogSelect*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(
           WINDOW_DIALOG_SELECT));
   if (dialog)
   {
@@ -555,7 +556,7 @@ void CAsyncGetItemsForPlaylist::GetItemsForPlaylist(const std::shared_ptr<CFileI
       }
 
       SortDescription sortDesc;
-      if (g_windowManager.GetActiveWindow() == WINDOW_MUSIC_NAV)
+      if (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_MUSIC_NAV)
         sortDesc = state->GetSortMethod();
       else
         sortDesc = GetSortDescription(*state, items);
@@ -732,7 +733,7 @@ void QueueItem(const std::shared_ptr<CFileItem>& itemIn, QueuePosition pos)
 
   if (!appPlayer->IsPlaying() && player.GetPlaylist(playlistId).size())
   {
-    const int winID = g_windowManager.GetActiveWindow();
+    const int winID = CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow();
     if (winID == WINDOW_MUSIC_NAV)
     {
       CGUIViewState* viewState = CGUIViewState::GetViewState(winID, queuedItems);
@@ -784,7 +785,7 @@ bool IsItemPlayable(const CFileItem& item)
     return false;
 
   // Exclude unwanted windows
-  if (g_windowManager.GetActiveWindow() == WINDOW_MUSIC_PLAYLIST)
+  if (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_MUSIC_PLAYLIST)
     return false;
 
   // Include playlists located at one of the possible music playlist locations
@@ -830,7 +831,7 @@ bool IsItemPlayable(const CFileItem& item)
   else if (item.m_bIsFolder)
   {
     // Not a music-specific folder (just file:// or nfs://). Allow play if context is Music window.
-    if (g_windowManager.GetActiveWindow() == WINDOW_MUSIC_NAV &&
+    if (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_MUSIC_NAV &&
         item.GetPath() != "add") // Exclude "Add music source" item
       return true;
   }

@@ -11,6 +11,7 @@
 #include "FileItem.h"
 #include "GUIUserMessages.h"
 #include "ServiceBroker.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "music/MusicUtils.h"
 #include "music/dialogs/GUIDialogMusicInfo.h"
@@ -48,15 +49,16 @@ bool CMusicBrowse::IsVisible(const CFileItem& item) const
 
 bool CMusicBrowse::Execute(const std::shared_ptr<CFileItem>& item) const
 {
-  if (g_windowManager.GetActiveWindow() == WINDOW_MUSIC_NAV)
+  auto& windowMgr = CServiceBroker::GetGUI()->GetWindowManager();
+  if (windowMgr.GetActiveWindow() == WINDOW_MUSIC_NAV)
   {
     CGUIMessage msg(GUI_MSG_NOTIFY_ALL, WINDOW_MUSIC_NAV, 0, GUI_MSG_UPDATE);
     msg.SetStringParam(item->GetPath());
-    g_windowManager.SendMessage(msg);
+    windowMgr.SendMessage(msg);
   }
   else
   {
-    g_windowManager.ActivateWindow(WINDOW_MUSIC_NAV, {item->GetPath(), "return"});
+    windowMgr.ActivateWindow(WINDOW_MUSIC_NAV, {item->GetPath(), "return"});
   }
   return true;
 }
@@ -98,17 +100,18 @@ namespace
 {
 void SelectNextItem(int windowID)
 {
-  CGUIWindow* window = g_windowManager.GetWindow(windowID);
+  auto& windowMgr = CServiceBroker::GetGUI()->GetWindowManager();
+  CGUIWindow* window = windowMgr.GetWindow(windowID);
   if (window)
   {
     const int viewContainerID = window->GetViewContainerID();
     if (viewContainerID > 0)
     {
       CGUIMessage msg1(GUI_MSG_ITEM_SELECTED, windowID, viewContainerID);
-      g_windowManager.SendMessage(msg1, windowID);
+      windowMgr.SendMessage(msg1, windowID);
 
       CGUIMessage msg2(GUI_MSG_ITEM_SELECT, windowID, viewContainerID, msg1.GetParam1() + 1);
-      g_windowManager.SendMessage(msg2, windowID);
+      windowMgr.SendMessage(msg2, windowID);
     }
   }
 }
@@ -119,7 +122,7 @@ bool CMusicQueue::Execute(const std::shared_ptr<CFileItem>& item) const
   MUSIC_UTILS::QueueItem(item, MUSIC_UTILS::QueuePosition::POSITION_END);
 
   // Set selection to next item in active window's view.
-  const int windowID = g_windowManager.GetActiveWindow();
+  const int windowID = CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow();
   SelectNextItem(windowID);
 
   return true;

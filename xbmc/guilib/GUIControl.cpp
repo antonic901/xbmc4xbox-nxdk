@@ -22,7 +22,9 @@
 
 #include "GUIInfoManager.h"
 #include "utils/log.h"
+#include "GUIComponent.h"
 #include "GUIWindowManager.h"
+#include "ServiceBroker.h"
 #include "GUITexture.h"
 #include "input/Key.h"
 
@@ -302,10 +304,10 @@ void CGUIControl::OnPrevControl()
 
 bool CGUIControl::SendWindowMessage(CGUIMessage &message) const
 {
-  CGUIWindow *pWindow = g_windowManager.GetWindow(GetParentID());
+  CGUIWindow *pWindow = CServiceBroker::GetGUI()->GetWindowManager().GetWindow(GetParentID());
   if (pWindow)
     return pWindow->OnMessage(message);
-  return g_windowManager.SendMessage(message);
+  return CServiceBroker::GetGUI()->GetWindowManager().SendMessage(message);
 }
 
 int CGUIControl::GetID(void) const

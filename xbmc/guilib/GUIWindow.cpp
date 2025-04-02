@@ -20,6 +20,7 @@
 
 #include "system.h"
 #include "GUIWindow.h"
+#include "GUIComponent.h"
 #include "GUIWindowManager.h"
 #include "ServiceBroker.h"
 #include "input/Key.h"
@@ -823,7 +824,7 @@ void CGUIWindow::ClearAll()
 
 bool CGUIWindow::Initialize()
 {
-  if (!g_windowManager.Initialized())
+  if (!CServiceBroker::GetGUI()->GetWindowManager().Initialized())
     return false;     // can't load if we have no skin yet
   if(!NeedXMLReload())
     return true;
@@ -848,7 +849,7 @@ void CGUIWindow::SetInitialVisibility()
 
 bool CGUIWindow::IsActive() const
 {
-  return g_windowManager.IsWindowActive(GetID());
+  return CServiceBroker::GetGUI()->GetWindowManager().IsWindowActive(GetID());
 }
 
 bool CGUIWindow::CheckAnimation(ANIMATION_TYPE animType)
@@ -944,7 +945,7 @@ void CGUIWindow::ResetControlStates()
 
 bool CGUIWindow::OnBack(int actionID)
 {
-  g_windowManager.PreviousWindow();
+  CServiceBroker::GetGUI()->GetWindowManager().PreviousWindow();
   return true;
 }
 

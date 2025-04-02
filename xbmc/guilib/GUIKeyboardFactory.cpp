@@ -19,6 +19,7 @@
  */
 
 #include "ServiceBroker.h"
+#include "GUIComponent.h"
 #include "messaging/ApplicationMessenger.h"
 #include "LocalizeStrings.h"
 #include "GUIKeyboardFactory.h"
@@ -55,7 +56,7 @@ void CGUIKeyboardFactory::keyTypedCB(CGUIKeyboard *ref, const std::string &typed
       case FILTERING_SEARCH:
         message.SetParam1(GUI_MSG_SEARCH_UPDATE);
         message.SetStringParam(typedString);
-        CServiceBroker::GetAppMessenger()->SendGUIMessage(message, g_windowManager.GetActiveWindow());
+        CServiceBroker::GetAppMessenger()->SendGUIMessage(message, CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow());
         break;
       case FILTERING_CURRENT:
         message.SetParam1(GUI_MSG_FILTER_ITEMS);
@@ -93,9 +94,9 @@ bool CGUIKeyboardFactory::ShowAndGetInput(std::string& aTextString, CVariant hea
 
 #if 0
 #if defined(TARGET_DARWIN_IOS)
-  kb = (CGUIDialogKeyboardTouch*)g_windowManager.GetWindow(WINDOW_DIALOG_KEYBOARD_TOUCH);
+  kb = (CGUIDialogKeyboardTouch*)CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_KEYBOARD_TOUCH);
 #else
-  kb = (CGUIDialogKeyboardGeneric*)g_windowManager.GetWindow(WINDOW_DIALOG_KEYBOARD);
+  kb = (CGUIDialogKeyboardGeneric*)CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_KEYBOARD);
 #endif
 
   if (kb)

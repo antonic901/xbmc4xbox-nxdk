@@ -10,6 +10,7 @@
 
 #include "FileItem.h"
 #include "ServiceBroker.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/WindowIDs.h"
 #include "settings/Settings.h"
@@ -32,7 +33,7 @@ int CAutoSwitch::GetView(const CFileItemList &vecItems)
 {
   int iSortMethod = -1;
   int iPercent = 0;
-  int iCurrentWindow = g_windowManager.GetActiveWindow();
+  int iCurrentWindow = CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow();
   bool bHideParentFolderItems = !CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_FILELISTS_SHOWPARENTDIRITEMS);
 
   switch (iCurrentWindow)

@@ -13,6 +13,7 @@
 #include "GUIUserMessages.h"
 #include "ServiceBroker.h"
 #include "XBDateTime.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
 #include "music/MusicDatabase.h"
@@ -186,7 +187,7 @@ bool CGUIDialogMediaFilter::OnMessage(CGUIMessage& message)
 
 void CGUIDialogMediaFilter::ShowAndEditMediaFilter(const std::string &path, CSmartPlaylist &filter)
 {
-  CGUIDialogMediaFilter *dialog = dynamic_cast<CGUIDialogMediaFilter*>(g_windowManager.GetWindow(WINDOW_DIALOG_MEDIA_FILTER));
+  CGUIDialogMediaFilter *dialog = dynamic_cast<CGUIDialogMediaFilter*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_MEDIA_FILTER));
   if (dialog == NULL)
     return;
 
@@ -340,7 +341,7 @@ void CGUIDialogMediaFilter::OnSettingChanged(const std::shared_ptr<const CSettin
   }
 
   CGUIMessage msg(GUI_MSG_REFRESH_LIST, GetID(), 0);
-  g_windowManager.SendThreadMessage(msg, WINDOW_DIALOG_MEDIA_FILTER);
+  CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg, WINDOW_DIALOG_MEDIA_FILTER);
 }
 
 void CGUIDialogMediaFilter::SetupView()
@@ -623,7 +624,7 @@ void CGUIDialogMediaFilter::TriggerFilter() const
     return;
 
   CGUIMessage message(GUI_MSG_NOTIFY_ALL, GetID(), 0, GUI_MSG_FILTER_ITEMS, 10); // 10 for advanced
-  g_windowManager.SendThreadMessage(message);
+  CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(message);
 }
 
 void CGUIDialogMediaFilter::Reset(bool filtersOnly /* = false */)

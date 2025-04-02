@@ -9,8 +9,10 @@
 #include "ContextMenus.h"
 
 #include "ServiceBroker.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
+#include "input/ButtonTranslator.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
@@ -63,11 +65,9 @@ int GetTargetWindowID(const CFileItem& item)
 
   const std::string targetWindow = item.GetProperty("targetwindow").asString();
   if (targetWindow.empty())
-    iTargetWindow = g_windowManager.GetActiveWindow();
-#if 0
+    iTargetWindow = CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow();
   else
-    iTargetWindow = CWindowTranslator::TranslateWindow(targetWindow);
-#endif
+    iTargetWindow = CButtonTranslator::TranslateWindow(targetWindow);
 
   return iTargetWindow;
 }

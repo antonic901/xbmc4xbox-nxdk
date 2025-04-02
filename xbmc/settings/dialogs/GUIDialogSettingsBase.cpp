@@ -11,6 +11,7 @@
 #include "GUIUserMessages.h"
 #include "ServiceBroker.h"
 #include "dialogs/GUIDialogYesNo.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIControlGroupList.h"
 #include "guilib/GUIEditControl.h"
 #include "guilib/GUIImage.h"
@@ -134,7 +135,7 @@ bool CGUIDialogSettingsBase::OnMessage(CGUIMessage& message)
         m_delayedTimer.Stop();
         // param1 = 1 for "reset the control if it's invalid"
         CGUIMessage message(GUI_MSG_UPDATE_ITEM, GetID(), m_delayedSetting->GetID(), 1);
-        g_windowManager.SendThreadMessage(message, GetID());
+        CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(message, GetID());
       }
       // update the value of the previous setting (in case it was invalid)
       else if (m_iSetting >= CONTROL_SETTINGS_START_CONTROL &&
@@ -146,7 +147,7 @@ bool CGUIDialogSettingsBase::OnMessage(CGUIMessage& message)
           // param1 = 1 for "reset the control if it's invalid"
           // param2 = 1 for "only update the current value"
           CGUIMessage message(GUI_MSG_UPDATE_ITEM, GetID(), m_iSetting, 1, 1);
-          g_windowManager.SendThreadMessage(message, GetID());
+          CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(message, GetID());
         }
       }
 
@@ -907,7 +908,7 @@ void CGUIDialogSettingsBase::UpdateSettingControl(const BaseSettingControlPtr& p
   // param2 = 1 for "only update the current value"
   CGUIMessage message(GUI_MSG_UPDATE_ITEM, GetID(), pSettingControl->GetID(), 0,
                       updateDisplayOnly ? 1 : 0);
-  g_windowManager.SendThreadMessage(message, GetID());
+  CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(message, GetID());
 }
 
 void CGUIDialogSettingsBase::SetControlLabel(int controlId, const CVariant& label)

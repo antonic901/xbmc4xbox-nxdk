@@ -11,6 +11,7 @@
 #include "FileItem.h"
 #include "ServiceBroker.h"
 #include "URL.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/LocalizeStrings.h"
 #include "utils/URIUtils.h"
 
@@ -337,11 +338,9 @@ void CMediaManager::AddAutoSource(const CMediaSource &share, bool bAutorun)
   CMediaSourceSettings::GetInstance().AddShare("music", share);
   CMediaSourceSettings::GetInstance().AddShare("programs", share);
   CGUIMessage msg(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_UPDATE_SOURCES);
-#if 0
   CGUIComponent *gui = CServiceBroker::GetGUI();
   if (gui)
-#endif
-    g_windowManager.SendThreadMessage( msg );
+    gui->GetWindowManager().SendThreadMessage( msg );
 
 #ifdef HAS_DVD_DRIVE
   if(bAutorun)
@@ -357,7 +356,7 @@ void CMediaManager::RemoveAutoSource(const CMediaSource &share)
   CMediaSourceSettings::GetInstance().DeleteSource("music", share.strName, share.strPath, true);
   CMediaSourceSettings::GetInstance().DeleteSource("programs", share.strName, share.strPath, true);
   CGUIMessage msg(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_UPDATE_SOURCES);
-  g_windowManager.SendThreadMessage( msg );
+  CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage( msg );
 
 #ifdef HAS_DVD_DRIVE
   // delete cached CdInfo if any
@@ -689,7 +688,7 @@ void CMediaManager::ProcessEvents()
 #endif
 
     CGUIMessage msg(GUI_MSG_NOTIFY_ALL,0,0,GUI_MSG_UPDATE_SOURCES);
-    g_windowManager.SendThreadMessage(msg);
+    CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
   }
 }
 
