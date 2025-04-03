@@ -10,7 +10,7 @@
 
 #include "ServiceBroker.h"
 #include "Util.h"
-#include "Application.h"
+#include "application/Application.h"
 #include "application/ApplicationComponents.h"
 #include "dialogs/GUIDialogKaiToast.h"
 #include "dialogs/GUIDialogNumeric.h"
@@ -69,7 +69,7 @@ static int ActivateWindow(const std::vector<std::string>& params2)
   }
 
   // confirm the window destination is valid prior to switching
-  int iWindow = CWindowTranslator::TranslateWindow(strWindow);
+  int iWindow = CButtonTranslator::TranslateWindow(strWindow);
   if (iWindow != WINDOW_INVALID)
   {
     // compare the given directory param with the current active directory
@@ -129,7 +129,7 @@ static int ActivateAndFocus(const std::vector<std::string>& params)
   std::string strWindow = params[0];
 
   // confirm the window destination is valid prior to switching
-  int iWindow = CWindowTranslator::TranslateWindow(strWindow);
+  int iWindow = CButtonTranslator::TranslateWindow(strWindow);
   if (iWindow != WINDOW_INVALID)
   {
     if (iWindow != CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow())
@@ -147,7 +147,7 @@ static int ActivateAndFocus(const std::vector<std::string>& params)
       unsigned int iPtr = 1;
       while (params.size() > iPtr + 1)
       {
-        CGUIMessage msg(GUI_MSG_SETFOCUS, CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindowOrDialog(),
+        CGUIMessage msg(GUI_MSG_SETFOCUS, CServiceBroker::GetGUI()->GetWindowManager().GetFocusedWindow(),
                         atol(params[iPtr].c_str()),
                         (params.size() >= iPtr + 2) ? atol(params[iPtr + 1].c_str())+1 : 0);
         CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);

@@ -19,6 +19,7 @@
  */
 
 #include "system.h"
+#include "PlatformDefs.h" // strcmpi
 #include "GUIControlFactory.h"
 #include "LocalizeStrings.h"
 #include "GUIButtonControl.h"

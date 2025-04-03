@@ -35,8 +35,10 @@
 using namespace KODI::GUILIB::GUIINFO;
 
 CPlayerGUIInfo::CPlayerGUIInfo()
-  : m_appPlayer(CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>()),
+  : m_appPlayer(CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>())
+#if 0
     m_appVolume(CServiceBroker::GetAppComponents().GetComponent<CApplicationVolumeHandling>())
+#endif
 {
 }
 

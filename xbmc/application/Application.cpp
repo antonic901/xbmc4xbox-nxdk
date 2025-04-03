@@ -18,7 +18,7 @@
  *
  */
 
-#include "Application.h"
+#include "application/Application.h"
 
 #include "PlayListPlayer.h"
 #include "ServiceManager.h"

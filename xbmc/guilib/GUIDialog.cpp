@@ -138,7 +138,7 @@ void CGUIDialog::UpdateVisibility()
 {
   if (m_visibleCondition)
   {
-    if (m_visibleCondition->Get())
+    if (m_visibleCondition->Get(INFO::DEFAULT_CONTEXT))
       Open();
     else
       Close();

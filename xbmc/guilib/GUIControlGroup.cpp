@@ -23,8 +23,6 @@
 #include <cassert>
 #include <utility>
 
-#include "guiinfo/GUIInfoLabels.h"
-
 CGUIControlGroup::CGUIControlGroup()
 {
   m_defaultControl = 0;

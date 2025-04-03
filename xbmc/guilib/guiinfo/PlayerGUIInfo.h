@@ -19,7 +19,9 @@
 #include <vector>
 
 class CApplicationPlayer;
+#if 0
 class CApplicationVolumeHandling;
+#endif
 class CDataCacheCore;
 
 namespace KODI
@@ -84,7 +86,9 @@ private:
   std::atomic_bool m_playerShowTime{false};
   std::atomic_bool m_playerShowInfo{false};
   const std::shared_ptr<CApplicationPlayer> m_appPlayer;
+#if 0
   const std::shared_ptr<CApplicationVolumeHandling> m_appVolume;
+#endif
   CEventSource<PlayerShowInfoChangedEvent> m_events;
 };
 

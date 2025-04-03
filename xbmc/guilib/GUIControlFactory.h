@@ -39,6 +39,17 @@ class CGUIInfoLabel;
 class TiXmlNode;
 class CGUIAction;
 
+namespace KODI
+{
+namespace GUILIB
+{
+namespace GUIINFO
+{
+  class CGUIInfoLabel;
+}
+}
+}
+
 /*!
  \ingroup controls
  \brief

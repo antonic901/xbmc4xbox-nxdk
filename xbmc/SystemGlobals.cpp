@@ -6,6 +6,7 @@
  *  See LICENSES/README.md for more information.
  */
 
+#include "utils/AlarmClock.h"
 #include "filesystem/DirectoryCache.h"
 #include "GUIPassword.h"
 #include "utils/LangCodeExpander.h"
@@ -25,3 +26,5 @@ std::map<std::string, std::string> CSpecialProtocol::m_pathMap;
   CGUIPassword       g_passwordManager;
 
   CPartyModeManager     g_partyModeManager;
+
+  CAlarmClock        g_alarmClock;

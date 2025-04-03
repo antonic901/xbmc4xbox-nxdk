@@ -29,6 +29,7 @@
 #include "utils/StringUtils.h"
 #include "interfaces/info/SkinVariable.h"
 #include "ServiceBroker.h"
+#include "PlatformDefs.h" // strcmpi
 
 using namespace KODI::GUILIB;
 

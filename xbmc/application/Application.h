@@ -88,8 +88,6 @@ public:
   // Get the percentage of data currently cached/buffered (aq/vq + FileCache) from the input stream if applicable.
   float GetCachePercentage() const;
 
-  void SeekTime( double dTime = 0.0 );
-
   int GetVolume(bool percentage = true) const;
   void SetVolume(long iValue, bool isPercentage = true);
   int GetDynamicRangeCompressionLevel() { return 0; };

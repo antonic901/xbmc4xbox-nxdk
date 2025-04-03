@@ -91,7 +91,7 @@ CTemperature CSystemGUIInfo::GetGPUTemperature() const
 #if defined(TARGET_DARWIN_OSX)
   value = SMCGetTemperature(SMC_KEY_GPU_TEMP);
   return CTemperature::CreateFromCelsius(value);
-#elif defined(TARGET_WINDOWS_STORE)
+#elif defined(TARGET_WINDOWS_STORE) || defined(_XBOX)
   return CTemperature::CreateFromCelsius(0);
 #else
   std::string cmd = CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_gpuTempCmd;

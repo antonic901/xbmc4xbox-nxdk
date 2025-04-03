@@ -28,6 +28,7 @@
 #include "utils/XBMCTinyXML.h"
 #include "utils/XMLUtils.h"
 #include "ServiceBroker.h"
+#include "PlatformDefs.h" // strcmpi
 
 CAnimEffect::CAnimEffect(const TiXmlElement *node, EFFECT_TYPE effect)
 {
