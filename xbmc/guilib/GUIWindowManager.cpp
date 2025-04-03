@@ -19,9 +19,12 @@
  */
 
 #include "GUIWindowManager.h"
+
+#include "GUIAudioManager.h"
 #include "GUIDialog.h"
 #include "application/Application.h"
 #include "ServiceBroker.h"
+#include "input/Key.h"
 #include "messaging/ApplicationMessenger.h"
 #include "messaging/helpers/DialogHelper.h"
 #include "GUIInfoManager.h"
@@ -542,9 +545,7 @@ void CGUIWindowManager::ActivateWindow_Internal(int iWindowID, const std::vector
   if (!force && HasModalDialog({ DialogModalityType::MODAL }))
   {
     CLog::Log(LOGINFO, "Activate of window '%i' refused because there are active modal dialogs", iWindowID);
-#if 0
-    g_audioManager.PlayActionSound(CAction(ACTION_ERROR));
-#endif
+    CServiceBroker::GetGUI()->GetAudioManager().PlayActionSound(CAction(ACTION_ERROR));
     return;
   }
 

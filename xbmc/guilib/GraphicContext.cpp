@@ -959,6 +959,6 @@ int CGraphicContext::GetFPS() const
 
 void CGraphicContext::SetMediaDir(const std::string &strMediaDir)
 {
-  g_TextureManager.SetTexturePath(strMediaDir);
+  CServiceBroker::GetGUI()->GetTextureManager().SetTexturePath(strMediaDir);
   m_strMediaDir = strMediaDir;
 }
