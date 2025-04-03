@@ -63,7 +63,7 @@ public:
   static std::string TranslateControlType(CGUIControl::GUICONTROLTYPES type);
 
   static bool GetAspectRatio(const TiXmlNode* pRootNode, const char* strTag, CAspectRatio &aspectRatio);
-  static bool GetInfoTexture(const TiXmlNode* pRootNode, const char* strTag, CTextureInfo &image, CGUIInfoLabel &info, int parentID);
+  static bool GetInfoTexture(const TiXmlNode* pRootNode, const char* strTag, CTextureInfo &image, KODI::GUILIB::GUIINFO::CGUIInfoLabel &info, int parentID);
   static bool GetTexture(const TiXmlNode* pRootNode, const char* strTag, CTextureInfo &image);
   static bool GetAlignment(const TiXmlNode* pRootNode, const char* strTag, uint32_t& dwAlignment);
   static bool GetAlignmentY(const TiXmlNode* pRootNode, const char* strTag, uint32_t& dwAlignment);
@@ -80,11 +80,11 @@ public:
    \param parentID The parent id
    \return true if a valid info label was read, false otherwise
    */
-  static bool GetInfoLabelFromElement(const TiXmlElement *element, CGUIInfoLabel &infoLabel, int parentID);
-  static void GetInfoLabel(const TiXmlNode *pControlNode, const std::string &labelTag, CGUIInfoLabel &infoLabel, int parentID);
-  static void GetInfoLabels(const TiXmlNode *pControlNode, const std::string &labelTag, std::vector<CGUIInfoLabel> &infoLabels, int parentID);
+  static bool GetInfoLabelFromElement(const TiXmlElement *element, KODI::GUILIB::GUIINFO::CGUIInfoLabel &infoLabel, int parentID);
+  static void GetInfoLabel(const TiXmlNode *pControlNode, const std::string &labelTag, KODI::GUILIB::GUIINFO::CGUIInfoLabel &infoLabel, int parentID);
+  static void GetInfoLabels(const TiXmlNode *pControlNode, const std::string &labelTag, std::vector<KODI::GUILIB::GUIINFO::CGUIInfoLabel> &infoLabels, int parentID);
   static bool GetColor(const TiXmlNode* pRootNode, const char* strTag, color_t &value);
-  static bool GetInfoColor(const TiXmlNode* pRootNode, const char* strTag, CGUIInfoColor &value, int parentID);
+  static bool GetInfoColor(const TiXmlNode* pRootNode, const char* strTag, KODI::GUILIB::GUIINFO::CGUIInfoColor &value, int parentID);
   static std::string FilterLabel(const std::string &label);
   static bool GetConditionalVisibility(const TiXmlNode* control, std::string &condition);
   static bool GetActions(const TiXmlNode* pRootNode, const char* strTag, CGUIAction& actions);

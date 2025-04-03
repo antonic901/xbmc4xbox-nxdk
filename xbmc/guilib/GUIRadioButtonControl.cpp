@@ -243,5 +243,5 @@ bool CGUIRadioButtonControl::UpdateColors()
 
 void CGUIRadioButtonControl::SetToggleSelect(const std::string &toggleSelect)
 {
-  m_toggleSelect = g_infoManager.Register(toggleSelect, GetParentID());
+  m_toggleSelect = CServiceBroker::GetGUI()->GetInfoManager().Register(toggleSelect, GetParentID());
 }

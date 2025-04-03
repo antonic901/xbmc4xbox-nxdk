@@ -30,6 +30,7 @@
 
 #include "GUIControl.h"
 #include "GUILabel.h"
+#include "guilib/guiinfo/GUIInfoLabel.h"
 
 /*!
  \ingroup controls
@@ -58,7 +59,7 @@ public:
   void ShowCursor(bool bShow = true);
   void SetCursorPos(int iPos);
   int GetCursorPos() const { return m_iCursorPos;};
-  void SetInfo(const CGUIInfoLabel&labelInfo);
+  void SetInfo(const KODI::GUILIB::GUIINFO::CGUIInfoLabel&labelInfo);
   void SetWidthControl(float minWidth, bool bScroll);
   void SetAlignment(uint32_t align);
   void SetHighlight(unsigned int start, unsigned int end);
@@ -84,7 +85,7 @@ protected:
   float m_minWidth;
 
   // multi-info stuff
-  CGUIInfoLabel m_infoLabel;
+  KODI::GUILIB::GUIINFO::CGUIInfoLabel m_infoLabel;
 
   unsigned int m_startHighlight;
   unsigned int m_endHighlight;

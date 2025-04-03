@@ -21,7 +21,6 @@ SRCS += \
 	$(CURDIR)/xbmc/guilib/GUIFontManager.cpp \
 	$(CURDIR)/xbmc/guilib/GUIImage.cpp \
 	$(CURDIR)/xbmc/guilib/GUIIncludes.cpp \
-	$(CURDIR)/xbmc/guilib/GUIInfoTypes.cpp \
 	$(CURDIR)/xbmc/guilib/GUIKeyboardFactory.cpp \
 	$(CURDIR)/xbmc/guilib/GUILabel.cpp \
 	$(CURDIR)/xbmc/guilib/GUILabelControl.cpp \

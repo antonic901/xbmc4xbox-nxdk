@@ -28,10 +28,10 @@
 #include <utility>
 #include <vector>
 
-#include "GUIAction.h"
-#include "GUIInfoTypes.h"
 #include "FileItem.h"
 #include "GUIAction.h"
+#include "guilib/guiinfo/GUIInfoLabel.h"
+#include "interfaces/info/InfoBool.h"
 
 class TiXmlElement;
 

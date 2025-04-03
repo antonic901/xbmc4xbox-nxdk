@@ -21,12 +21,16 @@
 #include "GUIIncludes.h"
 #include "addons/Skin.h"
 #include "GUIInfoManager.h"
-#include "GUIInfoTypes.h"
+#include "guilib/GUIComponent.h"
+#include "guilib/guiinfo/GUIInfoLabel.h"
 #include "utils/log.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/XMLUtils.h"
 #include "utils/StringUtils.h"
 #include "interfaces/info/SkinVariable.h"
+#include "ServiceBroker.h"
+
+using namespace KODI::GUILIB;
 
 CGUIIncludes::CGUIIncludes()
 {
@@ -155,8 +159,8 @@ bool CGUIIncludes::LoadIncludesFromXML(const TiXmlElement *root)
       const char *condition = node->Attribute("condition");
       if (condition)
       { // check this condition
-        INFO::InfoPtr conditionID = g_infoManager.Register(condition);
-        bool value = conditionID->Get();
+        INFO::InfoPtr conditionID = CServiceBroker::GetGUI()->GetInfoManager().Register(condition);
+        bool value = conditionID->Get(INFO::DEFAULT_CONTEXT);
 
         if (value)
         {
@@ -286,8 +290,8 @@ void CGUIIncludes::ResolveIncludesForNode(TiXmlElement *node, std::map<INFO::Inf
     const char *condition = include->Attribute("condition");
     if (condition)
     { // check this condition
-      INFO::InfoPtr conditionID = g_infoManager.Register(condition);
-      bool value = conditionID->Get();
+      INFO::InfoPtr conditionID = CServiceBroker::GetGUI()->GetInfoManager().Register(condition);
+      bool value = conditionID->Get(INFO::DEFAULT_CONTEXT);
 
       if (xmlIncludeConditions)
         (*xmlIncludeConditions)[conditionID] = value;
@@ -493,7 +497,7 @@ public:
 CGUIIncludes::ResolveParamsResult CGUIIncludes::ResolveParameters(const std::string& strInput, std::string& strOutput, const Params& params)
 {
   ParamReplacer paramReplacer(params);
-  if (CGUIInfoLabel::ReplaceSpecialKeywordReferences(strInput, "PARAM", std::ref(paramReplacer), strOutput))
+  if (GUIINFO::CGUIInfoLabel::ReplaceSpecialKeywordReferences(strInput, "PARAM", std::ref(paramReplacer), strOutput))
     // detect special input values of the form "$PARAM[undefinedParam]" (with no extra characters around)
     return paramReplacer.GetNumUndefinedParams() == 1 && paramReplacer.GetNumTotalParams() == 1 && strOutput.empty() ? SINGLE_UNDEFINED_PARAM_RESOLVED : PARAMS_RESOLVED;
   return NO_PARAMS_FOUND;
@@ -514,7 +518,7 @@ std::string CGUIIncludes::ResolveConstant(const std::string &constant) const
 std::string CGUIIncludes::ResolveExpressions(const std::string &expression) const
 {
   std::string work(expression);
-  CGUIInfoLabel::ReplaceSpecialKeywordReferences(work, "EXP", [&](const std::string &str) -> std::string {
+  GUIINFO::CGUIInfoLabel::ReplaceSpecialKeywordReferences(work, "EXP", [&](const std::string &str) -> std::string {
     std::map<std::string, std::string>::const_iterator it = m_expressions.find(str);
     if (it != m_expressions.end())
       return it->second;

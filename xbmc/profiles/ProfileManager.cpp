@@ -304,16 +304,13 @@ bool CProfileManager::LoadProfile(unsigned int index)
 
   CServiceBroker::GetDatabaseManager().Initialize();
 
-#if 0
   CGUIComponent* gui = CServiceBroker::GetGUI();
   if (gui)
-#endif
   {
-    g_infoManager.ResetCache();
-#if 0
-    g_infoManager.ResetContainerMovingCache();
-#endif
-    g_infoManager.ResetLibraryBools();
+    CGUIInfoManager& infoMgr = gui->GetInfoManager();
+    infoMgr.ResetCache();
+    infoMgr.GetInfoProviders().GetGUIControlsInfoProvider().ResetContainerMovingCache();
+    infoMgr.GetInfoProviders().GetLibraryInfoProvider().ResetLibraryBools();
   }
 
   if (m_currentProfile != 0)

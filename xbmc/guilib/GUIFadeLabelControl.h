@@ -32,6 +32,7 @@
 
 #include "GUIControl.h"
 #include "GUILabel.h"
+#include "guilib/guiinfo/GUIInfoLabel.h"
 
 /*!
  \ingroup controls
@@ -50,7 +51,7 @@ public:
   virtual bool CanFocus() const;
   virtual bool OnMessage(CGUIMessage& message);
 
-  void SetInfo(const std::vector<CGUIInfoLabel> &vecInfo);
+  void SetInfo(const std::vector<KODI::GUILIB::GUIINFO::CGUIInfoLabel> &vecInfo);
   void SetScrolling(bool scroll) { m_scroll = scroll; }
 
 protected:
@@ -68,7 +69,7 @@ protected:
    */
   std::string GetLabel();
 
-  std::vector< CGUIInfoLabel > m_infoLabels;
+  std::vector<KODI::GUILIB::GUIINFO::CGUIInfoLabel > m_infoLabels;
   unsigned int m_currentLabel;
   unsigned int m_lastLabel;
 

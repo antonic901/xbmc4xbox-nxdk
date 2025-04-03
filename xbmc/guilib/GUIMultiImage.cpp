@@ -286,7 +286,7 @@ void CGUIMultiImage::OnJobComplete(unsigned int jobID, bool success, CJob *job)
   }
 }
 
-void CGUIMultiImage::SetInfo(const CGUIInfoLabel &info)
+void CGUIMultiImage::SetInfo(const KODI::GUILIB::GUIINFO::CGUIInfoLabel &info)
 {
   m_texturePath = info;
   if (m_texturePath.IsConstant())

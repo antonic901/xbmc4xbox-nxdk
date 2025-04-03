@@ -31,6 +31,7 @@
 #include "GUITextLayout.h"
 #include "GUIControl.h"
 #include "GUILabel.h"
+#include "guilib/guiinfo/GUIInfoLabel.h"
 
 /*!
  \ingroup controls
@@ -58,7 +59,7 @@ public:
   void SetPageControl(int pageControl);
 
   virtual bool CanFocus() const;
-  void SetInfo(const CGUIInfoLabel &info);
+  void SetInfo(const KODI::GUILIB::GUIINFO::CGUIInfoLabel &info);
   void SetAutoScrolling(const TiXmlNode *node);
   void SetAutoScrolling(int delay, int time, int repeatTime, const std::string &condition = "");
   void ResetAutoScrolling();
@@ -105,6 +106,6 @@ protected:
 
   int m_pageControl;
 
-  CGUIInfoLabel m_info;
+  KODI::GUILIB::GUIINFO::CGUIInfoLabel m_info;
 };
 #endif

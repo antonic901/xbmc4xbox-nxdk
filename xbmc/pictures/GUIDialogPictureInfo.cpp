@@ -35,7 +35,7 @@ CGUIDialogPictureInfo::~CGUIDialogPictureInfo(void)
 
 void CGUIDialogPictureInfo::SetPicture(CFileItem *item)
 {
-  g_infoManager.SetCurrentSlide(*item);
+  CServiceBroker::GetGUI()->GetInfoManager().GetInfoProviders().GetPicturesInfoProvider().SetCurrentSlide(item);
 }
 
 void CGUIDialogPictureInfo::OnInitWindow()
@@ -69,7 +69,7 @@ bool CGUIDialogPictureInfo::OnAction(const CAction& action)
 
 void CGUIDialogPictureInfo::FrameMove()
 {
-  const CFileItem* item = &g_infoManager.GetCurrentSlide();
+  const CFileItem* item = CServiceBroker::GetGUI()->GetInfoManager().GetInfoProviders().GetPicturesInfoProvider().GetCurrentSlide();
   if (item && item->GetPath() != m_currentPicture)
   {
     UpdatePictureInfo();
@@ -92,7 +92,7 @@ void CGUIDialogPictureInfo::UpdatePictureInfo()
       continue;
 
     std::string picInfo =
-        g_infoManager.GetLabel(info);
+        CServiceBroker::GetGUI()->GetInfoManager().GetLabel(info, INFO::DEFAULT_CONTEXT);
     if (!picInfo.empty())
     {
       CFileItemPtr item(new CFileItem(g_localizeStrings.Get(SLIDESHOW_STRING_BASE + info)));

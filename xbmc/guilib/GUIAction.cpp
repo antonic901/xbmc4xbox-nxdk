@@ -50,11 +50,13 @@ bool CGUIAction::ExecuteActions() const
 bool CGUIAction::ExecuteActions(int controlID, int parentID, const CGUIListItemPtr &item /* = NULL */) const
 {
   if (m_actions.empty()) return false;
+
+  CGUIInfoManager& infoMgr = CServiceBroker::GetGUI()->GetInfoManager();
   // take a copy of actions that satisfy our conditions
   std::vector<std::string> actions;
   for (ciActions it = m_actions.begin() ; it != m_actions.end() ; ++it)
   {
-    if (it->condition.empty() || g_infoManager.EvaluateBool(it->condition, 0, item))
+    if (it->condition.empty() || infoMgr.EvaluateBool(it->condition, 0, item))
     {
       if (!StringUtils::IsInteger(it->action))
         actions.push_back(it->action);
@@ -77,11 +79,12 @@ bool CGUIAction::ExecuteActions(int controlID, int parentID, const CGUIListItemP
 
 int CGUIAction::GetNavigation() const
 {
+  CGUIInfoManager& infoMgr = CServiceBroker::GetGUI()->GetInfoManager();
   for (ciActions it = m_actions.begin() ; it != m_actions.end() ; ++it)
   {
     if (StringUtils::IsInteger(it->action))
     {
-      if (it->condition.empty() || g_infoManager.EvaluateBool(it->condition))
+      if (it->condition.empty() || infoMgr.EvaluateBool(it->condition, INFO::DEFAULT_CONTEXT))
         return atoi(it->action.c_str());
     }
   }
@@ -107,9 +110,10 @@ void CGUIAction::SetNavigation(int id)
 
 bool CGUIAction::HasActionsMeetingCondition() const
 {
+  CGUIInfoManager& infoMgr = CServiceBroker::GetGUI()->GetInfoManager();
   for (ciActions it = m_actions.begin() ; it != m_actions.end() ; ++it)
   {
-    if (it->condition.empty() || g_infoManager.EvaluateBool(it->condition))
+    if (it->condition.empty() || infoMgr.EvaluateBool(it->condition, INFO::DEFAULT_CONTEXT))
       return true;
   }
   return false;

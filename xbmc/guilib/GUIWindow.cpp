@@ -208,7 +208,7 @@ bool CGUIWindow::Load(TiXmlElement* pRootElement)
     {
       std::string condition;
       CGUIControlFactory::GetConditionalVisibility(pRootElement, condition);
-      m_visibleCondition = g_infoManager.Register(condition, GetID());
+      m_visibleCondition = CServiceBroker::GetGUI()->GetInfoManager().Register(condition, GetID());
     }
     else if (strValue == "animation" && pChild->FirstChild())
     {
@@ -235,7 +235,7 @@ bool CGUIWindow::Load(TiXmlElement* pRootElement)
         originElement->QueryFloatAttribute("x", &origin.x);
         originElement->QueryFloatAttribute("y", &origin.y);
         if (originElement->FirstChild())
-          origin.condition = g_infoManager.Register(originElement->FirstChild()->Value(), GetID());
+          origin.condition = CServiceBroker::GetGUI()->GetInfoManager().Register(originElement->FirstChild()->Value(), GetID());
         m_origins.push_back(origin);
         originElement = originElement->NextSiblingElement("origin");
       }
@@ -472,7 +472,7 @@ CPoint CGUIWindow::GetPosition() const
   for (unsigned int i = 0; i < m_origins.size(); i++)
   {
     // no condition implies true
-    if (!m_origins[i].condition || m_origins[i].condition->Get())
+    if (!m_origins[i].condition || m_origins[i].condition->Get(INFO::DEFAULT_CONTEXT))
     { // found origin
       return CPoint(m_origins[i].x, m_origins[i].y);
     }
@@ -741,7 +741,7 @@ bool CGUIWindow::OnMessage(CGUIMessage& message)
 
 bool CGUIWindow::NeedXMLReload()
 {
-  return !m_windowLoaded || g_infoManager.ConditionsChangedValues(m_xmlIncludeConditions);
+  return !m_windowLoaded || CServiceBroker::GetGUI()->GetInfoManager().ConditionsChangedValues(m_xmlIncludeConditions);
 }
 
 void CGUIWindow::AllocResources(bool forceLoad /*= FALSE */)
@@ -843,7 +843,8 @@ bool CGUIWindow::Initialize()
 void CGUIWindow::SetInitialVisibility()
 {
   // reset our info manager caches
-  g_infoManager.ResetCache();
+  CGUIInfoManager& infoMgr = CServiceBroker::GetGUI()->GetInfoManager();
+  infoMgr.ResetCache();
   CGUIControlGroup::SetInitialVisibility();
 }
 

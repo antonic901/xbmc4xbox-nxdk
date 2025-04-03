@@ -31,6 +31,7 @@
 #include "filesystem/DirectoryCache.h"
 #include "filesystem/File.h"
 #include "filesystem/MusicDatabaseDirectory/DirectoryNode.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
 #include "guiinfo/GUIInfoLabels.h"
@@ -11417,12 +11418,10 @@ bool CMusicDatabase::CommitTransaction()
 {
   if (CDatabase::CommitTransaction())
   { // number of items in the db has likely changed, so reset the infomanager cache
-#if 0
     CGUIComponent* gui = CServiceBroker::GetGUI();
     if (gui)
-#endif
     {
-      g_infoManager.SetLibraryBool(
+      gui->GetInfoManager().GetInfoProviders().GetLibraryInfoProvider().SetLibraryBool(
           LIBRARY_HAS_MUSIC, GetSongsCount() > 0);
       return true;
     }
@@ -12275,11 +12274,9 @@ void CMusicDatabase::ImportFromXML(const std::string& xmlFile, CGUIDialogProgres
       if (!ImportSongHistory(xmlFile, songtotal, progressDialog))
         return;
 
-#if 0
     CGUIComponent* gui = CServiceBroker::GetGUI();
     if (gui)
-#endif
-      g_infoManager.ResetLibraryBools();
+      gui->GetInfoManager().GetInfoProviders().GetLibraryInfoProvider().ResetLibraryBools();
   }
   catch (...)
   {

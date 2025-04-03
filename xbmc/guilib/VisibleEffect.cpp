@@ -22,10 +22,12 @@
 #include "GUIInfoManager.h"
 #include "utils/log.h"
 #include "addons/Skin.h" // for the effect time adjustments
+#include "guilib/GUIComponent.h"
 #include "utils/StringUtils.h"
 #include "Tween.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/XMLUtils.h"
+#include "ServiceBroker.h"
 
 CAnimEffect::CAnimEffect(const TiXmlElement *node, EFFECT_TYPE effect)
 {
@@ -579,14 +581,14 @@ CAnimation CAnimation::CreateFader(float start, float end, unsigned int delay, u
 
 bool CAnimation::CheckCondition()
 {
-  return !m_condition || m_condition->Get();
+  return !m_condition || m_condition->Get(INFO::DEFAULT_CONTEXT);
 }
 
 void CAnimation::UpdateCondition(const CGUIListItem *item)
 {
   if (!m_condition)
     return;
-  bool condition = m_condition->Get(item);
+  bool condition = m_condition->Get(INFO::DEFAULT_CONTEXT, item);
   if (condition && !m_lastCondition)
     QueueAnimation(ANIM_PROCESS_NORMAL);
   else if (!condition && m_lastCondition)
@@ -601,7 +603,7 @@ void CAnimation::UpdateCondition(const CGUIListItem *item)
 
 void CAnimation::SetInitialCondition()
 {
-  m_lastCondition = m_condition ? m_condition->Get() : false;
+  m_lastCondition = m_condition ? m_condition->Get(INFO::DEFAULT_CONTEXT) : false;
   if (m_lastCondition)
     ApplyAnimation();
   else
@@ -616,7 +618,7 @@ void CAnimation::Create(const TiXmlElement *node, const CRect &rect, int context
   // conditions and reversibility
   const char *condition = node->Attribute("condition");
   if (condition)
-    m_condition = g_infoManager.Register(condition, context);
+    m_condition = CServiceBroker::GetGUI()->GetInfoManager().Register(condition, context);
   const char *reverse = node->Attribute("reversible");
   if (reverse && strcmpi(reverse, "false") == 0)
     m_reversible = false;

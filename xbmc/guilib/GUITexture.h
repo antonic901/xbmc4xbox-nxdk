@@ -31,7 +31,7 @@
 #include "TextureManager.h"
 #include "Geometry.h"
 #include "system.h" // HAS_GL, HAS_DX, etc
-#include "GUIInfoTypes.h"
+#include "guiinfo/GUIInfoColor.h"
 
 typedef uint32_t color_t;
 
@@ -78,7 +78,7 @@ public:
   CRect      border;          // scaled  - unneeded if we get rid of scale on load
   int        orientation;     // orientation of the texture (0 - 7 == EXIForientation - 1)
   std::string diffuse;         // diffuse overlay texture
-  CGUIInfoColor diffuseColor; // diffuse color
+  KODI::GUILIB::GUIINFO::CGUIInfoColor diffuseColor; // diffuse color
   std::string filename;        // main texture file
 };
 
