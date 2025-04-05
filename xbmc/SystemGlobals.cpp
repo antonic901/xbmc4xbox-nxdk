@@ -6,9 +6,7 @@
  *  See LICENSES/README.md for more information.
  */
 
-#include "GUILargeTextureManager.h"
-#include "guilib/TextureManager.h"
-#include "GUIInfoManager.h"
+#include "utils/AlarmClock.h"
 #include "filesystem/DirectoryCache.h"
 #include "GUIPassword.h"
 #include "utils/LangCodeExpander.h"
@@ -29,7 +27,4 @@ std::map<std::string, std::string> CSpecialProtocol::m_pathMap;
 
   CPartyModeManager     g_partyModeManager;
 
-  CGUITextureManager g_TextureManager;
-  CGUILargeTextureManager g_largeTextureManager;
-
-  CGUIInfoManager    g_infoManager;
+  CAlarmClock        g_alarmClock;

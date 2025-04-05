@@ -15,6 +15,7 @@
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
 #include "filesystem/FileDirectoryFactory.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
 #include "utils/StringUtils.h"
@@ -68,7 +69,7 @@ bool CFileOperationJob::DoWork()
   if (m_displayProgress && GetProgressDialog() == NULL)
   {
     CGUIDialogExtendedProgressBar* dialog =
-      dynamic_cast<CGUIDialogExtendedProgressBar*>(g_windowManager.GetWindow(WINDOW_DIALOG_EXT_PROGRESS));
+      dynamic_cast<CGUIDialogExtendedProgressBar*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_EXT_PROGRESS));
     SetProgressBar(dialog->GetHandle(GetActionString(m_action)));
   }
 

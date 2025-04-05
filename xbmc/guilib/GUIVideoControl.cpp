@@ -20,6 +20,7 @@
 
 #include "system.h"
 #include "GUIVideoControl.h"
+#include "GUIComponent.h"
 #include "GUIWindowManager.h"
 #include "input/Key.h"
 #include "WindowIDs.h"
@@ -99,7 +100,7 @@ EVENT_RESULT CGUIVideoControl::OnMouseEvent(const CPoint &point, const CMouseEve
   if (event.m_id == ACTION_MOUSE_LEFT_CLICK)
   { // switch to fullscreen
     CGUIMessage message(GUI_MSG_FULLSCREEN, GetID(), GetParentID());
-    g_windowManager.SendMessage(message);
+    CServiceBroker::GetGUI()->GetWindowManager().SendMessage(message);
     return EVENT_RESULT_HANDLED;
   }
 #endif

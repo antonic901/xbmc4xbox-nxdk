@@ -15,6 +15,7 @@
 #include "dialogs/GUIDialogKaiToast.h"
 #include "filesystem/Directory.h"
 #include "filesystem/SpecialProtocol.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
 #include "guilib/WindowIDs.h"
@@ -405,7 +406,7 @@ void CSkinInfo::OnPostInstall(bool update, bool modal)
                     HELPERS::ShowYesNoDialogText(CVariant{Name()}, CVariant{24099}) ==
                         DialogResponse::CHOICE_YES))
   {
-    CGUIDialogKaiToast *toast = dynamic_cast<CGUIDialogKaiToast*>(g_windowManager.GetWindow(WINDOW_DIALOG_KAI_TOAST));
+    CGUIDialogKaiToast *toast = dynamic_cast<CGUIDialogKaiToast*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_KAI_TOAST));
     if (toast)
     {
       toast->ResetTimer();

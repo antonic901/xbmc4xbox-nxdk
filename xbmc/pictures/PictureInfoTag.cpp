@@ -11,7 +11,7 @@
 #include "ServiceBroker.h"
 #include "addons/ExtsMimeSupportList.h"
 #include "addons/addoninfo/AddonType.h"
-#include "guiinfo/GUIInfoLabels.h"
+#include "guilib/guiinfo/GUIInfoLabels.h"
 #include "utils/Archive.h"
 #include "utils/CharsetConverter.h"
 #include "utils/StringUtils.h"

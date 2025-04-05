@@ -14,6 +14,7 @@
 #include "TextureCache.h"
 #include "Util.h"
 #include "dialogs/GUIDialogBusy.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
 #include "input/Key.h"
@@ -46,7 +47,7 @@ public:
   // Fetch full song information including art types list
   bool DoWork() override
   {
-    CGUIDialogSongInfo *dialog = dynamic_cast<CGUIDialogSongInfo*>(g_windowManager.GetWindow(WINDOW_DIALOG_SONG_INFO));
+    CGUIDialogSongInfo *dialog = dynamic_cast<CGUIDialogSongInfo*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_SONG_INFO));
     if (!dialog)
       return false;
     if (dialog->IsCancelled())
@@ -135,7 +136,7 @@ bool CGUIDialogSongInfo::OnMessage(CGUIMessage& message)
         // The music lib window item is updated to but changes to the rating when it is the sort
         // do not show on screen until refresh() that fetches the list from scratch, sorts etc.
         CGUIMessage msg(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_UPDATE_ITEM, 0, m_song);
-        g_windowManager.SendMessage(msg);
+        CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
       }
       CGUIMessage msg(GUI_MSG_LABEL_RESET, GetID(), CONTROL_LIST);
       OnMessage(msg);
@@ -170,7 +171,7 @@ bool CGUIDialogSongInfo::OnMessage(CGUIMessage& message)
         if ((ACTION_SELECT_ITEM == iAction || ACTION_MOUSE_LEFT_CLICK == iAction))
         {
           CGUIMessage msg(GUI_MSG_ITEM_SELECTED, GetID(), iControl);
-          g_windowManager.SendMessage(msg);
+          CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
           int iItem = msg.GetParam1();
           if (iItem < 0 || iItem >= static_cast<int>(m_song->GetMusicInfoTag()->GetContributors().size()))
             break;
@@ -499,7 +500,7 @@ void CGUIDialogSongInfo::ShowFor(CFileItem* pItem)
   if (!pItem->HasMusicInfoTag())
     return;
 
-  CGUIDialogSongInfo *dialog = dynamic_cast<CGUIDialogSongInfo*>(g_windowManager.
+  CGUIDialogSongInfo *dialog = dynamic_cast<CGUIDialogSongInfo*>(CServiceBroker::GetGUI()->GetWindowManager().
     GetWindow(WINDOW_DIALOG_SONG_INFO));
   if (dialog)
   {
@@ -508,7 +509,7 @@ void CGUIDialogSongInfo::ShowFor(CFileItem* pItem)
       dialog->Open();
       if (dialog->HasUpdatedUserrating())
       {
-        auto window = dynamic_cast<CGUIWindowMusicBase*>(g_windowManager.GetWindow(WINDOW_MUSIC_NAV));
+        auto window = dynamic_cast<CGUIWindowMusicBase*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_MUSIC_NAV));
         if (window)
           window->RefreshContent("songs");
       }

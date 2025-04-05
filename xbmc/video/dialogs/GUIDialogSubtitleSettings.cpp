@@ -14,11 +14,12 @@
 #include "ServiceBroker.h"
 #include "URL.h"
 #include "addons/Skin.h"
-#include "Application.h"
-#include "ApplicationPlayer.h"
+#include "application/Application.h"
+#include "application/ApplicationPlayer.h"
 #include "cores/IPlayer.h"
 #include "dialogs/GUIDialogFileBrowser.h"
 #include "dialogs/GUIDialogYesNo.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
 #include "profiles/ProfileManager.h"
@@ -192,7 +193,7 @@ void CGUIDialogSubtitleSettings::OnSettingAction(const std::shared_ptr<const CSe
   }
   else if (settingId == SETTING_SUBTITLE_SEARCH)
   {
-    auto dialog = dynamic_cast<CGUIDialogSubtitles*>(g_windowManager.GetWindow(WINDOW_DIALOG_SUBTITLES));
+    auto dialog = dynamic_cast<CGUIDialogSubtitles*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_SUBTITLES));
     if (dialog)
     {
       dialog->Open();

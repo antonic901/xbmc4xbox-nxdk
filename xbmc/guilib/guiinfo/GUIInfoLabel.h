@@ -1,83 +1,44 @@
-/*!
-\file GUIInfoTypes.h
-\brief
-*/
-
-#ifndef GUILIB_GUIINFOTYPES_H
-#define GUILIB_GUIINFOTYPES_H
+/*
+ *  Copyright (C) 2005-2018 Team Kodi
+ *  This file is part of Kodi - https://kodi.tv
+ *
+ *  SPDX-License-Identifier: GPL-2.0-or-later
+ *  See LICENSES/README.md for more information.
+ */
 
 #pragma once
 
-/*
- *      Copyright (C) 2005-2013 Team XBMC
- *      http://xbmc.org
- *
- *  This Program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2, or (at your option)
- *  any later version.
- *
- *  This Program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XBMC; see the file COPYING.  If not, see
- *  <http://www.gnu.org/licenses/>.
- *
- */
+/*!
+\file GUIInfoLabel.h
+\brief
+*/
 
+#include "interfaces/info/Info.h"
+
+#include <functional>
 #include <string>
 #include <vector>
-#include <stdint.h>
-#include <functional>
-#include "interfaces/info/InfoBool.h"
 
 class CGUIListItem;
 
-class CGUIInfoBool
+namespace KODI
 {
-public:
-  CGUIInfoBool(bool value = false);
-  virtual ~CGUIInfoBool();
-
-  operator bool() const { return m_value; };
-
-  void Update(const CGUIListItem *item = NULL);
-  void Parse(const std::string &expression, int context);
-private:
-  INFO::InfoPtr m_info;
-  bool m_value;
-};
-
-typedef uint32_t color_t;
-
-class CGUIInfoColor
+namespace GUILIB
 {
-public:
-  CGUIInfoColor(color_t color = 0);
-
-  CGUIInfoColor& operator=(const CGUIInfoColor &color);
-  CGUIInfoColor& operator=(color_t color);
-  operator color_t() const { return m_color; };
-
-  bool Update();
-  void Parse(const std::string &label, int context);
-
-private:
-  color_t GetColor() const;
-  int     m_info;
-  color_t m_color;
-};
+namespace GUIINFO
+{
 
 class CGUIInfoLabel
 {
 public:
-  CGUIInfoLabel();
-  CGUIInfoLabel(const std::string &label, const std::string &fallback = "", int context = 0);
+  CGUIInfoLabel() = default;
+  CGUIInfoLabel(const std::string& label,
+                const std::string& fallback = "",
+                int context = INFO::DEFAULT_CONTEXT);
 
-  void SetLabel(const std::string &label, const std::string &fallback, int context = 0);
+  void SetLabel(const std::string& label,
+                const std::string& fallback,
+                int context = INFO::DEFAULT_CONTEXT);
 
   /*!
    \brief Gets a label (or image) for a given window context from the info manager.
@@ -108,9 +69,11 @@ public:
   bool IsConstant() const;
   bool IsEmpty() const;
 
-  const std::string &GetFallback() const { return m_fallback; };
+  const std::string& GetFallback() const { return m_fallback; }
 
-  static std::string GetLabel(const std::string &label, int contextWindow = 0, bool preferImage = false);
+  static std::string GetLabel(const std::string& label,
+                              int contextWindow,
+                              bool preferImage = false);
   static std::string GetItemLabel(const std::string &label, const CGUIListItem *item, bool preferImage = false);
 
   /*!
@@ -125,7 +88,7 @@ public:
    \param label text to replace
    \return text with any localized strings filled in.
    */
-  static std::string ReplaceAddonStrings(const std::string &label);
+  static std::string ReplaceAddonStrings(std::string &&label);
 
   typedef std::function<std::string(const std::string&)> StringReplacerFunc;
 
@@ -171,10 +134,13 @@ private:
     std::string m_postfix;
   };
 
-  mutable bool        m_dirty;
+  mutable bool        m_dirty = false;
   mutable std::string m_label;
   std::string m_fallback;
   std::vector<CInfoPortion> m_info;
 };
 
-#endif
+} // namespace GUIINFO
+} // namespace GUILIB
+} // namespace KODI
+

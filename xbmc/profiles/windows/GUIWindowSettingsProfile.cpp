@@ -13,6 +13,7 @@
 #include "dialogs/GUIDialogContextMenu.h"
 #include "dialogs/GUIDialogSelect.h"
 #include "filesystem/Directory.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIMessage.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
@@ -46,7 +47,7 @@ CGUIWindowSettingsProfile::~CGUIWindowSettingsProfile(void)
 int CGUIWindowSettingsProfile::GetSelectedItem()
 {
   CGUIMessage msg(GUI_MSG_ITEM_SELECTED, GetID(), CONTROL_PROFILES);
-  g_windowManager.SendMessage(msg);
+  CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
 
   return msg.GetParam1();
 }
@@ -110,7 +111,7 @@ bool CGUIWindowSettingsProfile::OnMessage(CGUIMessage& message)
           const std::shared_ptr<CProfileManager> profileManager = CServiceBroker::GetSettingsComponent()->GetProfileManager();
 
           CGUIMessage msg(GUI_MSG_ITEM_SELECTED, GetID(), CONTROL_PROFILES);
-          g_windowManager.SendMessage(msg);
+          CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
           int iItem = msg.GetParam1();
           if (iAction == ACTION_CONTEXT_MENU || iAction == ACTION_MOUSE_RIGHT_CLICK)
           {
@@ -127,7 +128,7 @@ bool CGUIWindowSettingsProfile::OnMessage(CGUIMessage& message)
             {
               LoadList();
               CGUIMessage msg(GUI_MSG_ITEM_SELECT, GetID(), 2,iItem);
-              g_windowManager.SendMessage(msg);
+              CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
 
               return true;
             }
@@ -141,7 +142,7 @@ bool CGUIWindowSettingsProfile::OnMessage(CGUIMessage& message)
             {
               LoadList();
               CGUIMessage msg(GUI_MSG_ITEM_SELECT, GetID(), 2,iItem);
-              g_windowManager.SendMessage(msg);
+              CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
               return true;
             }
 
@@ -212,7 +213,7 @@ void CGUIWindowSettingsProfile::LoadList()
 void CGUIWindowSettingsProfile::ClearListItems()
 {
   CGUIMessage msg(GUI_MSG_LABEL_RESET, GetID(), CONTROL_PROFILES);
-  g_windowManager.SendMessage(msg);
+  CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
 
   m_listItems->Clear();
 }
@@ -225,7 +226,7 @@ void CGUIWindowSettingsProfile::OnInitWindow()
 
 bool CGUIWindowSettingsProfile::GetAutoLoginProfileChoice(int &iProfile)
 {
-  CGUIDialogSelect *dialog = dynamic_cast<CGUIDialogSelect*>(g_windowManager.GetWindow(WINDOW_DIALOG_SELECT));
+  CGUIDialogSelect *dialog = dynamic_cast<CGUIDialogSelect*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_SELECT));
   if (!dialog) return false;
 
   const std::shared_ptr<CProfileManager> profileManager = CServiceBroker::GetSettingsComponent()->GetProfileManager();

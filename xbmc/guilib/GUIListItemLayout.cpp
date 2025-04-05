@@ -27,6 +27,8 @@
 #include "GUIImage.h"
 #include "utils/XBMCTinyXML.h"
 
+using namespace KODI::GUILIB;
+
 CGUIListItemLayout::CGUIListItemLayout()
 : m_group(0, 0, 0, 0, 0, 0)
 {
@@ -74,7 +76,7 @@ void CGUIListItemLayout::Process(CGUIListItem *item, int parentID, unsigned int 
     // could use a dynamic cast here if RTTI was enabled.  As it's not,
     // let's use a static cast with a virtual base function
     CFileItem *fileItem = item->IsFileItem() ? (CFileItem *)item : new CFileItem(*item);
-    m_isPlaying.Update(item);
+    m_isPlaying.Update(INFO::DEFAULT_CONTEXT, item);
     m_group.SetInvalid();
     m_group.UpdateInfo(fileItem);
     // delete our temporary fileitem
@@ -140,7 +142,7 @@ bool CGUIListItemLayout::MoveRight()
 
 bool CGUIListItemLayout::CheckCondition()
 {
-  return !m_condition || m_condition->Get();
+  return !m_condition || m_condition->Get(INFO::DEFAULT_CONTEXT);
 }
 
 void CGUIListItemLayout::LoadControl(TiXmlElement *child, CGUIControlGroup *group)
@@ -174,7 +176,7 @@ void CGUIListItemLayout::LoadLayout(TiXmlElement *layout, int context, bool focu
   layout->QueryFloatAttribute("height", &m_height);
   const char *condition = layout->Attribute("condition");
   if (condition)
-    m_condition = g_infoManager.Register(condition, context);
+    m_condition = CServiceBroker::GetGUI()->GetInfoManager().Register(condition, context);
   m_isPlaying.Parse("listitem.isplaying", context);
   TiXmlElement *child = layout->FirstChildElement("control");
   m_group.SetWidth(m_width);
@@ -206,14 +208,14 @@ void CGUIListItemLayout::CreateListControlLayouts(float width, float height, boo
     m_group.AddControl(tex);
   }
   CGUIImage *image = new CGUIImage(0, 0, 8, 0, iconWidth, texHeight, CTextureInfo(""));
-  image->SetInfo(CGUIInfoLabel("$INFO[ListItem.Icon]", "", m_group.GetParentID()));
+  image->SetInfo(GUIINFO::CGUIInfoLabel("$INFO[ListItem.Icon]", "", m_group.GetParentID()));
   image->SetAspectRatio(CAspectRatio::AR_KEEP);
   m_group.AddControl(image);
   float x = iconWidth + labelInfo.offsetX + 10;
-  CGUIListLabel *label = new CGUIListLabel(0, 0, x, labelInfo.offsetY, width - x - 18, height, labelInfo, CGUIInfoLabel("$INFO[ListItem.Label]", "", m_group.GetParentID()), CGUIControl::FOCUS);
+  CGUIListLabel *label = new CGUIListLabel(0, 0, x, labelInfo.offsetY, width - x - 18, height, labelInfo, GUIINFO::CGUIInfoLabel("$INFO[ListItem.Label]", "", m_group.GetParentID()), CGUIControl::FOCUS);
   m_group.AddControl(label);
   x = labelInfo2.offsetX ? labelInfo2.offsetX : m_width - 16;
-  label = new CGUIListLabel(0, 0, x, labelInfo2.offsetY, x - iconWidth - 20, height, labelInfo2, CGUIInfoLabel("$INFO[ListItem.Label2]", "", m_group.GetParentID()), CGUIControl::FOCUS);
+  label = new CGUIListLabel(0, 0, x, labelInfo2.offsetY, x - iconWidth - 20, height, labelInfo2, GUIINFO::CGUIInfoLabel("$INFO[ListItem.Label2]", "", m_group.GetParentID()), CGUIControl::FOCUS);
   m_group.AddControl(label);
 }
 //#endif

@@ -9,14 +9,17 @@
 #include "ServiceBroker.h"
 
 #include "ServiceManager.h"
-#include "Application.h"
+#include "application/Application.h"
 #include "settings/SettingsComponent.h"
 #include "utils/log.h"
 
 #include <stdexcept>
 #include <utility>
 
+using namespace KODI;
+
 CServiceBroker::CServiceBroker()
+  : m_pGUI(nullptr)
 {
 }
 
@@ -61,6 +64,11 @@ void CServiceBroker::UnregisterAnnouncementManager()
 ADDON::CAddonMgr& CServiceBroker::GetAddonMgr()
 {
   return g_application.m_ServiceManager->GetAddonMgr();
+}
+
+ADDONS::CExtsMimeSupportList& CServiceBroker::GetExtsMimeSupportList()
+{
+  return g_application.m_ServiceManager->GetExtsMimeSupportList();
 }
 
 CContextMenuManager& CServiceBroker::GetContextMenuManager()
@@ -116,6 +124,26 @@ CDatabaseManager& CServiceBroker::GetDatabaseManager()
 CMediaManager& CServiceBroker::GetMediaManager()
 {
   return g_application.m_ServiceManager->GetMediaManager();
+}
+
+CApplicationComponents& CServiceBroker::GetAppComponents()
+{
+  return g_application;
+}
+
+CGUIComponent* CServiceBroker::GetGUI()
+{
+  return g_serviceBroker.m_pGUI;
+}
+
+void CServiceBroker::RegisterGUI(CGUIComponent* gui)
+{
+  g_serviceBroker.m_pGUI = gui;
+}
+
+void CServiceBroker::UnregisterGUI()
+{
+  g_serviceBroker.m_pGUI = nullptr;
 }
 
 void CServiceBroker::RegisterTextureCache(const std::shared_ptr<CTextureCache>& cache)

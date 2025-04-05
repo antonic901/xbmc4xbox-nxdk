@@ -13,6 +13,7 @@
 #include "addons/addoninfo/AddonInfo.h"
 #include "dialogs/GUIDialogKaiToast.h"
 #include "dialogs/GUIDialogYesNo.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "messaging/ApplicationMessenger.h"
 #include "messaging/helpers/DialogOKHelper.h"
@@ -100,7 +101,7 @@ void CAddonStatusHandler::Process()
   /* Some required settings are missing/invalid */
   else if (m_status == ADDON_STATUS_NEED_SETTINGS)
   {
-    CGUIDialogYesNo* pDialogYesNo = dynamic_cast<CGUIDialogYesNo*>(g_windowManager.GetWindow(WINDOW_DIALOG_YES_NO));
+    CGUIDialogYesNo* pDialogYesNo = dynamic_cast<CGUIDialogYesNo*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_YES_NO));
     if (!pDialogYesNo) return;
 
     pDialogYesNo->SetHeading(CVariant{heading});

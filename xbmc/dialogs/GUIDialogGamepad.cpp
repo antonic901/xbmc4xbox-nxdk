@@ -10,6 +10,7 @@
 
 #include "ServiceBroker.h"
 #include "guilib/GUIAudioManager.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
 #include "input/Key.h"
@@ -267,7 +268,7 @@ bool CGUIDialogGamepad::ShowAndVerifyInput(std::string& strToVerify, const std::
     const std::string& dlgLine2, bool bGetUserInput, bool bHideInputChars)
 {
   // Prompt user for password input
-  CGUIDialogGamepad *pDialog = dynamic_cast<CGUIDialogGamepad*>(g_windowManager.GetWindow(WINDOW_DIALOG_GAMEPAD));
+  CGUIDialogGamepad *pDialog = dynamic_cast<CGUIDialogGamepad*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_GAMEPAD));
   pDialog->m_strPassword = strToVerify;
   pDialog->m_bUserInputCleanup = !bGetUserInput;
   pDialog->m_bHideInputChars = bHideInputChars;
@@ -293,11 +294,14 @@ bool CGUIDialogGamepad::ShowAndVerifyInput(std::string& strToVerify, const std::
   else
     pDialog->SetLine(2, CVariant{atoi(dlgLine2.c_str())});
 
-  g_audioManager.Enable(false); // dont do sounds during pwd input
+  CGUIComponent* gui = CServiceBroker::GetGUI();
+  if (gui)
+    gui->GetAudioManager().Enable(false); // don't do sounds during pwd input
 
   pDialog->Open();
 
-  g_audioManager.Enable(true);
+  if (gui)
+    gui->GetAudioManager().Enable(true);
 
   if (bGetUserInput && !pDialog->IsCanceled())
   {

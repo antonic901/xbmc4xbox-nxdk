@@ -31,6 +31,7 @@
 #include "GUITexture.h"
 #include "GUILabel.h"
 #include "GUIControl.h"
+#include "guilib/guiinfo/GUIInfoLabel.h"
 
 /*!
  \ingroup controls
@@ -98,8 +99,8 @@ protected:
   float m_minWidth;
   float m_maxWidth;
 
-  CGUIInfoLabel  m_info;
-  CGUIInfoLabel  m_info2;
+  KODI::GUILIB::GUIINFO::CGUIInfoLabel  m_info;
+  KODI::GUILIB::GUIINFO::CGUIInfoLabel  m_info2;
   CGUILabel      m_label;
   CGUILabel      m_label2;
 

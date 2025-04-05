@@ -21,6 +21,7 @@
 #include "system.h"
 #include "GUIDialogContextMenu.h"
 #include "guilib/GUIButtonControl.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIControlGroupList.h"
 #include "GUIUserMessages.h"
 #include "GUIPassword.h"
@@ -445,7 +446,7 @@ bool CGUIDialogContextMenu::OnContextButton(const std::string &type, const CFile
       }
 
       CGUIMessage msg(GUI_MSG_NOTIFY_ALL,0,0,GUI_MSG_UPDATE_SOURCES);
-      g_windowManager.SendThreadMessage(msg);
+      CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
       return true;
     }
 
@@ -467,7 +468,7 @@ bool CGUIDialogContextMenu::OnContextButton(const std::string &type, const CFile
       CMediaSourceSettings::GetInstance().Save();
 
       CGUIMessage msg(GUI_MSG_NOTIFY_ALL,0,0,GUI_MSG_UPDATE_SOURCES);
-      g_windowManager.SendThreadMessage(msg);
+      CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
       return true;
     }
   case CONTEXT_BUTTON_RESET_LOCK:
@@ -479,7 +480,7 @@ bool CGUIDialogContextMenu::OnContextButton(const std::string &type, const CFile
       CMediaSourceSettings::GetInstance().UpdateSource(type, share->strName, "badpwdcount", "0");
       CMediaSourceSettings::GetInstance().Save();
       CGUIMessage msg(GUI_MSG_NOTIFY_ALL,0,0,GUI_MSG_UPDATE_SOURCES);
-      g_windowManager.SendThreadMessage(msg);
+      CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
       return true;
     }
   case CONTEXT_BUTTON_REMOVE_LOCK:
@@ -496,7 +497,7 @@ bool CGUIDialogContextMenu::OnContextButton(const std::string &type, const CFile
       CMediaSourceSettings::GetInstance().UpdateSource(type, share->strName, "badpwdcount", "0");
       CMediaSourceSettings::GetInstance().Save();
       CGUIMessage msg(GUI_MSG_NOTIFY_ALL,0,0,GUI_MSG_UPDATE_SOURCES);
-      g_windowManager.SendThreadMessage(msg);
+      CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
       return true;
     }
   case CONTEXT_BUTTON_REACTIVATE_LOCK:
@@ -529,7 +530,7 @@ bool CGUIDialogContextMenu::OnContextButton(const std::string &type, const CFile
       CMediaSourceSettings::GetInstance().UpdateSource(type, share->strName, "badpwdcount", "0");
       CMediaSourceSettings::GetInstance().Save();
       CGUIMessage msg(GUI_MSG_NOTIFY_ALL,0,0,GUI_MSG_UPDATE_SOURCES);
-      g_windowManager.SendThreadMessage(msg);
+      CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
       return true;
     }
   default:
@@ -641,13 +642,13 @@ void CGUIDialogContextMenu::SwitchMedia(const std::string& strType, const std::s
   if (window >= 0)
   {
     CUtil::DeleteDirectoryCache();
-    g_windowManager.ChangeActiveWindow(window, strPath);
+    CServiceBroker::GetGUI()->GetWindowManager().ChangeActiveWindow(window, strPath);
   }
 }
 
 int CGUIDialogContextMenu::Show(const CContextButtons& choices)
 {
-  auto dialog = static_cast<CGUIDialogContextMenu*>(g_windowManager.GetWindow(WINDOW_DIALOG_CONTEXT_MENU));
+  auto dialog = static_cast<CGUIDialogContextMenu*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_CONTEXT_MENU));
   if (!dialog)
     return -1;
 
@@ -665,7 +666,7 @@ int CGUIDialogContextMenu::ShowAndGetChoice(const CContextButtons &choices)
   if (choices.empty())
     return -1;
 
-  CGUIDialogContextMenu *pMenu = (CGUIDialogContextMenu *)g_windowManager.GetWindow(WINDOW_DIALOG_CONTEXT_MENU);
+  CGUIDialogContextMenu *pMenu = (CGUIDialogContextMenu *)CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_CONTEXT_MENU);
   if (pMenu)
   {
     pMenu->m_buttons = choices;
@@ -684,7 +685,7 @@ int CGUIDialogContextMenu::ShowAndGetChoice(const CContextButtons &choices)
 
 void CGUIDialogContextMenu::PositionAtCurrentFocus()
 {
-  CGUIWindow *window = g_windowManager.GetWindow(g_windowManager.GetFocusedWindow());
+  CGUIWindow *window = CServiceBroker::GetGUI()->GetWindowManager().GetWindow(CServiceBroker::GetGUI()->GetWindowManager().GetFocusedWindow());
   if (window)
   {
     const CGUIControl *focusedControl = window->GetFocusedControl();

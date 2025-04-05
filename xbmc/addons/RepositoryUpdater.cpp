@@ -19,6 +19,7 @@
 #include "addons/addoninfo/AddonType.h"
 #include "dialogs/GUIDialogExtendedProgressBar.h"
 #include "dialogs/GUIDialogKaiToast.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
 #include "settings/Settings.h"
@@ -208,7 +209,7 @@ bool CRepositoryUpdater::CheckForUpdates(bool showProgress)
 
 static void SetProgressIndicator(CRepositoryUpdateJob* job)
 {
-  auto dialog = dynamic_cast<CGUIDialogExtendedProgressBar*>(g_windowManager.GetWindow(WINDOW_DIALOG_EXT_PROGRESS));
+  auto dialog = dynamic_cast<CGUIDialogExtendedProgressBar*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_EXT_PROGRESS));
   if (dialog)
     job->SetProgressIndicators(dialog->GetHandle(g_localizeStrings.Get(24092)), nullptr);
 }
@@ -243,9 +244,9 @@ void CRepositoryUpdater::Await()
 void CRepositoryUpdater::OnTimeout()
 {
   //workaround
-  if (g_windowManager.GetActiveWindow() == WINDOW_FULLSCREEN_VIDEO ||
-      g_windowManager.GetActiveWindow() == WINDOW_FULLSCREEN_GAME ||
-      g_windowManager.GetActiveWindow() == WINDOW_SLIDESHOW)
+  if (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_FULLSCREEN_VIDEO ||
+      CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_FULLSCREEN_GAME ||
+      CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_SLIDESHOW)
   {
     CLog::Log(LOGDEBUG,"CRepositoryUpdater: busy playing. postponing scheduled update");
     m_timer.RestartAsync(2min);

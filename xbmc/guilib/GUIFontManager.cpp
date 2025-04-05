@@ -20,9 +20,11 @@
 
 #include "GUIFontManager.h"
 #include "GraphicContext.h"
+#include "GUIComponent.h"
 #include "GUIWindowManager.h"
 #include "addons/Skin.h"
 #include "GUIFont.h"
+#include "ServiceBroker.h"
 #include "utils/XMLUtils.h"
 #include "GUIControlFactory.h"
 #include "filesystem/Directory.h"
@@ -184,7 +186,7 @@ bool GUIFontManager::OnMessage(CGUIMessage &message)
   { // our device has been reset - we have to reload our ttf fonts, and send
     // a message to controls that we have done so
     ReloadTTFFonts();
-    g_windowManager.SendMessage(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_WINDOW_RESIZE);
+    CServiceBroker::GetGUI()->GetWindowManager().SendMessage(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_WINDOW_RESIZE);
     m_canReload = true;
     return true;
   }

@@ -18,10 +18,6 @@
  *
  */
 
-/*!
-\file TextureManager.h
-\brief
-*/
 #pragma once
 
 #include <list>
@@ -32,6 +28,9 @@
 #include "TextureBundle.h"
 #endif
 #include "threads/CriticalSection.h"
+
+#include "GUIComponent.h"
+#include "ServiceBroker.h"
 
 class CTexture;
 
@@ -154,9 +153,3 @@ protected:
   std::vector<std::string> m_texturePaths;
   CCriticalSection m_section;
 };
-
-/*!
- \ingroup textures
- \brief
- */
-extern CGUITextureManager g_TextureManager;

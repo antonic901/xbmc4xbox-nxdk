@@ -13,10 +13,11 @@
 #include "PlayListPlayer.h"
 #include "ServiceBroker.h"
 #include "Util.h"
-#include "Application.h"
-#include "ApplicationPlayer.h"
+#include "application/Application.h"
+#include "application/ApplicationPlayer.h"
 #include "cores/playercorefactory/PlayerCoreFactory.h"
 #include "dialogs/GUIDialogSmartPlaylistEditor.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIKeyboardFactory.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
@@ -219,7 +220,7 @@ bool CGUIWindowVideoPlaylist::OnAction(const CAction &action)
   }
   if (action.GetID() == ACTION_SHOW_PLAYLIST)
   {
-    g_windowManager.PreviousWindow();
+    CServiceBroker::GetGUI()->GetWindowManager().PreviousWindow();
     return true;
   }
   if ((action.GetID() == ACTION_MOVE_ITEM_UP) || (action.GetID() == ACTION_MOVE_ITEM_DOWN))

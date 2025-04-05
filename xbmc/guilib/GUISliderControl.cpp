@@ -19,12 +19,15 @@
  */
 
 #include "GUISliderControl.h"
+
+#include "GUIComponent.h"
 #include "GUIInfoManager.h"
 #include "input/Key.h"
 #include "utils/MathUtils.h"
 #include "utils/StringUtils.h"
-#include "guiinfo/GUIInfoLabels.h"
+#include "guilib/guiinfo/GUIInfoLabels.h"
 #include "GUIWindowManager.h"
+#include "ServiceBroker.h"
 
 static const SliderAction actions[] = {
   {"seek",    "PlayerControl(SeekPercentage(%2f))", PLAYER_PROGRESS, false},
@@ -76,7 +79,7 @@ void CGUISliderControl::Process(unsigned int currentTime, CDirtyRegionList &dirt
   if (infoCode)
   {
     int val;
-    if (g_infoManager.GetInt(val, infoCode))
+    if (CServiceBroker::GetGUI()->GetInfoManager().GetInt(val, infoCode, INFO::DEFAULT_CONTEXT))
       SetIntValue(val);
   }
 
@@ -308,7 +311,7 @@ void CGUISliderControl::SendClick()
     std::string action = StringUtils::Format(m_action->formatString, percent);
     CGUIMessage message(GUI_MSG_EXECUTE, m_controlID, m_parentID);
     message.SetStringParam(action);
-    g_windowManager.SendMessage(message);    
+    CServiceBroker::GetGUI()->GetWindowManager().SendMessage(message);    
   }
 }
 

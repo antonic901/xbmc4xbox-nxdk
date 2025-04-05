@@ -19,6 +19,7 @@
  */
 
 #include "system.h"
+#include "PlatformDefs.h" // strcmpi
 #include "GUIControlFactory.h"
 #include "LocalizeStrings.h"
 #include "GUIButtonControl.h"
@@ -59,6 +60,9 @@
 #include "utils/StringUtils.h"
 #include "GUIAction.h"
 #include "Util.h"
+
+using namespace KODI;
+using namespace KODI::GUILIB;
 
 typedef struct
 {
@@ -324,7 +328,7 @@ bool CGUIControlFactory::GetAspectRatio(const TiXmlNode* pRootNode, const char* 
   return true;
 }
 
-bool CGUIControlFactory::GetInfoTexture(const TiXmlNode* pRootNode, const char* strTag, CTextureInfo &image, CGUIInfoLabel &info, int parentID)
+bool CGUIControlFactory::GetInfoTexture(const TiXmlNode* pRootNode, const char* strTag, CTextureInfo &image, GUIINFO::CGUIInfoLabel &info, int parentID)
 {
   GetTexture(pRootNode, strTag, image);
   image.filename = "";
@@ -534,13 +538,13 @@ bool CGUIControlFactory::GetColor(const TiXmlNode *control, const char *strTag, 
   const TiXmlElement* node = control->FirstChildElement(strTag);
   if (node && node->FirstChild())
   {
-    value = g_colorManager.GetColor(node->FirstChild()->Value());
+    value = CServiceBroker::GetGUI()->GetColorManager().GetColor(node->FirstChild()->Value());
     return true;
   }
   return false;
 }
 
-bool CGUIControlFactory::GetInfoColor(const TiXmlNode *control, const char *strTag, CGUIInfoColor &value,int parentID)
+bool CGUIControlFactory::GetInfoColor(const TiXmlNode *control, const char *strTag, GUIINFO::CGUIInfoColor &value,int parentID)
 {
   const TiXmlElement* node = control->FirstChildElement(strTag);
   if (node && node->FirstChild())
@@ -551,15 +555,15 @@ bool CGUIControlFactory::GetInfoColor(const TiXmlNode *control, const char *strT
   return false;
 }
 
-void CGUIControlFactory::GetInfoLabel(const TiXmlNode *pControlNode, const std::string &labelTag, CGUIInfoLabel &infoLabel, int parentID)
+void CGUIControlFactory::GetInfoLabel(const TiXmlNode *pControlNode, const std::string &labelTag, GUIINFO::CGUIInfoLabel &infoLabel, int parentID)
 {
-  std::vector<CGUIInfoLabel> labels;
+  std::vector<GUIINFO::CGUIInfoLabel> labels;
   GetInfoLabels(pControlNode, labelTag, labels, parentID);
   if (labels.size())
     infoLabel = labels[0];
 }
 
-bool CGUIControlFactory::GetInfoLabelFromElement(const TiXmlElement *element, CGUIInfoLabel &infoLabel, int parentID)
+bool CGUIControlFactory::GetInfoLabelFromElement(const TiXmlElement *element, GUIINFO::CGUIInfoLabel &infoLabel, int parentID)
 {
   if (!element || !element->FirstChild())
     return false;
@@ -579,7 +583,7 @@ bool CGUIControlFactory::GetInfoLabelFromElement(const TiXmlElement *element, CG
   return true;
 }
 
-void CGUIControlFactory::GetInfoLabels(const TiXmlNode *pControlNode, const std::string &labelTag, std::vector<CGUIInfoLabel> &infoLabels, int parentID)
+void CGUIControlFactory::GetInfoLabels(const TiXmlNode *pControlNode, const std::string &labelTag, std::vector<GUIINFO::CGUIInfoLabel> &infoLabels, int parentID)
 {
   // we can have the following infolabels:
   // 1.  <number>1234</number> -> direct number
@@ -590,13 +594,13 @@ void CGUIControlFactory::GetInfoLabels(const TiXmlNode *pControlNode, const std:
   if (XMLUtils::GetInt(pControlNode, "number", labelNumber))
   {
     std::string label = StringUtils::Format("%i", labelNumber);
-    infoLabels.push_back(CGUIInfoLabel(label));
+    infoLabels.push_back(GUIINFO::CGUIInfoLabel(label));
     return; // done
   }
   const TiXmlElement *labelNode = pControlNode->FirstChildElement(labelTag);
   while (labelNode)
   {
-    CGUIInfoLabel label;
+    GUIINFO::CGUIInfoLabel label;
     if (GetInfoLabelFromElement(labelNode, label, parentID))
       infoLabels.push_back(label);
     labelNode = labelNode->NextSiblingElement(labelTag);
@@ -613,7 +617,7 @@ void CGUIControlFactory::GetInfoLabels(const TiXmlNode *pControlNode, const std:
       if (infoNode->FirstChild())
       {
         std::string info = StringUtils::Format("$INFO[%s]", infoNode->FirstChild()->Value());
-        infoLabels.push_back(CGUIInfoLabel(info, fallback, parentID));
+        infoLabels.push_back(GUIINFO::CGUIInfoLabel(info, fallback, parentID));
       }
       infoNode = infoNode->NextSibling("info");
     }
@@ -664,7 +668,7 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
   CGUIControl::ActionMap actions;
 
   int pageControl = 0;
-  CGUIInfoColor colorDiffuse(0xFFFFFFFF);
+  GUIINFO::CGUIInfoColor colorDiffuse(0xFFFFFFFF);
   int defaultControl = 0;
   bool  defaultAlways = false;
   std::string strTmp;
@@ -692,14 +696,14 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
   CTextureInfo textureUpFocus, textureDownFocus;
   CTextureInfo textureUpDisabled, textureDownDisabled;
   CTextureInfo texture, borderTexture;
-  CGUIInfoLabel textureFile;
+  GUIINFO::CGUIInfoLabel textureFile;
   CTextureInfo textureFocus, textureNoFocus;
   CTextureInfo textureAltFocus, textureAltNoFocus;
   CTextureInfo textureRadioOnFocus, textureRadioOnNoFocus;
   CTextureInfo textureRadioOffFocus, textureRadioOffNoFocus;
   CTextureInfo textureRadioOnDisabled, textureRadioOffDisabled;
   CTextureInfo textureProgressIndicator;
-  CGUIInfoLabel texturePath;
+  GUIINFO::CGUIInfoLabel texturePath;
   CRect borderSize;
 
   float sliderWidth = 150, sliderHeight = 16;
@@ -737,9 +741,9 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
 
   CLabelInfo labelInfo;
 
-  CGUIInfoColor hitColor(0xFFFFFFFF);
-  CGUIInfoColor textColor3;
-  CGUIInfoColor headlineColor;
+  GUIINFO::CGUIInfoColor hitColor(0xFFFFFFFF);
+  GUIINFO::CGUIInfoColor textColor3;
+  GUIINFO::CGUIInfoColor headlineColor;
 
   float radioWidth = 0;
   float radioHeight = 0;
@@ -855,7 +859,7 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
 
   std::string infoString;
   if (XMLUtils::GetString(pControlNode, "info", infoString))
-    singleInfo = g_infoManager.TranslateString(infoString);
+    singleInfo = CServiceBroker::GetGUI()->GetInfoManager().TranslateString(infoString);
 
   GetTexture(pControlNode, "texturefocus", textureFocus);
   GetTexture(pControlNode, "texturenofocus", textureNoFocus);
@@ -940,7 +944,7 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
   GetTexture(pControlNode, "bordertexture", borderTexture);
 
   // fade label can have a whole bunch, but most just have one
-  std::vector<CGUIInfoLabel> infoLabels;
+  std::vector<GUIINFO::CGUIInfoLabel> infoLabels;
   GetInfoLabels(pControlNode, "label", infoLabels, parentID);
 
   GetString(pControlNode, "label", strLabel);
@@ -1041,7 +1045,7 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
       viewType = VIEW_TYPE_BIG_INFO;
     const char *label = itemElement->Attribute("label");
     if (label)
-      viewLabel = CGUIInfoLabel::GetLabel(FilterLabel(label));
+      viewLabel = GUIINFO::CGUIInfoLabel::GetLabel(FilterLabel(label), INFO::DEFAULT_CONTEXT);
   }
 
   TiXmlElement *cam = pControlNode->FirstChildElement("camera");
@@ -1097,7 +1101,7 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
     break;
   case CGUIControl::GUICONTROL_LABEL:
     {
-      const CGUIInfoLabel &content = (infoLabels.size()) ? infoLabels[0] : CGUIInfoLabel("");
+      const GUIINFO::CGUIInfoLabel &content = (infoLabels.size()) ? infoLabels[0] : GUIINFO::CGUIInfoLabel("");
       if (insideContainer)
       { // inside lists we use CGUIListLabel
         control = new CGUIListLabel(parentID, id, posX, posY, width, height, labelInfo, content, scrollValue);
@@ -1118,7 +1122,7 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
         parentID, id, posX, posY, width, height, textureFocus, textureNoFocus,
         labelInfo, strLabel);
 
-      CGUIInfoLabel hint_text;
+      GUIINFO::CGUIInfoLabel hint_text;
       GetInfoLabel(pControlNode, "hinttext", hint_text, parentID);
       ((CGUIEditControl *) control)->SetHint(hint_text);
 

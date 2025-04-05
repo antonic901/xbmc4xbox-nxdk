@@ -19,10 +19,11 @@
 #include "ServiceBroker.h"
 #include "URL.h"
 #include "Util.h"
-#include "Application.h"
-#include "ApplicationPlayer.h"
+#include "application/Application.h"
+#include "application/ApplicationPlayer.h"
 #include "dialogs/GUIDialogMediaSource.h"
 #include "dialogs/GUIDialogProgress.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "input/Key.h"
 #include "interfaces/AnnouncementManager.h"
@@ -66,7 +67,7 @@ void CGUIWindowPictures::OnInitWindow()
   CGUIMediaWindow::OnInitWindow();
   if (m_slideShowStarted)
   {
-    CGUIWindowSlideShow* wndw = dynamic_cast<CGUIWindowSlideShow*>(g_windowManager.GetWindow(WINDOW_SLIDESHOW));
+    CGUIWindowSlideShow* wndw = dynamic_cast<CGUIWindowSlideShow*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_SLIDESHOW));
     std::string path;
     if (wndw && wndw->GetCurrentSlide())
       path = URIUtils::GetDirectory(wndw->GetCurrentSlide()->GetPath());
@@ -100,7 +101,7 @@ bool CGUIWindowPictures::OnMessage(CGUIMessage& message)
       if (m_vecItems->GetPath() == "?" && message.GetStringParam().empty())
         message.SetStringParam(CMediaSourceSettings::GetInstance().GetDefaultSource("pictures"));
 
-      m_dlgProgress = dynamic_cast<CGUIDialogProgress*>(g_windowManager.GetWindow(WINDOW_DIALOG_PROGRESS));
+      m_dlgProgress = dynamic_cast<CGUIDialogProgress*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PROGRESS));
     }
     break;
 
@@ -199,7 +200,7 @@ void CGUIWindowPictures::OnPrepareFileItems(CFileItemList& items)
   loader.SetProgressCallback(m_dlgProgress);
   loader.Load(items);
 
-  bool bShowProgress = !g_windowManager.HasModalDialog();
+  bool bShowProgress = !CServiceBroker::GetGUI()->GetWindowManager().HasModalDialog();
   bool bProgressVisible = false;
 
   auto start = std::chrono::steady_clock::now();
@@ -313,7 +314,7 @@ bool CGUIWindowPictures::ShowPicture(int iItem, bool startSlideShow)
   if (pItem->m_bIsShareOrDrive)
     return false;
 
-  CGUIWindowSlideShow *pSlideShow = dynamic_cast<CGUIWindowSlideShow*>(g_windowManager.GetWindow(WINDOW_SLIDESHOW));
+  CGUIWindowSlideShow *pSlideShow = dynamic_cast<CGUIWindowSlideShow*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_SLIDESHOW));
   if (!pSlideShow)
     return false;
   const auto appPlayer = g_application.m_pPlayer;
@@ -349,14 +350,14 @@ bool CGUIWindowPictures::ShowPicture(int iItem, bool startSlideShow)
   }
 
   m_slideShowStarted = true;
-  g_windowManager.ActivateWindow(WINDOW_SLIDESHOW);
+  CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_SLIDESHOW);
 
   return true;
 }
 
 void CGUIWindowPictures::OnShowPictureRecursive(const std::string& strPath)
 {
-  CGUIWindowSlideShow *pSlideShow = dynamic_cast<CGUIWindowSlideShow*>(g_windowManager.GetWindow(WINDOW_SLIDESHOW));
+  CGUIWindowSlideShow *pSlideShow = dynamic_cast<CGUIWindowSlideShow*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_SLIDESHOW));
   if (pSlideShow)
   {
     // stop any video
@@ -370,14 +371,14 @@ void CGUIWindowPictures::OnShowPictureRecursive(const std::string& strPath)
     if (pSlideShow->NumSlides())
     {
       m_slideShowStarted = true;
-      g_windowManager.ActivateWindow(WINDOW_SLIDESHOW);
+      CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_SLIDESHOW);
     }
   }
 }
 
 void CGUIWindowPictures::OnSlideShowRecursive(const std::string &strPicture)
 {
-  CGUIWindowSlideShow *pSlideShow = dynamic_cast<CGUIWindowSlideShow*>(g_windowManager.GetWindow(WINDOW_SLIDESHOW));
+  CGUIWindowSlideShow *pSlideShow = dynamic_cast<CGUIWindowSlideShow*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_SLIDESHOW));
   if (pSlideShow)
   {
     std::string strExtensions;
@@ -411,7 +412,7 @@ void CGUIWindowPictures::OnSlideShow()
 
 void CGUIWindowPictures::OnSlideShow(const std::string &strPicture)
 {
-  CGUIWindowSlideShow *pSlideShow = dynamic_cast<CGUIWindowSlideShow*>(g_windowManager.GetWindow(WINDOW_SLIDESHOW));
+  CGUIWindowSlideShow *pSlideShow = dynamic_cast<CGUIWindowSlideShow*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_SLIDESHOW));
   if (pSlideShow)
   {
     std::string strExtensions;
@@ -550,7 +551,7 @@ void CGUIWindowPictures::LoadPlayList(const std::string& strPlayList)
   if (playlist.size() > 0)
   {
     // set up slideshow
-    CGUIWindowSlideShow *pSlideShow = dynamic_cast<CGUIWindowSlideShow*>(g_windowManager.GetWindow(WINDOW_SLIDESHOW));
+    CGUIWindowSlideShow *pSlideShow = dynamic_cast<CGUIWindowSlideShow*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_SLIDESHOW));
     if (!pSlideShow)
       return;
     const auto appPlayer = g_application.m_pPlayer;
@@ -570,7 +571,7 @@ void CGUIWindowPictures::LoadPlayList(const std::string& strPlayList)
     // start slideshow if there are items
     pSlideShow->StartSlideShow();
     if (pSlideShow->NumSlides())
-      g_windowManager.ActivateWindow(WINDOW_SLIDESHOW);
+      CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_SLIDESHOW);
   }
 }
 
@@ -588,7 +589,7 @@ void CGUIWindowPictures::OnItemInfo(int itemNumber)
   }
   if (item->m_bIsFolder || item->IsZIP() || item->IsRAR() || item->IsCBZ() || item->IsCBR() || !item->IsPicture())
     return;
-  CGUIDialogPictureInfo *pictureInfo = dynamic_cast<CGUIDialogPictureInfo*>(g_windowManager.GetWindow(WINDOW_DIALOG_PICTURE_INFO));
+  CGUIDialogPictureInfo *pictureInfo = dynamic_cast<CGUIDialogPictureInfo*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PICTURE_INFO));
   if (pictureInfo)
   {
     pictureInfo->SetPicture(item.get());

@@ -15,11 +15,12 @@
 #include "ServiceBroker.h"
 #include "URL.h"
 #include "Util.h"
-#include "Application.h"
-#include "ApplicationPlayer.h"
+#include "application/Application.h"
+#include "application/ApplicationPlayer.h"
 #include "dialogs/GUIDialogBusy.h"
 #include "filesystem/Directory.h"
 #include "filesystem/VideoDatabaseDirectory.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "playlists/PlayList.h"
 #include "playlists/PlayListFactory.h"
@@ -173,7 +174,7 @@ void CAsyncGetItemsForPlaylist::GetItemsForPlaylist(const std::shared_ptr<CFileI
       }
 
       SortDescription sortDesc;
-      if (g_windowManager.GetActiveWindow() == viewStateWindowId)
+      if (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == viewStateWindowId)
         sortDesc = state->GetSortMethod();
       else
         sortDesc = GetSortDescription(*state, items);
@@ -427,7 +428,7 @@ bool IsItemPlayable(const CFileItem& item)
     return false;
 
   // Exclude unwanted windows
-  if (g_windowManager.GetActiveWindow() == WINDOW_VIDEO_PLAYLIST)
+  if (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_VIDEO_PLAYLIST)
     return false;
 
   // Exclude special items
@@ -488,7 +489,7 @@ bool IsItemPlayable(const CFileItem& item)
   else if (item.m_bIsFolder)
   {
     // Not a video-specific folder (like file:// or nfs://). Allow play if context is Video window.
-    if (g_windowManager.GetActiveWindow() == WINDOW_VIDEO_NAV &&
+    if (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_VIDEO_NAV &&
         item.GetPath() != "add") // Exclude "Add video source" item
       return true;
   }

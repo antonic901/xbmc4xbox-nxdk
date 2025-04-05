@@ -15,9 +15,10 @@
 #include "ServiceBroker.h"
 #include "TextureDatabase.h"
 #include "URL.h"
-#include "Application.h"
-#include "ApplicationPlayer.h"
+#include "application/Application.h"
+#include "application/ApplicationPlayer.h"
 #include "filesystem/Directory.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUILabelControl.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
@@ -259,7 +260,7 @@ void CGUIWindowSlideShow::OnDeinitWindow(int nextWindowID)
     m_Image[0].Close();
     m_Image[1].Close();
   }
-  g_infoManager.ResetCurrentSlide();
+  CServiceBroker::GetGUI()->GetInfoManager().GetInfoProviders().GetPicturesInfoProvider().SetCurrentSlide(nullptr);
   m_bSlideShow = false;
 
   CGUIDialog::OnDeinitWindow(nextWindowID);
@@ -634,7 +635,7 @@ void CGUIWindowSlideShow::Process(unsigned int currentTime, CDirtyRegionList &re
       return;
 
   if (m_Image[m_iCurrentPic].IsLoaded())
-    g_infoManager.SetCurrentSlide(*m_slides.at(m_iCurrentSlide).get());
+    CServiceBroker::GetGUI()->GetInfoManager().GetInfoProviders().GetPicturesInfoProvider().SetCurrentSlide(m_slides.at(m_iCurrentSlide).get());
 
   RenderPause();
   if (m_slides.at(m_iCurrentSlide)->IsVideo() && appPlayer && appPlayer->IsRenderingGuiLayer())
@@ -800,7 +801,7 @@ bool CGUIWindowSlideShow::OnAction(const CAction &action)
   {
   case ACTION_SHOW_INFO:
     {
-      CGUIDialogPictureInfo *pictureInfo = dynamic_cast<CGUIDialogPictureInfo*>(g_windowManager.GetWindow(WINDOW_DIALOG_PICTURE_INFO));
+      CGUIDialogPictureInfo *pictureInfo = dynamic_cast<CGUIDialogPictureInfo*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PICTURE_INFO));
       if (pictureInfo)
       {
         // no need to set the picture here, it's done in Render()
@@ -1296,7 +1297,7 @@ void CGUIWindowSlideShow::RunSlideShow(const std::string &strPath,
                                                        GetCurrentSlide(), param);
   }
 
-  g_windowManager.ActivateWindow(WINDOW_SLIDESHOW);
+  CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_SLIDESHOW);
 }
 
 void CGUIWindowSlideShow::AddItems(const std::string &strPath, path_set *recursivePaths, SortBy method, SortOrder order, SortAttribute sortAttributes)
@@ -1363,7 +1364,7 @@ std::string CGUIWindowSlideShow::GetPicturePath(CFileItem *item)
 
 void CGUIWindowSlideShow::RunSlideShow(const std::vector<std::string>& paths, int start /* = 0*/)
 {
-  auto dialog = dynamic_cast<CGUIWindowSlideShow*>(g_windowManager.GetWindow(WINDOW_SLIDESHOW));
+  auto dialog = dynamic_cast<CGUIWindowSlideShow*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_SLIDESHOW));
   if (dialog)
   {
     std::vector<CFileItemPtr> items;

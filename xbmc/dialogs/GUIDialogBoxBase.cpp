@@ -18,7 +18,7 @@
  *
  */
 
-#include "Application.h"
+#include "application/Application.h"
 #include "GUIDialogBoxBase.h"
 #include "guilib/LocalizeStrings.h"
 #include "threads/SingleLock.h"

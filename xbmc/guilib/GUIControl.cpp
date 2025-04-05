@@ -22,9 +22,13 @@
 
 #include "GUIInfoManager.h"
 #include "utils/log.h"
+#include "GUIComponent.h"
 #include "GUIWindowManager.h"
+#include "ServiceBroker.h"
 #include "GUITexture.h"
 #include "input/Key.h"
+
+using namespace KODI::GUILIB;
 
 CGUIControl::CGUIControl() :
   m_hitColor(0xffffffff),
@@ -302,10 +306,10 @@ void CGUIControl::OnPrevControl()
 
 bool CGUIControl::SendWindowMessage(CGUIMessage &message) const
 {
-  CGUIWindow *pWindow = g_windowManager.GetWindow(GetParentID());
+  CGUIWindow *pWindow = CServiceBroker::GetGUI()->GetWindowManager().GetWindow(GetParentID());
   if (pWindow)
     return pWindow->OnMessage(message);
-  return g_windowManager.SendMessage(message);
+  return CServiceBroker::GetGUI()->GetWindowManager().SendMessage(message);
 }
 
 int CGUIControl::GetID(void) const
@@ -429,7 +433,7 @@ void CGUIControl::SetEnableCondition(const std::string &expression)
   else if (expression == "false")
     m_enabled = false;
   else
-    m_enableCondition = g_infoManager.Register(expression, GetParentID());
+    m_enableCondition = CServiceBroker::GetGUI()->GetInfoManager().Register(expression, GetParentID());
 }
 
 void CGUIControl::SetPosition(float posX, float posY)
@@ -446,7 +450,7 @@ void CGUIControl::SetPosition(float posX, float posY)
   }
 }
 
-bool CGUIControl::SetColorDiffuse(const CGUIInfoColor &color)
+bool CGUIControl::SetColorDiffuse(const GUIINFO::CGUIInfoColor &color)
 {
   bool changed = m_diffuseColor != color;
   m_diffuseColor = color;
@@ -527,7 +531,7 @@ void CGUIControl::SetVisible(bool bVisible, bool setVisState)
      //!       otherwise we just set m_forceHidden
     GUIVISIBLE visible;
     if (m_visibleCondition)
-      visible = m_visibleCondition->Get() ? VISIBLE : HIDDEN;
+      visible = m_visibleCondition->Get(INFO::DEFAULT_CONTEXT) ? VISIBLE : HIDDEN;
     else
       visible = VISIBLE;
     if (visible != m_visible)
@@ -594,7 +598,7 @@ void CGUIControl::UpdateVisibility(const CGUIListItem *item)
   if (m_visibleCondition)
   {
     bool bWasVisible = m_visibleFromSkinCondition;
-    m_visibleFromSkinCondition = m_visibleCondition->Get(item);
+    m_visibleFromSkinCondition = m_visibleCondition->Get(INFO::DEFAULT_CONTEXT, item);
     if (!bWasVisible && m_visibleFromSkinCondition)
     { // automatic change of visibility - queue the in effect
   //    CLog::Log(LOGDEBUG, "Visibility changed to visible for control id %i", m_controlID);
@@ -617,12 +621,12 @@ void CGUIControl::UpdateVisibility(const CGUIListItem *item)
   // this may need to be reviewed at a later date
   bool enabled = m_enabled;
   if (m_enableCondition)
-    m_enabled = m_enableCondition->Get(item);
+    m_enabled = m_enableCondition->Get(INFO::DEFAULT_CONTEXT, item);
 
   if (m_enabled != enabled)
     MarkDirtyRegion();
 
-  m_allowHiddenFocus.Update(item);
+  m_allowHiddenFocus.Update(INFO::DEFAULT_CONTEXT, item);
   if (UpdateColors())
     MarkDirtyRegion();
   // and finally, update our control information (if not pushed)
@@ -639,7 +643,7 @@ void CGUIControl::SetInitialVisibility()
 {
   if (m_visibleCondition)
   {
-    m_visibleFromSkinCondition = m_visibleCondition->Get();
+    m_visibleFromSkinCondition = m_visibleCondition->Get(INFO::DEFAULT_CONTEXT);
     m_visible = m_visibleFromSkinCondition ? VISIBLE : HIDDEN;
   //  CLog::Log(LOGDEBUG, "Set initial visibility for control %i: %s", m_controlID, m_visible == VISIBLE ? "visible" : "hidden");
   }
@@ -655,8 +659,8 @@ void CGUIControl::SetInitialVisibility()
   // and check for conditional enabling - note this overrides SetEnabled() from the code currently
   // this may need to be reviewed at a later date
   if (m_enableCondition)
-    m_enabled = m_enableCondition->Get();
-  m_allowHiddenFocus.Update();
+    m_enabled = m_enableCondition->Get(INFO::DEFAULT_CONTEXT);
+  m_allowHiddenFocus.Update(INFO::DEFAULT_CONTEXT);
   UpdateColors();
 
   MarkDirtyRegion();
@@ -669,7 +673,7 @@ void CGUIControl::SetVisibleCondition(const std::string &expression, const std::
   else if (expression == "false")
     m_visible = HIDDEN;
   else  // register with the infomanager for updates
-    m_visibleCondition = g_infoManager.Register(expression, GetParentID());
+    m_visibleCondition = CServiceBroker::GetGUI()->GetInfoManager().Register(expression, GetParentID());
   m_allowHiddenFocus.Parse(allowHiddenFocus, GetParentID());
 }
 

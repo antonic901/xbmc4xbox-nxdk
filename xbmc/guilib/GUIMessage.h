@@ -161,6 +161,11 @@
  */
 #define GUI_MSG_UI_READY       49
 
+ /*!
+ \brief Called if state has changed which could lead to GUI changes
+ */
+#define GUI_MSG_STATE_CHANGED  51
+
 /*!
  \brief Called when a subtitle download has finished
  */
@@ -258,7 +263,7 @@ do { \
  if(g_application.IsCurrentThread()) \
    OnMessage(msg); \
  else \
-   g_windowManager.SendThreadMessage(msg, GetID()); \
+   CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg, GetID()); \
 }
 
 /*!

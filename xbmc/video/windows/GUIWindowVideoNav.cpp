@@ -18,6 +18,7 @@
 #include "filesystem/Directory.h"
 #include "filesystem/VideoDatabaseDirectory.h"
 #include "filesystem/VideoDatabaseFile.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIKeyboardFactory.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
@@ -684,7 +685,7 @@ void CGUIWindowVideoNav::OnDeleteItem(const CFileItemPtr& pItem)
   else if (StringUtils::StartsWithNoCase(pItem->GetPath(), "videodb://movies/sets/") &&
            pItem->GetPath().size() > 22 && pItem->m_bIsFolder)
   {
-    CGUIDialogYesNo* pDialog = dynamic_cast<CGUIDialogYesNo*>(g_windowManager.GetWindow(WINDOW_DIALOG_YES_NO));
+    CGUIDialogYesNo* pDialog = dynamic_cast<CGUIDialogYesNo*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_YES_NO));
 
     if (!pDialog)
       return;
@@ -711,10 +712,8 @@ void CGUIWindowVideoNav::OnDeleteItem(const CFileItemPtr& pItem)
            m_vecItems->IsPath("special://videoplaylists/"))
   {
     pItem->m_bIsFolder = false;
-#if 0
     CGUIComponent *gui = CServiceBroker::GetGUI();
     if (gui && gui->ConfirmDelete(pItem->GetPath()))
-#endif
       CFileUtils::DeleteItem(pItem);
   }
   else
@@ -912,7 +911,7 @@ bool CGUIWindowVideoNav::OnContextButton(int itemNumber, CONTEXT_BUTTON button)
       std::string strPath;
       strPath = StringUtils::Format("musicdb://artists/{}/",
                                     item->GetProperty("artist_musicid").asInteger());
-      g_windowManager.ActivateWindow(WINDOW_MUSIC_NAV, strPath);
+      CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_MUSIC_NAV, strPath);
       return true;
     }
   case CONTEXT_BUTTON_GO_TO_ALBUM:
@@ -920,7 +919,7 @@ bool CGUIWindowVideoNav::OnContextButton(int itemNumber, CONTEXT_BUTTON button)
       std::string strPath;
       strPath = StringUtils::Format("musicdb://albums/{}/",
                                     item->GetProperty("album_musicid").asInteger());
-      g_windowManager.ActivateWindow(WINDOW_MUSIC_NAV, strPath);
+      CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_MUSIC_NAV, strPath);
       return true;
     }
   case CONTEXT_BUTTON_PLAY_OTHER:

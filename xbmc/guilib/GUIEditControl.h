@@ -69,7 +69,7 @@ public:
 
   virtual void SetLabel(const std::string &text);
   virtual void SetLabel2(const std::string &text);
-  void SetHint(const CGUIInfoLabel& hint);
+  void SetHint(const KODI::GUILIB::GUIINFO::CGUIInfoLabel& hint);
 
   virtual std::string GetLabel2() const;
 
@@ -110,7 +110,7 @@ protected:
   
   std::wstring m_text2;
   std::string  m_text;
-  CGUIInfoLabel m_hintInfo;
+  KODI::GUILIB::GUIINFO::CGUIInfoLabel m_hintInfo;
   float m_textOffset;
   float m_textWidth;
   CRect m_clipRect; ///< clipping rect for the second label

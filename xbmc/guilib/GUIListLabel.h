@@ -27,6 +27,7 @@
 
 #include "GUIControl.h"
 #include "GUILabel.h"
+#include "guilib/guiinfo/GUIInfoLabel.h"
 
 /*!
  \ingroup controls
@@ -36,7 +37,7 @@ class CGUIListLabel :
       public CGUIControl
 {
 public:
-  CGUIListLabel(int parentID, int controlID, float posX, float posY, float width, float height, const CLabelInfo& labelInfo, const CGUIInfoLabel &label, CGUIControl::GUISCROLLVALUE scroll);
+  CGUIListLabel(int parentID, int controlID, float posX, float posY, float width, float height, const CLabelInfo& labelInfo, const KODI::GUILIB::GUIINFO::CGUIInfoLabel &label, CGUIControl::GUISCROLLVALUE scroll);
   virtual ~CGUIListLabel(void);
   virtual CGUIListLabel *Clone() const { return new CGUIListLabel(*this); };
 
@@ -63,6 +64,6 @@ protected:
   virtual bool UpdateColors();
 
   CGUILabel     m_label;
-  CGUIInfoLabel m_info;
+  KODI::GUILIB::GUIINFO::CGUIInfoLabel m_info;
   CGUIControl::GUISCROLLVALUE m_scroll;
 };

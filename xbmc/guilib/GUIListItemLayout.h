@@ -22,7 +22,7 @@
 
 #include "GUIListGroup.h"
 #include "GUITexture.h"
-#include "GUIInfoTypes.h"
+#include "guilib/guiinfo/GUIInfoLabel.h"
 
 class CGUIListItem;
 class CFileItem;
@@ -71,6 +71,6 @@ protected:
   bool m_invalidated;
 
   INFO::InfoPtr m_condition;
-  CGUIInfoBool m_isPlaying;
+  KODI::GUILIB::GUIINFO::CGUIInfoBool m_isPlaying;
 };
 

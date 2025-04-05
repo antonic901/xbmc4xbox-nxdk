@@ -11,9 +11,10 @@
 #include "FileItem.h"
 #include "GUIInfoManager.h"
 #include "ServiceBroker.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
-#include "guiinfo/GUIInfoLabels.h"
+#include "guilib/guiinfo/GUIInfoLabels.h"
 #include "input/Key.h"
 
 #define CONTROL_PICTURE_INFO 5
@@ -34,7 +35,7 @@ CGUIDialogPictureInfo::~CGUIDialogPictureInfo(void)
 
 void CGUIDialogPictureInfo::SetPicture(CFileItem *item)
 {
-  g_infoManager.SetCurrentSlide(*item);
+  CServiceBroker::GetGUI()->GetInfoManager().GetInfoProviders().GetPicturesInfoProvider().SetCurrentSlide(item);
 }
 
 void CGUIDialogPictureInfo::OnInitWindow()
@@ -52,9 +53,9 @@ bool CGUIDialogPictureInfo::OnAction(const CAction& action)
     case ACTION_PREV_PICTURE:
     case ACTION_PLAYER_PLAY:
     case ACTION_PAUSE:
-      if (g_windowManager.GetActiveWindow() == WINDOW_SLIDESHOW)
+      if (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_SLIDESHOW)
       {
-        CGUIWindow* pWindow = g_windowManager.GetWindow(WINDOW_SLIDESHOW);
+        CGUIWindow* pWindow = CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_SLIDESHOW);
         return pWindow->OnAction(action);
       }
       break;
@@ -68,7 +69,7 @@ bool CGUIDialogPictureInfo::OnAction(const CAction& action)
 
 void CGUIDialogPictureInfo::FrameMove()
 {
-  const CFileItem* item = &g_infoManager.GetCurrentSlide();
+  const CFileItem* item = CServiceBroker::GetGUI()->GetInfoManager().GetInfoProviders().GetPicturesInfoProvider().GetCurrentSlide();
   if (item && item->GetPath() != m_currentPicture)
   {
     UpdatePictureInfo();
@@ -91,7 +92,7 @@ void CGUIDialogPictureInfo::UpdatePictureInfo()
       continue;
 
     std::string picInfo =
-        g_infoManager.GetLabel(info);
+        CServiceBroker::GetGUI()->GetInfoManager().GetLabel(info, INFO::DEFAULT_CONTEXT);
     if (!picInfo.empty())
     {
       CFileItemPtr item(new CFileItem(g_localizeStrings.Get(SLIDESHOW_STRING_BASE + info)));

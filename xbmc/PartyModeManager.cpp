@@ -12,8 +12,9 @@
 #include "GUIUserMessages.h"
 #include "PlayListPlayer.h"
 #include "ServiceBroker.h"
-#include "Application.h"
+#include "application/Application.h"
 #include "dialogs/GUIDialogProgress.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "interfaces/AnnouncementManager.h"
 #include "messaging/helpers/DialogOKHelper.h"
@@ -79,7 +80,7 @@ bool CPartyModeManager::Enable(PartyModeContext context /*= PARTYMODECONTEXT_MUS
   else
     m_type = "songs";
 
-  CGUIDialogProgress* pDialog = dynamic_cast<CGUIDialogProgress*>(g_windowManager.GetWindow(WINDOW_DIALOG_PROGRESS));
+  CGUIDialogProgress* pDialog = dynamic_cast<CGUIDialogProgress*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PROGRESS));
   int iHeading = (m_bIsVideo ? 20250 : 20121);
   int iLine0 = (m_bIsVideo ? 20251 : 20123);
   pDialog->SetHeading(CVariant{iHeading});
@@ -197,8 +198,8 @@ bool CPartyModeManager::Enable(PartyModeContext context /*= PARTYMODECONTEXT_MUS
   // open now playing window
   if (StringUtils::EqualsNoCase(m_type, "songs"))
   {
-    if (g_windowManager.GetActiveWindow() != WINDOW_MUSIC_PLAYLIST)
-      g_windowManager.ActivateWindow(WINDOW_MUSIC_PLAYLIST);
+    if (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() != WINDOW_MUSIC_PLAYLIST)
+      CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_MUSIC_PLAYLIST);
   }
 
   // done
@@ -449,7 +450,7 @@ bool CPartyModeManager::MovePlaying()
 void CPartyModeManager::SendUpdateMessage()
 {
   CGUIMessage msg(GUI_MSG_PLAYLIST_CHANGED, 0, 0);
-  g_windowManager.SendThreadMessage(msg);
+  CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
 }
 
 void CPartyModeManager::Play(int iPos)

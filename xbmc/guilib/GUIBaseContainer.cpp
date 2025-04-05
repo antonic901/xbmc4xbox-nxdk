@@ -29,7 +29,7 @@
 #include "utils/MathUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "listproviders/IListProvider.h"
-#include "guiinfo/GUIInfoLabels.h"
+#include "guilib/guiinfo/GUIInfoLabels.h"
 
 #define HOLD_TIME_START 100
 #define HOLD_TIME_END   3000
@@ -1079,7 +1079,7 @@ void CGUIBaseContainer::SetAutoScrolling(const TiXmlNode *node)
     if (scroll->Attribute("reverse"))
       m_autoScrollIsReversed = true;
     if (scroll->FirstChild())
-      m_autoScrollCondition = g_infoManager.Register(scroll->FirstChild()->ValueStr(), GetParentID());
+      m_autoScrollCondition = CServiceBroker::GetGUI()->GetInfoManager().Register(scroll->FirstChild()->ValueStr(), GetParentID());
   }
 }
 
@@ -1090,7 +1090,7 @@ void CGUIBaseContainer::ResetAutoScrolling()
 
 void CGUIBaseContainer::UpdateAutoScrolling(unsigned int currentTime)
 {
-  if (m_autoScrollCondition && m_autoScrollCondition->Get())
+  if (m_autoScrollCondition && m_autoScrollCondition->Get(INFO::DEFAULT_CONTEXT))
   {
     if (m_lastRenderTime)
       m_autoScrollDelayTime += currentTime - m_lastRenderTime;
@@ -1108,7 +1108,7 @@ void CGUIBaseContainer::UpdateAutoScrolling(unsigned int currentTime)
 void CGUIBaseContainer::SetContainerMoving(int direction)
 {
   if (direction)
-    g_infoManager.SetContainerMoving(GetID(), direction > 0, m_scroller.IsScrolling());
+    CServiceBroker::GetGUI()->GetInfoManager().GetInfoProviders().GetGUIControlsInfoProvider().SetContainerMoving(GetID(), direction > 0, m_scroller.IsScrolling());
 }
 
 void CGUIBaseContainer::UpdateScrollOffset(unsigned int currentTime)

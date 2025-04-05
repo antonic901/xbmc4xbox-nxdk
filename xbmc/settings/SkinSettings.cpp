@@ -11,6 +11,7 @@
 #include "GUIInfoManager.h"
 #include "ServiceBroker.h"
 #include "addons/Skin.h"
+#include "guilib/GUIComponent.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
@@ -96,10 +97,9 @@ void CSkinSettings::Reset()
 {
   g_SkinInfo->Reset();
 
-  g_infoManager.ResetCache();
-#if 0
-  g_infoManager.ResetContainerMovingCache();
-#endif
+  CGUIInfoManager& infoMgr = CServiceBroker::GetGUI()->GetInfoManager();
+  infoMgr.ResetCache();
+  infoMgr.GetInfoProviders().GetGUIControlsInfoProvider().ResetContainerMovingCache();
 }
 
 bool CSkinSettings::Load(const TiXmlNode *settings)

@@ -17,6 +17,7 @@
 #include "addons/binary-addons/AddonInstanceHandler.h"
 #include "addons/settings/SettingUrlEncodedString.h"
 #include "filesystem/Directory.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/LocalizeStrings.h"
 #include "messaging/ApplicationMessenger.h"
 #include "settings/SettingConditions.h"
@@ -50,7 +51,7 @@ bool InfoBool(const std::string& condition,
               const SettingConstPtr& setting,
               void* data)
 {
-  return g_infoManager.EvaluateBool(value);
+  return CServiceBroker::GetGUI()->GetInfoManager().EvaluateBool(value, INFO::DEFAULT_CONTEXT);
 }
 
 template<class TSetting>

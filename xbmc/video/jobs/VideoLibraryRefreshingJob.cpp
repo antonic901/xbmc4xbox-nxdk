@@ -15,6 +15,7 @@
 #include "addons/Scraper.h"
 #include "dialogs/GUIDialogSelect.h"
 #include "dialogs/GUIDialogYesNo.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIKeyboardFactory.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
@@ -193,7 +194,7 @@ bool CVideoLibraryRefreshingJob::Work(CVideoDatabase &db)
           else
           {
             // ask the user what to do
-            CGUIDialogSelect* selectDialog = dynamic_cast<CGUIDialogSelect*>(g_windowManager.GetWindow(WINDOW_DIALOG_SELECT));
+            CGUIDialogSelect* selectDialog = dynamic_cast<CGUIDialogSelect*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_SELECT));
             selectDialog->Reset();
             selectDialog->SetHeading(scraper->Content() == CONTENT_TVSHOWS ? 20356 : 196);
             for (const auto& itemResult : itemResultList)

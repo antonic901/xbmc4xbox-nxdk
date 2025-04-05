@@ -20,7 +20,7 @@
 
 #include "GraphicContext.h"
 #include "ServiceBroker.h"
-#include "Application.h"
+#include "application/Application.h"
 #include "messaging/ApplicationMessenger.h"
 #include "TextureManager.h"
 #include "utils/MathUtils.h"
@@ -529,7 +529,7 @@ void CGraphicContext::SetVideoResolutionInternal(RESOLUTION res, BOOL NeedZ, boo
   {
     CLog::Log(LOGDEBUG, "We set resolution %i", m_Resolution);
     if (m_Resolution != RES_INVALID)
-      g_windowManager.SendMessage(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_WINDOW_RESIZE);
+      CServiceBroker::GetGUI()->GetWindowManager().SendMessage(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_WINDOW_RESIZE);
   }
 
   Unlock();
@@ -959,6 +959,6 @@ int CGraphicContext::GetFPS() const
 
 void CGraphicContext::SetMediaDir(const std::string &strMediaDir)
 {
-  g_TextureManager.SetTexturePath(strMediaDir);
+  CServiceBroker::GetGUI()->GetTextureManager().SetTexturePath(strMediaDir);
   m_strMediaDir = strMediaDir;
 }

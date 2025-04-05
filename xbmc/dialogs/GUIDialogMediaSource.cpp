@@ -12,6 +12,7 @@
 #include "GUIDialogFileBrowser.h"
 #include "video/windows/GUIWindowVideoBase.h"
 #include "music/windows/GUIWindowMusicBase.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "input/Key.h"
 #include "Util.h"
@@ -121,7 +122,7 @@ bool CGUIDialogMediaSource::OnMessage(CGUIMessage& message)
 // \return True if the media source is added, false otherwise.
 bool CGUIDialogMediaSource::ShowAndAddMediaSource(const std::string &type)
 {
-  CGUIDialogMediaSource *dialog = dynamic_cast<CGUIDialogMediaSource*>(g_windowManager.GetWindow(WINDOW_DIALOG_MEDIA_SOURCE));
+  CGUIDialogMediaSource *dialog = dynamic_cast<CGUIDialogMediaSource*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_MEDIA_SOURCE));
   if (!dialog) return false;
   dialog->Initialize();
   dialog->SetShare(CMediaSource());
@@ -162,7 +163,7 @@ bool CGUIDialogMediaSource::ShowAndEditMediaSource(const std::string &type, cons
 bool CGUIDialogMediaSource::ShowAndEditMediaSource(const std::string &type, const CMediaSource &share)
 {
   std::string strOldName = share.strName;
-  CGUIDialogMediaSource *dialog = dynamic_cast<CGUIDialogMediaSource*>(g_windowManager.GetWindow(WINDOW_DIALOG_MEDIA_SOURCE));
+  CGUIDialogMediaSource *dialog = dynamic_cast<CGUIDialogMediaSource*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_MEDIA_SOURCE));
   if (!dialog) return false;
   dialog->Initialize();
   dialog->SetShare(share);

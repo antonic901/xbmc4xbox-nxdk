@@ -37,15 +37,27 @@ class CApplicationMessenger;
 } // namespace KODI
 
 class CAppParams;
+template<class T>
+class CComponentContainer;
 class CContextMenuManager;
 class CDataCacheCore;
-class CSettingsComponent;
+class IApplicationComponent;
 class CFileExtensionProvider;
 class CPlayerCoreFactory;
 class CDatabaseManager;
+class CGUIComponent;
+class CSettingsComponent;
 class CMediaManager;
 class CTextureCache;
 class CJobManager;
+
+namespace KODI
+{
+namespace ADDONS
+{
+class CExtsMimeSupportList;
+}
+} // namespace KODI
 
 class CServiceBroker
 {
@@ -63,6 +75,7 @@ public:
   static void UnregisterAnnouncementManager();
 
   static ADDON::CAddonMgr& GetAddonMgr();
+  static KODI::ADDONS::CExtsMimeSupportList& GetExtsMimeSupportList();
   static CContextMenuManager& GetContextMenuManager();
   static CDataCacheCore& GetDataCacheCore();
   static PLAYLIST::CPlayListPlayer& GetPlaylistPlayer();
@@ -71,6 +84,11 @@ public:
   static CPlayerCoreFactory& GetPlayerCoreFactory();
   static CDatabaseManager& GetDatabaseManager();
   static CMediaManager& GetMediaManager();
+  static CComponentContainer<IApplicationComponent>& GetAppComponents();
+
+  static CGUIComponent* GetGUI();
+  static void RegisterGUI(CGUIComponent* gui);
+  static void UnregisterGUI();
 
   static void RegisterSettingsComponent(const std::shared_ptr<CSettingsComponent>& settings);
   static void UnregisterSettingsComponent();
@@ -92,6 +110,7 @@ public:
 private:
   std::shared_ptr<CAppParams> m_appParams;
   std::shared_ptr<ANNOUNCEMENT::CAnnouncementManager> m_pAnnouncementManager;
+  CGUIComponent* m_pGUI;
   std::shared_ptr<CSettingsComponent> m_pSettingsComponent;
   std::shared_ptr<CTextureCache> m_textureCache;
   std::shared_ptr<CJobManager> m_jobManager;

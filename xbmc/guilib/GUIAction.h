@@ -36,6 +36,10 @@ public:
   CGUIAction(int controlID);
 
   /**
+   * Execute actions without specifying any target control or parent control. Action will use the default focused control.
+   */
+  bool ExecuteActions() const;
+  /**
    * Execute actions (no navigation paths), if action is paired with condition - evaluate condition first
    */
   bool ExecuteActions(int controlID, int parentID, const CGUIListItemPtr &item = NULL) const;

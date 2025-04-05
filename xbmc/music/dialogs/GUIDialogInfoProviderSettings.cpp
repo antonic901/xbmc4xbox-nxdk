@@ -16,6 +16,7 @@
 #include "dialogs/GUIDialogKaiToast.h"
 #include "filesystem/AddonsDirectory.h"
 #include "filesystem/Directory.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
 #include "settings/Settings.h"
@@ -44,7 +45,7 @@ CGUIDialogInfoProviderSettings::CGUIDialogInfoProviderSettings()
 
 bool CGUIDialogInfoProviderSettings::Show()
 {
-  CGUIDialogInfoProviderSettings *dialog = dynamic_cast<CGUIDialogInfoProviderSettings*>(g_windowManager.GetWindow(WINDOW_DIALOG_INFOPROVIDER_SETTINGS));
+  CGUIDialogInfoProviderSettings *dialog = dynamic_cast<CGUIDialogInfoProviderSettings*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_INFOPROVIDER_SETTINGS));
   if (!dialog)
     return false;
 
@@ -82,7 +83,7 @@ bool CGUIDialogInfoProviderSettings::Show()
 
 int CGUIDialogInfoProviderSettings::Show(ADDON::ScraperPtr& scraper)
 {
-  CGUIDialogInfoProviderSettings *dialog = dynamic_cast<CGUIDialogInfoProviderSettings*>(g_windowManager.GetWindow(WINDOW_DIALOG_INFOPROVIDER_SETTINGS));
+  CGUIDialogInfoProviderSettings *dialog = dynamic_cast<CGUIDialogInfoProviderSettings*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_INFOPROVIDER_SETTINGS));
   if (!dialog || !scraper)
     return -1;
   if (scraper->Content() != CONTENT_ARTISTS && scraper->Content() != CONTENT_ALBUMS)

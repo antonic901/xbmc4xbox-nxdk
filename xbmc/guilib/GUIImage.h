@@ -32,6 +32,7 @@
 
 #include "GUIControl.h"
 #include "GUITexture.h"
+#include "guilib/guiinfo/GUIInfoLabel.h"
 
 /*!
  \ingroup controls
@@ -85,7 +86,7 @@ public:
   virtual bool CanFocus() const;
   virtual void UpdateInfo(const CGUIListItem *item = NULL);
 
-  virtual void SetInfo(const CGUIInfoLabel &info);
+  virtual void SetInfo(const KODI::GUILIB::GUIINFO::CGUIInfoLabel &info);
   virtual void SetFileName(const std::string& strFileName, bool setConstant = false, const bool useCache = true);
   virtual void SetAspectRatio(const CAspectRatio &aspect);
   virtual void SetWidth(float width);
@@ -114,7 +115,7 @@ protected:
 
   // border + conditional info
   CTextureInfo m_image;
-  CGUIInfoLabel m_info;
+  KODI::GUILIB::GUIINFO::CGUIInfoLabel m_info;
 
   CGUITexture m_texture;
   std::vector<CFadingTexture *> m_fadingTextures;

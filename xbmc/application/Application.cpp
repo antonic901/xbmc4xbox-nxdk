@@ -18,30 +18,60 @@
  *
  */
 
-#include "Application.h"
+#include "application/Application.h"
 
 #include "PlayListPlayer.h"
 #include "ServiceManager.h"
+#include "application/ApplicationActionListeners.h"
+#include "application/ApplicationSkinHandling.h"
 #include "playlists/PlayListFactory.h"
+#include "messaging/ApplicationMessenger.h"
+#include "messaging/ThreadMessage.h"
 
 #include "playlists/PlayList.h"
 #include "playlists/SmartPlayList.h"
 
 #include "input/Key.h"
 
+using namespace KODI::MESSAGING;
+
 CApplication::CApplication(void)
   : m_pPlayer(new CApplicationPlayer)
   , m_itemCurrentFile(new CFileItem)
 {
+  // register application components
+  RegisterComponent(std::make_shared<CApplicationActionListeners>(m_critSection));
+  RegisterComponent(std::make_shared<CApplicationPlayer>());
+  RegisterComponent(std::make_shared<CApplicationSkinHandling>(this, this, m_bInitializing));
 }
 
 CApplication::~CApplication(void)
+{
+  DeregisterComponent(typeid(CApplicationSkinHandling));
+  DeregisterComponent(typeid(CApplicationPlayer));
+  DeregisterComponent(typeid(CApplicationActionListeners));
+}
+
+void CApplication::Render()
 {
 }
 
 bool CApplication::OnAction(const CAction &action)
 {
   return false;
+}
+
+int CApplication::GetMessageMask()
+{
+  return 0;
+}
+
+void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
+{
+}
+
+void CApplication::FrameMove(bool processEvents, bool processGUI)
+{
 }
 
 void CApplication::ResetScreenSaver()
@@ -65,6 +95,15 @@ bool CApplication::PlayFile(CFileItem item, const std::string& player, bool bRes
 }
 
 void CApplication::StopPlaying()
+{
+}
+
+bool CApplication::OnMessage(CGUIMessage& message)
+{
+  return false;
+}
+
+void CApplication::Process()
 {
 }
 
@@ -115,6 +154,29 @@ double CApplication::GetTime() const
 // delta from the current position.  This method accepts a double to be
 // consistent with GetTime() and GetTotalTime().
 void CApplication::SeekTime( double dTime )
+{
+}
+
+float CApplication::GetPercentage() const
+{
+  return 0.0f;
+}
+
+float CApplication::GetCachePercentage() const
+{
+  return 0.0f;
+}
+
+void CApplication::SeekPercentage(float percent)
+{
+}
+
+bool CApplication::IsMuted() const
+{
+  return false;
+}
+
+void CApplication::ToggleMute(void)
 {
 }
 

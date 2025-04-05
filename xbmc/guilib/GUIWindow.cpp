@@ -20,6 +20,7 @@
 
 #include "system.h"
 #include "GUIWindow.h"
+#include "GUIComponent.h"
 #include "GUIWindowManager.h"
 #include "ServiceBroker.h"
 #include "input/Key.h"
@@ -34,7 +35,7 @@
 #include "input/ButtonTranslator.h"
 #include "utils/XMLUtils.h"
 #include "GUIAudioManager.h"
-#include "Application.h"
+#include "application/Application.h"
 #include "messaging/ApplicationMessenger.h"
 #include "utils/Variant.h"
 #include "utils/StringUtils.h"
@@ -207,7 +208,7 @@ bool CGUIWindow::Load(TiXmlElement* pRootElement)
     {
       std::string condition;
       CGUIControlFactory::GetConditionalVisibility(pRootElement, condition);
-      m_visibleCondition = g_infoManager.Register(condition, GetID());
+      m_visibleCondition = CServiceBroker::GetGUI()->GetInfoManager().Register(condition, GetID());
     }
     else if (strValue == "animation" && pChild->FirstChild())
     {
@@ -234,7 +235,7 @@ bool CGUIWindow::Load(TiXmlElement* pRootElement)
         originElement->QueryFloatAttribute("x", &origin.x);
         originElement->QueryFloatAttribute("y", &origin.y);
         if (originElement->FirstChild())
-          origin.condition = g_infoManager.Register(originElement->FirstChild()->Value(), GetID());
+          origin.condition = CServiceBroker::GetGUI()->GetInfoManager().Register(originElement->FirstChild()->Value(), GetID());
         m_origins.push_back(origin);
         originElement = originElement->NextSiblingElement("origin");
       }
@@ -377,7 +378,7 @@ void CGUIWindow::Close_Internal(bool forceClose /*= false*/, int nextWindowID /*
     if (!m_closing)
     {
       if (enableSound && IsSoundEnabled())
-        g_audioManager.PlayWindowSound(GetID(), SOUND_DEINIT);
+        CServiceBroker::GetGUI()->GetAudioManager().PlayWindowSound(GetID(), SOUND_DEINIT);
 
       // Perform the window out effect
       QueueAnimation(ANIM_TYPE_WINDOW_CLOSE);
@@ -471,7 +472,7 @@ CPoint CGUIWindow::GetPosition() const
   for (unsigned int i = 0; i < m_origins.size(); i++)
   {
     // no condition implies true
-    if (!m_origins[i].condition || m_origins[i].condition->Get())
+    if (!m_origins[i].condition || m_origins[i].condition->Get(INFO::DEFAULT_CONTEXT))
     { // found origin
       return CPoint(m_origins[i].x, m_origins[i].y);
     }
@@ -524,7 +525,7 @@ void CGUIWindow::OnInitWindow()
 {
   //  Play the window specific init sound
   if (IsSoundEnabled())
-    g_audioManager.PlayWindowSound(GetID(), SOUND_INIT);
+    CServiceBroker::GetGUI()->GetAudioManager().PlayWindowSound(GetID(), SOUND_INIT);
 
   // set our rendered state
   m_hasProcessed = false;
@@ -740,7 +741,7 @@ bool CGUIWindow::OnMessage(CGUIMessage& message)
 
 bool CGUIWindow::NeedXMLReload()
 {
-  return !m_windowLoaded || g_infoManager.ConditionsChangedValues(m_xmlIncludeConditions);
+  return !m_windowLoaded || CServiceBroker::GetGUI()->GetInfoManager().ConditionsChangedValues(m_xmlIncludeConditions);
 }
 
 void CGUIWindow::AllocResources(bool forceLoad /*= FALSE */)
@@ -795,7 +796,7 @@ void CGUIWindow::FreeResources(bool forceUnload /*= FALSE */)
 {
   m_bAllocated = false;
   CGUIControlGroup::FreeResources();
-  //g_TextureManager.Dump();
+  //CServiceBroker::GetGUI()->GetTextureManager().Dump();
   // unload the skin
   if (m_loadType == LOAD_EVERY_TIME || forceUnload) ClearAll();
   if (forceUnload)
@@ -823,7 +824,7 @@ void CGUIWindow::ClearAll()
 
 bool CGUIWindow::Initialize()
 {
-  if (!g_windowManager.Initialized())
+  if (!CServiceBroker::GetGUI()->GetWindowManager().Initialized())
     return false;     // can't load if we have no skin yet
   if(!NeedXMLReload())
     return true;
@@ -842,13 +843,14 @@ bool CGUIWindow::Initialize()
 void CGUIWindow::SetInitialVisibility()
 {
   // reset our info manager caches
-  g_infoManager.ResetCache();
+  CGUIInfoManager& infoMgr = CServiceBroker::GetGUI()->GetInfoManager();
+  infoMgr.ResetCache();
   CGUIControlGroup::SetInitialVisibility();
 }
 
 bool CGUIWindow::IsActive() const
 {
-  return g_windowManager.IsWindowActive(GetID());
+  return CServiceBroker::GetGUI()->GetWindowManager().IsWindowActive(GetID());
 }
 
 bool CGUIWindow::CheckAnimation(ANIMATION_TYPE animType)
@@ -944,7 +946,7 @@ void CGUIWindow::ResetControlStates()
 
 bool CGUIWindow::OnBack(int actionID)
 {
-  g_windowManager.PreviousWindow();
+  CServiceBroker::GetGUI()->GetWindowManager().PreviousWindow();
   return true;
 }
 

@@ -8,6 +8,7 @@ SRCS += \
 	$(CURDIR)/xbmc/guilib/GUIBorderedImage.cpp \
 	$(CURDIR)/xbmc/guilib/GUIButtonControl.cpp \
 	$(CURDIR)/xbmc/guilib/GUIColorManager.cpp \
+	$(CURDIR)/xbmc/guilib/GUIComponent.cpp \
 	$(CURDIR)/xbmc/guilib/GUIControl.cpp \
 	$(CURDIR)/xbmc/guilib/GUIControlFactory.cpp \
 	$(CURDIR)/xbmc/guilib/GUIControlGroup.cpp \
@@ -20,7 +21,6 @@ SRCS += \
 	$(CURDIR)/xbmc/guilib/GUIFontManager.cpp \
 	$(CURDIR)/xbmc/guilib/GUIImage.cpp \
 	$(CURDIR)/xbmc/guilib/GUIIncludes.cpp \
-	$(CURDIR)/xbmc/guilib/GUIInfoTypes.cpp \
 	$(CURDIR)/xbmc/guilib/GUIKeyboardFactory.cpp \
 	$(CURDIR)/xbmc/guilib/GUILabel.cpp \
 	$(CURDIR)/xbmc/guilib/GUILabelControl.cpp \
@@ -62,3 +62,5 @@ SRCS += \
 	$(CURDIR)/xbmc/guilib/Texture.cpp \
 	$(CURDIR)/xbmc/guilib/TextureManager.cpp \
 	$(CURDIR)/xbmc/guilib/VisibleEffect.cpp
+
+include $(CURDIR)/xbmc/guilib/guiinfo/Makefile

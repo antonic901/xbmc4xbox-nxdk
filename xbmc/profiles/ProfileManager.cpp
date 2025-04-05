@@ -16,13 +16,14 @@
 #include "ServiceBroker.h"
 #include "Util.h"
 #include "addons/Skin.h"
-#include "Application.h" //! @todo Remove me
+#include "application/Application.h" //! @todo Remove me
 #include "dialogs/GUIDialogKaiToast.h"
 #include "dialogs/GUIDialogYesNo.h"
 #include "filesystem/Directory.h"
 #include "filesystem/DirectoryCache.h"
 #include "filesystem/File.h"
 #include "filesystem/SpecialProtocol.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
 #include "music/MusicLibraryQueue.h"
@@ -257,7 +258,7 @@ bool CProfileManager::LoadProfile(unsigned int index)
 
   if (index == 0 && IsMasterProfile())
   {
-    CGUIWindow* pWindow = g_windowManager.GetWindow(WINDOW_HOME);
+    CGUIWindow* pWindow = CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_HOME);
     if (pWindow)
       pWindow->ResetControlStates();
 
@@ -303,16 +304,13 @@ bool CProfileManager::LoadProfile(unsigned int index)
 
   CServiceBroker::GetDatabaseManager().Initialize();
 
-#if 0
   CGUIComponent* gui = CServiceBroker::GetGUI();
   if (gui)
-#endif
   {
-    g_infoManager.ResetCache();
-#if 0
-    g_infoManager.ResetContainerMovingCache();
-#endif
-    g_infoManager.ResetLibraryBools();
+    CGUIInfoManager& infoMgr = gui->GetInfoManager();
+    infoMgr.ResetCache();
+    infoMgr.GetInfoProviders().GetGUIControlsInfoProvider().ResetContainerMovingCache();
+    infoMgr.GetInfoProviders().GetLibraryInfoProvider().ResetLibraryBools();
   }
 
   if (m_currentProfile != 0)
@@ -334,7 +332,7 @@ bool CProfileManager::LoadProfile(unsigned int index)
 
   // init windows
   CGUIMessage msg(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_WINDOW_RESET);
-  g_windowManager.SendMessage(msg);
+  CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
 
   CUtil::DeleteDirectoryCache();
   g_directoryCache.Clear();
@@ -387,11 +385,11 @@ void CProfileManager::FinalizeLoadProfile()
   // Load initial window
   int firstWindow = g_SkinInfo->GetFirstWindow();
 
-  g_windowManager.ChangeActiveWindow(firstWindow);
+  CServiceBroker::GetGUI()->GetWindowManager().ChangeActiveWindow(firstWindow);
 
   //the user interfaces has been fully initialized, let everyone know
   CGUIMessage msg(GUI_MSG_NOTIFY_ALL, WINDOW_SETTINGS_PROFILES, 0, GUI_MSG_UI_READY);
-  g_windowManager.SendThreadMessage(msg);
+  CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
 }
 
 void CProfileManager::LogOff()
@@ -408,7 +406,7 @@ void CProfileManager::LogOff()
 
   g_passwordManager.bMasterUser = false;
 
-  g_windowManager.ActivateWindow(WINDOW_LOGIN_SCREEN, {}, false);
+  CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_LOGIN_SCREEN, {}, false);
 }
 
 bool CProfileManager::DeleteProfile(unsigned int index)
@@ -418,7 +416,7 @@ bool CProfileManager::DeleteProfile(unsigned int index)
   if (profile == NULL)
     return false;
 
-  CGUIDialogYesNo* dlgYesNo = dynamic_cast<CGUIDialogYesNo*>(g_windowManager.GetWindow(WINDOW_DIALOG_YES_NO));
+  CGUIDialogYesNo* dlgYesNo = dynamic_cast<CGUIDialogYesNo*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_YES_NO));
   if (dlgYesNo == NULL)
     return false;
 
@@ -452,10 +450,8 @@ bool CProfileManager::DeleteProfile(unsigned int index)
   item->m_bIsFolder = true;
   item->Select(true);
 
-#if 0
   CGUIComponent *gui = CServiceBroker::GetGUI();
   if (gui && gui->ConfirmDelete(item->GetPath()))
-#endif
     CFileUtils::DeleteItem(item);
 
   return Save();

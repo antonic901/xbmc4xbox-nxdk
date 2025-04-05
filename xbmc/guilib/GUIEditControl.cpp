@@ -26,6 +26,7 @@
 #include "input/XBMC_vkeys.h"
 #include "input/Key.h"
 #include "LocalizeStrings.h"
+#include "ServiceBroker.h"
 #include "XBDateTime.h"
 #include "utils/md5.h"
 #include "utils/Variant.h"
@@ -34,6 +35,8 @@
 #if defined(TARGET_DARWIN)
 #include "platform/darwin/osx/CocoaInterface.h"
 #endif
+
+using namespace KODI::GUILIB;
 
 const char* CGUIEditControl::smsLetters[10] = { " !@#$%^&*()[]{}<>/\\|0", ".,;:\'\"-+_=?`~1", "abc2ABC", "def3DEF", "ghi4GHI", "jkl5JKL", "mno6MNO", "pqrs7PQRS", "tuv8TUV", "wxyz9WXYZ" };
 const unsigned int CGUIEditControl::smsDelay = 1000;
@@ -533,7 +536,7 @@ CGUILabel::COLOR CGUIEditControl::GetTextColor() const
   return color;
 }
 
-void CGUIEditControl::SetHint(const CGUIInfoLabel& hint)
+void CGUIEditControl::SetHint(const GUIINFO::CGUIInfoLabel& hint)
 {
   m_hintInfo = hint;
 }

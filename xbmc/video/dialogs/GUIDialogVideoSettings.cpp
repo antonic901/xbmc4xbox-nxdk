@@ -11,9 +11,10 @@
 #include "GUIPassword.h"
 #include "ServiceBroker.h"
 #include "addons/Skin.h"
-#include "Application.h"
-#include "ApplicationPlayer.h"
+#include "application/Application.h"
+#include "application/ApplicationPlayer.h"
 #include "dialogs/GUIDialogYesNo.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
 #include "profiles/ProfileManager.h"
@@ -237,7 +238,7 @@ void CGUIDialogVideoSettings::OnSettingAction(const std::shared_ptr<const CSetti
         g_passwordManager.CheckSettingLevelLock(calibsetting->GetLevel()))
       return;
 
-    g_windowManager.ForceActivateWindow(WINDOW_SCREEN_CALIBRATION);
+    CServiceBroker::GetGUI()->GetWindowManager().ForceActivateWindow(WINDOW_SCREEN_CALIBRATION);
   }
   //! @todo implement
   else if (settingId == SETTING_VIDEO_MAKE_DEFAULT)

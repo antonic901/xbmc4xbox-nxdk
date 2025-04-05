@@ -24,6 +24,14 @@ class CPlayListPlayer;
 class CContextMenuManager;
 class CDataCacheCore;
 
+namespace KODI
+{
+namespace ADDONS
+{
+class CExtsMimeSupportList;
+}
+} // namespace KODI
+
 class CFileExtensionProvider;
 class CPlayerCoreFactory;
 class CDatabaseManager;
@@ -46,6 +54,7 @@ public:
   void DeinitStageOne();
 
   ADDON::CAddonMgr& GetAddonMgr();
+  KODI::ADDONS::CExtsMimeSupportList& GetExtsMimeSupportList();
   ADDON::CRepositoryUpdater& GetRepositoryUpdater();
   CContextMenuManager& GetContextMenuManager();
   CDataCacheCore& GetDataCacheCore();
@@ -73,6 +82,7 @@ protected:
   };
 
   std::unique_ptr<ADDON::CAddonMgr> m_addonMgr;
+  std::unique_ptr<KODI::ADDONS::CExtsMimeSupportList> m_extsMimeSupportList;
   std::unique_ptr<ADDON::CRepositoryUpdater> m_repositoryUpdater;
   std::unique_ptr<CContextMenuManager, delete_contextMenuManager> m_contextMenuManager;
   std::unique_ptr<CDataCacheCore, delete_dataCacheCore> m_dataCacheCore;

@@ -20,7 +20,7 @@
 
 #include "DummyVideoPlayer.h"
 
-#include "Application.h"
+#include "application/Application.h"
 #include "ServiceBroker.h"
 #include "guilib/GUIFont.h"
 #include "guilib/GUIFontManager.h"
