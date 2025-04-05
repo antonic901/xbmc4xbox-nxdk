@@ -21,6 +21,9 @@
  */
 
 #include "application/ApplicationComponents.h"
+#include "guilib/IMsgTargetCallback.h"
+#include "guilib/IWindowManagerCallback.h"
+#include "messaging/IMessageTarget.h"
 #include "playlists/PlayListTypes.h"
 #include "utils/GlobalsHandling.h"
 
@@ -47,20 +50,29 @@ namespace PLAYLIST
 #define VOLUME_MINIMUM -6000  // -60dB
 #define VOLUME_MAXIMUM 0      // 0dB
 
-class CApplication :
-                      public CApplicationComponents
+class CApplication : public IWindowManagerCallback,
+                     public IMsgTargetCallback,
+                     public KODI::MESSAGING::IMessageTarget,
+                     public CApplicationComponents
 {
   friend class CApplicationPlayer;
 public:
   CApplication(void);
   virtual ~CApplication(void);
 
+  void FrameMove(bool processEvents, bool processGUI = true) override;
+  void Render() override;
+
   bool IsCurrentThread() const;
   const std::string& CurrentFile();
   CFileItem& CurrentFileItem();
   std::shared_ptr<CFileItem> CurrentFileItemPtr();
   CFileItem& CurrentUnstackedItem();
+  bool OnMessage(CGUIMessage& message) override;
   std::string GetCurrentPlayer();
+
+  int  GetMessageMask() override;
+  void OnApplicationMessage(KODI::MESSAGING::ThreadMessage* pMsg) override;
 
   bool PlayMedia(CFileItem& item, const std::string& player, PLAYLIST::Id playlistId);
   bool ProcessAndStartPlaylist(const std::string& strPlayList,
@@ -70,6 +82,8 @@ public:
   bool PlayFile(CFileItem item, const std::string& player, bool bRestart = false);
   void StopPlaying();
   void Restart(bool bSamePosition = true);
+
+  void Process() override;
 
   /*!
    \brief Returns the total time in fractional seconds of the currently playing media
@@ -129,6 +143,11 @@ public:
 
 protected:
   CFileItemPtr m_itemCurrentFile;
+
+  bool m_bInitializing = true;
+
+private:
+  mutable CCriticalSection m_critSection; /*!< critical section for all changes to this class, except for changes to triggers */
 };
 
 XBMC_GLOBAL_REF(CApplication,g_application);
