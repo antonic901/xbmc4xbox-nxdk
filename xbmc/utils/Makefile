@@ -25,6 +25,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/HttpParser.cpp \
 	$(CURDIR)/xbmc/utils/HttpRangeUtils.cpp \
 	$(CURDIR)/xbmc/utils/HttpResponse.cpp \
+	$(CURDIR)/xbmc/utils/InfoLoader.cpp \
 	$(CURDIR)/xbmc/utils/JobManager.cpp \
 	$(CURDIR)/xbmc/utils/JSONVariantParser.cpp \
 	$(CURDIR)/xbmc/utils/JSONVariantWriter.cpp \
