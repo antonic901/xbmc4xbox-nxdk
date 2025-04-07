@@ -111,6 +111,16 @@ CFileExtensionProvider& CServiceBroker::GetFileExtensionProvider()
   return g_application.m_ServiceManager->GetFileExtensionProvider();
 }
 
+bool CServiceBroker::IsAddonInterfaceUp()
+{
+  return g_application.m_ServiceManager && g_application.m_ServiceManager->init_level > 1;
+}
+
+bool CServiceBroker::IsServiceManagerUp()
+{
+  return g_application.m_ServiceManager && g_application.m_ServiceManager->init_level == 3;
+}
+
 CPlayerCoreFactory& CServiceBroker::GetPlayerCoreFactory()
 {
   return g_application.m_ServiceManager->GetPlayerCoreFactory();

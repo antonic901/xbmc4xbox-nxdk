@@ -23,6 +23,7 @@
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/Digest.h"
+#include "utils/FileExtensionProvider.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
@@ -231,6 +232,12 @@ void CUtil::GetQualifiedFilename(const std::string &strBasePath, std::string &st
     basePath = URIUtils::GetParentPath(basePath);
     strFilename = URIUtils::AddFileToFolder(basePath, strFilename);
   }
+}
+
+bool CUtil::IsPicture(const std::string& strFile)
+{
+  return URIUtils::HasExtension(strFile,
+                  CServiceBroker::GetFileExtensionProvider().GetPictureExtensions()+ "|.tbn|.dds");
 }
 
 bool CUtil::ExcludeFileOrFolder(const std::string& strFileOrFolder, const std::vector<std::string>& regexps)

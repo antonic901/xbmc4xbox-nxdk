@@ -81,6 +81,8 @@ public:
   static PLAYLIST::CPlayListPlayer& GetPlaylistPlayer();
   static ADDON::CRepositoryUpdater& GetRepositoryUpdater();
   static CFileExtensionProvider& GetFileExtensionProvider();
+  static bool IsAddonInterfaceUp();
+  static bool IsServiceManagerUp();
   static CPlayerCoreFactory& GetPlayerCoreFactory();
   static CDatabaseManager& GetDatabaseManager();
   static CMediaManager& GetMediaManager();

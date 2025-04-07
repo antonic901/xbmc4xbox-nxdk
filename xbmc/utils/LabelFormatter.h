@@ -1,34 +1,20 @@
-#pragma once
-
 /*
- *      Copyright (C) 2005-2013 Team XBMC
- *      http://xbmc.org
+ *  Copyright (C) 2005-2018 Team Kodi
+ *  This file is part of Kodi - https://kodi.tv
  *
- *  This Program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2, or (at your option)
- *  any later version.
- *
- *  This Program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XBMC; see the file COPYING.  If not, see
- *  <http://www.gnu.org/licenses/>.
- *
+ *  SPDX-License-Identifier: GPL-2.0-or-later
+ *  See LICENSES/README.md for more information.
  */
+
+#pragma once
 
 #include <string>
 #include <vector>
 
-#if 0
 namespace MUSIC_INFO
 {
   class CMusicInfoTag;
 }
-#endif
 
 class CFileItem;  // forward
 
@@ -59,9 +45,7 @@ public:
     FormatLabel2(item);
   }
 
-#if 0
   bool FillMusicTag(const std::string &fileName, MUSIC_INFO::CMusicInfoTag *tag) const;
-#endif
 
 private:
   class CMaskString
@@ -70,7 +54,7 @@ private:
     CMaskString(const std::string &prefix, char content, const std::string &postfix) :
       m_prefix(prefix),
       m_postfix(postfix),
-      m_content(content)      
+      m_content(content)
     {};
     std::string m_prefix;
     std::string m_postfix;
@@ -84,9 +68,7 @@ private:
   // functions for retrieving content based on our mask vectors
   std::string GetContent(unsigned int label, const CFileItem *item) const;
   std::string GetMaskContent(const CMaskString &mask, const CFileItem *item) const;
-#if 0
   void FillMusicMaskContent(const char mask, const std::string &value, MUSIC_INFO::CMusicInfoTag *tag) const;
-#endif
 
   std::vector<std::string>   m_staticContent[2];
   std::vector<CMaskString>  m_dynamicContent[2];

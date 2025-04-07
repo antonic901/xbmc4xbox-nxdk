@@ -7,6 +7,10 @@
  */
 
 #include "URIUtils.h"
+#include "filesystem/MultiPathDirectory.h"
+#include "filesystem/SpecialProtocol.h"
+#include "filesystem/StackDirectory.h"
+#include "network/DNSNameCache.h"
 #include "settings/AdvancedSettings.h"
 #include "URL.h"
 #include "utils/FileExtensionProvider.h"
@@ -20,6 +24,14 @@
 
 #include <algorithm>
 #include <cassert>
+#ifdef NXDK
+#include <lwip/netdb.h>
+#else
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#endif
+
+using namespace XFILE;
 
 const CAdvancedSettings* URIUtils::m_advancedSettings = nullptr;
 
@@ -588,6 +600,84 @@ bool URIUtils::IsOnDVD(const std::string& strFile)
   return false;
 }
 
+bool URIUtils::IsOnLAN(const std::string& strPath)
+{
+  if(IsMultiPath(strPath))
+    return IsOnLAN(CMultiPathDirectory::GetFirstPath(strPath));
+
+  if(IsStack(strPath))
+    return IsOnLAN(CStackDirectory::GetFirstStackedFile(strPath));
+
+  if(IsSpecial(strPath))
+    return IsOnLAN(CSpecialProtocol::TranslatePath(strPath));
+
+  if(IsPlugin(strPath))
+    return false;
+
+  if(IsUPnP(strPath))
+    return true;
+
+  CURL url(strPath);
+  if (HasParentInHostname(url))
+    return IsOnLAN(url.GetHostName());
+
+  if(!IsRemote(strPath))
+    return false;
+
+  const std::string& host = url.GetHostName();
+
+  return IsHostOnLAN(host);
+}
+
+static bool addr_match(uint32_t addr, const char* target, const char* submask)
+{
+  uint32_t addr2 = ntohl(inet_addr(target));
+  uint32_t mask = ntohl(inet_addr(submask));
+  return (addr & mask) == (addr2 & mask);
+}
+
+bool URIUtils::IsHostOnLAN(const std::string& host, bool offLineCheck)
+{
+  if(host.length() == 0)
+    return false;
+
+  // assume a hostname without dot's
+  // is local (smb netbios hostnames)
+  if(host.find('.') == std::string::npos)
+    return true;
+
+  uint32_t address = ntohl(inet_addr(host.c_str()));
+  if(address == INADDR_NONE)
+  {
+    std::string ip;
+    if(CDNSNameCache::Lookup(host, ip))
+      address = ntohl(inet_addr(ip.c_str()));
+  }
+
+  if(address != INADDR_NONE)
+  {
+    if (offLineCheck) // check if in private range, ref https://en.wikipedia.org/wiki/Private_network
+    {
+      if (
+        addr_match(address, "192.168.0.0", "255.255.0.0") ||
+        addr_match(address, "10.0.0.0", "255.0.0.0") ||
+        addr_match(address, "172.16.0.0", "255.240.0.0")
+        )
+        return true;
+    }
+    // check if we are on the local subnet
+#if 0
+    if (!CServiceBroker::GetNetwork().GetFirstConnectedInterface())
+      return false;
+
+    if (CServiceBroker::GetNetwork().HasInterfaceForIP(address))
+      return true;
+#endif
+  }
+
+  return false;
+}
+
 bool URIUtils::IsMultiPath(const std::string& strPath)
 {
   return IsProtocol(strPath, "multipath");
@@ -975,6 +1065,21 @@ bool URIUtils::IsPVRRadioRecordingFileOrFolder(const std::string& strFile)
 bool URIUtils::IsMusicDb(const std::string& strFile)
 {
   return IsProtocol(strFile, "musicdb");
+}
+
+bool URIUtils::IsNfs(const std::string& strFile)
+{
+  if (IsStack(strFile))
+    return IsNfs(CStackDirectory::GetFirstStackedFile(strFile));
+
+  if (IsSpecial(strFile))
+    return IsNfs(CSpecialProtocol::TranslatePath(strFile));
+
+  CURL url(strFile);
+  if (HasParentInHostname(url))
+    return IsNfs(url.GetHostName());
+
+  return IsProtocol(strFile, "nfs");
 }
 
 bool URIUtils::IsVideoDb(const std::string& strFile)

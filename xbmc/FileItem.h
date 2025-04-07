@@ -19,6 +19,7 @@
 #include "threads/CriticalSection.h"
 #include "utils/IArchivable.h"
 #include "utils/ISerializable.h"
+#include "utils/ISortable.h"
 #include "utils/SortUtils.h"
 
 #include <map>
@@ -26,6 +27,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+enum class VideoDbContentType;
 
 namespace ADDON
 {
@@ -48,11 +51,15 @@ class CURL;
 class CVariant;
 
 class CFileItemList;
+class CCueDocument;
+typedef std::shared_ptr<CCueDocument> CCueDocumentPtr;
 
 /* special startoffset used to indicate that we wish to resume */
 #define STARTOFFSET_RESUME (-1)
 
 class CMediaSource;
+
+class CBookmark;
 
 enum EFileFolderType {
   EFILEFOLDER_TYPE_ALWAYS     = 1<<0,
@@ -72,12 +79,12 @@ enum EFileFolderType {
   \sa CFileItemList
   */
 class CFileItem :
-  public CGUIListItem, public IArchivable, public ISerializable
+  public CGUIListItem, public IArchivable, public ISerializable, public ISortable
 {
 public:
   CFileItem(void);
   CFileItem(const CFileItem& item);
-  CFileItem(const CGUIListItem& item);
+  explicit CFileItem(const CGUIListItem& item);
   explicit CFileItem(const std::string& strLabel);
   explicit CFileItem(const char* strLabel);
   CFileItem(const CURL& path, bool bIsFolder);
@@ -93,8 +100,8 @@ public:
   explicit CFileItem(const CMediaSource& share);
   explicit CFileItem(std::shared_ptr<const ADDON::IAddon> addonInfo);
 
-  ~CFileItem(void);
-  virtual CGUIListItem *Clone() const { return new CFileItem(*this); };
+  ~CFileItem(void) override;
+  CGUIListItem* Clone() const override { return new CFileItem(*this); }
 
   const CURL GetURL() const;
   void SetURL(const CURL& url);
@@ -116,7 +123,9 @@ public:
   CFileItem& operator=(const CFileItem& item);
   void Archive(CArchive& ar) override;
   void Serialize(CVariant& value) const override;
-  bool IsFileItem() const { return false; }
+  void ToSortable(SortItem &sortable, Field field) const override;
+  void ToSortable(SortItem &sortable, const Fields &fields) const;
+  bool IsFileItem() const override { return true; }
 
   bool Exists(bool bUseCache = true) const;
 
@@ -229,7 +238,7 @@ public:
   void CleanString();
   void FillInDefaultIcon();
   void SetFileSizeLabel();
-  virtual void SetLabel(const std::string &strLabel);
+  void SetLabel(const std::string &strLabel) override;
   VideoDbContentType GetVideoContentType() const;
   bool IsLabelPreformatted() const { return m_bLabelPreformatted; }
   void SetLabelPreformatted(bool bYesNo) { m_bLabelPreformatted=bYesNo; }
@@ -239,7 +248,7 @@ public:
 
   inline bool HasMusicInfoTag() const
   {
-    return false;
+    return m_musicInfoTag != NULL;
   }
 
   MUSIC_INFO::CMusicInfoTag* GetMusicInfoTag();
@@ -259,6 +268,8 @@ public:
   {
     return false;
   }
+
+  bool HasEPGSearchFilter() const { return false; }
 
   inline bool HasPVRChannelGroupMemberInfoTag() const
   {
@@ -337,7 +348,7 @@ public:
 
   inline bool HasPictureInfoTag() const
   {
-    return false;
+    return m_pictureInfoTag != NULL;
   }
 
   inline const CPictureInfoTag* GetPictureInfoTag() const
@@ -552,20 +563,22 @@ public:
   int m_iHasLock; // 0 - no lock 1 - lock, but unlocked 2 - locked
   int m_iBadPwdCount;
 
+  void SetCueDocument(const CCueDocumentPtr& cuePtr);
   void LoadEmbeddedCue();
   bool HasCueDocument() const;
   bool LoadTracksFromCueDocument(CFileItemList& scannedItems);
-
-  // part of CGUIListItem
-  bool m_bIsFolder;
-  void SetProperty(const std::string &strKey, const CVariant &value) { };
-
 private:
   /*! \brief initialize all members of this class (not CGUIListItem members) to default values.
    Called from constructors, and from Reset()
    \sa Reset, CGUIListItem
    */
   void Initialize();
+
+  /*!
+   \brief Return the current resume point for this item.
+   \return The resume point.
+   */
+  CBookmark GetResumePoint() const;
 
   std::string m_strPath;            ///< complete path to item
   std::string m_strDynPath;
@@ -584,6 +597,8 @@ private:
   bool m_bIsAlbum;
   int64_t m_lStartOffset;
   int64_t m_lEndOffset;
+
+  CCueDocumentPtr m_cueDocument;
 };
 
 /*!
@@ -630,7 +645,8 @@ public:
 
   CFileItemList();
   explicit CFileItemList(const std::string& strPath);
-  ~CFileItemList();
+  ~CFileItemList() override;
+  void Archive(CArchive& ar) override;
   CFileItemPtr operator[] (int iItem);
   const CFileItemPtr operator[] (int iItem) const;
   CFileItemPtr operator[] (const std::string& strPath);
@@ -736,7 +752,7 @@ public:
   void AddSortMethod(SortBy sortBy, int buttonLabel, const LABEL_MASKS &labelMasks, SortAttribute sortAttributes = SortAttributeNone);
   void AddSortMethod(SortBy sortBy, SortAttribute sortAttributes, int buttonLabel, const LABEL_MASKS &labelMasks);
   void AddSortMethod(SortDescription sortDescription, int buttonLabel, const LABEL_MASKS &labelMasks);
-  bool HasSortDetails() const { return false; }
+  bool HasSortDetails() const { return m_sortDetails.size() != 0; }
   const std::vector<GUIViewSortDetails> &GetSortDetails() const { return m_sortDetails; }
 
   /*! \brief Specify whether this list should be sorted with folders separate from files

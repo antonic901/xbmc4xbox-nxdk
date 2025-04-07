@@ -43,6 +43,7 @@ public:
   static void GetQualifiedFilename(const std::string &strBasePath, std::string &strFilename);
   static bool ExcludeFileOrFolder(const std::string& strFileOrFolder, const std::vector<std::string>& regexps);
 
+  static bool IsPicture(const std::string& strFile);
   /*! \brief retrieve MD5sum of a file
    \param strPath - path to the file to MD5sum
    \return md5 sum of the file
