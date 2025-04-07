@@ -4,6 +4,7 @@ SRCS += \
 	$(CURDIR)/xbmc/ContextMenuItem.cpp \
 	$(CURDIR)/xbmc/ContextMenuManager.cpp \
 	$(CURDIR)/xbmc/ContextMenus.cpp \
+	$(CURDIR)/xbmc/CueDocument.cpp \
 	$(CURDIR)/xbmc/DatabaseManager.cpp \
 	$(CURDIR)/xbmc/DbUrl.cpp \
 	$(CURDIR)/xbmc/FileItem.cpp \
