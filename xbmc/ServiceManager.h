@@ -24,6 +24,7 @@ class CPlayListPlayer;
 class CContextMenuManager;
 class CDataCacheCore;
 class CFavouritesService;
+class CWeatherManager;
 
 namespace KODI
 {
@@ -66,6 +67,8 @@ public:
   CFavouritesService& GetFavouritesService();
   CFileExtensionProvider& GetFileExtensionProvider();
 
+  CWeatherManager& GetWeatherManager();
+
   CPlayerCoreFactory& GetPlayerCoreFactory();
 
   CDatabaseManager& GetDatabaseManager();
@@ -96,6 +99,7 @@ protected:
   std::unique_ptr<PLAYLIST::CPlayListPlayer> m_playlistPlayer;
   std::unique_ptr<CFavouritesService, delete_favouritesService> m_favouritesService;
   std::unique_ptr<CFileExtensionProvider> m_fileExtensionProvider;
+  std::unique_ptr<CWeatherManager> m_weatherManager;
   std::unique_ptr<CPlayerCoreFactory> m_playerCoreFactory;
   std::unique_ptr<CDatabaseManager> m_databaseManager;
   std::unique_ptr<CMediaManager> m_mediaManager;

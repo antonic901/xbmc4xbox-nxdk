@@ -21,6 +21,7 @@
 #include "storage/MediaManager.h"
 #include "utils/FileExtensionProvider.h"
 #include "utils/log.h"
+#include "weather/WeatherManager.h"
 
 using namespace KODI;
 
@@ -95,6 +96,8 @@ bool CServiceManager::InitStageTwo(const std::string& profilesUserDataFolder)
 
   m_fileExtensionProvider.reset(new CFileExtensionProvider());
 
+  m_weatherManager.reset(new CWeatherManager());
+
   m_mediaManager.reset(new CMediaManager());
   m_mediaManager->Initialize();
 
@@ -124,6 +127,7 @@ void CServiceManager::DeinitStageTwo()
 {
   init_level = 1;
 
+  m_weatherManager.reset();
   m_fileExtensionProvider.reset();
   m_contextMenuManager.reset();
   m_favouritesService.reset();
@@ -198,6 +202,11 @@ void CServiceManager::delete_contextMenuManager::operator()(CContextMenuManager*
 void CServiceManager::delete_favouritesService::operator()(CFavouritesService* p) const
 {
   delete p;
+}
+
+CWeatherManager& CServiceManager::GetWeatherManager()
+{
+  return *m_weatherManager;
 }
 
 CPlayerCoreFactory& CServiceManager::GetPlayerCoreFactory()

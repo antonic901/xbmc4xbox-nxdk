@@ -126,6 +126,11 @@ bool CServiceBroker::IsServiceManagerUp()
   return g_application.m_ServiceManager && g_application.m_ServiceManager->init_level == 3;
 }
 
+CWeatherManager& CServiceBroker::GetWeatherManager()
+{
+  return g_application.m_ServiceManager->GetWeatherManager();
+}
+
 CPlayerCoreFactory& CServiceBroker::GetPlayerCoreFactory()
 {
   return g_application.m_ServiceManager->GetPlayerCoreFactory();

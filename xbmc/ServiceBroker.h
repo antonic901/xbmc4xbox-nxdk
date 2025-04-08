@@ -44,6 +44,7 @@ class CDataCacheCore;
 class IApplicationComponent;
 class CFavouritesService;
 class CFileExtensionProvider;
+class CWeatherManager;
 class CPlayerCoreFactory;
 class CDatabaseManager;
 class CGUIComponent;
@@ -86,6 +87,7 @@ public:
   static CFileExtensionProvider& GetFileExtensionProvider();
   static bool IsAddonInterfaceUp();
   static bool IsServiceManagerUp();
+  static CWeatherManager& GetWeatherManager();
   static CPlayerCoreFactory& GetPlayerCoreFactory();
   static CDatabaseManager& GetDatabaseManager();
   static CMediaManager& GetMediaManager();

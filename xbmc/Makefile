@@ -56,4 +56,5 @@ include $(CURDIR)/xbmc/threads/Makefile
 include $(CURDIR)/xbmc/utils/Makefile
 include $(CURDIR)/xbmc/video/Makefile
 include $(CURDIR)/xbmc/view/Makefile
+include $(CURDIR)/xbmc/weather/Makefile
 include $(CURDIR)/xbmc/windows/Makefile
