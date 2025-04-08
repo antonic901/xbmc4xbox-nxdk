@@ -16,6 +16,7 @@
 #include "addons/RepositoryUpdater.h"
 #include "cores/DataCacheCore.h"
 #include "cores/playercorefactory/PlayerCoreFactory.h"
+#include "favourites/FavouritesService.h"
 #include "profiles/ProfileManager.h"
 #include "storage/MediaManager.h"
 #include "utils/FileExtensionProvider.h"
@@ -88,6 +89,8 @@ bool CServiceManager::InitStageTwo(const std::string& profilesUserDataFolder)
 
   m_dataCacheCore.reset(new CDataCacheCore());
 
+  m_favouritesService.reset(new CFavouritesService(profilesUserDataFolder));
+
   m_contextMenuManager.reset(new CContextMenuManager(*m_addonMgr));
 
   m_fileExtensionProvider.reset(new CFileExtensionProvider());
@@ -123,6 +126,7 @@ void CServiceManager::DeinitStageTwo()
 
   m_fileExtensionProvider.reset();
   m_contextMenuManager.reset();
+  m_favouritesService.reset();
   m_dataCacheCore.reset();
   m_extsMimeSupportList.reset();
   m_repositoryUpdater.reset();
@@ -170,6 +174,11 @@ PLAYLIST::CPlayListPlayer& CServiceManager::GetPlaylistPlayer()
   return *m_playlistPlayer;
 }
 
+CFavouritesService& CServiceManager::GetFavouritesService()
+{
+  return *m_favouritesService;
+}
+
 CFileExtensionProvider& CServiceManager::GetFileExtensionProvider()
 {
   return *m_fileExtensionProvider;
@@ -182,6 +191,11 @@ void CServiceManager::delete_dataCacheCore::operator()(CDataCacheCore* p) const
 }
 
 void CServiceManager::delete_contextMenuManager::operator()(CContextMenuManager* p) const
+{
+  delete p;
+}
+
+void CServiceManager::delete_favouritesService::operator()(CFavouritesService* p) const
 {
   delete p;
 }

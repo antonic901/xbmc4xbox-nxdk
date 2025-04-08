@@ -42,6 +42,7 @@ class CComponentContainer;
 class CContextMenuManager;
 class CDataCacheCore;
 class IApplicationComponent;
+class CFavouritesService;
 class CFileExtensionProvider;
 class CPlayerCoreFactory;
 class CDatabaseManager;
@@ -80,6 +81,7 @@ public:
   static CContextMenuManager& GetContextMenuManager();
   static CDataCacheCore& GetDataCacheCore();
   static PLAYLIST::CPlayListPlayer& GetPlaylistPlayer();
+  static CFavouritesService& GetFavouritesService();
   static ADDON::CRepositoryUpdater& GetRepositoryUpdater();
   static CFileExtensionProvider& GetFileExtensionProvider();
   static bool IsAddonInterfaceUp();

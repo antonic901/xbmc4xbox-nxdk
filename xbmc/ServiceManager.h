@@ -23,6 +23,7 @@ class CPlayListPlayer;
 
 class CContextMenuManager;
 class CDataCacheCore;
+class CFavouritesService;
 
 namespace KODI
 {
@@ -62,6 +63,7 @@ public:
   PLAYLIST::CPlayListPlayer& GetPlaylistPlayer();
   int init_level = 0;
 
+  CFavouritesService& GetFavouritesService();
   CFileExtensionProvider& GetFileExtensionProvider();
 
   CPlayerCoreFactory& GetPlayerCoreFactory();
@@ -81,12 +83,18 @@ protected:
     void operator()(CContextMenuManager* p) const;
   };
 
+  struct delete_favouritesService
+  {
+    void operator()(CFavouritesService* p) const;
+  };
+
   std::unique_ptr<ADDON::CAddonMgr> m_addonMgr;
   std::unique_ptr<KODI::ADDONS::CExtsMimeSupportList> m_extsMimeSupportList;
   std::unique_ptr<ADDON::CRepositoryUpdater> m_repositoryUpdater;
   std::unique_ptr<CContextMenuManager, delete_contextMenuManager> m_contextMenuManager;
   std::unique_ptr<CDataCacheCore, delete_dataCacheCore> m_dataCacheCore;
   std::unique_ptr<PLAYLIST::CPlayListPlayer> m_playlistPlayer;
+  std::unique_ptr<CFavouritesService, delete_favouritesService> m_favouritesService;
   std::unique_ptr<CFileExtensionProvider> m_fileExtensionProvider;
   std::unique_ptr<CPlayerCoreFactory> m_playerCoreFactory;
   std::unique_ptr<CDatabaseManager> m_databaseManager;

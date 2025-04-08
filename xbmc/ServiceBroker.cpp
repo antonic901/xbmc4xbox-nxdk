@@ -101,6 +101,11 @@ std::shared_ptr<CSettingsComponent> CServiceBroker::GetSettingsComponent()
   return g_serviceBroker.m_pSettingsComponent;
 }
 
+CFavouritesService& CServiceBroker::GetFavouritesService()
+{
+  return g_application.m_ServiceManager->GetFavouritesService();
+}
+
 ADDON::CRepositoryUpdater& CServiceBroker::GetRepositoryUpdater()
 {
   return g_application.m_ServiceManager->GetRepositoryUpdater();

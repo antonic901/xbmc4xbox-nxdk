@@ -36,6 +36,7 @@ include $(CURDIR)/xbmc/commons/Makefile
 include $(CURDIR)/xbmc/cores/Makefile
 include $(CURDIR)/xbmc/dbwrappers/Makefile
 include $(CURDIR)/xbmc/dialogs/Makefile
+include $(CURDIR)/xbmc/favourites/Makefile
 include $(CURDIR)/xbmc/filesystem/Makefile
 include $(CURDIR)/xbmc/guilib/Makefile
 include $(CURDIR)/xbmc/input/Makefile

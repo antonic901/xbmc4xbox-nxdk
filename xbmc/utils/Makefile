@@ -9,6 +9,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/CharsetDetection.cpp \
 	$(CURDIR)/xbmc/utils/ColorUtils.cpp \
 	$(CURDIR)/xbmc/utils/CompileInfo.cpp \
+	$(CURDIR)/xbmc/utils/ContentUtils.cpp \
 	$(CURDIR)/xbmc/utils/CPUInfo.cpp \
 	$(CURDIR)/xbmc/utils/Crc32.cpp \
 	$(CURDIR)/xbmc/utils/DatabaseUtils.cpp \
@@ -39,6 +40,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/Mime.cpp \
 	$(CURDIR)/xbmc/utils/MovingSpeed.cpp \
 	$(CURDIR)/xbmc/utils/Observer.cpp \
+	$(CURDIR)/xbmc/utils/PlayerUtils.cpp \
 	$(CURDIR)/xbmc/utils/POUtils.cpp \
 	$(CURDIR)/xbmc/utils/ProgressJob.cpp \
 	$(CURDIR)/xbmc/utils/RegExp.cpp \
