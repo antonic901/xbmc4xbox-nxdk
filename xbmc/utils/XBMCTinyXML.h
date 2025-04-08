@@ -19,7 +19,7 @@
 #define TYPECOUNT   TINYXML_TYPECOUNT
 #endif
 
-#include <tinyxml/tinyxml.h>
+#include <tinyxml.h>
 #include <string>
 
 #undef DOCUMENT

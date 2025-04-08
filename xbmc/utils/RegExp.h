@@ -21,7 +21,7 @@
 namespace PCRE {
 struct real_pcre_jit_stack; // forward declaration for PCRE without JIT
 typedef struct real_pcre_jit_stack pcre_jit_stack;
-#include <pcre/pcre.h>
+#include <pcre.h>
 }
 
 class CRegExp

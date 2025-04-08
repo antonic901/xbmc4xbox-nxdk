@@ -13,12 +13,14 @@
 #include "ServiceBroker.h"
 #include "TextureCache.h"
 #include "URL.h"
+#include "cores/VideoPlayer/DVDFileInfo.h"
 #include "cores/VideoSettings.h"
 #include "filesystem/Directory.h"
 #include "filesystem/DirectoryCache.h"
 #include "filesystem/StackDirectory.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
+#include "guilib/StereoscopicsManager.h"
 #include "music/MusicDatabase.h"
 #include "music/tags/MusicInfoTag.h"
 #include "settings/AdvancedSettings.h"
@@ -93,7 +95,7 @@ bool CThumbExtractor::DoWork()
 
   // For HTTP/FTP we only allow extraction when on a LAN
   if (URIUtils::IsRemote(m_item.GetPath()) &&
-     //!URIUtils::IsOnLAN(m_item.GetPath())  &&
+     !URIUtils::IsOnLAN(m_item.GetPath())  &&
      (URIUtils::IsFTP(m_item.GetPath())    ||
       URIUtils::IsHTTP(m_item.GetPath())))
     return false;
@@ -106,7 +108,6 @@ bool CThumbExtractor::DoWork()
     // construct the thumb cache file
     CTextureDetails details;
     details.file = CTextureCache::GetCacheFile(m_target) + ".jpg";
-#if 0
     result = CDVDFileInfo::ExtractThumb(m_item, details, m_fillStreamDetails ? &m_item.GetVideoInfoTag()->m_streamDetails : nullptr, m_pos);
     if (result)
     {
@@ -126,7 +127,6 @@ bool CThumbExtractor::DoWork()
         }
       }
     }
-#endif
   }
   else if (!m_item.IsPlugin() &&
            (!m_item.HasVideoInfoTag() ||
@@ -135,9 +135,7 @@ bool CThumbExtractor::DoWork()
     // No tag or no details set, so extract them
     CLog::Log(LOGDEBUG, "{} - trying to extract filestream details from video file {}",
               __FUNCTION__, CURL::GetRedacted(m_item.GetPath()));
-#if 0
     result = CDVDFileInfo::GetFileStreamDetails(&m_item);
-#endif
   }
 
   if (result)
@@ -758,7 +756,6 @@ void CVideoThumbLoader::DetectAndAddMissingItemData(CFileItem &item)
     }
   }
 
-#if 0
   const CStereoscopicsManager &stereoscopicsManager = CServiceBroker::GetGUI()->GetStereoscopicsManager();
 
   std::string stereoMode;
@@ -790,7 +787,6 @@ void CVideoThumbLoader::DetectAndAddMissingItemData(CFileItem &item)
 
   if (!stereoMode.empty())
     item.SetProperty("stereomode", CStereoscopicsManager::NormalizeStereoMode(stereoMode));
-#endif
 }
 
 const ArtMap& CVideoThumbLoader::GetArtFromCache(const std::string &mediaType, const int id)

@@ -15,6 +15,7 @@
 #include "SourcesDirectory.h"
 #include "URL.h"
 #include "Util.h"
+#include "storage/MediaManager.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 
@@ -165,6 +166,9 @@ void CVirtualDirectory::GetSources(VECSOURCES &shares) const
 {
   shares = m_vecSources;
   // add our plug n play shares
+
+  if (m_allowNonLocalSources)
+    CServiceBroker::GetMediaManager().GetRemovableDrives(shares);
 
 #ifdef HAS_DVD_DRIVE
   // and update our dvd share

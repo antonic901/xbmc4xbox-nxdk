@@ -23,6 +23,7 @@
 #include "addons/gui/GUIWindowAddonBrowser.h"
 #include "application/Application.h"
 #include "filesystem/PluginDirectory.h"
+#include "games/tags/GameInfoTag.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "interfaces/generic/ScriptInvocationManager.h"
@@ -175,7 +176,6 @@ static int RunAddon(const std::vector<std::string>& params)
       CBuiltins::GetInstance().Execute(
           StringUtils::Format("RunScript({})", StringUtils::Join(params, ",")));
     }
-#if 0
     else if (CServiceBroker::GetAddonMgr().GetAddon(addonid, addon, AddonType::GAMEDLL,
                                                     OnlyEnabled::CHOICE_YES))
     {
@@ -195,7 +195,6 @@ static int RunAddon(const std::vector<std::string>& params)
         return false;
       }
     }
-#endif
     else
       CLog::Log(
           LOGERROR,

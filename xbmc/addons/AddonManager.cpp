@@ -8,7 +8,7 @@
 
 #include "AddonManager.h"
 
-#include "utils/CompileInfo.h"
+#include "CompileInfo.h"
 #include "FileItem.h"
 #include "LangInfo.h"
 #include "ServiceBroker.h"
@@ -23,6 +23,9 @@
 #include "addons/addoninfo/AddonInfo.h"
 #include "addons/addoninfo/AddonInfoBuilder.h"
 #include "addons/addoninfo/AddonType.h"
+#include "events/AddonManagementEvent.h"
+#include "events/EventLog.h"
+#include "events/NotificationEvent.h"
 #include "filesystem/Directory.h"
 #include "filesystem/SpecialProtocol.h"
 #include "utils/FileUtils.h"
@@ -860,7 +863,9 @@ bool CAddonMgr::DisableAddon(const std::string& id, AddonDisabledReason disabled
   AddonPtr addon;
   if (GetAddon(id, addon, AddonType::UNKNOWN, OnlyEnabled::CHOICE_NO) && addon != nullptr)
   {
-    // TODO: add event logger
+    auto eventLog = CServiceBroker::GetEventLog();
+    if (eventLog)
+      eventLog->Add(EventPtr(new CAddonManagementEvent(addon, 24141)));
   }
 
   m_events.Publish(AddonEvents::Disabled(id));
@@ -894,9 +899,14 @@ bool CAddonMgr::EnableSingle(const std::string& id)
   if (!GetAddon(id, addon, AddonType::UNKNOWN, OnlyEnabled::CHOICE_NO) || addon == nullptr)
     return false;
 
+  auto eventLog = CServiceBroker::GetEventLog();
+
   if (!IsCompatible(*addon))
   {
     CLog::Log(LOGERROR, "Add-on '{}' is not compatible with Kodi", addon->ID());
+    if (eventLog)
+      eventLog->AddWithNotification(
+          EventPtr(new CNotificationEvent(addon->Name(), 24152, EventLevel::Error)));
     UpdateDisabledReason(addon->ID(), AddonDisabledReason::INCOMPATIBLE);
     return false;
   }
@@ -908,6 +918,9 @@ bool CAddonMgr::EnableSingle(const std::string& id)
   // If enabling a repo add-on without an origin, set its origin to its own id
   if (addon->HasType(AddonType::REPOSITORY) && addon->Origin().empty())
     SetAddonOrigin(id, id, false);
+
+  if (eventLog)
+    eventLog->Add(EventPtr(new CAddonManagementEvent(addon, 24064)));
 
   CLog::Log(LOGDEBUG, "CAddonMgr: enabled {}", addon->ID());
   m_events.Publish(AddonEvents::Enabled(id));

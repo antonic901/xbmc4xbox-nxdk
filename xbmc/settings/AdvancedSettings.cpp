@@ -13,12 +13,16 @@
 #include "URL.h"
 #include "application/AppParams.h"
 #include "filesystem/SpecialProtocol.h"
+#include "network/DNSNameCache.h"
+#include "profiles/ProfileManager.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 #include "settings/lib/Setting.h"
 #include "settings/lib/SettingsManager.h"
+#include "utils/FileUtils.h"
 #include "utils/LangCodeExpander.h"
 #include "utils/StringUtils.h"
+#include "utils/SystemInfo.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/XMLUtils.h"
@@ -30,6 +34,8 @@
 #include <string>
 #include <vector>
 
+using namespace ADDON;
+
 CAdvancedSettings::CAdvancedSettings()
 {
   m_initialized = false;
@@ -38,8 +44,10 @@ CAdvancedSettings::CAdvancedSettings()
 
 void CAdvancedSettings::OnSettingsLoaded()
 {
+  const std::shared_ptr<CProfileManager> profileManager = CServiceBroker::GetSettingsComponent()->GetProfileManager();
+
   // load advanced settings
-  Load();
+  Load(*profileManager);
 
   // default players?
   CLog::Log(LOGINFO, "Default Video Player: {}", m_videoDefaultPlayer);
@@ -57,7 +65,7 @@ void CAdvancedSettings::OnSettingsLoaded()
     m_logLevel = std::min(m_logLevelHint, LOG_LEVEL_DEBUG/*LOG_LEVEL_NORMAL*/);
     CLog::Log(LOGINFO, "Disabled debug logging due to GUI setting. Level {}.", m_logLevel);
   }
-  CLog::SetLogLevel(m_logLevel);
+  CServiceBroker::GetLogging().SetLogLevel(m_logLevel);
 }
 
 void CAdvancedSettings::OnSettingsUnloaded()
@@ -85,7 +93,7 @@ void CAdvancedSettings::Initialize(CSettingsManager& settingsMgr)
   {
     m_logLevel = LOG_LEVEL_DEBUG;
     m_logLevelHint = LOG_LEVEL_DEBUG;
-    CLog::SetLogLevel(LOG_LEVEL_DEBUG);
+    CServiceBroker::GetLogging().SetLogLevel(LOG_LEVEL_DEBUG);
   }
 
   const std::string& settingsFile = params->GetSettingsFile();
@@ -275,6 +283,7 @@ void CAdvancedSettings::Initialize()
 
   m_fanartRes = 1080;
   m_imageRes = 720;
+  m_imageScalingAlgorithm = CPictureScalingAlgorithm::Default;
   m_imageQualityJpeg = 4;
 
   m_sambaclienttimeout = 30;
@@ -442,7 +451,7 @@ void CAdvancedSettings::Initialize()
 
   m_openGlDebugging = false;
 
-  m_userAgent = "XBMC/Xbox; NXDK";
+  m_userAgent = g_sysinfo.GetUserAgent();
 
   m_nfsTimeout = 30;
   m_nfsRetries = -1;
@@ -450,7 +459,7 @@ void CAdvancedSettings::Initialize()
   m_initialized = true;
 }
 
-bool CAdvancedSettings::Load()
+bool CAdvancedSettings::Load(const CProfileManager &profileManager)
 {
   // NOTE: This routine should NOT set the default of any of these parameters
   //       it should instead use the versions of GetString/Integer/Float that
@@ -460,7 +469,7 @@ bool CAdvancedSettings::Load()
   for (unsigned int i = 0; i < m_settingsFiles.size(); i++)
     ParseSettingsFile(m_settingsFiles[i]);
 
-  ParseSettingsFile("special://masterprofile/advancedsettings.xml");
+  ParseSettingsFile(profileManager.GetUserDataItem("advancedsettings.xml"));
 
   // Add the list of disc stub extensions (if any) to the list of video extensions
   if (!m_discStubExtensions.empty())
@@ -472,9 +481,7 @@ bool CAdvancedSettings::Load()
 void CAdvancedSettings::ParseSettingsFile(const std::string &file)
 {
   CXBMCTinyXML advancedXML;
-#if 0
   if (!CFileUtils::Exists(file))
-#endif
   {
     CLog::Log(LOGINFO, "No settings file to load ({})", file);
     return;
@@ -908,7 +915,7 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
         setting->SetVisible(false);
     }
     m_logLevel = std::max(m_logLevel, m_logLevelHint);
-    CLog::SetLogLevel(m_logLevel);
+    CServiceBroker::GetLogging().SetLogLevel(m_logLevel);
   }
 
   XMLUtils::GetString(pRootElement, "cddbaddress", m_cddbAddress);
@@ -1077,6 +1084,8 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
 
   XMLUtils::GetUInt(pRootElement, "fanartres", m_fanartRes, 0, 9999);
   XMLUtils::GetUInt(pRootElement, "imageres", m_imageRes, 0, 9999);
+  if (XMLUtils::GetString(pRootElement, "imagescalingalgorithm", tmp))
+    m_imageScalingAlgorithm = CPictureScalingAlgorithm::FromString(tmp);
   XMLUtils::GetUInt(pRootElement, "imagequalityjpeg", m_imageQualityJpeg, 0, 21);
   XMLUtils::GetBoolean(pRootElement, "playlistasfolders", m_playlistAsFolders);
   XMLUtils::GetBoolean(pRootElement, "uselocalecollation", m_useLocaleCollation);
@@ -1099,6 +1108,23 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
       if (filter->FirstChild())
         m_musicTagsFromFileFilters.push_back(filter->FirstChild()->ValueStr());
       filter = filter->NextSibling("filter");
+    }
+  }
+
+  TiXmlElement* pHostEntries = pRootElement->FirstChildElement("hosts");
+  if (pHostEntries)
+  {
+    TiXmlElement* element = pHostEntries->FirstChildElement("entry");
+    while(element)
+    {
+      if(!element->NoChildren())
+      {
+        std::string name  = XMLUtils::GetAttribute(element, "name");
+        std::string value = element->FirstChild()->ValueStr();
+        if (!name.empty())
+          CDNSNameCache::Add(name, value);
+      }
+      element = element->NextSiblingElement("entry");
     }
   }
 
@@ -1406,7 +1432,7 @@ void CAdvancedSettings::SetDebugMode(bool debug)
   {
     int level = std::max(m_logLevelHint, LOG_LEVEL_DEBUG_FREEMEM);
     m_logLevel = level;
-    CLog::SetLogLevel(level);
+    CServiceBroker::GetLogging().SetLogLevel(level);
     CLog::Log(LOGINFO, "Enabled debug logging due to GUI setting. Level {}.", level);
   }
   else
@@ -1414,7 +1440,7 @@ void CAdvancedSettings::SetDebugMode(bool debug)
     int level = std::min(m_logLevelHint, LOG_LEVEL_DEBUG/*LOG_LEVEL_NORMAL*/);
     CLog::Log(LOGINFO, "Disabled debug logging due to GUI setting. Level {}.", level);
     m_logLevel = level;
-    CLog::SetLogLevel(level);
+    CServiceBroker::GetLogging().SetLogLevel(level);
   }
 }
 

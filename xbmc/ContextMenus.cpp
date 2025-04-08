@@ -9,14 +9,15 @@
 #include "ContextMenus.h"
 
 #include "ServiceBroker.h"
+#include "favourites/FavouritesService.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
-#include "input/ButtonTranslator.h"
+#include "input/WindowTranslator.h"
+#include "storage/MediaManager.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
-#include "FileItem.h"
 
 namespace CONTEXTMENU
 {
@@ -41,19 +42,13 @@ namespace CONTEXTMENU
 
   bool CEjectDrive::IsVisible(const CFileItem& item) const
   {
-#if 0
     // Must be HDD
     return item.IsRemovable() && !item.IsDVD() && !item.IsCDDA();
-#endif
-    return false;
   }
 
   bool CEjectDrive::Execute(const std::shared_ptr<CFileItem>& item) const
   {
-#if 0
     return CServiceBroker::GetMediaManager().Eject(item->GetPath());
-#endif
-    return false;
   }
 
 namespace
@@ -67,7 +62,7 @@ int GetTargetWindowID(const CFileItem& item)
   if (targetWindow.empty())
     iTargetWindow = CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow();
   else
-    iTargetWindow = CButtonTranslator::TranslateWindow(targetWindow);
+    iTargetWindow = CWindowTranslator::TranslateWindow(targetWindow);
 
   return iTargetWindow;
 }
@@ -76,17 +71,13 @@ int GetTargetWindowID(const CFileItem& item)
 
 std::string CAddRemoveFavourite::GetLabel(const CFileItem& item) const
 {
-#if 0
   return g_localizeStrings.Get(CServiceBroker::GetFavouritesService().IsFavourited(item, GetTargetWindowID(item))
                                ? 14077   /* Remove from favourites */
                                : 14076); /* Add to favourites */
-#endif
-  return "Favorites not supported";
 }
 
 bool CAddRemoveFavourite::IsVisible(const CFileItem& item) const
 {
-#if 0
   return (!item.GetPath().empty() && !item.IsParentFolder() && !item.IsPath("add") &&
           !item.IsPath("newplaylist://") && !URIUtils::IsProtocol(item.GetPath(), "favourites") &&
           !URIUtils::IsProtocol(item.GetPath(), "newsmartplaylist") &&
@@ -103,16 +94,11 @@ bool CAddRemoveFavourite::IsVisible(const CFileItem& item) const
          item.GetPath() == "pvr://timers/tv/rules/" ||
          item.GetPath() == "pvr://timers/radio/rules/" || item.GetPath() == "pvr://search/tv/" ||
          item.GetPath() == "pvr://search/radio/";
-#endif
-  return false;
 }
 
 bool CAddRemoveFavourite::Execute(const std::shared_ptr<CFileItem>& item) const
 {
-#if 0
   return CServiceBroker::GetFavouritesService().AddOrRemove(*item.get(), GetTargetWindowID(*item));
-#endif
-  return false;
 }
 
 } // namespace CONTEXTMENU

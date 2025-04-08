@@ -196,6 +196,8 @@ private:
   uint32_t m_unidentifiedSettingId;
   int m_unknownSettingLabelId;
   std::map<int, std::string> m_unknownSettingLabels;
+
+  Logger m_logger;
 };
 
 } // namespace ADDON

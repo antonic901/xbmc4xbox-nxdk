@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "addons/IAddon.h"
 #include "settings/dialogs/GUIDialogSettingsManagerBase.h"
 #include "settings/lib/SettingDefinitions.h"
 #include "settings/lib/SettingLevel.h"
@@ -19,6 +20,7 @@
 
 class CSetting;
 class CSettingAction;
+class CSettingAddon;
 class CSettingBool;
 class CSettingCategory;
 class CSettingDate;
@@ -137,6 +139,21 @@ protected:
                                                      const std::string& info,
                                                      bool visible = true,
                                                      int help = -1);
+  std::shared_ptr<CSettingAddon> AddAddon(const std::shared_ptr<CSettingGroup>& group,
+                                          const std::string& id,
+                                          int label,
+                                          SettingLevel level,
+                                          const std::string& value,
+                                          ADDON::AddonType addonType,
+                                          bool allowEmpty = false,
+                                          int heading = -1,
+                                          bool hideValue = false,
+                                          bool showInstalledAddons = true,
+                                          bool showInstallableAddons = false,
+                                          bool showMoreAddons = true,
+                                          bool delayed = false,
+                                          bool visible = true,
+                                          int help = -1);
   std::shared_ptr<CSettingPath> AddPath(
       const std::shared_ptr<CSettingGroup>& group,
       const std::string& id,

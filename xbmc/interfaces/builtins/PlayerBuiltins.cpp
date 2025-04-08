@@ -23,6 +23,10 @@
 #include "guilib/GUIWindowManager.h"
 #include "music/MusicUtils.h"
 #include "playlists/PlayList.h"
+#include "pvr/PVRManager.h"
+#include "pvr/channels/PVRChannel.h"
+#include "pvr/guilib/PVRGUIActionsChannels.h"
+#include "pvr/recordings/PVRRecording.h"
 #include "settings/MediaSettings.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
@@ -369,7 +373,6 @@ static int PlayerControl(const std::vector<std::string>& params)
   }
   else if (StringUtils::StartsWithNoCase(params[0], "resumelivetv"))
   {
-#if 0
     CFileItem& fileItem(g_application.CurrentFileItem());
     std::shared_ptr<PVR::CPVRChannel> channel = fileItem.HasPVRRecordingInfoTag() ? fileItem.GetPVRRecordingInfoTag()->Channel() : std::shared_ptr<PVR::CPVRChannel>();
 
@@ -392,8 +395,6 @@ static int PlayerControl(const std::vector<std::string>& params)
         return false;
       }
     }
-#endif
-    return false;
   }
   else if (paramlow == "reset")
   {

@@ -1,33 +1,23 @@
+/*
+ *  Copyright (C) 2005-2018 Team Kodi
+ *  This file is part of Kodi - https://kodi.tv
+ *
+ *  SPDX-License-Identifier: GPL-2.0-or-later
+ *  See LICENSES/README.md for more information.
+ */
+
 #pragma once
 
-/*
- *      Copyright (C) 2005-2013 Team XBMC
- *      http://xbmc.org
- *
- *  This Program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2, or (at your option)
- *  any later version.
- *
- *  This Program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XBMC; see the file COPYING.  If not, see
- *  <http://www.gnu.org/licenses/>.
- *
- */
+#include "guilib/TextureManager.h"
+#include "threads/CriticalSection.h"
+#include "utils/Job.h"
 
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "guilib/TextureManager.h"
-#include "threads/CriticalSection.h"
-#include "utils/Job.h"
+class CTexture;
 
 /*!
  \ingroup textures,jobs
@@ -41,12 +31,12 @@ class CImageLoader : public CJob
 {
 public:
   CImageLoader(const std::string &path, const bool useCache);
-  virtual ~CImageLoader();
+  ~CImageLoader() override;
 
   /*!
    \brief Work function that loads in a particular image.
    */
-  virtual bool DoWork();
+  bool DoWork() override;
 
   bool          m_use_cache; ///< Whether or not to use any caching with this image
   std::string    m_path; ///< path of image to load
@@ -66,7 +56,7 @@ class CGUILargeTextureManager : public IJobCallback
 {
 public:
   CGUILargeTextureManager();
-  virtual ~CGUILargeTextureManager();
+  ~CGUILargeTextureManager() override;
 
   /*!
    \brief Callback from CImageLoader on completion of a loaded image
@@ -75,7 +65,7 @@ public:
 
    \sa CImageLoader, IJobCallback
    */
-  virtual void OnJobComplete(unsigned int jobID, bool success, CJob *job);
+  void OnJobComplete(unsigned int jobID, bool success, CJob *job) override;
 
   /*!
    \brief Request a texture to be loaded in the background.
@@ -121,7 +111,7 @@ private:
   class CLargeTexture
   {
   public:
-    CLargeTexture(const std::string &path);
+    explicit CLargeTexture(const std::string &path);
     virtual ~CLargeTexture();
 
     void AddRef();
@@ -129,8 +119,8 @@ private:
     bool DeleteIfRequired(bool deleteImmediately = false);
     void SetTexture(std::unique_ptr<CTexture> texture);
 
-    const std::string &GetPath() const { return m_path; };
-    const CTextureArray &GetTexture() const { return m_texture; };
+    const std::string& GetPath() const { return m_path; }
+    const CTextureArray& GetTexture() const { return m_texture; }
 
   private:
     static const unsigned int TIME_TO_DELETE = 2000;

@@ -14,10 +14,8 @@
 #include "Util.h"
 #include "dialogs/GUIDialogGamepad.h"
 #include "dialogs/GUIDialogNumeric.h"
-#include "guilib/GUIComponent.h"
-#if 0
 #include "favourites/FavouritesService.h"
-#endif
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIKeyboardFactory.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
@@ -95,9 +93,7 @@ bool CGUIPassword::IsItemUnlocked(T pItem,
 
         // a mediasource has been unlocked successfully
         // => refresh favourites due to possible visibility changes
-#if 0
         CServiceBroker::GetFavouritesService().RefreshFavourites();
-#endif
         break;
       }
     case 1:

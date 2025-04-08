@@ -9,9 +9,7 @@
 #include "MusicInfoTagLoaderFFmpeg.h"
 
 #include "MusicInfoTag.h"
-#if 0
 #include "cores/FFmpeg.h"
-#endif
 #include "filesystem/File.h"
 #include "utils/StringUtils.h"
 
@@ -27,12 +25,10 @@ static int vfs_file_read(void *h, uint8_t* buf, int size)
 static int64_t vfs_file_seek(void *h, int64_t pos, int whence)
 {
   CFile* pFile = static_cast<CFile*>(h);
-#if 0
   if (whence == AVSEEK_SIZE)
     return pFile->GetLength();
   else
     return pFile->Seek(pos, whence & ~AVSEEK_FORCE);
-#endif
 }
 
 CMusicInfoTagLoaderFFmpeg::CMusicInfoTagLoaderFFmpeg(void) = default;
@@ -41,7 +37,6 @@ CMusicInfoTagLoaderFFmpeg::~CMusicInfoTagLoaderFFmpeg() = default;
 
 bool CMusicInfoTagLoaderFFmpeg::Load(const std::string& strFileName, CMusicInfoTag& tag, EmbeddedArt *art)
 {
-#if 0
   tag.SetLoaded(false);
 
   CFile file;
@@ -170,7 +165,4 @@ bool CMusicInfoTagLoaderFFmpeg::Load(const std::string& strFileName, CMusicInfoT
   av_free(ioctx);
 
   return true;
-#else
-  return false;
-#endif
 }

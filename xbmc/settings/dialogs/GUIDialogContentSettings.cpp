@@ -11,10 +11,8 @@
 #include "ServiceBroker.h"
 #include "addons/AddonManager.h"
 #include "addons/AddonSystemSettings.h"
-#if 0
 #include "addons/gui/GUIDialogAddonSettings.h"
 #include "addons/gui/GUIWindowAddonBrowser.h"
-#endif
 #include "dialogs/GUIDialogKaiToast.h"
 #include "dialogs/GUIDialogSelect.h"
 #include "filesystem/AddonsDirectory.h"
@@ -80,7 +78,7 @@ bool CGUIDialogContentSettings::Show(ADDON::ScraperPtr& scraper, CONTENT_TYPE co
 
 bool CGUIDialogContentSettings::Show(ADDON::ScraperPtr& scraper, VIDEO::SScanSettings& settings, CONTENT_TYPE content /* = CONTENT_NONE */)
 {
-  CGUIDialogContentSettings *dialog = dynamic_cast<CGUIDialogContentSettings*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_CONTENT_SETTINGS));
+  CGUIDialogContentSettings *dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogContentSettings>(WINDOW_DIALOG_CONTENT_SETTINGS);
   if (dialog == NULL)
     return false;
 
@@ -202,7 +200,7 @@ void CGUIDialogContentSettings::OnSettingAction(const std::shared_ptr<const CSet
     }
     std::sort(labels.begin(), labels.end());
 
-    CGUIDialogSelect *dialog = dynamic_cast<CGUIDialogSelect*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_SELECT));
+    CGUIDialogSelect *dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(WINDOW_DIALOG_SELECT);
     if (dialog)
     {
       dialog->SetHeading(CVariant{ 20344 }); //Label "This directory contains"
@@ -247,7 +245,6 @@ void CGUIDialogContentSettings::OnSettingAction(const std::shared_ptr<const CSet
       currentScraperId = m_scraper->ID();
     std::string selectedAddonId = currentScraperId;
 
-#if 0
     if (CGUIWindowAddonBrowser::SelectAddonID(type, selectedAddonId, false) == 1
         && selectedAddonId != currentScraperId)
     {
@@ -265,12 +262,9 @@ void CGUIDialogContentSettings::OnSettingAction(const std::shared_ptr<const CSet
                   selectedAddonId);
       }
     }
-#endif
   }
-#if 0
   else if (settingId == SETTING_SCRAPER_SETTINGS)
     CGUIDialogAddonSettings::ShowForAddon(m_scraper, false);
-#endif
 }
 
 bool CGUIDialogContentSettings::Save()

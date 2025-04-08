@@ -15,7 +15,7 @@
 #include "ServiceBroker.h"
 #include "URL.h"
 #include "Util.h"
-#include "application/Application.h"
+#include "application/ApplicationComponents.h"
 #include "application/ApplicationPlayer.h"
 #include "dialogs/GUIDialogBusy.h"
 #include "filesystem/Directory.h"
@@ -367,11 +367,12 @@ void QueueItem(const std::shared_ptr<CFileItem>& itemIn, QueuePosition pos)
   }
 
   auto& player = CServiceBroker::GetPlaylistPlayer();
+  const auto& components = CServiceBroker::GetAppComponents();
 
   // Determine the proper list to queue this element
   PLAYLIST::Id playlistId = player.GetCurrentPlaylist();
   if (playlistId == PLAYLIST::TYPE_NONE)
-    playlistId = g_application.m_pPlayer->GetPreferredPlaylist();
+    playlistId = components.GetComponent<CApplicationPlayer>()->GetPreferredPlaylist();
 
   if (playlistId == PLAYLIST::TYPE_NONE)
     playlistId = PLAYLIST::TYPE_VIDEO;
@@ -387,7 +388,7 @@ void QueueItem(const std::shared_ptr<CFileItem>& itemIn, QueuePosition pos)
   }
 
   if (pos == QueuePosition::POSITION_BEGIN &&
-      g_application.m_pPlayer->IsPlaying())
+      components.GetComponent<CApplicationPlayer>()->IsPlaying())
     player.Insert(playlistId, queuedItems, player.GetCurrentSong() + 1);
   else
     player.Add(playlistId, queuedItems);
@@ -400,7 +401,9 @@ void QueueItem(const std::shared_ptr<CFileItem>& itemIn, QueuePosition pos)
 bool GetItemsForPlayList(const std::shared_ptr<CFileItem>& item, CFileItemList& queuedItems)
 {
   CAsyncGetItemsForPlaylist getItems(item, queuedItems);
-  return CGUIDialogBusy::Wait(&getItems);
+  return CGUIDialogBusy::Wait(&getItems,
+                              500, // 500ms before busy dialog appears
+                              true); // can be cancelled
 }
 
 bool IsItemPlayable(const CFileItem& item)

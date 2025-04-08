@@ -13,9 +13,6 @@
 #include "IRunnable.h"
 #include "commons/Exception.h"
 #include "threads/IThreadImpl.h"
-#ifdef NXDK
-#include "platform/win32/threads/ThreadImplWin.h"
-#endif
 #include "threads/SingleLock.h"
 #include "utils/log.h"
 
@@ -130,11 +127,7 @@ void CThread::Create(bool bAutoDelete)
         std::string id = ss.str();
         autodelete = pThread->m_bAutoDelete;
 
-#ifdef NXDK
-        pThread->m_impl = CThreadImplWin::CreateThreadImpl(pThread->m_thread->native_handle());
-#else
         pThread->m_impl = IThreadImpl::CreateThreadImpl(pThread->m_thread->native_handle());
-#endif
         pThread->m_impl->SetThreadInfo(name);
 
         CLog::Log(LOGDEBUG, "Thread {} start, auto delete: {}", name,

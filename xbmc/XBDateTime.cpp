@@ -9,6 +9,7 @@
 #include "XBDateTime.h"
 
 #include "LangInfo.h"
+#include "guilib/LocalizeStrings.h"
 #include "utils/Archive.h"
 #include "utils/StringUtils.h"
 #include "utils/XTimeUtils.h"
@@ -1392,7 +1393,7 @@ std::string CDateTime::GetAsLocalizedDate(const std::string &strFormat) const
       {
         int wday = dateTime.dayOfWeek;
         if (wday < 1 || wday > 7) wday = 7;
-        str = "Day";
+        str = g_localizeStrings.Get((c =='d' ? 40 : 10) + wday);
       }
       strOut+=str;
     }
@@ -1424,7 +1425,7 @@ std::string CDateTime::GetAsLocalizedDate(const std::string &strFormat) const
       {
         int wmonth = dateTime.month;
         if (wmonth < 1 || wmonth > 12) wmonth = 12;
-        str = "Month";
+        str = g_localizeStrings.Get((c =='m' ? 50 : 20) + wmonth);
       }
       strOut+=str;
     }

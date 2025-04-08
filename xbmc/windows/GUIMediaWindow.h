@@ -14,7 +14,6 @@
 #include "guilib/GUIWindow.h"
 #include "playlists/SmartPlayList.h"
 #include "view/GUIViewControl.h"
-#include "threads/Event.h" // FIXME: this shouldn't be included here
 
 #include <atomic>
 
@@ -62,8 +61,7 @@ protected:
   // specializations of CGUIControlGroup
   CGUIControl *GetFirstFocusableControl(int id) override;
 
-  // specializations of CGUIWindow
-  void LoadAdditionalTags(TiXmlElement *root) override;
+  bool Load(TiXmlElement *pRootElement) override;
 
   // custom methods
   virtual void SetupShares();

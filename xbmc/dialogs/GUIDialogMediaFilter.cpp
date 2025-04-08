@@ -187,7 +187,7 @@ bool CGUIDialogMediaFilter::OnMessage(CGUIMessage& message)
 
 void CGUIDialogMediaFilter::ShowAndEditMediaFilter(const std::string &path, CSmartPlaylist &filter)
 {
-  CGUIDialogMediaFilter *dialog = dynamic_cast<CGUIDialogMediaFilter*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_MEDIA_FILTER));
+  CGUIDialogMediaFilter *dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogMediaFilter>(WINDOW_DIALOG_MEDIA_FILTER);
   if (dialog == NULL)
     return;
 
@@ -416,7 +416,7 @@ void CGUIDialogMediaFilter::InitializeSettings()
       }
     }
 
-    std::string settingId = StringUtils::Format("filter.{}.{}", filter.mediaType, static_cast<int>(filter.field));
+    std::string settingId = StringUtils::Format("filter.{}.{}", filter.mediaType, filter.field);
     if (filter.controlType == "edit")
     {
       CVariant data;
@@ -519,7 +519,7 @@ void CGUIDialogMediaFilter::InitializeSettings()
 
       CLog::Log(LOGWARNING,
                 "CGUIDialogMediaFilter: filter {} of media type {} with unknown control type '{}'",
-                static_cast<int>(filter.field), filter.mediaType, filter.controlType);
+                filter.field, filter.mediaType, filter.controlType);
       continue;
     }
 
@@ -531,7 +531,7 @@ void CGUIDialogMediaFilter::InitializeSettings()
       CLog::Log(LOGWARNING,
                 "CGUIDialogMediaFilter: failed to create filter {} of media type {} with control "
                 "type '{}'",
-                static_cast<int>(filter.field), filter.mediaType, filter.controlType);
+                filter.field, filter.mediaType, filter.controlType);
       continue;
     }
 

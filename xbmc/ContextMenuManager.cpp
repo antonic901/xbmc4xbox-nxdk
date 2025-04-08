@@ -19,14 +19,20 @@
 #include "addons/ContextMenus.h"
 #include "addons/IAddon.h"
 #include "addons/addoninfo/AddonType.h"
+#include "dialogs/GUIDialogContextMenu.h"
+#include "favourites/ContextMenus.h"
 #include "messaging/ApplicationMessenger.h"
+#include "music/ContextMenus.h"
+#include "pvr/PVRContextMenus.h"
 #include "utils/StringUtils.h"
 #include "utils/log.h"
+#include "video/ContextMenus.h"
 
 #include <iterator>
 #include <mutex>
 
 using namespace ADDON;
+using namespace PVR;
 
 const CContextMenuItem CContextMenuManager::MAIN = CContextMenuItem::CreateGroup("", "", "kodi.core.main", "");
 const CContextMenuItem CContextMenuManager::MANAGE = CContextMenuItem::CreateGroup("", "", "kodi.core.manage", "");
@@ -42,6 +48,7 @@ CContextMenuManager::~CContextMenuManager()
 
 void CContextMenuManager::Deinit()
 {
+  CPVRContextMenuManager::GetInstance().Events().Unsubscribe(this);
   m_addonMgr.Events().Unsubscribe(this);
   m_items.clear();
 }
@@ -49,17 +56,50 @@ void CContextMenuManager::Deinit()
 void CContextMenuManager::Init()
 {
   m_addonMgr.Events().Subscribe(this, &CContextMenuManager::OnEvent);
+  CPVRContextMenuManager::GetInstance().Events().Subscribe(this, &CContextMenuManager::OnPVREvent);
 
   std::unique_lock<CCriticalSection> lock(m_criticalSection);
   m_items = {
+      std::make_shared<CONTEXTMENU::CVideoBrowse>(),
+      std::make_shared<CONTEXTMENU::CVideoResume>(),
+      std::make_shared<CONTEXTMENU::CVideoPlay>(),
+      std::make_shared<CONTEXTMENU::CVideoPlayAndQueue>(),
+      std::make_shared<CONTEXTMENU::CVideoPlayNext>(),
+      std::make_shared<CONTEXTMENU::CVideoQueue>(),
+      std::make_shared<CONTEXTMENU::CMusicBrowse>(),
+      std::make_shared<CONTEXTMENU::CMusicPlay>(),
+      std::make_shared<CONTEXTMENU::CMusicPlayNext>(),
+      std::make_shared<CONTEXTMENU::CMusicQueue>(),
       std::make_shared<CONTEXTMENU::CAddonInfo>(),
       std::make_shared<CONTEXTMENU::CEnableAddon>(),
       std::make_shared<CONTEXTMENU::CDisableAddon>(),
       std::make_shared<CONTEXTMENU::CAddonSettings>(),
       std::make_shared<CONTEXTMENU::CCheckForUpdates>(),
+      std::make_shared<CONTEXTMENU::CEpisodeInfo>(),
+      std::make_shared<CONTEXTMENU::CMovieInfo>(),
+      std::make_shared<CONTEXTMENU::CMusicVideoInfo>(),
+      std::make_shared<CONTEXTMENU::CTVShowInfo>(),
+      std::make_shared<CONTEXTMENU::CAlbumInfo>(),
+      std::make_shared<CONTEXTMENU::CArtistInfo>(),
+      std::make_shared<CONTEXTMENU::CSongInfo>(),
+      std::make_shared<CONTEXTMENU::CVideoMarkWatched>(),
+      std::make_shared<CONTEXTMENU::CVideoMarkUnWatched>(),
+      std::make_shared<CONTEXTMENU::CVideoRemoveResumePoint>(),
+      std::make_shared<CONTEXTMENU::CEjectDisk>(),
+      std::make_shared<CONTEXTMENU::CEjectDrive>(),
+      std::make_shared<CONTEXTMENU::CMoveUpFavourite>(),
+      std::make_shared<CONTEXTMENU::CMoveDownFavourite>(),
+      std::make_shared<CONTEXTMENU::CChooseThumbnailForFavourite>(),
+      std::make_shared<CONTEXTMENU::CRenameFavourite>(),
+      std::make_shared<CONTEXTMENU::CRemoveFavourite>(),
+      std::make_shared<CONTEXTMENU::CAddRemoveFavourite>(),
   };
 
   ReloadAddonItems();
+
+  const std::vector<std::shared_ptr<IContextMenuItem>> pvrItems(CPVRContextMenuManager::GetInstance().GetMenuItems());
+  for (const auto &item : pvrItems)
+    m_items.emplace_back(item);
 }
 
 void CContextMenuManager::ReloadAddonItems()
@@ -115,6 +155,30 @@ void CContextMenuManager::OnEvent(const ADDON::AddonEvent& event)
     {
       ReloadAddonItems();
     }
+  }
+}
+
+void CContextMenuManager::OnPVREvent(const PVRContextMenuEvent& event)
+{
+  switch (event.action)
+  {
+    case PVRContextMenuEventAction::ADD_ITEM:
+    {
+      std::unique_lock<CCriticalSection> lock(m_criticalSection);
+      m_items.emplace_back(event.item);
+      break;
+    }
+    case PVRContextMenuEventAction::REMOVE_ITEM:
+    {
+      std::unique_lock<CCriticalSection> lock(m_criticalSection);
+      auto it = std::find(m_items.begin(), m_items.end(), event.item);
+      if (it != m_items.end())
+        m_items.erase(it);
+      break;
+    }
+
+    default:
+      break;
   }
 }
 
@@ -174,7 +238,6 @@ bool CONTEXTMENU::ShowFor(const std::shared_ptr<CFileItem>& fileItem, const CCon
   if (!fileItem)
     return false;
 
-#if 0
   const CContextMenuManager &contextMenuManager = CServiceBroker::GetContextMenuManager();
 
   auto menuItems = contextMenuManager.GetItems(*fileItem, root);
@@ -218,8 +281,6 @@ bool CONTEXTMENU::ShowFor(const std::shared_ptr<CFileItem>& fileItem, const CCon
              ? ShowFor(fileItem, static_cast<const CContextMenuItem&>(
                                      *menuItems[selected - propertyMenuSize]))
              : menuItems[selected - propertyMenuSize]->Execute(fileItem);
-#endif
-  return false;
 }
 
 bool CONTEXTMENU::LoopFrom(const IContextMenuItem& menu, const std::shared_ptr<CFileItem>& fileItem)

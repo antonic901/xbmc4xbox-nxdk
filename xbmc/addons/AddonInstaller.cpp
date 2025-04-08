@@ -10,6 +10,7 @@
 
 #include "FileItem.h"
 #include "FilesystemInstaller.h"
+#include "GUIPassword.h"
 #include "GUIUserMessages.h" // for callback
 #include "ServiceBroker.h"
 #include "URL.h"
@@ -21,6 +22,10 @@
 #include "addons/addoninfo/AddonInfo.h"
 #include "addons/addoninfo/AddonType.h"
 #include "dialogs/GUIDialogExtendedProgressBar.h"
+#include "events/AddonManagementEvent.h"
+#include "events/EventLog.h"
+#include "events/NotificationEvent.h"
+#include "favourites/FavouritesService.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
 #include "guilib/GUIComponent.h"
@@ -242,10 +247,8 @@ bool CAddonInstaller::InstallModal(const std::string& addonID,
                                    ADDON::AddonPtr& addon,
                                    InstallModalPrompt promptForInstall)
 {
-#if 0
   if (!g_passwordManager.CheckMenuLock(WINDOW_ADDON_BROWSER))
     return false;
-#endif
 
   // we assume that addons that are enabled don't get to this routine (i.e. that GetAddon() has been called)
   if (CServiceBroker::GetAddonMgr().GetAddon(addonID, addon, OnlyEnabled::CHOICE_NO))
@@ -403,10 +406,8 @@ bool CAddonInstaller::DoInstall(const AddonPtr& addon,
 
 bool CAddonInstaller::InstallFromZip(const std::string &path)
 {
-#if 0
   if (!g_passwordManager.CheckMenuLock(WINDOW_ADDON_BROWSER))
     return false;
-#endif
 
   CLog::Log(LOGDEBUG, "CAddonInstaller: installing from zip '{}'", CURL::GetRedacted(path));
 
@@ -415,9 +416,15 @@ bool CAddonInstaller::InstallFromZip(const std::string &path)
   //! @bug some zip files return a single item (root folder) that we think is stored, so we don't use the zip:// protocol
   CURL pathToUrl(path);
   CURL zipDir = URIUtils::CreateArchivePath("zip", pathToUrl, "");
+  auto eventLog = CServiceBroker::GetEventLog();
   if (!CDirectory::GetDirectory(zipDir, items, "", DIR_FLAG_DEFAULTS) ||
       items.Size() != 1 || !items[0]->m_bIsFolder)
   {
+    if (eventLog)
+      eventLog->AddWithNotification(EventPtr(
+          new CNotificationEvent(24045, StringUtils::Format(g_localizeStrings.Get(24143), path),
+                                 "special://xbmc/media/icon256x256.png", EventLevel::Error)));
+
     CLog::Log(
         LOGERROR,
         "CAddonInstaller: installing addon failed '{}' - itemsize: {}, first item is folder: {}",
@@ -431,6 +438,10 @@ bool CAddonInstaller::InstallFromZip(const std::string &path)
                      AutoUpdateJob::CHOICE_NO, DependencyJob::CHOICE_NO,
                      AllowCheckForUpdates::CHOICE_YES);
 
+  if (eventLog)
+    eventLog->AddWithNotification(EventPtr(
+        new CNotificationEvent(24045, StringUtils::Format(g_localizeStrings.Get(24143), path),
+                               "special://xbmc/media/icon256x256.png", EventLevel::Error)));
   return false;
 }
 
@@ -926,17 +937,32 @@ bool CAddonInstallJob::DoWork()
     }
   }
 
+  bool notify = (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
+                     CSettings::SETTING_ADDONS_NOTIFICATIONS) ||
+                 m_isAutoUpdate == AutoUpdateJob::CHOICE_NO) &&
+                !IsModal() && m_dependsInstall == DependencyJob::CHOICE_NO;
+  auto eventLog = CServiceBroker::GetEventLog();
+  if (eventLog)
+    eventLog->Add(EventPtr(new CAddonManagementEvent(m_addon, m_isUpdate ? 24065 : 24084)), notify,
+                  false);
+
   if (m_isAutoUpdate == AutoUpdateJob::CHOICE_YES &&
       m_addon->LifecycleState() == AddonLifecycleState::BROKEN)
   {
     CLog::Log(LOGDEBUG, "CAddonInstallJob[{}]: auto-disabling due to being marked as broken",
               m_addon->ID());
     CServiceBroker::GetAddonMgr().DisableAddon(m_addon->ID(), AddonDisabledReason::USER);
+    if (eventLog)
+      eventLog->Add(EventPtr(new CAddonManagementEvent(m_addon, 24094)), true, false);
   }
   else if (m_addon->LifecycleState() == AddonLifecycleState::DEPRECATED)
   {
     CLog::Log(LOGDEBUG, "CAddonInstallJob[{}]: installed addon marked as deprecated",
               m_addon->ID());
+    std::string text =
+        StringUtils::Format(g_localizeStrings.Get(24168), m_addon->LifecycleStateDescription());
+    if (eventLog)
+      eventLog->Add(EventPtr(new CAddonManagementEvent(m_addon, text)), true, false);
   }
 
   // and we're done!
@@ -1148,6 +1174,7 @@ void CAddonInstallJob::ReportInstallError(const std::string& addonID, const std:
   MarkFinished();
 
   std::string msg = message;
+  EventPtr activity;
   if (addon != nullptr)
   {
     AddonPtr addon2;
@@ -1157,14 +1184,23 @@ void CAddonInstallJob::ReportInstallError(const std::string& addonID, const std:
       msg = g_localizeStrings.Get(addon2 != nullptr && success ? 113 : 114);
     }
 
+    activity = EventPtr(new CAddonManagementEvent(addon, EventLevel::Error, msg));
     if (IsModal())
       HELPERS::ShowOKDialogText(CVariant{m_addon->Name()}, CVariant{msg});
   }
   else
   {
+    activity = EventPtr(new CNotificationEvent(
+        24045, !msg.empty() ? msg : StringUtils::Format(g_localizeStrings.Get(24143), fileName),
+        EventLevel::Error));
+
     if (IsModal())
       HELPERS::ShowOKDialogText(CVariant{fileName}, CVariant{msg});
   }
+
+  auto eventLog = CServiceBroker::GetEventLog();
+  if (eventLog)
+    eventLog->Add(activity, !IsModal(), false);
 }
 
 CAddonUnInstallJob::CAddonUnInstallJob(const AddonPtr &addon, bool removeData)
@@ -1205,6 +1241,10 @@ bool CAddonUnInstallJob::DoWork()
     addon = m_addon;
   }
 
+  auto eventLog = CServiceBroker::GetEventLog();
+  if (eventLog)
+    eventLog->Add(EventPtr(new CAddonManagementEvent(addon, 24144))); // Add-on uninstalled
+
   CServiceBroker::GetAddonMgr().OnPostUnInstall(m_addon->ID());
 
   CAddonDatabase database;
@@ -1229,7 +1269,6 @@ bool CAddonUnInstallJob::DoWork()
 
 void CAddonUnInstallJob::ClearFavourites()
 {
-#if 0
   bool bSave = false;
   CFileItemList items;
   CServiceBroker::GetFavouritesService().GetAll(items);
@@ -1244,5 +1283,4 @@ void CAddonUnInstallJob::ClearFavourites()
 
   if (bSave)
     CServiceBroker::GetFavouritesService().Save(items);
-#endif
 }

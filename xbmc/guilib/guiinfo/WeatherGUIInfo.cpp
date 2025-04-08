@@ -17,9 +17,7 @@
 #include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
-#if 0
 #include "weather/WeatherManager.h"
-#endif
 
 using namespace KODI::GUILIB::GUIINFO;
 
@@ -30,7 +28,6 @@ bool CWeatherGUIInfo::InitCurrentItem(CFileItem *item)
 
 bool CWeatherGUIInfo::GetLabel(std::string& value, const CFileItem *item, int contextWindow, const CGUIInfo &info, std::string *fallback) const
 {
-#if 0
   switch (info.m_info)
   {
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,7 +56,6 @@ bool CWeatherGUIInfo::GetLabel(std::string& value, const CFileItem *item, int co
       value = CServiceBroker::GetSettingsComponent()->GetSettings()->GetString(CSettings::SETTING_WEATHER_ADDON);
       return true;
   }
-#endif
 
   return false;
 }
@@ -71,7 +67,6 @@ bool CWeatherGUIInfo::GetInt(int& value, const CGUIListItem *gitem, int contextW
 
 bool CWeatherGUIInfo::GetBool(bool& value, const CGUIListItem *gitem, int contextWindow, const CGUIInfo &info) const
 {
-#if 0
   switch (info.m_info)
   {
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -81,7 +76,6 @@ bool CWeatherGUIInfo::GetBool(bool& value, const CGUIListItem *gitem, int contex
       value = CServiceBroker::GetWeatherManager().IsFetched();
       return true;;
   }
-#endif
 
   return false;
 }

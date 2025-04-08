@@ -30,8 +30,7 @@ public:
   template<class T>
   std::shared_ptr<T> GetComponent()
   {
-    return std::const_pointer_cast<T>(const_cast<const CComponentContainer&>(*this).template GetComponent<T>());
-    // return std::const_pointer_cast<T>(std::as_const(*this).template GetComponent<T>());
+    return std::const_pointer_cast<T>(std::as_const(*this).template GetComponent<T>());
   }
 
   //! \brief Obtain a component.

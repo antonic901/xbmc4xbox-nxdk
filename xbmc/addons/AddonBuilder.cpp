@@ -16,14 +16,17 @@
 #include "addons/LanguageResource.h"
 #include "addons/PluginSource.h"
 #include "addons/Repository.h"
+#include "addons/Scraper.h"
 #include "addons/Service.h"
 #include "addons/Skin.h"
 #include "addons/UISoundsResource.h"
 #include "addons/Webinterface.h"
 #include "addons/addoninfo/AddonInfo.h"
 #include "addons/addoninfo/AddonType.h"
+#include "games/addons/GameClient.h"
+#include "games/controllers/Controller.h"
+#include "pvr/addons/PVRClient.h"
 #include "utils/StringUtils.h"
-#include "utils/log.h"
 
 using namespace KODI;
 
@@ -49,7 +52,6 @@ AddonPtr CAddonBuilder::Generate(const AddonInfoPtr& info, AddonType type)
       return std::make_shared<CAddon>(info, type);
   }
 
-#if 0
   // Handle audio encoder special cases
   if (type == AddonType::AUDIOENCODER)
   {
@@ -57,7 +59,6 @@ AddonPtr CAddonBuilder::Generate(const AddonInfoPtr& info, AddonType type)
     if (StringUtils::StartsWithNoCase(info->ID(), "audioencoder.kodi.builtin."))
       return std::make_shared<CAddonDll>(info, type);
   }
-#endif
 
   switch (type)
   {
@@ -70,11 +71,9 @@ AddonPtr CAddonBuilder::Generate(const AddonInfoPtr& info, AddonType type)
     case AddonType::VFS:
     case AddonType::VISUALIZATION:
     case AddonType::SCREENSAVER:
-      CLog::Log(LOGINFO, "{} - Binary addons are not supported", __FUNCTION__);
-      break;
+      return std::make_shared<CAddonDll>(info, type);
     case AddonType::GAMEDLL:
-      CLog::Log(LOGINFO, "{} - Game DLLs are not supported", __FUNCTION__);
-      break;
+      return std::make_shared<GAME::CGameClient>(info);
     case AddonType::PLUGIN:
     case AddonType::SCRIPT:
       return std::make_shared<CPluginSource>(info, type);
@@ -94,8 +93,7 @@ AddonPtr CAddonBuilder::Generate(const AddonInfoPtr& info, AddonType type)
     case AddonType::SCRAPER_MUSICVIDEOS:
     case AddonType::SCRAPER_TVSHOWS:
     case AddonType::SCRAPER_LIBRARY:
-      CLog::Log(LOGINFO, "{} - Scraper addons are not supported", __FUNCTION__);
-      break;
+      return std::make_shared<CScraper>(info, type);
     case AddonType::SKIN:
       return std::make_shared<CSkinInfo>(info);
     case AddonType::RESOURCE_FONT:
@@ -113,7 +111,7 @@ AddonPtr CAddonBuilder::Generate(const AddonInfoPtr& info, AddonType type)
     case AddonType::CONTEXTMENU_ITEM:
       return std::make_shared<CContextMenuAddon>(info);
     case AddonType::GAME_CONTROLLER:
-      CLog::Log(LOGINFO, "{} - Game controller addons are not supported", __FUNCTION__);
+      return std::make_shared<GAME::CController>(info);
     default:
       break;
   }

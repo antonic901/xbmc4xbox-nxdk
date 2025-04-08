@@ -12,6 +12,7 @@
 #include "URL.h"
 #include "dialogs/GUIDialogBusy.h"
 #include "dialogs/GUIDialogProgress.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "interfaces/generic/RunningScriptObserver.h"
 #include "interfaces/generic/ScriptInvocationManager.h"
@@ -134,7 +135,6 @@ bool CScriptRunner::WaitOnScriptResult(int scriptId,
       // observe the script until it's finished while showing the busy dialog
       CRunningScriptObserver scriptObs(scriptId, m_scriptDone);
 
-#if 0
       auto& wm = CServiceBroker::GetGUI()->GetWindowManager();
       if (wm.IsModalDialogTopmost(WINDOW_DIALOG_PROGRESS))
       {
@@ -142,9 +142,7 @@ bool CScriptRunner::WaitOnScriptResult(int scriptId,
         if (!progress->WaitOnEvent(m_scriptDone))
           cancelled = true;
       }
-      else
-#endif
-      if (!CGUIDialogBusy::WaitOnEvent(m_scriptDone, 200))
+      else if (!CGUIDialogBusy::WaitOnEvent(m_scriptDone, 200))
         cancelled = true;
 
       scriptObs.Abort();

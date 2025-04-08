@@ -11,7 +11,10 @@
 #include "FileItem.h"
 #include "URIUtils.h"
 #include "URL.h"
+#include "filesystem/CurlFile.h"
+#include "music/tags/MusicInfoTag.h"
 #include "utils/StringUtils.h"
+#include "video/VideoInfoTag.h"
 
 #include <algorithm>
 
@@ -532,12 +535,10 @@ std::string CMime::GetMimeType(const std::string &extension)
 std::string CMime::GetMimeType(const CFileItem &item)
 {
   std::string path = item.GetDynPath();
-#if 0
   if (item.HasVideoInfoTag() && !item.GetVideoInfoTag()->GetPath().empty())
     path = item.GetVideoInfoTag()->GetPath();
   else if (item.HasMusicInfoTag() && !item.GetMusicInfoTag()->GetURL().empty())
     path = item.GetMusicInfoTag()->GetURL();
-#endif
 
   return GetMimeType(URIUtils::GetExtension(path));
 }
@@ -553,7 +554,6 @@ std::string CMime::GetMimeType(const CURL &url, bool lookup)
     if (!lookup)
       return strMimeType;
 
-#if 0
     std::string strmime;
     XFILE::CCurlFile::GetMimeType(url, strmime);
 
@@ -570,7 +570,6 @@ std::string CMime::GetMimeType(const CURL &url, bool lookup)
       strmime.erase(i, strmime.length() - i);
     StringUtils::Trim(strmime);
     strMimeType = strmime;
-#endif
   }
   else
     strMimeType = GetMimeType(url.GetFileType());

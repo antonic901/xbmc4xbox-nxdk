@@ -9,11 +9,13 @@
 #include "GUIDialogSongInfo.h"
 
 #include "GUIDialogMusicInfo.h"
+#include "GUIPassword.h"
 #include "GUIUserMessages.h"
 #include "ServiceBroker.h"
 #include "TextureCache.h"
 #include "Util.h"
 #include "dialogs/GUIDialogBusy.h"
+#include "dialogs/GUIDialogFileBrowser.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
@@ -25,6 +27,7 @@
 #include "profiles/ProfileManager.h"
 #include "settings/MediaSourceSettings.h"
 #include "settings/SettingsComponent.h"
+#include "storage/MediaManager.h"
 #include "utils/FileUtils.h"
 
 #define CONTROL_BTN_REFRESH       6
@@ -47,7 +50,7 @@ public:
   // Fetch full song information including art types list
   bool DoWork() override
   {
-    CGUIDialogSongInfo *dialog = dynamic_cast<CGUIDialogSongInfo*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_SONG_INFO));
+    CGUIDialogSongInfo *dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSongInfo>(WINDOW_DIALOG_SONG_INFO);
     if (!dialog)
       return false;
     if (dialog->IsCancelled())
@@ -242,10 +245,8 @@ void CGUIDialogSongInfo::OnInitWindow()
 
   // Disable the Choose Art button if the user isn't allowed it
   const std::shared_ptr<CProfileManager> profileManager = CServiceBroker::GetSettingsComponent()->GetProfileManager();
-#if 0
   CONTROL_ENABLE_ON_CONDITION(CONTROL_BTN_GET_THUMB,
     profileManager->GetCurrentProfile().canWriteDatabases() || g_passwordManager.bMasterUser);
-#endif
 
   SET_CONTROL_HIDDEN(CONTROL_BTN_REFRESH);
   SET_CONTROL_LABEL(CONTROL_USERRATING, 38023);
@@ -423,7 +424,6 @@ void CGUIDialogSongInfo::OnGetArt()
   }
   else  // Add parent folder of song
     CGUIDialogMusicInfo::AddItemPathToFileBrowserSources(sources, *m_song);
-#if 0
   CServiceBroker::GetMediaManager().GetLocalDrives(sources);
   if (CGUIDialogFileBrowser::ShowAndGetImage(items, sources, g_localizeStrings.Get(13511), result) &&
     result != "thumb://Current")
@@ -475,7 +475,6 @@ void CGUIDialogSongInfo::OnGetArt()
     CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
 
   }
-#endif
 
   // Re-open the art type selection dialog as we come back from
   // the image selection dialog
@@ -500,8 +499,8 @@ void CGUIDialogSongInfo::ShowFor(CFileItem* pItem)
   if (!pItem->HasMusicInfoTag())
     return;
 
-  CGUIDialogSongInfo *dialog = dynamic_cast<CGUIDialogSongInfo*>(CServiceBroker::GetGUI()->GetWindowManager().
-    GetWindow(WINDOW_DIALOG_SONG_INFO));
+  CGUIDialogSongInfo *dialog = CServiceBroker::GetGUI()->GetWindowManager().
+    GetWindow<CGUIDialogSongInfo>(WINDOW_DIALOG_SONG_INFO);
   if (dialog)
   {
     if (dialog->SetSong(pItem))  // Fetch full song info asynchronously
@@ -509,7 +508,7 @@ void CGUIDialogSongInfo::ShowFor(CFileItem* pItem)
       dialog->Open();
       if (dialog->HasUpdatedUserrating())
       {
-        auto window = dynamic_cast<CGUIWindowMusicBase*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_MUSIC_NAV));
+        auto window = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIWindowMusicBase>(WINDOW_MUSIC_NAV);
         if (window)
           window->RefreshContent("songs");
       }

@@ -62,7 +62,7 @@
 // macros for VC
 // VC check parameters only when "Code Analysis" is called
 #ifndef PRINTF_FORMAT_STRING
-#if defined(_MSC_VER) && !defined(NXDK)
+#ifdef _MSC_VER
 #include <sal.h>
 
 // for use in any function that take printf format string and parameters
@@ -581,7 +581,6 @@ public:
   ///                Additional arguments are ignored by the function.
   /// @return Formatted string
   ///
-#if 0
   inline static std::wstring Format(const wchar_t* fmt, ...)
   {
     va_list args;
@@ -591,7 +590,6 @@ public:
 
     return str;
   }
-#endif
   //----------------------------------------------------------------------------
 
   //============================================================================
@@ -657,7 +655,6 @@ public:
   ///                 with `va_start`.
   /// @return Formatted string
   ///
-#if 0
   inline static std::wstring FormatV(PRINTF_FORMAT_STRING const wchar_t* fmt, va_list args)
   {
     if (!fmt || !fmt[0])
@@ -702,7 +699,6 @@ public:
 
     return L"";
   }
-#endif
   //----------------------------------------------------------------------------
 
   //============================================================================

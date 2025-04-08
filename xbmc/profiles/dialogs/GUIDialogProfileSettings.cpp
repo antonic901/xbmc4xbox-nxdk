@@ -12,6 +12,7 @@
 #include "GUIPassword.h"
 #include "ServiceBroker.h"
 #include "Util.h"
+#include "dialogs/GUIDialogFileBrowser.h"
 #include "dialogs/GUIDialogYesNo.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
@@ -24,6 +25,7 @@
 #include "settings/SettingsComponent.h"
 #include "settings/lib/Setting.h"
 #include "settings/windows/GUIControlSettings.h"
+#include "storage/MediaManager.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
@@ -52,7 +54,7 @@ bool CGUIDialogProfileSettings::ShowForProfile(unsigned int iProfile, bool first
   if (firstLogin && iProfile > profileManager->GetNumberOfProfiles())
     return false;
 
-  CGUIDialogProfileSettings *dialog = dynamic_cast<CGUIDialogProfileSettings*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PROFILE_SETTINGS));
+  CGUIDialogProfileSettings *dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogProfileSettings>(WINDOW_DIALOG_PROFILE_SETTINGS);
   if (dialog == NULL)
     return false;
 
@@ -223,9 +225,7 @@ void CGUIDialogProfileSettings::OnSettingAction(const std::shared_ptr<const CSet
   if (settingId == SETTING_PROFILE_IMAGE)
   {
     VECSOURCES shares;
-#if 0
     CServiceBroker::GetMediaManager().GetLocalDrives(shares);
-#endif
 
     CFileItemList items;
     if (!m_thumb.empty())
@@ -242,7 +242,6 @@ void CGUIDialogProfileSettings::OnSettingAction(const std::shared_ptr<const CSet
     items.Add(item);
 
     std::string thumb;
-#if 0
     if (CGUIDialogFileBrowser::ShowAndGetImage(items, shares, g_localizeStrings.Get(1030), thumb) &&
         !StringUtils::EqualsNoCase(thumb, "thumb://Current"))
     {
@@ -251,7 +250,6 @@ void CGUIDialogProfileSettings::OnSettingAction(const std::shared_ptr<const CSet
 
       UpdateProfileImage();
     }
-#endif
   }
   else if (settingId == SETTING_PROFILE_DIRECTORY)
   {
@@ -374,9 +372,7 @@ bool CGUIDialogProfileSettings::GetProfilePath(std::string &directory, bool isDe
   else
     strDirectory = URIUtils::AddFileToFolder("special://masterprofile/", directory);
 
-#if 0
   if (!CGUIDialogFileBrowser::ShowAndGetDirectory(shares, g_localizeStrings.Get(657), strDirectory, true))
-#endif
     return false;
 
   directory = strDirectory;

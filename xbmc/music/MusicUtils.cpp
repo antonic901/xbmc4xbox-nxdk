@@ -9,13 +9,12 @@
 #include "MusicUtils.h"
 
 #include "FileItem.h"
-#if 0
 #include "GUIPassword.h"
-#endif
 #include "PartyModeManager.h"
 #include "PlayListPlayer.h"
 #include "ServiceBroker.h"
 #include "application/Application.h"
+#include "application/ApplicationComponents.h"
 #include "application/ApplicationPlayer.h"
 #include "dialogs/GUIDialogBusy.h"
 #include "dialogs/GUIDialogKaiToast.h"
@@ -151,7 +150,8 @@ public:
     }
 
     // Similarly update the art of the currently playing song so it shows on OSD
-    const auto appPlayer = g_application.m_pPlayer;
+    const auto& components = CServiceBroker::GetAppComponents();
+    const auto appPlayer = components.GetComponent<CApplicationPlayer>();
     if (appPlayer->IsPlayingAudio() && g_application.CurrentFileItem().HasMusicInfoTag())
     {
       CFileItemPtr songitem = CFileItemPtr(new CFileItem(g_application.CurrentFileItem()));
@@ -310,8 +310,8 @@ std::string ShowSelectArtTypeDialog(CFileItemList& artitems)
 {
   // Prompt for choice
   CGUIDialogSelect* dialog =
-      dynamic_cast<CGUIDialogSelect*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(
-          WINDOW_DIALOG_SELECT));
+      CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(
+          WINDOW_DIALOG_SELECT);
   if (!dialog)
     return "";
 
@@ -345,8 +345,8 @@ std::string ShowSelectArtTypeDialog(CFileItemList& artitems)
 int ShowSelectRatingDialog(int iSelected)
 {
   CGUIDialogSelect* dialog =
-      dynamic_cast<CGUIDialogSelect*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(
-          WINDOW_DIALOG_SELECT));
+      CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(
+          WINDOW_DIALOG_SELECT);
   if (dialog)
   {
     dialog->SetHeading(CVariant{38023});
@@ -525,10 +525,8 @@ void CAsyncGetItemsForPlaylist::GetItemsForPlaylist(const std::shared_ptr<CFileI
     // Check if we add a locked share
     if (item->m_bIsShareOrDrive)
     {
-#if 0
       if (!g_passwordManager.IsItemUnlocked(item.get(), "music"))
         return;
-#endif
     }
 
     CFileItemList items;
@@ -695,7 +693,8 @@ void QueueItem(const std::shared_ptr<CFileItem>& itemIn, QueuePosition pos)
   PLAYLIST::Id playlistId = player.GetCurrentPlaylist();
   if (playlistId == PLAYLIST::TYPE_NONE)
   {
-    playlistId = g_application.m_pPlayer->GetPreferredPlaylist();
+    const auto& components = CServiceBroker::GetAppComponents();
+    playlistId = components.GetComponent<CApplicationPlayer>()->GetPreferredPlaylist();
   }
 
   if (playlistId == PLAYLIST::TYPE_NONE)
@@ -721,7 +720,8 @@ void QueueItem(const std::shared_ptr<CFileItem>& itemIn, QueuePosition pos)
     return;
   }
 
-  const auto appPlayer = g_application.m_pPlayer;
+  const auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
 
   if (pos == QueuePosition::POSITION_BEGIN && appPlayer->IsPlaying())
     player.Insert(playlistId, queuedItems,
@@ -760,9 +760,9 @@ void QueueItem(const std::shared_ptr<CFileItem>& itemIn, QueuePosition pos)
 bool GetItemsForPlayList(const std::shared_ptr<CFileItem>& item, CFileItemList& queuedItems)
 {
   CAsyncGetItemsForPlaylist getItems(item, queuedItems);
-  return CGUIDialogBusy::Wait(&getItems/*,
+  return CGUIDialogBusy::Wait(&getItems,
                               500, // 500ms before busy dialog appears
-                              true*/); // can be cancelled
+                              true); // can be cancelled
 }
 
 bool IsItemPlayable(const CFileItem& item)

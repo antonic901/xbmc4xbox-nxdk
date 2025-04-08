@@ -14,7 +14,9 @@
 #include "ServiceBroker.h"
 #include "URL.h"
 #include "addons/Skin.h"
+#include "addons/VFSEntry.h"
 #include "application/Application.h"
+#include "application/ApplicationComponents.h"
 #include "application/ApplicationPlayer.h"
 #include "cores/IPlayer.h"
 #include "dialogs/GUIDialogFileBrowser.h"
@@ -57,7 +59,8 @@ CGUIDialogSubtitleSettings::~CGUIDialogSubtitleSettings() = default;
 
 void CGUIDialogSubtitleSettings::FrameMove()
 {
-  const auto appPlayer = g_application.m_pPlayer;
+  const auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
   if (appPlayer->HasPlayer())
   {
     const CVideoSettings videoSettings = appPlayer->GetVideoSettings();
@@ -87,7 +90,8 @@ void CGUIDialogSubtitleSettings::OnSettingChanged(const std::shared_ptr<const CS
   if (setting == NULL)
     return;
 
-  const auto appPlayer = g_application.m_pPlayer;
+  auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
 
   CGUIDialogSettingsManualBase::OnSettingChanged(setting);
 
@@ -117,13 +121,11 @@ void CGUIDialogSubtitleSettings::OnSettingChanged(const std::shared_ptr<const CS
 std::string CGUIDialogSubtitleSettings::BrowseForSubtitle()
 {
   std::string extras;
-#if 0
   for (const auto& vfsAddon : CServiceBroker::GetVFSAddonCache().GetAddonInstances())
   {
     if (vfsAddon->ID() == "vfs.rar" || vfsAddon->ID() == "vfs.libarchive")
       extras += '|' + vfsAddon->GetExtensions();
   }
-#endif
 
   std::string strPath;
   if (URIUtils::IsInRAR(g_application.CurrentFileItem().GetPath()) || URIUtils::IsInZIP(g_application.CurrentFileItem().GetPath()))
@@ -186,14 +188,15 @@ void CGUIDialogSubtitleSettings::OnSettingAction(const std::shared_ptr<const CSe
     std::string strPath = BrowseForSubtitle();
     if (!strPath.empty())
     {
-      const auto appPlayer = g_application.m_pPlayer;
+      auto& components = CServiceBroker::GetAppComponents();
+      const auto appPlayer = components.GetComponent<CApplicationPlayer>();
       appPlayer->AddSubtitle(strPath);
       Close();
     }
   }
   else if (settingId == SETTING_SUBTITLE_SEARCH)
   {
-    auto dialog = dynamic_cast<CGUIDialogSubtitles*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_SUBTITLES));
+    auto dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSubtitles>(WINDOW_DIALOG_SUBTITLES);
     if (dialog)
     {
       dialog->Open();
@@ -223,7 +226,8 @@ bool CGUIDialogSubtitleSettings::Save()
 
   db.EraseAllVideoSettings();
   db.Close();
-  const auto appPlayer = g_application.m_pPlayer;
+  const auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
 
   CMediaSettings::GetInstance().GetDefaultVideoSettings() = appPlayer->GetVideoSettings();
   CMediaSettings::GetInstance().GetDefaultVideoSettings().m_SubtitleStream = -1;
@@ -246,7 +250,8 @@ void CGUIDialogSubtitleSettings::InitializeSettings()
 {
   CGUIDialogSettingsManualBase::InitializeSettings();
 
-  const auto appPlayer = g_application.m_pPlayer;
+  const auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
 
   const std::shared_ptr<CSettingCategory> category = AddCategory("audiosubtitlesettings", -1);
   if (category == NULL)
@@ -327,7 +332,8 @@ void CGUIDialogSubtitleSettings::AddSubtitleStreams(const std::shared_ptr<CSetti
   if (group == NULL || settingId.empty())
     return;
 
-  const auto appPlayer = g_application.m_pPlayer;
+  auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
 
   m_subtitleStream = appPlayer->GetSubtitle();
   if (m_subtitleStream < 0)
@@ -342,7 +348,8 @@ void CGUIDialogSubtitleSettings::SubtitleStreamsOptionFiller(
     int& current,
     void* data)
 {
-  const auto appPlayer = g_application.m_pPlayer;
+  const auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
 
   int subtitleStreamCount = appPlayer->GetSubtitleCount();
 

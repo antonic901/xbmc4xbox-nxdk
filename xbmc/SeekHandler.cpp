@@ -17,7 +17,8 @@
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
-#include "input/Key.h"
+#include "input/actions/Action.h"
+#include "input/actions/ActionIDs.h"
 #include "settings/AdvancedSettings.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
@@ -27,7 +28,7 @@
 #include "utils/StringUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
-#include "guilib/GraphicContext.h"
+#include "windowing/GraphicContext.h"
 
 #include <cmath>
 #include <mutex>
@@ -139,7 +140,7 @@ void CSeekHandler::Seek(bool forward, float amount, float duration /* = 0 */, bo
     if( duration )
       speed *= duration;
     else
-      speed /= g_graphicsContext.GetFPS();
+      speed /= CServiceBroker::GetWinSystem()->GetGfxContext().GetFPS();
 
     double totalTime = g_application.GetTotalTime();
     if (totalTime < 0)
@@ -193,7 +194,6 @@ int CSeekHandler::GetSeekSize() const
 
 void CSeekHandler::SetSeekSize(double seekSize)
 {
-#if 0
   const auto& components = CServiceBroker::GetAppComponents();
   const auto appPlayer = components.GetComponent<CApplicationPlayer>();
   int64_t playTime = appPlayer->GetTime();
@@ -203,7 +203,6 @@ void CSeekHandler::SetSeekSize(double seekSize)
   m_seekSize = seekSize > 0
     ? std::min(seekSize, maxSeekSize)
     : std::max(seekSize, minSeekSize);
-#endif
 }
 
 bool CSeekHandler::InProgress() const

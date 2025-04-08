@@ -12,14 +12,19 @@
 #include "DirectoryFactory.h"
 #include "FileDirectoryFactory.h"
 #include "FileItem.h"
+#include "PasswordManager.h"
 #include "ServiceBroker.h"
 #include "URL.h"
 #include "commons/Exception.h"
+#include "dialogs/GUIDialogBusy.h"
+#include "guilib/GUIWindowManager.h"
+#include "messaging/ApplicationMessenger.h"
+#include "settings/Settings.h"
+#include "settings/SettingsComponent.h"
 #include "utils/Job.h"
 #include "utils/JobManager.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
-#include "application/Application.h"
 
 using namespace XFILE;
 using namespace std::chrono_literals;
@@ -180,6 +185,10 @@ bool CDirectory::GetDirectory(const CURL& url,
       {
         const std::string pathToUrl(url.Get());
 
+        // don't change auth if it's set explicitly
+        if (CPasswordManager::GetInstance().IsURLSupported(authUrl) && authUrl.GetUserName().empty())
+          CPasswordManager::GetInstance().AuthenticateURL(authUrl);
+
         items.SetURL(url);
         result = pDirectory->GetDirectory(authUrl, items);
 
@@ -187,7 +196,7 @@ bool CDirectory::GetDirectory(const CURL& url,
         {
           // @TODO ProcessRequirements() can bring up the keyboard input dialog
           // filesystem must not depend on GUI
-          if (g_application.IsCurrentThread() &&
+          if (CServiceBroker::GetAppMessenger()->IsProcessThread() &&
               pDirectory->ProcessRequirements())
           {
             authUrl.SetDomain("");
@@ -201,7 +210,6 @@ bool CDirectory::GetDirectory(const CURL& url,
         }
       }
 
-#if 0
       // hide credentials if necessary
       if (CPasswordManager::GetInstance().IsURLSupported(realURL))
       {
@@ -238,7 +246,6 @@ bool CDirectory::GetDirectory(const CURL& url,
           }
         }
       }
-#endif
 
       // cache the directory, if necessary
       if (!(hints.flags & DIR_FLAG_BYPASS_CACHE))
@@ -259,7 +266,6 @@ bool CDirectory::GetDirectory(const CURL& url,
         }
       }
     }
-#if 0 // Enable when we add support for settings and backport GUILIB
     // filter hidden files
     //! @todo we shouldn't be checking the gui setting here, callers should use getHidden instead
     if (!CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_FILELISTS_SHOWHIDDEN) && !(hints.flags & DIR_FLAG_GET_HIDDEN))
@@ -273,7 +279,6 @@ bool CDirectory::GetDirectory(const CURL& url,
         }
       }
     }
-#endif
 
     //  Should any of the files we read be treated as a directory?
     //  Disable for database folders, as they already contain the extracted items
@@ -312,6 +317,9 @@ bool CDirectory::Create(const CURL& url)
   {
     CURL realURL = URIUtils::SubstitutePath(url);
 
+    if (CPasswordManager::GetInstance().IsURLSupported(realURL) && realURL.GetUserName().empty())
+      CPasswordManager::GetInstance().AuthenticateURL(realURL);
+
     std::unique_ptr<IDirectory> pDirectory(CDirectoryFactory::Create(realURL));
     if (pDirectory)
       if(pDirectory->Create(realURL))
@@ -345,6 +353,9 @@ bool CDirectory::Exists(const CURL& url, bool bUseCache /* = true */)
         return false;
     }
 
+    if (CPasswordManager::GetInstance().IsURLSupported(realURL) && realURL.GetUserName().empty())
+      CPasswordManager::GetInstance().AuthenticateURL(realURL);
+
     std::unique_ptr<IDirectory> pDirectory(CDirectoryFactory::Create(realURL));
     if (pDirectory)
       return pDirectory->Exists(realURL);
@@ -372,6 +383,8 @@ bool CDirectory::Remove(const CURL& url)
   {
     CURL realURL = URIUtils::SubstitutePath(url);
     CURL authUrl = realURL;
+    if (CPasswordManager::GetInstance().IsURLSupported(authUrl) && authUrl.GetUserName().empty())
+      CPasswordManager::GetInstance().AuthenticateURL(authUrl);
 
     std::unique_ptr<IDirectory> pDirectory(CDirectoryFactory::Create(realURL));
     if (pDirectory)
@@ -393,6 +406,8 @@ bool CDirectory::RemoveRecursive(const CURL& url)
   {
     CURL realURL = URIUtils::SubstitutePath(url);
     CURL authUrl = realURL;
+    if (CPasswordManager::GetInstance().IsURLSupported(authUrl) && authUrl.GetUserName().empty())
+      CPasswordManager::GetInstance().AuthenticateURL(authUrl);
 
     std::unique_ptr<IDirectory> pDirectory(CDirectoryFactory::Create(realURL));
     if (pDirectory)

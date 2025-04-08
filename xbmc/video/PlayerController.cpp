@@ -9,12 +9,13 @@
 #include "PlayerController.h"
 
 #include "ServiceBroker.h"
-#include "application/Application.h"
+#include "application/ApplicationComponents.h"
 #include "application/ApplicationPlayer.h"
 #include "cores/IPlayer.h"
 #include "dialogs/GUIDialogKaiToast.h"
 #include "dialogs/GUIDialogSelect.h"
 #include "dialogs/GUIDialogSlider.h"
+#include "guilib/GUIComponent.h"
 #include "guilib/GUISliderControl.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
@@ -23,7 +24,7 @@
 #include "settings/MediaSettings.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
-// #include "settings/SubtitlesSettings.h"
+#include "settings/SubtitlesSettings.h"
 #include "utils/LangCodeExpander.h"
 #include "utils/StringUtils.h"
 #include "utils/Variant.h"
@@ -52,7 +53,8 @@ bool CPlayerController::OnAction(const CAction &action)
   const unsigned int MsgTime = 300;
   const unsigned int DisplTime = 2000;
 
-  const auto appPlayer = g_application.m_pPlayer;
+  auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
 
   if (appPlayer->IsPlayingVideo())
   {
@@ -335,7 +337,6 @@ bool CPlayerController::OnAction(const CAction &action)
 
       case ACTION_SUBTITLE_VSHIFT_UP:
       {
-#if 0
         const auto settings{CServiceBroker::GetSettingsComponent()->GetSubtitlesSettings()};
         SUBTITLES::Align subAlign{settings->GetAlignment()};
         if (subAlign != SUBTITLES::Align::BOTTOM_OUTSIDE && subAlign != SUBTITLES::Align::MANUAL)
@@ -362,13 +363,10 @@ bool CPlayerController::OnAction(const CAction &action)
         ShowSlider(action.GetID(), 277, static_cast<float>(vs.m_subtitleVerticalPosition),
                    static_cast<float>(resInfo.Overscan.top), 1.0f, static_cast<float>(maxPos));
         return true;
-#endif
-        return false;
       }
 
       case ACTION_SUBTITLE_VSHIFT_DOWN:
       {
-#if 0
         const auto settings{CServiceBroker::GetSettingsComponent()->GetSubtitlesSettings()};
         SUBTITLES::Align subAlign{settings->GetAlignment()};
         if (subAlign != SUBTITLES::Align::BOTTOM_OUTSIDE && subAlign != SUBTITLES::Align::MANUAL)
@@ -400,13 +398,10 @@ bool CPlayerController::OnAction(const CAction &action)
         ShowSlider(action.GetID(), 277, static_cast<float>(vs.m_subtitleVerticalPosition),
                    static_cast<float>(resInfo.Overscan.top), 1.0f, static_cast<float>(maxPos));
         return true;
-#endif
-        return false;
       }
 
       case ACTION_SUBTITLE_ALIGN:
       {
-#if 0
         const auto settings{CServiceBroker::GetSettingsComponent()->GetSubtitlesSettings()};
         SUBTITLES::Align align{settings->GetAlignment()};
 
@@ -424,8 +419,6 @@ bool CPlayerController::OnAction(const CAction &action)
             CGUIDialogKaiToast::Info, g_localizeStrings.Get(21460),
             g_localizeStrings.Get(21461 + static_cast<int>(align)), TOAST_DISPLAY_TIME, false);
         return true;
-#endif
-        return false;
       }
 
       case ACTION_VOLAMP_UP:
@@ -470,7 +463,6 @@ bool CPlayerController::OnAction(const CAction &action)
 
       case ACTION_PLAYER_PROGRAM_SELECT:
       {
-#if 0
         std::vector<ProgramInfo> programs;
         appPlayer->GetPrograms(programs);
         CGUIDialogSelect *dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(WINDOW_DIALOG_SELECT);
@@ -493,13 +485,10 @@ bool CPlayerController::OnAction(const CAction &action)
             appPlayer->SetProgram(programs[idx].id);
         }
         return true;
-#endif
-        return false;
       }
 
       case ACTION_PLAYER_RESOLUTION_SELECT:
       {
-#if 0
         std::vector<CVariant> indexList = CServiceBroker::GetSettingsComponent()->GetSettings()->GetList(CSettings::SETTING_VIDEOSCREEN_WHITELIST);
 
         CGUIDialogSelect *dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(WINDOW_DIALOG_SELECT);
@@ -528,8 +517,6 @@ bool CPlayerController::OnAction(const CAction &action)
           }
         }
         return true;
-#endif
-        return false;
       }
 
       default:
@@ -574,7 +561,8 @@ void CPlayerController::OnSliderChange(void *data, CGUISliderControl *slider)
     slider->SetTextValue(
         CGUIDialogAudioSettings::FormatDelay(slider->GetFloatValue(), AUDIO_DELAY_STEP));
 
-  const auto appPlayer = g_application.m_pPlayer;
+  auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
 
   if (appPlayer->HasPlayer())
   {

@@ -8,10 +8,14 @@
 
 #include "IDirectory.h"
 
+#include "PasswordManager.h"
 #include "URL.h"
+#include "guilib/GUIKeyboardFactory.h"
+#include "messaging/helpers/DialogOKHelper.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 
+using namespace KODI::MESSAGING;
 using namespace XFILE;
 
 const CProfileManager *IDirectory::m_profileManager = nullptr;
@@ -117,18 +121,25 @@ bool IDirectory::ProcessRequirements()
   std::string type = m_requirements["type"].asString();
   if (type == "keyboard")
   {
-    // TODO: show keyboard and get input
-    return false;
+    std::string input;
+    if (CGUIKeyboardFactory::ShowAndGetInput(input, m_requirements["heading"], false, m_requirements["hidden"].asBoolean()))
+    {
+      m_requirements["input"] = input;
+      return true;
+    }
   }
   else if (type == "authenticate")
   {
     CURL url(m_requirements["url"].asString());
-    // TODO: show dilaog to authenticate URL
-    return false;
+    if (CPasswordManager::GetInstance().PromptToAuthenticateURL(url))
+    {
+      m_requirements.clear();
+      return true;
+    }
   }
   else if (type == "error")
   {
-    // TODO: show dialog
+    HELPERS::ShowOKDialogLines(CVariant{m_requirements["heading"]}, CVariant{m_requirements["line1"]}, CVariant{m_requirements["line2"]}, CVariant{m_requirements["line3"]});
   }
   m_requirements.clear();
   return false;

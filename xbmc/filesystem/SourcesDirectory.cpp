@@ -16,6 +16,7 @@
 #include "media/MediaLockState.h"
 #include "profiles/ProfileManager.h"
 #include "settings/MediaSourceSettings.h"
+#include "storage/MediaManager.h"
 #include "utils/FileUtils.h"
 #include "utils/URIUtils.h"
 
@@ -38,6 +39,7 @@ bool CSourcesDirectory::GetDirectory(const CURL& url, CFileItemList &items)
     return false;
 
   sources = *sourcesFromType;
+  CServiceBroker::GetMediaManager().GetRemovableDrives(sources);
 
   return GetDirectory(sources, items);
 }

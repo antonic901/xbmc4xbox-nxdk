@@ -15,6 +15,8 @@
 #ifdef HAS_UPNP
 #include "network/upnp/UPnP.h"
 #endif
+#include "pvr/PVRManager.h"
+#include "pvr/recordings/PVRRecordings.h"
 #include "profiles/ProfileManager.h"
 #include "settings/SettingsComponent.h"
 #include "ServiceBroker.h"
@@ -64,6 +66,21 @@ bool CVideoLibraryMarkWatchedJob::Work(CVideoDatabase &db)
     if (URIUtils::IsUPnP(item->GetPath()) && UPNP::CUPnP::MarkWatched(*item, m_mark))
       continue;
 #endif
+
+    if (item->HasPVRRecordingInfoTag() &&
+        CServiceBroker::GetPVRManager().Recordings()->MarkWatched(item->GetPVRRecordingInfoTag(), m_mark))
+    {
+      CDateTime newLastPlayed;
+      if (m_mark)
+        newLastPlayed = db.IncrementPlayCount(*item);
+      else
+        newLastPlayed = db.SetPlayCount(*item, 0);
+
+      if (newLastPlayed.IsValid())
+        item->GetVideoInfoTag()->m_lastPlayed = newLastPlayed;
+
+      continue;
+    }
 
     markItems.push_back(item);
   }

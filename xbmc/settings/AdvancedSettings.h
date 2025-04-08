@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "pictures/PictureScalingAlgorithm.h"
 #include "settings/lib/ISettingCallback.h"
 #include "settings/lib/ISettingsHandler.h"
 #include "utils/SortUtils.h"
@@ -23,11 +24,16 @@
 #define CACHE_BUFFER_MODE_NONE 3
 #define CACHE_BUFFER_MODE_NETWORK 4
 
+class CProfileManager;
 class CSettingsManager;
 class CVariant;
 struct IntegerSettingOption;
 
 class TiXmlElement;
+namespace ADDON
+{
+  class IAddon;
+}
 
 class DatabaseSettings
 {
@@ -112,7 +118,7 @@ class CAdvancedSettings : public ISettingCallback, public ISettingsHandler
     void Uninitialize(CSettingsManager& settingsMgr);
     bool Initialized() const { return m_initialized; }
     void AddSettingsFile(const std::string &filename);
-    bool Load();
+    bool Load(const CProfileManager &profileManager);
 
     static void GetCustomTVRegexps(TiXmlElement *pRootElement, SETTINGS_TVSHOWLIST& settings);
     static void GetCustomRegexps(TiXmlElement *pRootElement, std::vector<std::string> &settings);
@@ -223,6 +229,7 @@ class CAdvancedSettings : public ISettingCallback, public ISettingsHandler
 
     unsigned int m_fanartRes; ///< \brief the maximal resolution to cache fanart at (assumes 16x9)
     unsigned int m_imageRes;  ///< \brief the maximal resolution to cache images at (assumes 16x9)
+    CPictureScalingAlgorithm::Algorithm m_imageScalingAlgorithm;
     unsigned int
         m_imageQualityJpeg; ///< \brief the stored jpeg quality the lower the better (default: 4)
 

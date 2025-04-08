@@ -10,8 +10,8 @@
 
 #include "platform/win32/CharsetConverter.h"
 
-#include <fileapi.h>
-#include <windows.h>
+#include <FileAPI.h>
+#include <Windows.h>
 
 using KODI::PLATFORM::WINDOWS::FromW;
 

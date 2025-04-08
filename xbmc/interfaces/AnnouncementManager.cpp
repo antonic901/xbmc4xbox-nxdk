@@ -9,11 +9,15 @@
 #include "AnnouncementManager.h"
 
 #include "FileItem.h"
+#include "music/MusicDatabase.h"
+#include "music/tags/MusicInfoTag.h"
 #include "playlists/PlayListTypes.h"
+#include "pvr/channels/PVRChannel.h"
 #include "threads/SingleLock.h"
 #include "utils/StringUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
+#include "video/VideoDatabase.h"
 
 #include <mutex>
 #include <stdio.h>
@@ -173,8 +177,22 @@ void CAnnouncementManager::DoAnnounce(AnnouncementFlag flag,
   std::string type;
   int id = 0;
 
-#if 0
-  if (item->HasVideoInfoTag() && !item->HasPVRRecordingInfoTag())
+  if(item->HasPVRChannelInfoTag())
+  {
+    const std::shared_ptr<PVR::CPVRChannel> channel(item->GetPVRChannelInfoTag());
+    id = channel->ChannelID();
+    type = "channel";
+
+    object["item"]["title"] = channel->ChannelName();
+    object["item"]["channeltype"] = channel->IsRadio() ? "radio" : "tv";
+
+    if (data.isMember("player") && data["player"].isMember("playerid"))
+    {
+      object["player"]["playerid"] =
+          channel->IsRadio() ? PLAYLIST::TYPE_MUSIC : PLAYLIST::TYPE_VIDEO;
+    }
+  }
+  else if (item->HasVideoInfoTag() && !item->HasPVRRecordingInfoTag())
   {
     id = item->GetVideoInfoTag()->m_iDbId;
 
@@ -277,9 +295,7 @@ void CAnnouncementManager::DoAnnounce(AnnouncementFlag flag,
         object["item"]["artist"] = item->GetMusicInfoTag()->GetArtist();
     }
   }
-  else
-#endif
-  if (item->IsVideo())
+  else if (item->IsVideo())
   {
     // video item but has no video info tag.
     type = "movie";

@@ -17,6 +17,7 @@
 #include "addons/AddonManager.h"
 #include "addons/AddonRepos.h"
 #include "addons/AddonSystemSettings.h"
+#include "addons/AudioDecoder.h"
 #include "addons/ExtsMimeSupportList.h"
 #include "addons/IAddon.h"
 #include "addons/addoninfo/AddonInfo.h"
@@ -26,10 +27,12 @@
 #include "dialogs/GUIDialogSelect.h"
 #include "dialogs/GUIDialogYesNo.h"
 #include "filesystem/Directory.h"
+#include "games/GameUtils.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
-#include "input/Key.h"
+#include "input/actions/Action.h"
+#include "input/actions/ActionIDs.h"
 #include "interfaces/builtins/Builtins.h"
 #include "messaging/helpers/DialogOKHelper.h"
 #include "pictures/GUIWindowSlideShow.h"
@@ -282,8 +285,8 @@ static const std::string LOCAL_CACHE =
 
 int CGUIDialogAddonInfo::AskForVersion(std::vector<std::pair<CAddonVersion, std::string>>& versions)
 {
-  auto dialog = dynamic_cast<CGUIDialogSelect*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(
-      WINDOW_DIALOG_SELECT));
+  auto dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(
+      WINDOW_DIALOG_SELECT);
   dialog->Reset();
   dialog->SetHeading(CVariant{21338});
   dialog->SetUseDetails(true);
@@ -515,10 +518,8 @@ bool CGUIDialogAddonInfo::CanRun() const
     if (m_localAddon->Type() == AddonType::SCRIPT)
       return true;
 
-#if 0
     if (GAME::CGameUtils::IsStandaloneGame(m_localAddon))
       return true;
-#endif
   }
 
   return false;
@@ -630,8 +631,8 @@ bool CGUIDialogAddonInfo::ShowDependencyList(Reactivate reactivate, EntryPoint e
 {
   if (entryPoint != EntryPoint::INSTALL || m_showDepDialogOnInstall)
   {
-    auto pDialog = dynamic_cast<CGUIDialogSelect*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(
-        WINDOW_DIALOG_SELECT));
+    auto pDialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(
+        WINDOW_DIALOG_SELECT);
     CFileItemList items;
 
     for (const auto& it : m_depsInstalledWithAvailable)
@@ -713,9 +714,7 @@ bool CGUIDialogAddonInfo::ShowDependencyList(Reactivate reactivate, EntryPoint e
         for (auto& it : items)
           pDialog->Add(*it);
         pDialog->EnableButton(reactivate == Reactivate::CHOICE_NO, 186);
-#if 0
         pDialog->SetButtonFocus(true);
-#endif
         pDialog->Open();
 
         if (pDialog->IsButtonPressed())
@@ -753,16 +752,14 @@ void CGUIDialogAddonInfo::ShowSupportList()
     list =
         CServiceBroker::GetExtsMimeSupportList().GetSupportedExtsAndMimeTypes(m_localAddon->ID());
 
-  auto pDialog = dynamic_cast<CGUIDialogSelect*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(
-      WINDOW_DIALOG_SELECT));
+  auto pDialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(
+      WINDOW_DIALOG_SELECT);
   CFileItemList items;
   for (const auto& entry : list)
   {
-#if 0
     // Ignore included extension about track support
     if (StringUtils::EndsWith(entry.m_name, KODI_ADDON_AUDIODECODER_TRACK_EXT))
       continue;
-#endif
 
     std::string label;
     if (entry.m_type == AddonSupportType::Extension)
@@ -789,9 +786,7 @@ void CGUIDialogAddonInfo::ShowSupportList()
   pDialog->SetUseDetails(true);
   for (auto& it : items)
     pDialog->Add(*it);
-#if 0
   pDialog->SetButtonFocus(true);
-#endif
   pDialog->Open();
 }
 
@@ -801,8 +796,8 @@ bool CGUIDialogAddonInfo::ShowForItem(const CFileItemPtr& item)
     return false;
 
   CGUIDialogAddonInfo* dialog =
-      dynamic_cast<CGUIDialogAddonInfo*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(
-          WINDOW_DIALOG_ADDON_INFO));
+      CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogAddonInfo>(
+          WINDOW_DIALOG_ADDON_INFO);
   if (!dialog)
     return false;
   if (!dialog->SetItem(item))

@@ -9,10 +9,11 @@
 #pragma once
 
 #include "ViewState.h"
+#include "events/IEvent.h"
 #include "settings/ISubSettings.h"
 #include "settings/lib/Setting.h"
 #include "threads/CriticalSection.h"
-#include "guilib/GraphicContext.h"
+#include "windowing/GraphicContext.h"
 
 #include <map>
 #include <string>
@@ -36,7 +37,6 @@ public:
   void CycleSettingLevel();
   SettingLevel GetNextSettingLevel() const;
 
-#if 0
   EventLevel GetEventLevel() const { return m_eventLevel; }
   void SetEventLevel(EventLevel eventLevel);
   void CycleEventLevel();
@@ -44,7 +44,6 @@ public:
   bool ShowHigherEventLevels() const { return m_eventShowHigherLevels; }
   void SetShowHigherEventLevels(bool showHigherEventLevels) { m_eventShowHigherLevels = showHigherEventLevels; }
   void ToggleShowHigherEventLevels() { m_eventShowHigherLevels = !m_eventShowHigherLevels; }
-#endif
 
 protected:
   CViewStateSettings();
@@ -55,10 +54,8 @@ protected:
 private:
   std::map<std::string, CViewState*> m_viewStates;
   SettingLevel m_settingLevel = SettingLevel::Standard;
-#if 0
   EventLevel m_eventLevel = EventLevel::Basic;
   bool m_eventShowHigherLevels = true;
-#endif
   mutable CCriticalSection m_critical;
 
   void AddViewState(const std::string& strTagName, int defaultView = DEFAULT_VIEW_LIST, SortBy defaultSort = SortByLabel);

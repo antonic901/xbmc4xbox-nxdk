@@ -20,13 +20,9 @@
 #include "platform/posix/filesystem/SMBWSDiscovery.h"
 #endif
 
-#ifdef NXDK
-#include <lwip/netdb.h>
-#else
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
-#endif
 
 CDNSNameCache g_DNSCache;
 

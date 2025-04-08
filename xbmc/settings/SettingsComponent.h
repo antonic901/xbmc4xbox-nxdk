@@ -72,7 +72,6 @@ private:
   bool InitDirectoriesLinux(bool bPlatformDirectories);
   bool InitDirectoriesOSX(bool bPlatformDirectories);
   bool InitDirectoriesWin32(bool bPlatformDirectories);
-  bool InitDirectoriesXbox(bool bPlatformDirectories);
   void CreateUserDirs() const;
 
   enum class State

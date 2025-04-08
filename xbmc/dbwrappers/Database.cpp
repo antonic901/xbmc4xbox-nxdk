@@ -28,10 +28,6 @@
 #include "platform/posix/ConvUtils.h"
 #endif
 
-#ifdef NXDK
-#include <windows.h> // GetLastError()
-#endif
-
 using namespace dbiplus;
 
 #define MAX_COMPRESS_COUNT 20

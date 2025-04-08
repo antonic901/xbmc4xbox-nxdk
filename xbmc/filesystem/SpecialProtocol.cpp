@@ -17,6 +17,7 @@
 #include "settings/SettingsComponent.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
+#include "windowing/GraphicContext.h"
 
 #include <cassert>
 
@@ -158,9 +159,23 @@ std::string CSpecialProtocol::TranslatePath(const CURL &url)
     translatedPath = URIUtils::AddFileToFolder(m_profileManager->GetDatabaseFolder(), FileName);
   else if (RootDir == "thumbnails" && m_profileManager)
     translatedPath = URIUtils::AddFileToFolder(m_profileManager->GetThumbnailsFolder(), FileName);
-
-  // TODO: add translation for musicplaylist, videoplaylist etc.
-
+  else if (RootDir == "recordings" || RootDir == "cdrips")
+    translatedPath = URIUtils::AddFileToFolder(CServiceBroker::GetSettingsComponent()->GetSettings()->GetString(CSettings::SETTING_AUDIOCDS_RECORDINGPATH), FileName);
+  else if (RootDir == "screenshots")
+    translatedPath = URIUtils::AddFileToFolder(CServiceBroker::GetSettingsComponent()->GetSettings()->GetString(CSettings::SETTING_DEBUG_SCREENSHOTPATH), FileName);
+  else if (RootDir == "musicartistsinfo")
+    translatedPath = URIUtils::AddFileToFolder(CServiceBroker::GetSettingsComponent()->GetSettings()->GetString(CSettings::SETTING_MUSICLIBRARY_ARTISTSFOLDER), FileName);
+  else if (RootDir == "musicplaylists")
+    translatedPath = URIUtils::AddFileToFolder(CUtil::MusicPlaylistsLocation(), FileName);
+  else if (RootDir == "videoplaylists")
+    translatedPath = URIUtils::AddFileToFolder(CUtil::VideoPlaylistsLocation(), FileName);
+  else if (RootDir == "skin")
+  {
+    auto winSystem = CServiceBroker::GetWinSystem();
+    // windowing may not have been initialized yet
+    if (winSystem)
+      translatedPath = URIUtils::AddFileToFolder(winSystem->GetGfxContext().GetMediaDir(), FileName);
+  }
   // from here on, we have our "real" special paths
   else if (RootDir == "xbmc" ||
            RootDir == "xbmcbin" ||
@@ -269,6 +284,8 @@ void CSpecialProtocol::LogPaths()
   CLog::Log(LOGINFO, "special://temp/ is mapped to: {}", GetPath("temp"));
   CLog::Log(LOGINFO, "special://logpath/ is mapped to: {}", GetPath("logpath"));
   //CLog::Log(LOGINFO, "special://userhome/ is mapped to: {}", GetPath("userhome"));
+  if (!CUtil::GetFrameworksPath().empty())
+    CLog::Log(LOGINFO, "special://frameworks/ is mapped to: {}", GetPath("frameworks"));
 }
 
 // private routines, to ensure we only set/get an appropriate path
