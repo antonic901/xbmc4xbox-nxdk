@@ -9,6 +9,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/CharsetDetection.cpp \
 	$(CURDIR)/xbmc/utils/ColorUtils.cpp \
 	$(CURDIR)/xbmc/utils/CompileInfo.cpp \
+	$(CURDIR)/xbmc/utils/CPUInfo.cpp \
 	$(CURDIR)/xbmc/utils/Crc32.cpp \
 	$(CURDIR)/xbmc/utils/DatabaseUtils.cpp \
 	$(CURDIR)/xbmc/utils/Digest.cpp \

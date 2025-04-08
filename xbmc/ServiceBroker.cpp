@@ -156,6 +156,21 @@ void CServiceBroker::UnregisterGUI()
   g_serviceBroker.m_pGUI = nullptr;
 }
 
+std::shared_ptr<CCPUInfo> CServiceBroker::GetCPUInfo()
+{
+  return g_serviceBroker.m_cpuInfo;
+}
+
+void CServiceBroker::RegisterCPUInfo(std::shared_ptr<CCPUInfo> cpuInfo)
+{
+  g_serviceBroker.m_cpuInfo = std::move(cpuInfo);
+}
+
+void CServiceBroker::UnregisterCPUInfo()
+{
+  g_serviceBroker.m_cpuInfo.reset();
+}
+
 void CServiceBroker::RegisterTextureCache(const std::shared_ptr<CTextureCache>& cache)
 {
   g_serviceBroker.m_textureCache = cache;

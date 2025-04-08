@@ -48,6 +48,7 @@ class CDatabaseManager;
 class CGUIComponent;
 class CSettingsComponent;
 class CMediaManager;
+class CCPUInfo;
 class CTextureCache;
 class CJobManager;
 
@@ -96,6 +97,10 @@ public:
   static void UnregisterSettingsComponent();
   static std::shared_ptr<CSettingsComponent> GetSettingsComponent();
 
+  static std::shared_ptr<CCPUInfo> GetCPUInfo();
+  static void RegisterCPUInfo(std::shared_ptr<CCPUInfo> cpuInfo);
+  static void UnregisterCPUInfo();
+
   static void RegisterTextureCache(const std::shared_ptr<CTextureCache>& cache);
   static void UnregisterTextureCache();
   static std::shared_ptr<CTextureCache> GetTextureCache();
@@ -114,6 +119,7 @@ private:
   std::shared_ptr<ANNOUNCEMENT::CAnnouncementManager> m_pAnnouncementManager;
   CGUIComponent* m_pGUI;
   std::shared_ptr<CSettingsComponent> m_pSettingsComponent;
+  std::shared_ptr<CCPUInfo> m_cpuInfo;
   std::shared_ptr<CTextureCache> m_textureCache;
   std::shared_ptr<CJobManager> m_jobManager;
   std::shared_ptr<KODI::MESSAGING::CApplicationMessenger> m_appMessenger;
