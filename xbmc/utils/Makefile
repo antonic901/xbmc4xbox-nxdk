@@ -51,6 +51,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/StreamUtils.cpp \
 	$(CURDIR)/xbmc/utils/StringUtils.cpp \
 	$(CURDIR)/xbmc/utils/StringValidation.cpp \
+	$(CURDIR)/xbmc/utils/SystemInfo.cpp \
 	$(CURDIR)/xbmc/utils/Temperature.cpp \
 	$(CURDIR)/xbmc/utils/TimeUtils.cpp \
 	$(CURDIR)/xbmc/utils/URIUtils.cpp \
