@@ -29,7 +29,9 @@ SRCS += \
 	$(CURDIR)/xbmc/filesystem/StackDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/VideoDatabaseDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/VideoDatabaseFile.cpp \
-	$(CURDIR)/xbmc/filesystem/VirtualDirectory.cpp
+	$(CURDIR)/xbmc/filesystem/VirtualDirectory.cpp \
+	$(CURDIR)/xbmc/filesystem/ZipDirectory.cpp \
+	$(CURDIR)/xbmc/filesystem/ZipFile.cpp
 
 include $(CURDIR)/xbmc/filesystem/MusicDatabaseDirectory/Makefile
 include $(CURDIR)/xbmc/filesystem/VideoDatabaseDirectory/Makefile
