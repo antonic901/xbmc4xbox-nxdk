@@ -14,7 +14,9 @@
 #include "ServiceBroker.h"
 #include "URL.h"
 #include "application/Application.h"
+#include "application/ApplicationComponents.h"
 #include "application/ApplicationPlayer.h"
+#include "application/ApplicationPowerHandling.h"
 #include "dialogs/GUIDialogKaiToast.h"
 #include "filesystem/VideoDatabaseFile.h"
 #include "guilib/GUIComponent.h"
@@ -819,15 +821,10 @@ void PLAYLIST::CPlayListPlayer::OnApplicationMessage(KODI::MESSAGING::ThreadMess
   const auto appPlayer = g_application.m_pPlayer;
 
   auto wakeScreensaver = []() {
-#if 0
     auto& components = CServiceBroker::GetAppComponents();
     const auto appPower = components.GetComponent<CApplicationPowerHandling>();
     appPower->ResetScreenSaver();
     appPower->WakeUpScreenSaverAndDPMS();
-#else
-    g_application.ResetScreenSaver();
-    g_application.ResetScreenSaverWindow();
-#endif
   };
 
   switch (pMsg->dwMessage)

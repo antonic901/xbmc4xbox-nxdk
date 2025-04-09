@@ -18,6 +18,7 @@
 #include "application/Application.h"
 #include "application/ApplicationComponents.h"
 #include "application/ApplicationPlayer.h"
+#include "application/ApplicationPowerHandling.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "music/MusicUtils.h"
@@ -111,14 +112,9 @@ static int PlayOffset(const std::vector<std::string>& params)
 static int PlayerControl(const std::vector<std::string>& params)
 {
   auto& components = CServiceBroker::GetAppComponents();
-#if 0
   const auto appPower = components.GetComponent<CApplicationPowerHandling>();
   appPower->ResetScreenSaver();
   appPower->WakeUpScreenSaverAndDPMS();
-#else
-  g_application.ResetScreenSaver();
-  g_application.ResetScreenSaverWindow();
-#endif
 
   std::string paramlow(params[0]);
   StringUtils::ToLower(paramlow);
@@ -446,14 +442,9 @@ int PlayOrQueueMedia(const std::vector<std::string>& params, bool forcePlay)
 
   // reset screensaver
   auto& components = CServiceBroker::GetAppComponents();
-#if 0
   const auto appPower = components.GetComponent<CApplicationPowerHandling>();
   appPower->ResetScreenSaver();
   appPower->WakeUpScreenSaverAndDPMS();
-#else
-  g_application.ResetScreenSaver();
-  g_application.ResetScreenSaverWindow();
-#endif
 
   CFileItem item(params[0], URIUtils::HasSlashAtEnd(params[0], true));
 

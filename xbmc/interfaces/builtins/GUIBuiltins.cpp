@@ -10,8 +10,8 @@
 
 #include "ServiceBroker.h"
 #include "Util.h"
-#include "application/Application.h"
 #include "application/ApplicationComponents.h"
+#include "application/ApplicationPowerHandling.h"
 #include "dialogs/GUIDialogKaiToast.h"
 #include "dialogs/GUIDialogNumeric.h"
 #include "filesystem/Directory.h"
@@ -94,13 +94,9 @@ static int ActivateWindow(const std::vector<std::string>& params2)
           iWindow == CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow())
         params.emplace_back("replace");
 
-#if 0
       auto& components = CServiceBroker::GetAppComponents();
       const auto appPower = components.GetComponent<CApplicationPowerHandling>();
       appPower->WakeUpScreenSaverAndDPMS();
-#else
-      g_application.ResetScreenSaverWindow();
-#endif
       CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(iWindow, params, Replace);
       return 0;
     }
@@ -135,13 +131,9 @@ static int ActivateAndFocus(const std::vector<std::string>& params)
     if (iWindow != CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow())
     {
       // disable the screensaver
-#if 0
       auto& components = CServiceBroker::GetAppComponents();
       const auto appPower = components.GetComponent<CApplicationPowerHandling>();
       appPower->WakeUpScreenSaverAndDPMS();
-#else
-      g_application.ResetScreenSaverWindow();
-#endif
       CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(iWindow, {}, Replace);
 
       unsigned int iPtr = 1;
