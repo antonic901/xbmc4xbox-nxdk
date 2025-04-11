@@ -40,11 +40,9 @@
 #include "guilib/GUIKeyboardFactory.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
-#include "input/actions/Action.h"
-#include "input/actions/ActionIDs.h"
+#include "input/Key.h"
 #include "interfaces/generic/ScriptInvocationManager.h"
 #include "messaging/helpers/DialogOKHelper.h"
-#include "network/Network.h"
 #include "playlists/PlayList.h"
 #include "profiles/ProfileManager.h"
 #include "settings/AdvancedSettings.h"
@@ -129,17 +127,14 @@ CGUIMediaWindow::~CGUIMediaWindow()
   delete m_unfilteredItems;
 }
 
-bool CGUIMediaWindow::Load(TiXmlElement *pRootElement)
+void CGUIMediaWindow::LoadAdditionalTags(TiXmlElement *root)
 {
-  bool retVal = CGUIWindow::Load(pRootElement);
-
-  if (!retVal)
-    return false;
+  CGUIWindow::LoadAdditionalTags(root);
 
   // configure our view control
   m_viewControl.Reset();
   m_viewControl.SetParentWindow(GetID());
-  TiXmlElement *element = pRootElement->FirstChildElement("views");
+  TiXmlElement *element = root->FirstChildElement("views");
   if (element && element->FirstChild())
   { // format is <views>50,29,51,95</views>
     const std::string &allViews = element->FirstChild()->ValueStr();
@@ -153,8 +148,6 @@ bool CGUIMediaWindow::Load(TiXmlElement *pRootElement)
     }
   }
   m_viewControl.SetViewControlID(CONTROL_BTNVIEWASICONS);
-
-  return true;
 }
 
 void CGUIMediaWindow::OnWindowLoaded()
@@ -1206,12 +1199,14 @@ bool CGUIMediaWindow::HaveDiscOrConnection(const std::string& strPath, int iDriv
   }
   else if (iDriveType==CMediaSource::SOURCE_TYPE_REMOTE)
   {
+#if 0
     //! @todo Handle not connected to a remote share
     if (!CServiceBroker::GetNetwork().IsConnected())
     {
       HELPERS::ShowOKDialogText(CVariant{220}, CVariant{221});
       return false;
     }
+#endif
   }
 
   return true;
@@ -1846,6 +1841,7 @@ const CFileItemList& CGUIMediaWindow::CurrentDirectory() const
 
 bool CGUIMediaWindow::WaitForNetwork() const
 {
+#if 0
   if (CServiceBroker::GetNetwork().IsAvailable())
     return true;
 
@@ -1868,6 +1864,7 @@ bool CGUIMediaWindow::WaitForNetwork() const
     }
   }
   progress->Close();
+#endif
   return true;
 }
 
@@ -2216,7 +2213,8 @@ std::string CGUIMediaWindow::RemoveParameterFromPath(const std::string &strDirec
 
 bool CGUIMediaWindow::ProcessRenderLoop(bool renderOnly)
 {
-  return CServiceBroker::GetGUI()->GetWindowManager().ProcessRenderLoop(renderOnly);
+  CServiceBroker::GetGUI()->GetWindowManager().ProcessRenderLoop(renderOnly);
+  return true;
 }
 
 bool CGUIMediaWindow::GetDirectoryItems(CURL &url, CFileItemList &items, bool useDir)

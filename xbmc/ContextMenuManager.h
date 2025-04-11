@@ -21,11 +21,6 @@ struct AddonEvent;
 class CAddonMgr;
 } // namespace ADDON
 
-namespace PVR
-{
-  struct PVRContextMenuEvent;
-}
-
 using ContextMenuView = std::vector<std::shared_ptr<const IContextMenuItem>>;
 
 class CContextMenuManager
@@ -55,8 +50,6 @@ private:
 
   void ReloadAddonItems();
   void OnEvent(const ADDON::AddonEvent& event);
-
-  void OnPVREvent(const PVR::PVRContextMenuEvent& event);
 
   ADDON::CAddonMgr& m_addonMgr;
 

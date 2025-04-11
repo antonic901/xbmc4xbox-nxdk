@@ -16,7 +16,7 @@
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIMessage.h"
 #include "guilib/GUIWindowManager.h"
-#include "input/actions/ActionIDs.h"
+#include "input/Key.h"
 
 #define FAVOURITES_LIST 450
 

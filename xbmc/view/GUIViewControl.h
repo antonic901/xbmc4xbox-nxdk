@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "windowing/GraphicContext.h" // for VIEW_TYPE
+#include "guilib/GraphicContext.h" // for VIEW_TYPE
 
 #include <string>
 #include <vector>

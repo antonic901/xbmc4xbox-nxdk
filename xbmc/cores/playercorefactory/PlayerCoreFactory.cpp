@@ -9,11 +9,11 @@
 #include "PlayerCoreFactory.h"
 
 #include "FileItem.h"
+#include "ServiceBroker.h"
 #include "PlayerCoreConfig.h"
 #include "PlayerSelectionRule.h"
 #include "URL.h"
 #include "cores/IPlayerCallback.h"
-#include "cores/VideoPlayer/Interface/InputStreamConstants.h"
 #include "dialogs/GUIDialogContextMenu.h"
 #include "guilib/LocalizeStrings.h"
 #include "profiles/ProfileManager.h"
@@ -109,6 +109,7 @@ void CPlayerCoreFactory::GetPlayers(const CFileItem& item, std::vector<std::stri
 
   ForcedPlayer defaultInputstreamPlayerOverride = ForcedPlayer::NONE;
 
+#if 0
   // If we are using an inpustream add-on
   if (!item.GetProperty(STREAM_PROPERTY_INPUTSTREAM).empty())
   {
@@ -123,6 +124,7 @@ void CPlayerCoreFactory::GetPlayers(const CFileItem& item, std::vector<std::stri
         defaultInputstreamPlayerOverride = ForcedPlayer::AUDIO_DEFAULT;
     }
   }
+#endif
 
   std::vector<std::string>validPlayers;
   GetPlayers(validPlayers);

@@ -33,8 +33,7 @@
 #include "guilib/GUIKeyboardFactory.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
-#include "input/actions/Action.h"
-#include "input/actions/ActionIDs.h"
+#include "input/Key.h"
 #include "messaging/helpers/DialogOKHelper.h"
 #include "music/dialogs/GUIDialogMusicInfo.h"
 #include "playlists/PlayList.h"
@@ -64,7 +63,6 @@ using namespace XFILE;
 using namespace VIDEODATABASEDIRECTORY;
 using namespace VIDEO;
 using namespace ADDON;
-using namespace PVR;
 using namespace KODI::MESSAGING;
 
 #define CONTROL_BTNVIEWASICONS     2

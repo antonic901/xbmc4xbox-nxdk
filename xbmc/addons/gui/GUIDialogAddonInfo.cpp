@@ -17,7 +17,7 @@
 #include "addons/AddonManager.h"
 #include "addons/AddonRepos.h"
 #include "addons/AddonSystemSettings.h"
-#include "addons/AudioDecoder.h"
+#include "addons/kodi-dev-kit/include/kodi/addon-instance/AudioDecoder.h" // KODI_ADDON_AUDIODECODER_TRACK_EXT
 #include "addons/ExtsMimeSupportList.h"
 #include "addons/IAddon.h"
 #include "addons/addoninfo/AddonInfo.h"
@@ -27,12 +27,10 @@
 #include "dialogs/GUIDialogSelect.h"
 #include "dialogs/GUIDialogYesNo.h"
 #include "filesystem/Directory.h"
-#include "games/GameUtils.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
-#include "input/actions/Action.h"
-#include "input/actions/ActionIDs.h"
+#include "input/Key.h"
 #include "interfaces/builtins/Builtins.h"
 #include "messaging/helpers/DialogOKHelper.h"
 #include "pictures/GUIWindowSlideShow.h"
@@ -516,9 +514,6 @@ bool CGUIDialogAddonInfo::CanRun() const
   if (m_localAddon)
   {
     if (m_localAddon->Type() == AddonType::SCRIPT)
-      return true;
-
-    if (GAME::CGameUtils::IsStandaloneGame(m_localAddon))
       return true;
   }
 

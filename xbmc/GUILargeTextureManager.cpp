@@ -16,8 +16,7 @@
 #include "utils/JobManager.h"
 #include "utils/TimeUtils.h"
 #include "utils/log.h"
-#include "windowing/GraphicContext.h"
-#include "windowing/WinSystem.h"
+#include "guilib/GraphicContext.h"
 
 #include <cassert>
 #include <chrono>
@@ -30,7 +29,10 @@ CImageLoader::CImageLoader(const std::string& path, const bool useCache)
   m_use_cache = useCache;
 }
 
-CImageLoader::~CImageLoader() = default;
+CImageLoader::~CImageLoader()
+{
+  m_texture.reset();
+}
 
 bool CImageLoader::DoWork()
 {
@@ -51,8 +53,8 @@ bool CImageLoader::DoWork()
     // direct route - load the image
     auto start = std::chrono::steady_clock::now();
     m_texture =
-        CTexture::LoadFromFile(loadPath, CServiceBroker::GetWinSystem()->GetGfxContext().GetWidth(),
-                               CServiceBroker::GetWinSystem()->GetGfxContext().GetHeight());
+        CTexture::LoadFromFile(loadPath, g_graphicsContext.GetWidth(),
+                               g_graphicsContext.GetHeight());
 
     auto end = std::chrono::steady_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);

@@ -8,6 +8,7 @@
 
 #include "guilib/guiinfo/GUIInfoLabel.h"
 
+#include "ServiceBroker.h"
 #include "FileItem.h"
 #include "GUIInfoManager.h"
 #include "addons/Skin.h"

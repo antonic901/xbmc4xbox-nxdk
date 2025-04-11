@@ -17,7 +17,6 @@
 #include "addons/gui/GUIWindowAddonBrowser.h"
 #include "application/ApplicationComponents.h"
 #include "application/ApplicationSkinHandling.h"
-#include "dialogs/GUIDialogColorPicker.h"
 #include "dialogs/GUIDialogFileBrowser.h"
 #include "dialogs/GUIDialogNumeric.h"
 #include "dialogs/GUIDialogSelect.h"
@@ -315,6 +314,7 @@ static int SetImage(const std::vector<std::string>& params)
  */
 static int SetColor(const std::vector<std::string>& params)
 {
+#if 0
   int string = CSkinSettings::GetInstance().TranslateString(params[0]);
   std::string value = CSkinSettings::GetInstance().GetString(string);
 
@@ -347,6 +347,7 @@ static int SetColor(const std::vector<std::string>& params)
     value = pDlgColorPicker->GetSelectedColor();
     CSkinSettings::GetInstance().SetString(string, value);
   }
+#endif
 
   return 0;
 }

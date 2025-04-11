@@ -11,7 +11,6 @@
 #include "GUIUserMessages.h"
 #include "ServiceBroker.h"
 #include "dialogs/GUIDialogYesNo.h"
-#include "guilib/GUIColorButtonControl.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIControlGroupList.h"
 #include "guilib/GUIEditControl.h"
@@ -61,7 +60,6 @@ CGUIDialogSettingsBase::CGUIDialogSettingsBase(int windowId, const std::string& 
     m_pOriginalSpin(NULL),
     m_pOriginalSlider(NULL),
     m_pOriginalRadioButton(NULL),
-    m_pOriginalColorButton(nullptr),
     m_pOriginalCategoryButton(NULL),
     m_pOriginalButton(NULL),
     m_pOriginalEdit(NULL),
@@ -373,8 +371,6 @@ void CGUIDialogSettingsBase::SetupControls(bool createSettings /* = true */)
   m_pOriginalEdit = dynamic_cast<CGUIEditControl*>(GetControl(CONTROL_DEFAULT_EDIT));
   m_pOriginalGroupTitle =
       dynamic_cast<CGUILabelControl*>(GetControl(CONTROL_DEFAULT_SETTING_LABEL));
-  m_pOriginalColorButton =
-      dynamic_cast<CGUIColorButtonControl*>(GetControl(CONTROL_DEFAULT_COLORBUTTON));
 
   // if there's no edit control but there's a button control use that instead
   if (m_pOriginalEdit == nullptr && m_pOriginalButton != nullptr)
@@ -400,8 +396,6 @@ void CGUIDialogSettingsBase::SetupControls(bool createSettings /* = true */)
     m_pOriginalImage->SetVisible(false);
   if (m_pOriginalGroupTitle != nullptr)
     m_pOriginalGroupTitle->SetVisible(false);
-  if (m_pOriginalColorButton != nullptr)
-    m_pOriginalColorButton->SetVisible(false);
 
   // get the section
   SettingSectionPtr section = GetSection();
@@ -434,9 +428,6 @@ void CGUIDialogSettingsBase::SetupControls(bool createSettings /* = true */)
       if (m_pOriginalCategoryButton->GetControlType() == CGUIControl::GUICONTROL_TOGGLEBUTTON)
         pButton = new CGUIToggleButtonControl(
             *static_cast<CGUIToggleButtonControl*>(m_pOriginalCategoryButton));
-      else if (m_pOriginalCategoryButton->GetControlType() == CGUIControl::GUICONTROL_COLORBUTTON)
-        pButton = new CGUIColorButtonControl(
-            *static_cast<CGUIColorButtonControl*>(m_pOriginalCategoryButton));
       else
         pButton = new CGUIButtonControl(*m_pOriginalCategoryButton);
       pButton->SetLabel(GetSettingsLabel(*category));
@@ -765,17 +756,6 @@ CGUIControl* CGUIDialogSettingsBase::AddSetting(const std::shared_ptr<CSetting>&
     static_cast<CGUIButtonControl*>(pControl)->SetLabel(label);
     pSettingControl.reset(new CGUIControlLabelSetting(static_cast<CGUIButtonControl*>(pControl),
                                                       iControlID, pSetting, this));
-  }
-  else if (controlType == "colorbutton")
-  {
-    if (m_pOriginalColorButton)
-      pControl = m_pOriginalColorButton->Clone();
-    if (pControl == nullptr)
-      return nullptr;
-
-    static_cast<CGUIColorButtonControl*>(pControl)->SetLabel(label);
-    pSettingControl.reset(new CGUIControlColorButtonSetting(
-        static_cast<CGUIColorButtonControl*>(pControl), iControlID, pSetting, this));
   }
   else
     return nullptr;

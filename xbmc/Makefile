@@ -1,6 +1,7 @@
 SRCS += \
 	$(CURDIR)/xbmc/AutoSwitch.cpp \
 	$(CURDIR)/xbmc/BackgroundInfoLoader.cpp \
+	$(CURDIR)/xbmc/CompileInfo.cpp \
 	$(CURDIR)/xbmc/ContextMenuItem.cpp \
 	$(CURDIR)/xbmc/ContextMenuManager.cpp \
 	$(CURDIR)/xbmc/ContextMenus.cpp \

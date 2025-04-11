@@ -235,7 +235,7 @@ void CSkinInfo::Start()
   if (!m_resolutions.empty())
   {
     // find the closest resolution
-    const RESOLUTION_INFO &target = CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo();
+    const RESOLUTION_INFO &target = g_graphicsContext.GetResInfo();
     RESOLUTION_INFO& res = *std::min_element(m_resolutions.begin(), m_resolutions.end(), closestRes(target));
     m_currentAspect = res.strId;
   }
@@ -256,7 +256,7 @@ std::string CSkinInfo::GetSkinPath(const std::string& strFile, RESOLUTION_INFO *
     res = &tempRes;
 
   // find the closest resolution
-  const RESOLUTION_INFO &target = CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo();
+  const RESOLUTION_INFO &target = g_graphicsContext.GetResInfo();
   *res = *std::min_element(m_resolutions.begin(), m_resolutions.end(), closestRes(target));
 
   std::string strPath = URIUtils::AddFileToFolder(strPathToUse, res->strMode, strFile);
@@ -279,8 +279,8 @@ void CSkinInfo::LoadIncludes()
   std::string includesPath =
       CSpecialProtocol::TranslatePathConvertCase(GetSkinPath("Includes.xml"));
   CLog::Log(LOGINFO, "Loading skin includes from {}", includesPath);
-  m_includes.Clear();
-  m_includes.Load(includesPath);
+  m_includes.ClearIncludes();
+  m_includes.LoadIncludes(includesPath);
 }
 
 void CSkinInfo::LoadTimers()
@@ -301,7 +301,7 @@ void CSkinInfo::ResolveIncludes(TiXmlElement* node,
   if(xmlIncludeConditions)
     xmlIncludeConditions->clear();
 
-  m_includes.Resolve(node, xmlIncludeConditions);
+  m_includes.ResolveIncludes(node, xmlIncludeConditions);
 }
 
 int CSkinInfo::GetStartWindow() const

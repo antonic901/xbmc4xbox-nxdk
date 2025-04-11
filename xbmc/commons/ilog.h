@@ -17,10 +17,12 @@
 // ones we use in the code
 #define LOGDEBUG   0
 #define LOGINFO    1
-#define LOGWARNING 2
-#define LOGERROR   3
-#define LOGFATAL   4
-#define LOGNONE    5
+#define LOGNOTICE  2
+#define LOGWARNING 3
+#define LOGERROR   4
+#define LOGSEVERE  5
+#define LOGFATAL   6
+#define LOGNONE    7
 
 // extra masks - from bit 5
 #define LOGMASKBIT    5
@@ -43,4 +45,17 @@
 #define LOGPVR        (1 << (LOGMASKBIT + 15))
 #define LOGEPG        (1 << (LOGMASKBIT + 16))
 #define LOGANNOUNCE   (1 << (LOGMASKBIT + 17))
-#define LOGWSDISCOVERY (1 << (LOGMASKBIT + 18))
+
+#include "utils/params_check_macros.h"
+
+namespace XbmcCommons
+{
+  class ILogger
+  {
+  public:
+    virtual ~ILogger() = default;
+    void Log(int loglevel, PRINTF_FORMAT_STRING const char *format, ...) PARAM3_PRINTF_FORMAT;
+
+    virtual void log(int loglevel, IN_STRING const char* message) = 0;
+  };
+}

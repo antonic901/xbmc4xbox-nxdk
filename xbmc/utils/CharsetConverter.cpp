@@ -20,8 +20,8 @@
 #include <algorithm>
 #include <mutex>
 
-#include <fribidi.h>
-#include <iconv.h>
+#include <fribidi/fribidi.h>
+#include <libiconv/iconv.h>
 
 #ifdef WORDS_BIGENDIAN
   #define ENDIAN_SUFFIX "BE"

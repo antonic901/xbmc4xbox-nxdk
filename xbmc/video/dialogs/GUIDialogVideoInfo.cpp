@@ -52,7 +52,6 @@
 #include "video/VideoInfoTag.h"
 #include "video/VideoLibraryQueue.h"
 #include "video/VideoThumbLoader.h"
-#include "video/tags/VideoTagLoaderFFmpeg.h"
 #include "video/windows/GUIWindowVideoNav.h"
 
 #include <iterator>
@@ -899,6 +898,7 @@ void CGUIDialogVideoInfo::OnGetArt()
     }
 
     std::string embeddedArt;
+#if 0
     if (URIUtils::HasExtension(m_movieItem->GetVideoInfoTag()->m_strFileNameAndPath, ".mkv"))
     {
       CFileItem item(m_movieItem->GetVideoInfoTag()->m_strFileNameAndPath, false);
@@ -917,6 +917,7 @@ void CGUIDialogVideoInfo::OnGetArt()
         }
       }
     }
+#endif
 
     // Grab the thumbnails from the web
     m_movieItem->GetVideoInfoTag()->m_strPictureURL.Parse();
@@ -1023,6 +1024,7 @@ void CGUIDialogVideoInfo::OnGetFanart()
   }
 
   std::string embeddedArt;
+#if 0
   if (URIUtils::HasExtension(m_movieItem->GetVideoInfoTag()->m_strFileNameAndPath, ".mkv"))
   {
     CFileItem item(m_movieItem->GetVideoInfoTag()->m_strFileNameAndPath, false);
@@ -1041,6 +1043,7 @@ void CGUIDialogVideoInfo::OnGetFanart()
       }
     }
   }
+#endif
 
   // Grab the thumbnails from the web
   for (unsigned int i = 0; i < m_movieItem->GetVideoInfoTag()->m_fanart.GetNumFanarts(); i++)

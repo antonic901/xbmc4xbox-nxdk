@@ -4,6 +4,7 @@ SRCS += \
 	$(CURDIR)/xbmc/settings/LibExportSettings.cpp \
 	$(CURDIR)/xbmc/settings/MediaSettings.cpp \
 	$(CURDIR)/xbmc/settings/MediaSourceSettings.cpp \
+	$(CURDIR)/xbmc/settings/SettingAddon.cpp \
 	$(CURDIR)/xbmc/settings/SettingConditions.cpp \
 	$(CURDIR)/xbmc/settings/SettingControl.cpp \
 	$(CURDIR)/xbmc/settings/SettingDateTime.cpp \

@@ -17,7 +17,7 @@
 #include "settings/SettingsComponent.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
-#include "windowing/GraphicContext.h"
+#include "guilib/GraphicContext.h"
 
 #include <cassert>
 
@@ -171,10 +171,7 @@ std::string CSpecialProtocol::TranslatePath(const CURL &url)
     translatedPath = URIUtils::AddFileToFolder(CUtil::VideoPlaylistsLocation(), FileName);
   else if (RootDir == "skin")
   {
-    auto winSystem = CServiceBroker::GetWinSystem();
-    // windowing may not have been initialized yet
-    if (winSystem)
-      translatedPath = URIUtils::AddFileToFolder(winSystem->GetGfxContext().GetMediaDir(), FileName);
+    translatedPath = URIUtils::AddFileToFolder(g_graphicsContext.GetMediaDir(), FileName);
   }
   // from here on, we have our "real" special paths
   else if (RootDir == "xbmc" ||
@@ -284,8 +281,10 @@ void CSpecialProtocol::LogPaths()
   CLog::Log(LOGINFO, "special://temp/ is mapped to: {}", GetPath("temp"));
   CLog::Log(LOGINFO, "special://logpath/ is mapped to: {}", GetPath("logpath"));
   //CLog::Log(LOGINFO, "special://userhome/ is mapped to: {}", GetPath("userhome"));
+#if 0
   if (!CUtil::GetFrameworksPath().empty())
     CLog::Log(LOGINFO, "special://frameworks/ is mapped to: {}", GetPath("frameworks"));
+#endif
 }
 
 // private routines, to ensure we only set/get an appropriate path

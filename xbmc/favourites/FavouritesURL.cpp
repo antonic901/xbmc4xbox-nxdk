@@ -14,7 +14,7 @@
 #include "addons/AddonManager.h"
 #include "addons/IAddon.h"
 #include "guilib/LocalizeStrings.h"
-#include "input/WindowTranslator.h"
+#include "input/ButtonTranslator.h"
 #include "utils/ExecString.h"
 #include "utils/StringUtils.h"
 #include "utils/SystemInfo.h"
@@ -115,7 +115,7 @@ bool CFavouritesURL::Parse(CFavouritesURL::Action action, const std::vector<std:
       }
 
       // mandatory: window name/id
-      m_windowId = CWindowTranslator::TranslateWindow(params[0]);
+      m_windowId = CButtonTranslator::TranslateWindow(params[0]);
 
       if (params.size() > 1)
       {

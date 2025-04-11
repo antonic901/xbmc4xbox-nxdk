@@ -13,7 +13,6 @@
 #include "profiles/ProfileManager.h"
 #include "settings/SettingsComponent.h"
 #include "utils/log.h"
-#include "windowing/WinSystem.h"
 
 #include <stdexcept>
 #include <utility>
@@ -21,7 +20,7 @@
 using namespace KODI;
 
 CServiceBroker::CServiceBroker()
-  : m_pGUI(nullptr), m_pWinSystem(nullptr), m_pActiveAE(nullptr), m_decoderFilterManager(nullptr)
+  : m_pGUI(nullptr)
 {
 }
 
@@ -47,21 +46,6 @@ void CServiceBroker::UnregisterAppParams()
   g_serviceBroker.m_appParams.reset();
 }
 
-CLog& CServiceBroker::GetLogging()
-{
-  return *(g_serviceBroker.m_logging);
-}
-
-void CServiceBroker::CreateLogging()
-{
-  g_serviceBroker.m_logging = std::make_unique<CLog>();
-}
-
-void CServiceBroker::DestroyLogging()
-{
-  g_serviceBroker.m_logging.reset();
-}
-
 // announcement
 std::shared_ptr<ANNOUNCEMENT::CAnnouncementManager> CServiceBroker::GetAnnouncementManager()
 {
@@ -83,11 +67,6 @@ ADDON::CAddonMgr& CServiceBroker::GetAddonMgr()
   return g_application.m_ServiceManager->GetAddonMgr();
 }
 
-ADDON::CBinaryAddonManager& CServiceBroker::GetBinaryAddonManager()
-{
-  return g_application.m_ServiceManager->GetBinaryAddonManager();
-}
-
 ADDON::CBinaryAddonCache& CServiceBroker::GetBinaryAddonCache()
 {
   return g_application.m_ServiceManager->GetBinaryAddonCache();
@@ -98,37 +77,6 @@ ADDONS::CExtsMimeSupportList& CServiceBroker::GetExtsMimeSupportList()
   return g_application.m_ServiceManager->GetExtsMimeSupportList();
 }
 
-ADDON::CVFSAddonCache& CServiceBroker::GetVFSAddonCache()
-{
-  return g_application.m_ServiceManager->GetVFSAddonCache();
-}
-
-#ifdef HAS_PYTHON
-XBPython& CServiceBroker::GetXBPython()
-{
-  return g_application.m_ServiceManager->GetXBPython();
-}
-#endif
-
-#if defined(HAS_FILESYSTEM_SMB)
-WSDiscovery::IWSDiscovery& CServiceBroker::GetWSDiscovery()
-{
-  return g_application.m_ServiceManager->GetWSDiscovery();
-}
-#endif
-
-#if !defined(TARGET_WINDOWS) && defined(HAS_DVD_DRIVE)
-MEDIA_DETECT::CDetectDVDMedia& CServiceBroker::GetDetectDVDMedia()
-{
-  return g_application.m_ServiceManager->GetDetectDVDMedia();
-}
-#endif
-
-PVR::CPVRManager& CServiceBroker::GetPVRManager()
-{
-  return g_application.m_ServiceManager->GetPVRManager();
-}
-
 CContextMenuManager& CServiceBroker::GetContextMenuManager()
 {
   return g_application.m_ServiceManager->GetContextMenuManager();
@@ -137,11 +85,6 @@ CContextMenuManager& CServiceBroker::GetContextMenuManager()
 CDataCacheCore& CServiceBroker::GetDataCacheCore()
 {
   return g_application.m_ServiceManager->GetDataCacheCore();
-}
-
-CPlatform& CServiceBroker::GetPlatform()
-{
-  return g_application.m_ServiceManager->GetPlatform();
 }
 
 PLAYLIST::CPlayListPlayer& CServiceBroker::GetPlaylistPlayer()
@@ -164,26 +107,6 @@ std::shared_ptr<CSettingsComponent> CServiceBroker::GetSettingsComponent()
   return g_serviceBroker.m_pSettingsComponent;
 }
 
-GAME::CControllerManager& CServiceBroker::GetGameControllerManager()
-{
-  return g_application.m_ServiceManager->GetGameControllerManager();
-}
-
-GAME::CGameServices& CServiceBroker::GetGameServices()
-{
-  return g_application.m_ServiceManager->GetGameServices();
-}
-
-KODI::RETRO::CGUIGameRenderManager& CServiceBroker::GetGameRenderManager()
-{
-  return g_application.m_ServiceManager->GetGameRenderManager();
-}
-
-PERIPHERALS::CPeripherals& CServiceBroker::GetPeripherals()
-{
-  return g_application.m_ServiceManager->GetPeripherals();
-}
-
 CFavouritesService& CServiceBroker::GetFavouritesService()
 {
   return g_application.m_ServiceManager->GetFavouritesService();
@@ -199,19 +122,9 @@ ADDON::CRepositoryUpdater& CServiceBroker::GetRepositoryUpdater()
   return g_application.m_ServiceManager->GetRepositoryUpdater();
 }
 
-CInputManager& CServiceBroker::GetInputManager()
-{
-  return g_application.m_ServiceManager->GetInputManager();
-}
-
 CFileExtensionProvider& CServiceBroker::GetFileExtensionProvider()
 {
   return g_application.m_ServiceManager->GetFileExtensionProvider();
-}
-
-CNetworkBase& CServiceBroker::GetNetwork()
-{
-  return g_application.m_ServiceManager->GetNetwork();
 }
 
 bool CServiceBroker::IsAddonInterfaceUp()
@@ -222,34 +135,6 @@ bool CServiceBroker::IsAddonInterfaceUp()
 bool CServiceBroker::IsServiceManagerUp()
 {
   return g_application.m_ServiceManager && g_application.m_ServiceManager->init_level == 3;
-}
-
-CWinSystemBase* CServiceBroker::GetWinSystem()
-{
-  return g_serviceBroker.m_pWinSystem;
-}
-
-void CServiceBroker::RegisterWinSystem(CWinSystemBase* winsystem)
-{
-  g_serviceBroker.m_pWinSystem = winsystem;
-}
-
-void CServiceBroker::UnregisterWinSystem()
-{
-  g_serviceBroker.m_pWinSystem = nullptr;
-}
-
-CRenderSystemBase* CServiceBroker::GetRenderSystem()
-{
-  if (g_serviceBroker.m_pWinSystem)
-    return g_serviceBroker.m_pWinSystem->GetRenderSystem();
-
-  return nullptr;
-}
-
-CPowerManager& CServiceBroker::GetPowerManager()
-{
-  return g_application.m_ServiceManager->GetPowerManager();
 }
 
 CWeatherManager& CServiceBroker::GetWeatherManager()
@@ -265,18 +150,6 @@ CPlayerCoreFactory& CServiceBroker::GetPlayerCoreFactory()
 CDatabaseManager& CServiceBroker::GetDatabaseManager()
 {
   return g_application.m_ServiceManager->GetDatabaseManager();
-}
-
-CEventLog* CServiceBroker::GetEventLog()
-{
-  if (!g_serviceBroker.m_pSettingsComponent)
-    return nullptr;
-
-  auto profileManager = g_serviceBroker.m_pSettingsComponent->GetProfileManager();
-  if (!profileManager)
-    return nullptr;
-
-  return &profileManager->GetEventLog();
 }
 
 CMediaManager& CServiceBroker::GetMediaManager()
@@ -302,44 +175,6 @@ void CServiceBroker::RegisterGUI(CGUIComponent* gui)
 void CServiceBroker::UnregisterGUI()
 {
   g_serviceBroker.m_pGUI = nullptr;
-}
-
-// audio
-IAE* CServiceBroker::GetActiveAE()
-{
-  return g_serviceBroker.m_pActiveAE;
-}
-void CServiceBroker::RegisterAE(IAE* ae)
-{
-  g_serviceBroker.m_pActiveAE = ae;
-}
-void CServiceBroker::UnregisterAE()
-{
-  g_serviceBroker.m_pActiveAE = nullptr;
-}
-
-// application
-std::shared_ptr<CAppInboundProtocol> CServiceBroker::GetAppPort()
-{
-  return g_serviceBroker.m_pAppPort;
-}
-void CServiceBroker::RegisterAppPort(std::shared_ptr<CAppInboundProtocol> port)
-{
-  g_serviceBroker.m_pAppPort = std::move(port);
-}
-void CServiceBroker::UnregisterAppPort()
-{
-  g_serviceBroker.m_pAppPort.reset();
-}
-
-void CServiceBroker::RegisterDecoderFilterManager(CDecoderFilterManager* manager)
-{
-  g_serviceBroker.m_decoderFilterManager = manager;
-}
-
-CDecoderFilterManager* CServiceBroker::GetDecoderFilterManager()
-{
-  return g_serviceBroker.m_decoderFilterManager;
 }
 
 std::shared_ptr<CCPUInfo> CServiceBroker::GetCPUInfo()
@@ -401,36 +236,4 @@ void CServiceBroker::UnregisterAppMessenger()
 std::shared_ptr<KODI::MESSAGING::CApplicationMessenger> CServiceBroker::GetAppMessenger()
 {
   return g_serviceBroker.m_appMessenger;
-}
-
-void CServiceBroker::RegisterKeyboardLayoutManager(
-    const std::shared_ptr<CKeyboardLayoutManager>& keyboardLayoutManager)
-{
-  g_serviceBroker.m_keyboardLayoutManager = keyboardLayoutManager;
-}
-
-void CServiceBroker::UnregisterKeyboardLayoutManager()
-{
-  g_serviceBroker.m_keyboardLayoutManager.reset();
-}
-
-std::shared_ptr<CKeyboardLayoutManager> CServiceBroker::GetKeyboardLayoutManager()
-{
-  return g_serviceBroker.m_keyboardLayoutManager;
-}
-
-void CServiceBroker::RegisterSpeechRecognition(
-    const std::shared_ptr<speech::ISpeechRecognition>& speechRecognition)
-{
-  g_serviceBroker.m_speechRecognition = speechRecognition;
-}
-
-void CServiceBroker::UnregisterSpeechRecognition()
-{
-  g_serviceBroker.m_speechRecognition.reset();
-}
-
-std::shared_ptr<speech::ISpeechRecognition> CServiceBroker::GetSpeechRecognition()
-{
-  return g_serviceBroker.m_speechRecognition;
 }

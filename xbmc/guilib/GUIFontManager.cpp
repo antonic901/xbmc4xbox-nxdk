@@ -29,6 +29,8 @@
 #include "GUIControlFactory.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
+#include "settings/lib/Setting.h"
+#include "settings/lib/SettingDefinitions.h"
 #include "utils/log.h"
 #include "utils/URIUtils.h"
 #include "utils/StringUtils.h"
@@ -460,7 +462,7 @@ void GUIFontManager::GetStyle(const TiXmlNode *fontNode, int &iStyle)
   }
 }
 
-void GUIFontManager::SettingOptionsFontsFiller(const CSetting *setting, std::vector< std::pair<std::string, std::string> > &list, std::string &current, void *data)
+void GUIFontManager::SettingOptionsFontsFiller(const SettingConstPtr& setting, std::vector<StringSettingOption>& list, std::string& current, void* data)
 {
   CFileItemList items;
   CFileItemList items2;
@@ -478,7 +480,7 @@ void GUIFontManager::SettingOptionsFontsFiller(const CSetting *setting, std::vec
       if (!pItem->m_bIsFolder
           && URIUtils::HasExtension(pItem->GetLabel(), ".ttf"))
       {
-        list.push_back(make_pair(pItem->GetLabel(), pItem->GetLabel()));
+        list.emplace_back(pItem->GetLabel(), pItem->GetLabel());
       }
     }
   }

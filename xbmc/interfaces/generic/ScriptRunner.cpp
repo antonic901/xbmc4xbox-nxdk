@@ -136,7 +136,7 @@ bool CScriptRunner::WaitOnScriptResult(int scriptId,
       CRunningScriptObserver scriptObs(scriptId, m_scriptDone);
 
       auto& wm = CServiceBroker::GetGUI()->GetWindowManager();
-      if (wm.IsModalDialogTopmost(WINDOW_DIALOG_PROGRESS))
+      if (wm.IsWindowTopMost(WINDOW_DIALOG_PROGRESS))
       {
         auto progress = wm.GetWindow<CGUIDialogProgress>(WINDOW_DIALOG_PROGRESS);
         if (!progress->WaitOnEvent(m_scriptDone))

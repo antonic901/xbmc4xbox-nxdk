@@ -13,7 +13,7 @@
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
-#include "input/WindowTranslator.h"
+#include "input/ButtonTranslator.h"
 #include "storage/MediaManager.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
@@ -62,7 +62,7 @@ int GetTargetWindowID(const CFileItem& item)
   if (targetWindow.empty())
     iTargetWindow = CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow();
   else
-    iTargetWindow = CWindowTranslator::TranslateWindow(targetWindow);
+    iTargetWindow = CButtonTranslator::TranslateWindow(targetWindow);
 
   return iTargetWindow;
 }

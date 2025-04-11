@@ -17,11 +17,8 @@
 #include "URL.h"
 #include "Util.h"
 #include "VideoInfoDownloader.h"
-#include "cores/VideoPlayer/DVDFileInfo.h"
 #include "dialogs/GUIDialogExtendedProgressBar.h"
 #include "dialogs/GUIDialogProgress.h"
-#include "events/EventLog.h"
-#include "events/MediaLibraryEvent.h"
 #include "filesystem/Directory.h"
 #include "filesystem/DirectoryCache.h"
 #include "filesystem/File.h"
@@ -497,14 +494,6 @@ namespace VIDEO
           mediaType = MediaTypeTvShow;
         else if (info2->Content() == CONTENT_MUSICVIDEOS)
           mediaType = MediaTypeMusicVideo;
-
-        auto eventLog = CServiceBroker::GetEventLog();
-        if (eventLog)
-          eventLog->Add(EventPtr(new CMediaLibraryEvent(
-              mediaType, pItem->GetPath(), 24145,
-              StringUtils::Format(g_localizeStrings.Get(24147), mediaType,
-                                  URIUtils::GetFileName(pItem->GetPath())),
-              pItem->GetArt("thumb"), CURL::GetRedacted(pItem->GetPath()), EventLevel::Warning)));
       }
 
       pURL = NULL;
@@ -1370,11 +1359,13 @@ namespace VIDEO
                                      movieDetails.m_iSeason, movieDetails.m_iEpisode, strTitle);
     }
 
+#if 0
     if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
             CSettings::SETTING_MYVIDEOS_EXTRACTFLAGS) &&
         CDVDFileInfo::GetFileStreamDetails(pItem))
       CLog::Log(LOGDEBUG, "VideoInfoScanner: Extracted filestream details from video file {}",
                 CURL::GetRedacted(pItem->GetPath()));
+#endif
 
     CLog::Log(LOGDEBUG, "VideoInfoScanner: Adding new item to {}:{}", TranslateContent(content), CURL::GetRedacted(pItem->GetPath()));
     long lResult = -1;

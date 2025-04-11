@@ -18,17 +18,12 @@
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
-#include "guilib/StereoscopicsManager.h"
-#include "input/WindowTranslator.h"
-#include "input/actions/Action.h"
-#include "input/actions/ActionIDs.h"
-#include "input/actions/ActionTranslator.h"
+#include "input/ButtonTranslator.h"
+#include "input/Key.h"
 #include "messaging/ApplicationMessenger.h"
 #include "settings/AdvancedSettings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/AlarmClock.h"
-#include "utils/RssManager.h"
-#include "utils/Screenshot.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
@@ -42,10 +37,10 @@
 static int Action(const std::vector<std::string>& params)
 {
   // try translating the action from our ButtonTranslator
-  unsigned int actionID;
-  if (CActionTranslator::TranslateString(params[0], actionID))
+  int actionID;
+  if (CButtonTranslator::TranslateActionString(params[0].c_str(), actionID))
   {
-    int windowID = params.size() == 2 ? CWindowTranslator::TranslateWindow(params[1]) : WINDOW_INVALID;
+    int windowID = params.size() == 2 ? CButtonTranslator::TranslateWindow(params[1]) : WINDOW_INVALID;
     CServiceBroker::GetAppMessenger()->SendMsg(TMSG_GUI_ACTION, windowID, -1,
                                                static_cast<void*>(new CAction(actionID)));
   }
@@ -74,7 +69,7 @@ static int ActivateWindow(const std::vector<std::string>& params2)
   }
 
   // confirm the window destination is valid prior to switching
-  int iWindow = CWindowTranslator::TranslateWindow(strWindow);
+  int iWindow = CButtonTranslator::TranslateWindow(strWindow);
   if (iWindow != WINDOW_INVALID)
   {
     // compare the given directory param with the current active directory
@@ -130,7 +125,7 @@ static int ActivateAndFocus(const std::vector<std::string>& params)
   std::string strWindow = params[0];
 
   // confirm the window destination is valid prior to switching
-  int iWindow = CWindowTranslator::TranslateWindow(strWindow);
+  int iWindow = CButtonTranslator::TranslateWindow(strWindow);
   if (iWindow != WINDOW_INVALID)
   {
     if (iWindow != CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow())
@@ -235,7 +230,7 @@ static int CancelAlarm(const std::vector<std::string>& params)
  */
 static int ClearProperty(const std::vector<std::string>& params)
 {
-  CGUIWindow *window = CServiceBroker::GetGUI()->GetWindowManager().GetWindow(params.size() > 1 ? CWindowTranslator::TranslateWindow(params[1]) : CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindowOrDialog());
+  CGUIWindow *window = CServiceBroker::GetGUI()->GetWindowManager().GetWindow(params.size() > 1 ? CButtonTranslator::TranslateWindow(params[1]) : CServiceBroker::GetGUI()->GetWindowManager().GetFocusedWindow());
   if (window)
     window->SetProperty(params[0],"");
 
@@ -258,7 +253,7 @@ static int CloseDialog(const std::vector<std::string>& params)
   }
   else
   {
-    int id = CWindowTranslator::TranslateWindow(params[0]);
+    int id = CButtonTranslator::TranslateWindow(params[0]);
     CGUIWindow *window = CServiceBroker::GetGUI()->GetWindowManager().GetWindow(id);
     if (window && window->IsDialog())
       static_cast<CGUIDialog*>(window)->Close(bForce);
@@ -293,7 +288,9 @@ static int Notification(const std::vector<std::string>& params)
  */
 static int RefreshRSS(const std::vector<std::string>& params)
 {
+#if 0
   CRssManager::GetInstance().Reload();
+#endif
 
   return 0;
 }
@@ -305,6 +302,7 @@ static int RefreshRSS(const std::vector<std::string>& params)
  */
 static int Screenshot(const std::vector<std::string>& params)
 {
+#if 0
   if (!params.empty())
   {
     // get the parameters
@@ -335,6 +333,7 @@ static int Screenshot(const std::vector<std::string>& params)
   }
   else
     CScreenShot::TakeScreenshot();
+#endif
 
   return 0;
 }
@@ -358,7 +357,7 @@ static int SetLanguage(const std::vector<std::string>& params)
  */
 static int SetProperty(const std::vector<std::string>& params)
 {
-  CGUIWindow *window = CServiceBroker::GetGUI()->GetWindowManager().GetWindow(params.size() > 2 ? CWindowTranslator::TranslateWindow(params[2]) : CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindowOrDialog());
+  CGUIWindow *window = CServiceBroker::GetGUI()->GetWindowManager().GetWindow(params.size() > 2 ? CButtonTranslator::TranslateWindow(params[2]) : CServiceBroker::GetGUI()->GetWindowManager().GetFocusedWindow());
   if (window)
     window->SetProperty(params[0],params[1]);
 
@@ -371,6 +370,7 @@ static int SetProperty(const std::vector<std::string>& params)
  */
 static int SetStereoMode(const std::vector<std::string>& params)
 {
+#if 0
   CAction action = CStereoscopicsManager::ConvertActionCommandToAction("SetStereoMode", params[0]);
   if (action.GetID() != ACTION_NONE)
     CServiceBroker::GetAppMessenger()->SendMsg(TMSG_GUI_ACTION, WINDOW_INVALID, -1,
@@ -380,6 +380,7 @@ static int SetStereoMode(const std::vector<std::string>& params)
     CLog::Log(LOGERROR, "Builtin 'SetStereoMode' called with unknown parameter: {}", params[0]);
     return -2;
   }
+#endif
 
   return 0;
 }

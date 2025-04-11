@@ -17,7 +17,6 @@
 #include "addons/addoninfo/AddonType.h"
 #include "guilib/LocalizeStrings.h"
 #include "messaging/ApplicationMessenger.h"
-#include "pvr/PVRManager.h"
 #include "settings/AdvancedSettings.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
@@ -34,8 +33,6 @@
 
 #include <algorithm>
 #include <stdexcept>
-
-using namespace PVR;
 
 static std::string shortDateFormats[] = {
   // short date formats using "/"
@@ -772,7 +769,6 @@ bool CLangInfo::SetLanguage(std::string language /* = "" */, bool reloadServices
   {
     // also tell our weather and skin to reload as these are localized
     CServiceBroker::GetWeatherManager().Refresh();
-    CServiceBroker::GetPVRManager().LocalizationChanged();
     CServiceBroker::GetAppMessenger()->PostMsg(TMSG_EXECUTE_BUILT_IN, -1, -1, nullptr,
                                                "ReloadSkin");
   }

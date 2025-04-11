@@ -10,7 +10,9 @@
 
 #include "SystemInfo.h"
 #ifndef TARGET_POSIX
+#ifndef _XBOX
 #include <conio.h>
+#endif
 #else
 #include <sys/utsname.h>
 #endif
@@ -20,9 +22,11 @@
 #include "filesystem/File.h"
 #include "guilib/LocalizeStrings.h"
 #include "guilib/guiinfo/GUIInfoLabels.h"
+#ifndef _XBOX
 #include "network/Network.h"
 #include "platform/Filesystem.h"
 #include "rendering/RenderSystem.h"
+#endif
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/CPUInfo.h"
@@ -48,7 +52,9 @@ using namespace winrt::Windows::System::Profile;
 #if defined(TARGET_DARWIN)
 #include "platform/darwin/DarwinUtils.h"
 #endif
+#ifndef _XBOX
 #include "powermanagement/PowerManager.h"
+#endif
 #include "utils/StringUtils.h"
 #include "utils/XMLUtils.h"
 #if defined(TARGET_ANDROID)
@@ -301,21 +307,31 @@ CSysData::INTERNET_STATE CSysInfoJob::GetInternetState()
 
 std::string CSysInfoJob::GetMACAddress()
 {
+#if 0
   CNetworkInterface* iface = CServiceBroker::GetNetwork().GetFirstConnectedInterface();
   if (iface)
     return iface->GetMacAddress();
+#endif
 
   return "";
 }
 
 std::string CSysInfoJob::GetVideoEncoder()
 {
+#ifdef _XBOX
+  return "GPU: Custom NV2A";
+#else
   return "GPU: " + CServiceBroker::GetRenderSystem()->GetRenderRenderer();
+#endif
 }
 
 std::string CSysInfoJob::GetBatteryLevel()
 {
+#if 0
   return StringUtils::Format("{}%", CServiceBroker::GetPowerManager().BatteryLevel());
+#else
+  return "0%";
+#endif
 }
 
 bool CSysInfoJob::SystemUpTime(int iInputMinutes, int &iMinutes, int &iHours, int &iDays)
@@ -454,6 +470,7 @@ const std::string& CSysInfo::GetAppName(void)
 
 bool CSysInfo::GetDiskSpace(std::string drive,int& iTotal, int& iTotalFree, int& iTotalUsed, int& iPercentFree, int& iPercentUsed)
 {
+#if 0
   using namespace KODI::PLATFORM::FILESYSTEM;
 
   space_info total = {};
@@ -495,6 +512,9 @@ bool CSysInfo::GetDiskSpace(std::string drive,int& iTotal, int& iTotalFree, int&
   iPercentFree = 100 - iPercentUsed;
 
   return true;
+#else
+  return false;
+#endif
 }
 
 std::string CSysInfo::GetKernelName(bool emptyIfUnknown /*= false*/)
@@ -1233,12 +1253,14 @@ std::string CSysInfo::GetUserAgent()
 std::string CSysInfo::GetDeviceName()
 {
   std::string friendlyName = CServiceBroker::GetSettingsComponent()->GetSettings()->GetString(CSettings::SETTING_SERVICES_DEVICENAME);
+#if 0
   if (StringUtils::EqualsNoCase(friendlyName, CCompileInfo::GetAppName()))
   {
     std::string hostname("[unknown]");
     CServiceBroker::GetNetwork().GetHostName(hostname);
     return StringUtils::Format("{} ({})", friendlyName, hostname);
   }
+#endif
 
   return friendlyName;
 }

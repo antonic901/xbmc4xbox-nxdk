@@ -12,7 +12,6 @@
 #include "URL.h"
 #include "Util.h"
 #include "media/MediaLockState.h"
-#include "network/WakeOnAccess.h"
 #include "profiles/ProfileManager.h"
 #include "settings/SettingsComponent.h"
 #include "utils/FileUtils.h"
@@ -125,8 +124,6 @@ bool CMediaSourceSettings::Save(const std::string &file) const
   SetSources(pRoot, "pictures", m_pictureSources, m_defaultPictureSource);
   SetSources(pRoot, "files", m_fileSources, m_defaultFileSource);
   SetSources(pRoot, "games", m_gameSources, "");
-
-  CWakeOnAccess::GetInstance().QueueMACDiscoveryForAllRemotes();
 
   return doc.SaveFile(file);
 }

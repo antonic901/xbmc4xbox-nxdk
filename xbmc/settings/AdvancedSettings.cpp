@@ -65,7 +65,7 @@ void CAdvancedSettings::OnSettingsLoaded()
     m_logLevel = std::min(m_logLevelHint, LOG_LEVEL_DEBUG/*LOG_LEVEL_NORMAL*/);
     CLog::Log(LOGINFO, "Disabled debug logging due to GUI setting. Level {}.", m_logLevel);
   }
-  CServiceBroker::GetLogging().SetLogLevel(m_logLevel);
+  CLog::SetLogLevel(m_logLevel);
 }
 
 void CAdvancedSettings::OnSettingsUnloaded()
@@ -93,7 +93,7 @@ void CAdvancedSettings::Initialize(CSettingsManager& settingsMgr)
   {
     m_logLevel = LOG_LEVEL_DEBUG;
     m_logLevelHint = LOG_LEVEL_DEBUG;
-    CServiceBroker::GetLogging().SetLogLevel(LOG_LEVEL_DEBUG);
+    CLog::SetLogLevel(LOG_LEVEL_DEBUG);
   }
 
   const std::string& settingsFile = params->GetSettingsFile();
@@ -283,7 +283,6 @@ void CAdvancedSettings::Initialize()
 
   m_fanartRes = 1080;
   m_imageRes = 720;
-  m_imageScalingAlgorithm = CPictureScalingAlgorithm::Default;
   m_imageQualityJpeg = 4;
 
   m_sambaclienttimeout = 30;
@@ -915,7 +914,7 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
         setting->SetVisible(false);
     }
     m_logLevel = std::max(m_logLevel, m_logLevelHint);
-    CServiceBroker::GetLogging().SetLogLevel(m_logLevel);
+    CLog::SetLogLevel(m_logLevel);
   }
 
   XMLUtils::GetString(pRootElement, "cddbaddress", m_cddbAddress);
@@ -1084,8 +1083,6 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
 
   XMLUtils::GetUInt(pRootElement, "fanartres", m_fanartRes, 0, 9999);
   XMLUtils::GetUInt(pRootElement, "imageres", m_imageRes, 0, 9999);
-  if (XMLUtils::GetString(pRootElement, "imagescalingalgorithm", tmp))
-    m_imageScalingAlgorithm = CPictureScalingAlgorithm::FromString(tmp);
   XMLUtils::GetUInt(pRootElement, "imagequalityjpeg", m_imageQualityJpeg, 0, 21);
   XMLUtils::GetBoolean(pRootElement, "playlistasfolders", m_playlistAsFolders);
   XMLUtils::GetBoolean(pRootElement, "uselocalecollation", m_useLocaleCollation);
@@ -1432,7 +1429,7 @@ void CAdvancedSettings::SetDebugMode(bool debug)
   {
     int level = std::max(m_logLevelHint, LOG_LEVEL_DEBUG_FREEMEM);
     m_logLevel = level;
-    CServiceBroker::GetLogging().SetLogLevel(level);
+    CLog::SetLogLevel(level);
     CLog::Log(LOGINFO, "Enabled debug logging due to GUI setting. Level {}.", level);
   }
   else
@@ -1440,7 +1437,7 @@ void CAdvancedSettings::SetDebugMode(bool debug)
     int level = std::min(m_logLevelHint, LOG_LEVEL_DEBUG/*LOG_LEVEL_NORMAL*/);
     CLog::Log(LOGINFO, "Disabled debug logging due to GUI setting. Level {}.", level);
     m_logLevel = level;
-    CServiceBroker::GetLogging().SetLogLevel(level);
+    CLog::SetLogLevel(level);
   }
 }
 

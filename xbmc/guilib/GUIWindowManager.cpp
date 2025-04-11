@@ -922,6 +922,14 @@ void CGUIWindowManager::FrameMove()
   CServiceBroker::GetGUI()->GetInfoManager().UpdateAVInfo();
 }
 
+CGUIDialog* CGUIWindowManager::GetDialog(int id) const
+{
+  CGUIWindow *window = GetWindow(id);
+  if (window && window->IsDialog())
+    return dynamic_cast<CGUIDialog*>(window);
+  return nullptr;
+}
+
 CGUIWindow* CGUIWindowManager::GetWindow(int id) const
 {
   CGUIWindow *window;

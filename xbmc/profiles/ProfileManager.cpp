@@ -21,8 +21,6 @@
 #include "application/ApplicationPowerHandling.h"
 #include "dialogs/GUIDialogKaiToast.h"
 #include "dialogs/GUIDialogYesNo.h"
-#include "events/EventLog.h"
-#include "events/EventLogManager.h"
 #include "filesystem/Directory.h"
 #include "filesystem/DirectoryCache.h"
 #include "filesystem/File.h"
@@ -30,7 +28,6 @@
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
-#include "input/InputManager.h"
 #include "music/MusicLibraryQueue.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
@@ -50,11 +47,6 @@
 #include "addons/Service.h" //! @todo Remove me
 #include "application/Application.h" //! @todo Remove me
 #include "favourites/FavouritesService.h" //! @todo Remove me
-#include "guilib/StereoscopicsManager.h" //! @todo Remove me
-#include "interfaces/json-rpc/JSONRPC.h" //! @todo Remove me
-#include "network/Network.h" //! @todo Remove me
-#include "network/NetworkServices.h" //! @todo Remove me
-#include "pvr/PVRManager.h" //! @todo Remove me
 #include "utils/FileUtils.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
@@ -81,7 +73,7 @@ using namespace XFILE;
 
 static CProfile EmptyProfile;
 
-CProfileManager::CProfileManager() : m_eventLogs(new CEventLogManager)
+CProfileManager::CProfileManager()
 {
 }
 
@@ -262,18 +254,10 @@ void CProfileManager::PrepareLoadProfile(unsigned int profileIndex)
 {
   CContextMenuManager &contextMenuManager = CServiceBroker::GetContextMenuManager();
   ADDON::CServiceAddonManager &serviceAddons = CServiceBroker::GetServiceAddons();
-  PVR::CPVRManager &pvrManager = CServiceBroker::GetPVRManager();
-  CNetworkBase &networkManager = CServiceBroker::GetNetwork();
 
   contextMenuManager.Deinit();
 
   serviceAddons.Stop();
-
-  // stop PVR related services
-  pvrManager.Stop();
-
-  if (profileIndex != 0 || !IsMasterProfile())
-    networkManager.NetworkMessage(CNetworkBase::SERVICES_DOWN, 1);
 }
 
 bool CProfileManager::LoadProfile(unsigned int index)
@@ -327,9 +311,6 @@ bool CProfileManager::LoadProfile(unsigned int index)
   CreateProfileFolders();
 
   CServiceBroker::GetDatabaseManager().Initialize();
-  CServiceBroker::GetInputManager().LoadKeymaps();
-
-  CServiceBroker::GetInputManager().SetMouseEnabled(settings->GetBool(CSettings::SETTING_INPUT_ENABLEMOUSE));
 
   CGUIComponent* gui = CServiceBroker::GetGUI();
   if (gui)
@@ -378,13 +359,10 @@ void CProfileManager::FinalizeLoadProfile()
 {
   CContextMenuManager &contextMenuManager = CServiceBroker::GetContextMenuManager();
   ADDON::CServiceAddonManager &serviceAddons = CServiceBroker::GetServiceAddons();
-  PVR::CPVRManager &pvrManager = CServiceBroker::GetPVRManager();
-  CNetworkBase &networkManager = CServiceBroker::GetNetwork();
   ADDON::CAddonMgr &addonManager = CServiceBroker::GetAddonMgr();
   CWeatherManager &weatherManager = CServiceBroker::GetWeatherManager();
   CFavouritesService &favouritesManager = CServiceBroker::GetFavouritesService();
   PLAYLIST::CPlayListPlayer &playlistManager = CServiceBroker::GetPlaylistPlayer();
-  CStereoscopicsManager &stereoscopicsManager = CServiceBroker::GetGUI()->GetStereoscopicsManager();
 
   if (m_lastUsedProfile != m_currentProfile)
   {
@@ -392,8 +370,6 @@ void CProfileManager::FinalizeLoadProfile()
     playlistManager.ClearPlaylist(PLAYLIST::TYPE_MUSIC);
     playlistManager.SetCurrentPlaylist(PLAYLIST::TYPE_NONE);
   }
-
-  networkManager.NetworkMessage(CNetworkBase::SERVICES_UP, 1);
 
   // reload the add-ons, or we will first load all add-ons from the master account without checking disabled status
   addonManager.ReInit();
@@ -410,14 +386,8 @@ void CProfileManager::FinalizeLoadProfile()
 
   weatherManager.Refresh();
 
-  JSONRPC::CJSONRPC::Initialize();
-
   // Restart context menu manager
   contextMenuManager.Init();
-
-  // Restart PVR services if we are not just loading the master profile for the login screen
-  if (m_previousProfileLoadedForLogin || m_currentProfile != 0 || m_lastUsedProfile == 0)
-    pvrManager.Init();
 
   favouritesManager.ReInit(GetProfileUserDataFolder());
 
@@ -427,8 +397,6 @@ void CProfileManager::FinalizeLoadProfile()
     serviceAddons.Start();
     g_application.UpdateLibraries();
   }
-
-  stereoscopicsManager.Initialize();
 
   // Load initial window
   int firstWindow = g_SkinInfo->GetFirstWindow();
@@ -442,8 +410,6 @@ void CProfileManager::FinalizeLoadProfile()
 
 void CProfileManager::LogOff()
 {
-  CNetworkBase &networkManager = CServiceBroker::GetNetwork();
-
   g_application.StopPlaying();
 
   if (CMusicLibraryQueue::GetInstance().IsScanningLibrary())
@@ -451,11 +417,6 @@ void CProfileManager::LogOff()
 
   if (CVideoLibraryQueue::GetInstance().IsRunning())
     CVideoLibraryQueue::GetInstance().CancelAllJobs();
-
-  // Stop PVR services
-  CServiceBroker::GetPVRManager().Stop();
-
-  networkManager.NetworkMessage(CNetworkBase::SERVICES_DOWN, 1);
 
   LoadMasterProfileForLogin();
 
@@ -465,9 +426,6 @@ void CProfileManager::LogOff()
   const auto appPower = components.GetComponent<CApplicationPowerHandling>();
   appPower->WakeUpScreenSaverAndDPMS();
   CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_LOGIN_SCREEN, {}, false);
-
-  if (!CServiceBroker::GetNetwork().GetServices().StartEventServer()) // event server could be needed in some situations
-    CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Warning, g_localizeStrings.Get(33102), g_localizeStrings.Get(33100));
 }
 
 bool CProfileManager::DeleteProfile(unsigned int index)
@@ -721,19 +679,10 @@ std::string CProfileManager::GetUserDataItem(const std::string& strFile) const
   return path;
 }
 
-CEventLog& CProfileManager::GetEventLog()
-{
-  return m_eventLogs->GetEventLog(GetCurrentProfileId());
-}
-
 void CProfileManager::OnSettingAction(const std::shared_ptr<const CSetting>& setting)
 {
   if (setting == nullptr)
     return;
-
-  const std::string& settingId = setting->GetId();
-  if (settingId == CSettings::SETTING_EVENTLOG_SHOW)
-    GetEventLog().ShowFullEventLog();
 }
 
 void CProfileManager::SetCurrentProfileId(unsigned int profileId)
