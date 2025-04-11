@@ -23,6 +23,7 @@
 #include "PlayListPlayer.h"
 #include "ServiceManager.h"
 #include "application/ApplicationActionListeners.h"
+#include "application/ApplicationPowerHandling.h"
 #include "application/ApplicationSkinHandling.h"
 #include "playlists/PlayListFactory.h"
 #include "messaging/ApplicationMessenger.h"
@@ -42,12 +43,14 @@ CApplication::CApplication(void)
   // register application components
   RegisterComponent(std::make_shared<CApplicationActionListeners>(m_critSection));
   RegisterComponent(std::make_shared<CApplicationPlayer>());
+  RegisterComponent(std::make_shared<CApplicationPowerHandling>());
   RegisterComponent(std::make_shared<CApplicationSkinHandling>(this, this, m_bInitializing));
 }
 
 CApplication::~CApplication(void)
 {
   DeregisterComponent(typeid(CApplicationSkinHandling));
+  DeregisterComponent(typeid(CApplicationPowerHandling));
   DeregisterComponent(typeid(CApplicationPlayer));
   DeregisterComponent(typeid(CApplicationActionListeners));
 }
@@ -72,15 +75,6 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
 
 void CApplication::FrameMove(bool processEvents, bool processGUI)
 {
-}
-
-void CApplication::ResetScreenSaver()
-{
-}
-
-bool CApplication::ResetScreenSaverWindow()
-{
-  return false;
 }
 
 bool CApplication::PlayMedia(CFileItem& item, const std::string& player, PLAYLIST::Id playlistId)

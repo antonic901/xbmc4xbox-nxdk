@@ -122,12 +122,7 @@ public:
 
   std::string m_strPlayListFile;
 
-  inline bool IsInScreenSaver() { return false; };
-
   bool OnAction(const CAction &action);
-
-  void ResetScreenSaver();
-  bool ResetScreenSaverWindow(); // this is MAYBE WakeUpScreenSaverAndDPMS
 
   CApplicationPlayer* m_pPlayer;
 

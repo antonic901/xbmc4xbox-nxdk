@@ -9,15 +9,22 @@
 #include "Win32File.h"
 
 #include "utils/log.h"
+#include "URL.h"
 
+#ifndef NXDK
 #include "platform/win32/CharsetConverter.h"
 #include "platform/win32/WIN32Util.h"
+#endif
 
 #include <cassert>
 #include <wchar.h>
 
-#include <Windows.h>
+#include <windows.h>
+#ifdef NXDK
+#define DWORD_MAX       0xffffffffUL
+#else
 #include <intsafe.h>
+#endif
 #include <sys/stat.h>
 
 
@@ -59,16 +66,27 @@ bool CWin32File::Open(const CURL& url)
     return false;
   }
 
+#ifdef NXDK
+  std::string pathnameW(url.Get());
+#else
   std::wstring pathnameW(CWIN32Util::ConvertPathToWin32Form(url));
+#endif
   if (pathnameW.length() <= 6) // 6 is length of "\\?\x:"
     return false; // pathnameW is empty or points to device ("\\?\x:")
 
+#ifdef NXDK
+  assert((pathnameW.compare(4, 4, "UNC\\", 4) == 0 && m_smbFile) || !m_smbFile);
+#else
   assert((pathnameW.compare(4, 4, L"UNC\\", 4) == 0 && m_smbFile) || !m_smbFile);
+#endif
 
   m_filepathnameW = pathnameW;
 #ifdef TARGET_WINDOWS_STORE
   m_hFile = CreateFile2(pathnameW.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
                         OPEN_EXISTING, NULL);
+#elif NXDK
+  m_hFile = CreateFileA(pathnameW.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+                        NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 #else
   m_hFile = CreateFileW(pathnameW.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
                         NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -88,15 +106,26 @@ bool CWin32File::OpenForWrite(const CURL& url, bool bOverWrite /*= false*/)
   if (m_hFile != INVALID_HANDLE_VALUE)
     return false;
 
+#ifdef NXDK
+  std::string pathnameW(url.Get());
+#else
   std::wstring pathnameW(CWIN32Util::ConvertPathToWin32Form(url));
+#endif
   if (pathnameW.length() <= 6) // 6 is length of "\\?\x:"
     return false; // pathnameW is empty or points to device ("\\?\x:")
 
+#ifdef NXDK
+  assert((pathnameW.compare(4, 4, "UNC\\", 4) == 0 && m_smbFile) || !m_smbFile);
+#else
   assert((pathnameW.compare(4, 4, L"UNC\\", 4) == 0 && m_smbFile) || !m_smbFile);
+#endif
 
 #ifdef TARGET_WINDOWS_STORE
   m_hFile = CreateFile2(pathnameW.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ,
                         bOverWrite ? CREATE_ALWAYS : OPEN_ALWAYS, NULL);
+#elif NXDK
+  m_hFile = CreateFileA(pathnameW.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ,
+                        NULL, bOverWrite ? CREATE_ALWAYS : OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 #else
   m_hFile = CreateFileW(pathnameW.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ,
                         NULL, bOverWrite ? CREATE_ALWAYS : OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -121,6 +150,7 @@ bool CWin32File::OpenForWrite(const CURL& url, bool bOverWrite /*= false*/)
       return false;
     }
   }
+#ifndef NXDK
   else
   { // newly created file
     /* set "hidden" attribute if filename starts with a period */
@@ -142,11 +172,17 @@ bool CWin32File::OpenForWrite(const CURL& url, bool bOverWrite /*= false*/)
       }
       if (!hiddenSet)
       {
+#ifdef NXDK
+        CLog::LogF(LOGWARNING, "Can't set hidden attribute for file \"{}\"",
+                   pathnameW);
+#else
         CLog::LogF(LOGWARNING, "Can't set hidden attribute for file \"{}\"",
                    KODI::PLATFORM::WINDOWS::FromW(pathnameW));
+#endif
       }
     }
   }
+#endif
 
   m_allowWrite = true;
 
@@ -361,7 +397,12 @@ void CWin32File::Flush()
     return;
   }
 
+#ifdef NXDK
+  IO_STATUS_BLOCK ioStatus;
+  NtFlushBuffersFile(m_hFile, &ioStatus);
+#else
   FlushFileBuffers(m_hFile);
+#endif
 }
 
 bool CWin32File::Delete(const CURL& url)
@@ -370,11 +411,19 @@ bool CWin32File::Delete(const CURL& url)
   if (m_smbFile)
     m_lastSMBFileErr = ERROR_INVALID_DATA; // used to indicate internal errors, cleared by successful file operation
 
+#ifdef NXDK
+  std::string pathnameW(url.Get());
+#else
   std::wstring pathnameW(CWIN32Util::ConvertPathToWin32Form(url));
+#endif
   if (pathnameW.empty())
     return false;
 
+#ifdef NXDK
+  const bool result = (DeleteFileA(pathnameW.c_str()) != 0);
+#else
   const bool result = (DeleteFileW(pathnameW.c_str()) != 0);
+#endif
   if (m_smbFile)
     m_lastSMBFileErr = GetLastError(); // set real error state
 
@@ -389,15 +438,27 @@ bool CWin32File::Rename(const CURL& urlCurrentName, const CURL& urlNewName)
     m_lastSMBFileErr = ERROR_INVALID_DATA; // used to indicate internal errors, cleared by successful file operation
 
   //! @todo check whether it's file or directory
+#ifdef NXDK
+  std::string curNameW(urlCurrentName.Get());
+#else
   std::wstring curNameW(CWIN32Util::ConvertPathToWin32Form(urlCurrentName));
+#endif
   if (curNameW.empty())
     return false;
 
+#ifdef NXDK
+  std::string newNameW(urlNewName.Get());
+#else
   std::wstring newNameW(CWIN32Util::ConvertPathToWin32Form(urlNewName));
+#endif
   if (newNameW.empty())
     return false;
 
+#ifdef NXDK
+  const bool result = (MoveFileA(curNameW.c_str(), newNameW.c_str()) != 0);
+#else
   const bool result = (MoveFileExW(curNameW.c_str(), newNameW.c_str(), MOVEFILE_COPY_ALLOWED) != 0);
+#endif
   if (m_smbFile)
     m_lastSMBFileErr = GetLastError(); // set real error state
 
@@ -410,11 +471,19 @@ bool CWin32File::SetHidden(const CURL& url, bool hidden)
   if (m_smbFile)
     m_lastSMBFileErr = ERROR_INVALID_DATA; // used to indicate internal errors, cleared by successful file operation
 
+#ifdef NXDK
+  std::string pathnameW(url.Get());
+#else
   std::wstring pathnameW(CWIN32Util::ConvertPathToWin32Form(url));
+#endif
   if (pathnameW.empty())
     return false;
 
+#ifdef NXDK
+  const DWORD attrs = GetFileAttributesA(pathnameW.c_str());
+#else
   const DWORD attrs = GetFileAttributesW(pathnameW.c_str());
+#endif
   if (attrs == INVALID_FILE_ATTRIBUTES || (attrs & FILE_ATTRIBUTE_DIRECTORY) != 0)
     return false;
 
@@ -424,9 +493,15 @@ bool CWin32File::SetHidden(const CURL& url, bool hidden)
 
   bool result;
   if (hidden)
+#ifdef NXDK
+    result = (SetFileAttributesA(pathnameW.c_str(), attrs | FILE_ATTRIBUTE_HIDDEN) != 0);
+  else
+    result = SetFileAttributesA(pathnameW.c_str(), attrs & ~FILE_ATTRIBUTE_HIDDEN) != 0;
+#else
     result = (SetFileAttributesW(pathnameW.c_str(), attrs | FILE_ATTRIBUTE_HIDDEN) != 0);
   else
     result = SetFileAttributesW(pathnameW.c_str(), attrs & ~FILE_ATTRIBUTE_HIDDEN) != 0;
+#endif
   if (m_smbFile)
     m_lastSMBFileErr = GetLastError(); // set real error state
 
@@ -439,328 +514,340 @@ bool CWin32File::Exists(const CURL& url)
   if (m_smbFile)
     m_lastSMBFileErr = ERROR_INVALID_DATA; // used to indicate internal errors, cleared by successful file operation
 
+#ifdef NXDK
+  std::string pathnameW(url.Get());
+#else
   std::wstring pathnameW(CWIN32Util::ConvertPathToWin32Form(url));
+#endif
   if (pathnameW.empty())
     return false;
 
+#ifdef NXDK
+  const DWORD attrs = GetFileAttributesA(pathnameW.c_str());
+#else
   const DWORD attrs = GetFileAttributesW(pathnameW.c_str());
+#endif
   if (m_smbFile)
     m_lastSMBFileErr = GetLastError(); // set real error state
 
   return attrs != INVALID_FILE_ATTRIBUTES && (attrs & FILE_ATTRIBUTE_DIRECTORY) == 0;
 }
 
-int CWin32File::Stat(const CURL& url, struct __stat64* statData)
-{
-  assert((!m_smbFile && url.GetProtocol().empty()) || (m_smbFile && url.IsProtocol("smb"))); // function suitable only for local or SMB files
-  if (m_smbFile)
-    m_lastSMBFileErr = ERROR_INVALID_DATA; // used to indicate internal errors, cleared by successful file operation
+// int CWin32File::Stat(const CURL& url, struct __stat64* statData)
+// {
+//   assert((!m_smbFile && url.GetProtocol().empty()) || (m_smbFile && url.IsProtocol("smb"))); // function suitable only for local or SMB files
+//   if (m_smbFile)
+//     m_lastSMBFileErr = ERROR_INVALID_DATA; // used to indicate internal errors, cleared by successful file operation
 
-  if (!statData)
-    return -1;
+//   if (!statData)
+//     return -1;
 
-  std::wstring pathnameW(CWIN32Util::ConvertPathToWin32Form(url));
-  if (pathnameW.empty())
-  {
-    errno = ENOENT;
-    return -1;
-  }
+// #ifdef NXDK
+//   std::string pathnameW(url.Get());
+// #else
+//   std::wstring pathnameW(CWIN32Util::ConvertPathToWin32Form(url));
+// #endif
+//   if (pathnameW.empty())
+//   {
+//     errno = ENOENT;
+//     return -1;
+//   }
 
-  if (pathnameW.length() <= 6) // 6 is length of "\\?\x:"
-    return -1; // pathnameW is empty or points to device ("\\?\x:"), on win32 stat() for devices is not supported
+//   if (pathnameW.length() <= 6) // 6 is length of "\\?\x:"
+//     return -1; // pathnameW is empty or points to device ("\\?\x:"), on win32 stat() for devices is not supported
 
-  assert((pathnameW.compare(4, 4, L"UNC\\", 4) == 0 && m_smbFile) || !m_smbFile);
+//   assert((pathnameW.compare(4, 4, L"UNC\\", 4) == 0 && m_smbFile) || !m_smbFile);
 
-  // get maximum information about file from search function
-  HANDLE hSearch;
-  WIN32_FIND_DATAW findData;
-  hSearch = FindFirstFileExW(pathnameW.c_str(), FindExInfoBasic, &findData, FindExSearchNameMatch, NULL, 0);
+//   // get maximum information about file from search function
+//   HANDLE hSearch;
+//   WIN32_FIND_DATAW findData;
+//   hSearch = FindFirstFileExW(pathnameW.c_str(), FindExInfoBasic, &findData, FindExSearchNameMatch, NULL, 0);
 
-  if (m_smbFile)
-    m_lastSMBFileErr = GetLastError(); // set real error state
+//   if (m_smbFile)
+//     m_lastSMBFileErr = GetLastError(); // set real error state
 
-  if (hSearch == INVALID_HANDLE_VALUE)
-    return -1;
+//   if (hSearch == INVALID_HANDLE_VALUE)
+//     return -1;
 
-  FindClose(hSearch);
+//   FindClose(hSearch);
 
-  *statData = {};
+//   *statData = {};
 
-  /* set st_gid */
-  statData->st_gid = 0; // UNIX group ID is always zero on Win32
+//   /* set st_gid */
+//   statData->st_gid = 0; // UNIX group ID is always zero on Win32
 
-  /* set st_uid */
-  statData->st_uid = 0; // UNIX user ID is always zero on Win32
+//   /* set st_uid */
+//   statData->st_uid = 0; // UNIX user ID is always zero on Win32
 
-  /* set st_ino */
-  statData->st_ino = 0; // inode number is not implemented on Win32
+//   /* set st_ino */
+//   statData->st_ino = 0; // inode number is not implemented on Win32
 
-  /* set st_size */
-  statData->st_size = (__int64(findData.nFileSizeHigh) << 32) + __int64(findData.nFileSizeLow);
+//   /* set st_size */
+//   statData->st_size = (__int64(findData.nFileSizeHigh) << 32) + __int64(findData.nFileSizeLow);
 
-  /* set st_dev and st_rdev */
-  if (!m_smbFile)
-  {
-    assert(pathnameW.compare(0, 4, L"\\\\?\\", 4) == 0);
-    assert(pathnameW.length() >= 7); // '7' is the minimal length of "\\?\x:\"
-    assert(pathnameW[5] == L':');
-    const wchar_t driveLetter = pathnameW[4];
-    assert((driveLetter >= L'A' && driveLetter <= L'Z') || (driveLetter >= L'a' && driveLetter <= L'z'));
-    statData->st_dev = (driveLetter >= L'a') ? driveLetter - L'a' : driveLetter - L'A';
-  }
-  else
-    statData->st_dev = 0;
-  statData->st_rdev = statData->st_dev;
+//   /* set st_dev and st_rdev */
+//   if (!m_smbFile)
+//   {
+//     assert(pathnameW.compare(0, 4, L"\\\\?\\", 4) == 0);
+//     assert(pathnameW.length() >= 7); // '7' is the minimal length of "\\?\x:\"
+//     assert(pathnameW[5] == L':');
+//     const wchar_t driveLetter = pathnameW[4];
+//     assert((driveLetter >= L'A' && driveLetter <= L'Z') || (driveLetter >= L'a' && driveLetter <= L'z'));
+//     statData->st_dev = (driveLetter >= L'a') ? driveLetter - L'a' : driveLetter - L'A';
+//   }
+//   else
+//     statData->st_dev = 0;
+//   statData->st_rdev = statData->st_dev;
 
-#ifdef TARGET_WINDOWS_STORE
-  const HANDLE hFile = CreateFile2(pathnameW.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
-    OPEN_EXISTING, NULL);
-#else
-  const HANDLE hFile = CreateFileW(pathnameW.c_str(), FILE_READ_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-#endif
-  /* set st_nlink */
-  statData->st_nlink = 1; // fallback value
-  if (hFile != INVALID_HANDLE_VALUE)
-  {
-    _FILE_STANDARD_INFO stdInfo;
-    if (GetFileInformationByHandleEx(hFile, FileStandardInfo, &stdInfo, sizeof(stdInfo)) != 0)
-      statData->st_nlink = (stdInfo.NumberOfLinks > SHORT_MAX) ? SHORT_MAX : short(stdInfo.NumberOfLinks);
-  }
+// #ifdef TARGET_WINDOWS_STORE
+//   const HANDLE hFile = CreateFile2(pathnameW.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+//     OPEN_EXISTING, NULL);
+// #else
+//   const HANDLE hFile = CreateFileW(pathnameW.c_str(), FILE_READ_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+// #endif
+//   /* set st_nlink */
+//   statData->st_nlink = 1; // fallback value
+//   if (hFile != INVALID_HANDLE_VALUE)
+//   {
+//     _FILE_STANDARD_INFO stdInfo;
+//     if (GetFileInformationByHandleEx(hFile, FileStandardInfo, &stdInfo, sizeof(stdInfo)) != 0)
+//       statData->st_nlink = (stdInfo.NumberOfLinks > SHORT_MAX) ? SHORT_MAX : short(stdInfo.NumberOfLinks);
+//   }
 
-  /* set st_mtime, st_atime, st_ctime */
-  statData->st_mtime = 0;
-  statData->st_atime = 0;
-  statData->st_ctime = 0;
-  if (hFile != INVALID_HANDLE_VALUE)
-  {
-    FILE_BASIC_INFO basicInfo;
-    if (GetFileInformationByHandleEx(hFile, FileBasicInfo, &basicInfo, sizeof(basicInfo)) != 0)
-    {
-      statData->st_mtime = CWIN32Util::fileTimeToTimeT(basicInfo.LastWriteTime);
-      statData->st_atime = CWIN32Util::fileTimeToTimeT(basicInfo.LastAccessTime);
-      statData->st_ctime = CWIN32Util::fileTimeToTimeT(basicInfo.CreationTime);
-    }
-    CloseHandle(hFile);
-  }
-  if (statData->st_mtime == 0)
-    statData->st_mtime = CWIN32Util::fileTimeToTimeT(findData.ftLastWriteTime);
+//   /* set st_mtime, st_atime, st_ctime */
+//   statData->st_mtime = 0;
+//   statData->st_atime = 0;
+//   statData->st_ctime = 0;
+//   if (hFile != INVALID_HANDLE_VALUE)
+//   {
+//     FILE_BASIC_INFO basicInfo;
+//     if (GetFileInformationByHandleEx(hFile, FileBasicInfo, &basicInfo, sizeof(basicInfo)) != 0)
+//     {
+//       statData->st_mtime = CWIN32Util::fileTimeToTimeT(basicInfo.LastWriteTime);
+//       statData->st_atime = CWIN32Util::fileTimeToTimeT(basicInfo.LastAccessTime);
+//       statData->st_ctime = CWIN32Util::fileTimeToTimeT(basicInfo.CreationTime);
+//     }
+//     CloseHandle(hFile);
+//   }
+//   if (statData->st_mtime == 0)
+//     statData->st_mtime = CWIN32Util::fileTimeToTimeT(findData.ftLastWriteTime);
 
-  if (statData->st_atime == 0)
-    statData->st_atime = CWIN32Util::fileTimeToTimeT(findData.ftLastAccessTime);
-  if (statData->st_atime == 0)
-    statData->st_atime = statData->st_mtime;
+//   if (statData->st_atime == 0)
+//     statData->st_atime = CWIN32Util::fileTimeToTimeT(findData.ftLastAccessTime);
+//   if (statData->st_atime == 0)
+//     statData->st_atime = statData->st_mtime;
 
-  if (statData->st_ctime == 0)
-    statData->st_ctime = CWIN32Util::fileTimeToTimeT(findData.ftCreationTime);
-  if (statData->st_ctime == 0)
-    statData->st_ctime = statData->st_mtime;
+//   if (statData->st_ctime == 0)
+//     statData->st_ctime = CWIN32Util::fileTimeToTimeT(findData.ftCreationTime);
+//   if (statData->st_ctime == 0)
+//     statData->st_ctime = statData->st_mtime;
 
-  /* set st_mode */
-  statData->st_mode = _S_IREAD; // Always assume Read permission for file owner
-#ifdef TARGET_WINDOWS_STORE
-  if ((findData.dwFileAttributes & FILE_ATTRIBUTE_READONLY) == 0)
-#else
-  if ((findData.dwFileAttributes & FILE_READ_ONLY) == 0)
-#endif
-    statData->st_mode |= _S_IWRITE; // Write possible
-  if ((findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
-    statData->st_mode |= _S_IFDIR | _S_IEXEC; // directory
-  else
-  {
-    statData->st_mode |= _S_IFREG; // file
-    // following large piece of code is disabled
-    // as it intended only to set _S_IEXEC flag
-    // which is not used by callers
-#ifdef WIN32_USE_FILE_STAT_MAX_INFO
-    // set _S_IEXEC if file has executable extension
-    const size_t lastDot = pathnameW.rfind(L'.');
-    if (lastDot != std::wstring::npos && pathnameW.rfind(L'\\') < lastDot)
-    { // file has some extension
-      const std::wstring fileExt(pathnameW, lastDot);
-      std::vector<wchar_t> buf(32767); // maximum possible size
-      const DWORD envRes = GetEnvironmentVariableW(L"PATHEXT", buf.data(), buf.size());
-      std::vector<std::wstring> listExts;
-      if (envRes == 0 || envRes > buf.size())
-      {
-        buf.clear();
-        static const wchar_t* extArr[] = { L".exe", L".bat", L".cmd", L".com" };
-        listExts.assign(extArr, extArr + (sizeof(extArr) / sizeof(extArr[0])));
-      }
-      else
-      {
-        std::wstring envPathextW(buf.data(), envRes);
-        buf.clear();
-        size_t posExt = envPathextW.find_first_not_of(L';'); // skip ';' at the start
-        while (posExt != std::wstring::npos)
-        {
-          const size_t posSemicol = envPathextW.find(L';', posExt);
-          listExts.push_back(envPathextW.substr(posExt, posSemicol - posExt));
-          posExt = envPathextW.find_first_not_of(L";", posSemicol);
-        }
-      }
-      const wchar_t* const fileExtC = fileExt.c_str();
-      for (const auto& it : listExts)
-      {
-        if (_wcsicmp(fileExtC, it.c_str()) == 0)
-        {
-          statData->st_mode |= _S_IEXEC; // file can be executed
-          break;
-        }
-      }
-    }
-#endif // WIN32_USE_FILE_STAT_MAX_INFO
-  }
-  // copy user RWX rights to group rights
-  statData->st_mode |= (statData->st_mode & (_S_IREAD | _S_IWRITE | _S_IEXEC)) >> 3;
-  // copy user RWX rights to other rights
-  statData->st_mode |= (statData->st_mode & (_S_IREAD | _S_IWRITE | _S_IEXEC)) >> 6;
+//   /* set st_mode */
+//   statData->st_mode = _S_IREAD; // Always assume Read permission for file owner
+// #ifdef TARGET_WINDOWS_STORE
+//   if ((findData.dwFileAttributes & FILE_ATTRIBUTE_READONLY) == 0)
+// #else
+//   if ((findData.dwFileAttributes & FILE_READ_ONLY) == 0)
+// #endif
+//     statData->st_mode |= _S_IWRITE; // Write possible
+//   if ((findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
+//     statData->st_mode |= _S_IFDIR | _S_IEXEC; // directory
+//   else
+//   {
+//     statData->st_mode |= _S_IFREG; // file
+//     // following large piece of code is disabled
+//     // as it intended only to set _S_IEXEC flag
+//     // which is not used by callers
+// #ifdef WIN32_USE_FILE_STAT_MAX_INFO
+//     // set _S_IEXEC if file has executable extension
+//     const size_t lastDot = pathnameW.rfind(L'.');
+//     if (lastDot != std::wstring::npos && pathnameW.rfind(L'\\') < lastDot)
+//     { // file has some extension
+//       const std::wstring fileExt(pathnameW, lastDot);
+//       std::vector<wchar_t> buf(32767); // maximum possible size
+//       const DWORD envRes = GetEnvironmentVariableW(L"PATHEXT", buf.data(), buf.size());
+//       std::vector<std::wstring> listExts;
+//       if (envRes == 0 || envRes > buf.size())
+//       {
+//         buf.clear();
+//         static const wchar_t* extArr[] = { L".exe", L".bat", L".cmd", L".com" };
+//         listExts.assign(extArr, extArr + (sizeof(extArr) / sizeof(extArr[0])));
+//       }
+//       else
+//       {
+//         std::wstring envPathextW(buf.data(), envRes);
+//         buf.clear();
+//         size_t posExt = envPathextW.find_first_not_of(L';'); // skip ';' at the start
+//         while (posExt != std::wstring::npos)
+//         {
+//           const size_t posSemicol = envPathextW.find(L';', posExt);
+//           listExts.push_back(envPathextW.substr(posExt, posSemicol - posExt));
+//           posExt = envPathextW.find_first_not_of(L";", posSemicol);
+//         }
+//       }
+//       const wchar_t* const fileExtC = fileExt.c_str();
+//       for (const auto& it : listExts)
+//       {
+//         if (_wcsicmp(fileExtC, it.c_str()) == 0)
+//         {
+//           statData->st_mode |= _S_IEXEC; // file can be executed
+//           break;
+//         }
+//       }
+//     }
+// #endif // WIN32_USE_FILE_STAT_MAX_INFO
+//   }
+//   // copy user RWX rights to group rights
+//   statData->st_mode |= (statData->st_mode & (_S_IREAD | _S_IWRITE | _S_IEXEC)) >> 3;
+//   // copy user RWX rights to other rights
+//   statData->st_mode |= (statData->st_mode & (_S_IREAD | _S_IWRITE | _S_IEXEC)) >> 6;
 
-  return 0;
-}
+//   return 0;
+// }
 
-int CWin32File::Stat(struct __stat64* statData)
-{
-  if (!statData)
-    return -1;
+// int CWin32File::Stat(struct __stat64* statData)
+// {
+//   if (!statData)
+//     return -1;
 
-  if (m_hFile == INVALID_HANDLE_VALUE)
-    return -1;
+//   if (m_hFile == INVALID_HANDLE_VALUE)
+//     return -1;
 
-  *statData = {};
+//   *statData = {};
 
-  /* set st_gid */
-  statData->st_gid = 0; // UNIX group ID is always zero on Win32
+//   /* set st_gid */
+//   statData->st_gid = 0; // UNIX group ID is always zero on Win32
 
-  /* set st_uid */
-  statData->st_uid = 0; // UNIX user ID is always zero on Win32
+//   /* set st_uid */
+//   statData->st_uid = 0; // UNIX user ID is always zero on Win32
 
-  /* set st_ino */
-  statData->st_ino = 0; // inode number is not implemented on Win32
+//   /* set st_ino */
+//   statData->st_ino = 0; // inode number is not implemented on Win32
 
-  /* set st_mtime, st_atime, st_ctime */
-  statData->st_mtime = 0;
-  statData->st_atime = 0;
-  statData->st_ctime = 0;
-  FILE_BASIC_INFO basicInfo;
-  if (GetFileInformationByHandleEx(m_hFile, FileBasicInfo, &basicInfo, sizeof(basicInfo)) == 0)
-    return -1; // can't get basic file information
+//   /* set st_mtime, st_atime, st_ctime */
+//   statData->st_mtime = 0;
+//   statData->st_atime = 0;
+//   statData->st_ctime = 0;
+//   FILE_BASIC_INFO basicInfo;
+//   if (GetFileInformationByHandleEx(m_hFile, FileBasicInfo, &basicInfo, sizeof(basicInfo)) == 0)
+//     return -1; // can't get basic file information
 
-  statData->st_mtime = CWIN32Util::fileTimeToTimeT(basicInfo.LastWriteTime);
+//   statData->st_mtime = CWIN32Util::fileTimeToTimeT(basicInfo.LastWriteTime);
 
-  statData->st_atime = CWIN32Util::fileTimeToTimeT(basicInfo.LastAccessTime);
-  if (statData->st_atime == 0)
-    statData->st_atime = statData->st_mtime;
+//   statData->st_atime = CWIN32Util::fileTimeToTimeT(basicInfo.LastAccessTime);
+//   if (statData->st_atime == 0)
+//     statData->st_atime = statData->st_mtime;
 
-  statData->st_ctime = CWIN32Util::fileTimeToTimeT(basicInfo.CreationTime);
-  if (statData->st_ctime == 0)
-    statData->st_ctime = statData->st_mtime;
+//   statData->st_ctime = CWIN32Util::fileTimeToTimeT(basicInfo.CreationTime);
+//   if (statData->st_ctime == 0)
+//     statData->st_ctime = statData->st_mtime;
 
-  /* set st_size and st_nlink */
-  FILE_STANDARD_INFO stdInfo;
-  if (GetFileInformationByHandleEx(m_hFile, FileStandardInfo, &stdInfo, sizeof(stdInfo)) != 0)
-  {
-    statData->st_size = __int64(stdInfo.EndOfFile.QuadPart);
-    statData->st_nlink = (stdInfo.NumberOfLinks > SHORT_MAX) ? SHORT_MAX : short(stdInfo.NumberOfLinks);
-  }
-  else
-  {
-    statData->st_size = GetLength();
-    if (statData->st_size < 0)
-      return -1; // can't get file size
-    statData->st_nlink = 1; // fallback value
-  }
+//   /* set st_size and st_nlink */
+//   FILE_STANDARD_INFO stdInfo;
+//   if (GetFileInformationByHandleEx(m_hFile, FileStandardInfo, &stdInfo, sizeof(stdInfo)) != 0)
+//   {
+//     statData->st_size = __int64(stdInfo.EndOfFile.QuadPart);
+//     statData->st_nlink = (stdInfo.NumberOfLinks > SHORT_MAX) ? SHORT_MAX : short(stdInfo.NumberOfLinks);
+//   }
+//   else
+//   {
+//     statData->st_size = GetLength();
+//     if (statData->st_size < 0)
+//       return -1; // can't get file size
+//     statData->st_nlink = 1; // fallback value
+//   }
 
-  /* set st_dev and st_rdev */
-  if (!m_smbFile)
-  {
-    assert(m_filepathnameW.compare(0, 4, L"\\\\?\\", 4) == 0);
-    assert(m_filepathnameW.length() >= 7); // '7' is the minimal length of "\\?\x:\"
-    assert(m_filepathnameW[5] == L':');
-    const wchar_t driveLetter = m_filepathnameW[4];
-    assert((driveLetter >= L'A' && driveLetter <= L'Z') || (driveLetter >= L'a' && driveLetter <= L'z'));
-    statData->st_dev = (driveLetter >= L'a') ? driveLetter - L'a' : driveLetter - L'A';
-  }
-  else
-    statData->st_dev = 0;
-  statData->st_rdev = statData->st_dev;
+//   /* set st_dev and st_rdev */
+//   if (!m_smbFile)
+//   {
+//     assert(m_filepathnameW.compare(0, 4, L"\\\\?\\", 4) == 0);
+//     assert(m_filepathnameW.length() >= 7); // '7' is the minimal length of "\\?\x:\"
+//     assert(m_filepathnameW[5] == L':');
+//     const wchar_t driveLetter = m_filepathnameW[4];
+//     assert((driveLetter >= L'A' && driveLetter <= L'Z') || (driveLetter >= L'a' && driveLetter <= L'z'));
+//     statData->st_dev = (driveLetter >= L'a') ? driveLetter - L'a' : driveLetter - L'A';
+//   }
+//   else
+//     statData->st_dev = 0;
+//   statData->st_rdev = statData->st_dev;
 
-  /* set st_mode */
-  statData->st_mode = _S_IREAD; // Always assume Read permission for file owner
-#ifdef TARGET_WINDOWS_STORE
-  if ((basicInfo.FileAttributes & FILE_ATTRIBUTE_READONLY) == 0)
-#else
-  if ((basicInfo.FileAttributes & FILE_READ_ONLY) == 0)
-#endif
-    statData->st_mode |= _S_IWRITE; // Write possible
-  if ((basicInfo.FileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
-    statData->st_mode |= _S_IFDIR | _S_IEXEC; // directory
-  else
-  {
-    statData->st_mode |= _S_IFREG; // file
-    // following large piece of code is disabled
-    // as it intended only to set _S_IEXEC flag
-    // which is not used by callers
-#ifdef WIN32_USE_FILE_STAT_MAX_INFO
-    // set _S_IEXEC if file has executable extension
-    std::wstring pathnameW;
-    std::vector<char> nameInfoBuf(sizeof(FILE_NAME_INFO) + sizeof(wchar_t) * MAX_PATH * 2);
-    if (GetFileInformationByHandleEx(m_hFile, FileNameInfo, nameInfoBuf.data(),
-                                     nameInfoBuf.size()) != 0)
-    {
-      // real path and name without drive
-      const PFILE_NAME_INFO pNameInfo = PFILE_NAME_INFO(nameInfoBuf.data());
-      pathnameW.assign(pNameInfo->FileName, pNameInfo->FileNameLength / sizeof(wchar_t));
-      nameInfoBuf.clear();
-    }
-    else
-      pathnameW = m_filepathnameW;
+//   /* set st_mode */
+//   statData->st_mode = _S_IREAD; // Always assume Read permission for file owner
+// #ifdef TARGET_WINDOWS_STORE
+//   if ((basicInfo.FileAttributes & FILE_ATTRIBUTE_READONLY) == 0)
+// #else
+//   if ((basicInfo.FileAttributes & FILE_READ_ONLY) == 0)
+// #endif
+//     statData->st_mode |= _S_IWRITE; // Write possible
+//   if ((basicInfo.FileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
+//     statData->st_mode |= _S_IFDIR | _S_IEXEC; // directory
+//   else
+//   {
+//     statData->st_mode |= _S_IFREG; // file
+//     // following large piece of code is disabled
+//     // as it intended only to set _S_IEXEC flag
+//     // which is not used by callers
+// #ifdef WIN32_USE_FILE_STAT_MAX_INFO
+//     // set _S_IEXEC if file has executable extension
+//     std::wstring pathnameW;
+//     std::vector<char> nameInfoBuf(sizeof(FILE_NAME_INFO) + sizeof(wchar_t) * MAX_PATH * 2);
+//     if (GetFileInformationByHandleEx(m_hFile, FileNameInfo, nameInfoBuf.data(),
+//                                      nameInfoBuf.size()) != 0)
+//     {
+//       // real path and name without drive
+//       const PFILE_NAME_INFO pNameInfo = PFILE_NAME_INFO(nameInfoBuf.data());
+//       pathnameW.assign(pNameInfo->FileName, pNameInfo->FileNameLength / sizeof(wchar_t));
+//       nameInfoBuf.clear();
+//     }
+//     else
+//       pathnameW = m_filepathnameW;
 
-    const size_t lastDot = pathnameW.rfind(L'.');
-    const size_t lastSlash = pathnameW.rfind(L'\\');
-    if (lastDot != std::wstring::npos &&
-        (lastSlash == std::wstring::npos || lastSlash<lastDot))
-    { // file has some extension
-      const std::wstring fileExt(pathnameW, lastDot);
-      std::vector<wchar_t> buf(32767); // maximum possible size
-      const DWORD envRes = GetEnvironmentVariableW(L"PATHEXT", buf.data(), buf.size());
-      std::vector<std::wstring> listExts;
-      if (envRes == 0 || envRes > buf.size())
-      {
-        buf.clear();
-        static const wchar_t* extArr[] = { L".exe", L".bat", L".cmd", L".com" };
-        listExts.assign(extArr, extArr + (sizeof(extArr) / sizeof(extArr[0])));
-      }
-      else
-      {
-        std::wstring envPathextW((buf.data(), envRes);
-        buf.clear();
-        size_t posExt = envPathextW.find_first_not_of(L';'); // skip ';' at the start
-        while (posExt != std::wstring::npos)
-        {
-          const size_t posSemicol = envPathextW.find(L';', posExt);
-          listExts.push_back(envPathextW.substr(posExt, posSemicol - posExt));
-          posExt = envPathextW.find_first_not_of(L";", posSemicol);
-        }
-      }
-      const wchar_t* const fileExtC = fileExt.c_str();
-      for (const auto& it : listExts)
-      {
-        if (_wcsicmp(fileExtC, it.c_str()) == 0)
-        {
-          statData->st_mode |= _S_IEXEC; // file can be executed
-          break;
-        }
-      }
-    }
-#endif // WIN32_USE_FILE_STAT_MAX_INFO
-  }
-  // copy user RWX rights to group rights
-  statData->st_mode |= (statData->st_mode & (_S_IREAD | _S_IWRITE | _S_IEXEC)) >> 3;
-  // copy user RWX rights to other rights
-  statData->st_mode |= (statData->st_mode & (_S_IREAD | _S_IWRITE | _S_IEXEC)) >> 6;
+//     const size_t lastDot = pathnameW.rfind(L'.');
+//     const size_t lastSlash = pathnameW.rfind(L'\\');
+//     if (lastDot != std::wstring::npos &&
+//         (lastSlash == std::wstring::npos || lastSlash<lastDot))
+//     { // file has some extension
+//       const std::wstring fileExt(pathnameW, lastDot);
+//       std::vector<wchar_t> buf(32767); // maximum possible size
+//       const DWORD envRes = GetEnvironmentVariableW(L"PATHEXT", buf.data(), buf.size());
+//       std::vector<std::wstring> listExts;
+//       if (envRes == 0 || envRes > buf.size())
+//       {
+//         buf.clear();
+//         static const wchar_t* extArr[] = { L".exe", L".bat", L".cmd", L".com" };
+//         listExts.assign(extArr, extArr + (sizeof(extArr) / sizeof(extArr[0])));
+//       }
+//       else
+//       {
+//         std::wstring envPathextW((buf.data(), envRes);
+//         buf.clear();
+//         size_t posExt = envPathextW.find_first_not_of(L';'); // skip ';' at the start
+//         while (posExt != std::wstring::npos)
+//         {
+//           const size_t posSemicol = envPathextW.find(L';', posExt);
+//           listExts.push_back(envPathextW.substr(posExt, posSemicol - posExt));
+//           posExt = envPathextW.find_first_not_of(L";", posSemicol);
+//         }
+//       }
+//       const wchar_t* const fileExtC = fileExt.c_str();
+//       for (const auto& it : listExts)
+//       {
+//         if (_wcsicmp(fileExtC, it.c_str()) == 0)
+//         {
+//           statData->st_mode |= _S_IEXEC; // file can be executed
+//           break;
+//         }
+//       }
+//     }
+// #endif // WIN32_USE_FILE_STAT_MAX_INFO
+//   }
+//   // copy user RWX rights to group rights
+//   statData->st_mode |= (statData->st_mode & (_S_IREAD | _S_IWRITE | _S_IEXEC)) >> 3;
+//   // copy user RWX rights to other rights
+//   statData->st_mode |= (statData->st_mode & (_S_IREAD | _S_IWRITE | _S_IEXEC)) >> 6;
 
-  return 0;
-}
+//   return 0;
+// }
 
 int CWin32File::GetChunkSize()
 {
