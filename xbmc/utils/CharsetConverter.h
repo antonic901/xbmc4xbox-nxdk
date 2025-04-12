@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "settings/lib/ISettingCallback.h"
 #include "utils/GlobalsHandling.h"
 
 #include <string>
@@ -17,10 +18,12 @@
 class CSetting;
 struct StringSettingOption;
 
-class CCharsetConverter
+class CCharsetConverter : public ISettingCallback
 {
 public:
   CCharsetConverter();
+
+  void OnSettingChanged(const std::shared_ptr<const CSetting>& setting) override;
 
   static void reset();
   static void resetSystemCharset();
@@ -186,6 +189,11 @@ public:
 
   static bool toW(const std::string& stringSrc, std::wstring& wStringDst, const std::string& enc);
   static bool fromW(const std::wstring& wStringSrc, std::string& stringDst, const std::string& enc);
+
+  static void SettingOptionsCharsetsFiller(const std::shared_ptr<const CSetting>& setting,
+                                           std::vector<StringSettingOption>& list,
+                                           std::string& current,
+                                           void* data);
 
 private:
   static void resetUserCharset(void);

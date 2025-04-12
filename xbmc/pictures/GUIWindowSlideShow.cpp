@@ -547,7 +547,7 @@ void CGUIWindowSlideShow::Process(unsigned int currentTime, CDirtyRegionList &re
     }
   }
 
-  const auto appPlayer = g_application.m_pPlayer;
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
 
   // render the next image
   if (m_Image[m_iCurrentPic].DrawNextImage())
@@ -656,7 +656,8 @@ void CGUIWindowSlideShow::Render()
     gfxCtx.SetViewWindow(0, 0, m_coordsRes.iWidth, m_coordsRes.iHeight);
     gfxCtx.SetRenderingResolution(gfxCtx.GetVideoResolution(), false);
 
-    const auto appPlayer = g_application.m_pPlayer;
+    auto& components = CServiceBroker::GetAppComponents();
+    const auto appPlayer = components.GetComponent<CApplicationPlayer>();
 
     if (appPlayer->IsRenderingVideoLayer())
     {
@@ -692,7 +693,8 @@ void CGUIWindowSlideShow::RenderEx()
 {
   if (m_slides.at(m_iCurrentSlide)->IsVideo())
   {
-    const auto appPlayer = g_application.m_pPlayer;
+    auto& components = CServiceBroker::GetAppComponents();
+    const auto appPlayer = components.GetComponent<CApplicationPlayer>();
     appPlayer->Render(false, 255, false);
   }
 
@@ -716,7 +718,6 @@ int CGUIWindowSlideShow::GetNextSlide()
 
 EVENT_RESULT CGUIWindowSlideShow::OnMouseEvent(const CPoint &point, const CMouseEvent &event)
 {
-#if 0
   if (event.m_id == ACTION_GESTURE_NOTIFY)
   {
     int result = EVENT_RESULT_ROTATE | EVENT_RESULT_ZOOM;
@@ -759,7 +760,7 @@ EVENT_RESULT CGUIWindowSlideShow::OnMouseEvent(const CPoint &point, const CMouse
         OnAction(CAction(ACTION_PREV_PICTURE));
     }
   }
-  else if (event.m_id == ACTION_GESTURE_END || event.m_id == ACTION_GESTURE_ABORT)
+  else if (event.m_id == ACTION_GESTURE_END/* || event.m_id == ACTION_GESTURE_ABORT*/)
   {
     if (m_fRotate != 0.0f)
     {
@@ -788,7 +789,6 @@ EVENT_RESULT CGUIWindowSlideShow::OnMouseEvent(const CPoint &point, const CMouse
     Rotate(m_fInitialRotate + event.m_offsetX - m_fRotate, true);
     return EVENT_RESULT_HANDLED;
   }
-#endif
   return EVENT_RESULT_UNHANDLED;
 }
 
@@ -798,7 +798,7 @@ bool CGUIWindowSlideShow::OnAction(const CAction &action)
   {
   case ACTION_SHOW_INFO:
     {
-      CGUIDialogPictureInfo *pictureInfo = dynamic_cast<CGUIDialogPictureInfo*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PICTURE_INFO));
+      CGUIDialogPictureInfo *pictureInfo = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogPictureInfo>(WINDOW_DIALOG_PICTURE_INFO);
       if (pictureInfo)
       {
         // no need to set the picture here, it's done in Render()
@@ -810,7 +810,8 @@ bool CGUIWindowSlideShow::OnAction(const CAction &action)
   {
     if (m_slides.size())
       AnnouncePlayerStop(m_slides.at(m_iCurrentSlide));
-    const auto appPlayer = g_application.m_pPlayer;
+    auto& components = CServiceBroker::GetAppComponents();
+    const auto appPlayer = components.GetComponent<CApplicationPlayer>();
     if (appPlayer->IsPlayingVideo())
       appPlayer->ClosePlayer();
     Close();
@@ -1262,7 +1263,8 @@ void CGUIWindowSlideShow::RunSlideShow(const std::string &strPath,
                                        const std::string &strExtensions)
 {
   // stop any video
-  const auto appPlayer = g_application.m_pPlayer;
+  const auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
   if (appPlayer->IsPlayingVideo())
     g_application.StopPlaying();
 
@@ -1361,7 +1363,7 @@ std::string CGUIWindowSlideShow::GetPicturePath(CFileItem *item)
 
 void CGUIWindowSlideShow::RunSlideShow(const std::vector<std::string>& paths, int start /* = 0*/)
 {
-  auto dialog = dynamic_cast<CGUIWindowSlideShow*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_SLIDESHOW));
+  auto dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIWindowSlideShow>(WINDOW_SLIDESHOW);
   if (dialog)
   {
     std::vector<CFileItemPtr> items;

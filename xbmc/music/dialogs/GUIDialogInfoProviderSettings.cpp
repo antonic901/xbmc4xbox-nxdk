@@ -13,16 +13,21 @@
 #include "addons/AddonManager.h"
 #include "addons/AddonSystemSettings.h"
 #include "addons/addoninfo/AddonType.h"
+#include "addons/gui/GUIDialogAddonSettings.h"
+#include "addons/gui/GUIWindowAddonBrowser.h"
+#include "dialogs/GUIDialogFileBrowser.h"
 #include "dialogs/GUIDialogKaiToast.h"
 #include "filesystem/AddonsDirectory.h"
 #include "filesystem/Directory.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
+#include "interfaces/builtins/Builtins.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 #include "settings/lib/Setting.h"
 #include "settings/windows/GUIControlSettings.h"
+#include "storage/MediaManager.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
@@ -45,7 +50,7 @@ CGUIDialogInfoProviderSettings::CGUIDialogInfoProviderSettings()
 
 bool CGUIDialogInfoProviderSettings::Show()
 {
-  CGUIDialogInfoProviderSettings *dialog = dynamic_cast<CGUIDialogInfoProviderSettings*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_INFOPROVIDER_SETTINGS));
+  CGUIDialogInfoProviderSettings *dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogInfoProviderSettings>(WINDOW_DIALOG_INFOPROVIDER_SETTINGS);
   if (!dialog)
     return false;
 
@@ -83,7 +88,7 @@ bool CGUIDialogInfoProviderSettings::Show()
 
 int CGUIDialogInfoProviderSettings::Show(ADDON::ScraperPtr& scraper)
 {
-  CGUIDialogInfoProviderSettings *dialog = dynamic_cast<CGUIDialogInfoProviderSettings*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_INFOPROVIDER_SETTINGS));
+  CGUIDialogInfoProviderSettings *dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogInfoProviderSettings>(WINDOW_DIALOG_INFOPROVIDER_SETTINGS);
   if (!dialog || !scraper)
     return -1;
   if (scraper->Content() != CONTENT_ARTISTS && scraper->Content() != CONTENT_ALBUMS)
@@ -174,7 +179,6 @@ void CGUIDialogInfoProviderSettings::OnSettingAction(const std::shared_ptr<const
       currentScraperId = m_albumscraper->ID();
     std::string selectedAddonId = currentScraperId;
 
-#if 0
     if (CGUIWindowAddonBrowser::SelectAddonID(AddonType::SCRAPER_ALBUMS, selectedAddonId, false) ==
             1 &&
         selectedAddonId != currentScraperId)
@@ -193,7 +197,6 @@ void CGUIDialogInfoProviderSettings::OnSettingAction(const std::shared_ptr<const
                   selectedAddonId);
       }
     }
-#endif
   }
   else if (settingId == CSettings::SETTING_MUSICLIBRARY_ARTISTSSCRAPER)
   {
@@ -202,7 +205,6 @@ void CGUIDialogInfoProviderSettings::OnSettingAction(const std::shared_ptr<const
       currentScraperId = m_artistscraper->ID();
     std::string selectedAddonId = currentScraperId;
 
-#if 0
     if (CGUIWindowAddonBrowser::SelectAddonID(AddonType::SCRAPER_ARTISTS, selectedAddonId, false) ==
             1 &&
         selectedAddonId != currentScraperId)
@@ -220,17 +222,13 @@ void CGUIDialogInfoProviderSettings::OnSettingAction(const std::shared_ptr<const
         CLog::Log(LOGERROR, "{} - Could not get addon: {}", __FUNCTION__, selectedAddonId);
       }
     }
-#endif
   }
-#if 0
   else if (settingId == SETTING_ALBUMSCRAPER_SETTINGS)
     CGUIDialogAddonSettings::ShowForAddon(m_albumscraper, false);
   else if (settingId == SETTING_ARTISTSCRAPER_SETTINGS)
     CGUIDialogAddonSettings::ShowForAddon(m_artistscraper, false);
-#endif
   else if (settingId == CSettings::SETTING_MUSICLIBRARY_ARTISTSFOLDER)
   {
-#if 0
     VECSOURCES shares;
     CServiceBroker::GetMediaManager().GetLocalDrives(shares);
     CServiceBroker::GetMediaManager().GetNetworkLocations(shares);
@@ -260,7 +258,6 @@ void CGUIDialogInfoProviderSettings::OnSettingAction(const std::shared_ptr<const
         SetFocus(CSettings::CSettings::SETTING_MUSICLIBRARY_ARTISTSFOLDER);
       }
     }
-#endif
   }
 }
 

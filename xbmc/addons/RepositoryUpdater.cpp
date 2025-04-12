@@ -9,6 +9,7 @@
 #include "RepositoryUpdater.h"
 
 #include "ServiceBroker.h"
+#include "TextureDatabase.h"
 #include "addons/AddonDatabase.h"
 #include "addons/AddonEvents.h"
 #include "addons/AddonInstaller.h"
@@ -88,7 +89,6 @@ bool CRepositoryUpdateJob::DoWork()
 
   //Invalidate art.
   {
-#if 0
     CTextureDatabase textureDB;
     textureDB.Open();
     textureDB.BeginMultipleExecute();
@@ -114,7 +114,6 @@ bool CRepositoryUpdateJob::DoWork()
       }
     }
     textureDB.CommitMultipleExecute();
-#endif
   }
 
   database.UpdateRepositoryContent(m_repo->ID(), m_repo->Version(), newChecksum, addons);
@@ -209,7 +208,7 @@ bool CRepositoryUpdater::CheckForUpdates(bool showProgress)
 
 static void SetProgressIndicator(CRepositoryUpdateJob* job)
 {
-  auto dialog = dynamic_cast<CGUIDialogExtendedProgressBar*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_EXT_PROGRESS));
+  auto dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogExtendedProgressBar>(WINDOW_DIALOG_EXT_PROGRESS);
   if (dialog)
     job->SetProgressIndicators(dialog->GetHandle(g_localizeStrings.Get(24092)), nullptr);
 }

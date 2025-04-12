@@ -23,6 +23,7 @@
 #include "utils/CharsetConverter.h"
 #include "utils/Variant.h"
 #include "GUIKeyboardFactory.h"
+#include "dialogs/GUIDialogNumeric.h"
 #include "input/XBMC_vkeys.h"
 #include "input/Key.h"
 #include "LocalizeStrings.h"
@@ -307,7 +308,6 @@ void CGUIEditControl::OnClick()
   std::string utf8;
   g_charsetConverter.wToUTF8(m_text2, utf8);
   bool textChanged = false;
-#if 0
   switch (m_inputType)
   {
     case INPUT_TYPE_READONLY:
@@ -323,7 +323,7 @@ void CGUIEditControl::OnClick()
     {
       CDateTime dateTime;
       dateTime.SetFromDBTime(utf8);
-      SYSTEMTIME time;
+      KODI::TIME::SystemTime time;
       dateTime.GetAsSystemTime(time);
       if (CGUIDialogNumeric::ShowAndGetTime(time, !m_inputHeading.empty() ? m_inputHeading : g_localizeStrings.Get(21420)))
       {
@@ -339,7 +339,7 @@ void CGUIEditControl::OnClick()
       dateTime.SetFromDBDate(utf8);
       if (dateTime < CDateTime(2000,1, 1, 0, 0, 0))
         dateTime = CDateTime(2000, 1, 1, 0, 0, 0);
-      SYSTEMTIME date;
+      KODI::TIME::SystemTime date;
       dateTime.GetAsSystemTime(date);
       if (CGUIDialogNumeric::ShowAndGetDate(date, !m_inputHeading.empty() ? m_inputHeading : g_localizeStrings.Get(21420)))
       {
@@ -369,7 +369,6 @@ void CGUIEditControl::OnClick()
       textChanged = CGUIKeyboardFactory::ShowAndGetInput(utf8, m_inputHeading, true, m_inputType == INPUT_TYPE_PASSWORD || m_inputType == INPUT_TYPE_PASSWORD_MD5);
       break;
   }
-#endif
   if (textChanged)
   {
     ClearMD5();

@@ -341,7 +341,7 @@ bool CGUIControlsGUIInfo::GetLabel(std::string& value, const CFileItem *item, in
     }
     case SYSTEM_PROGRESS_BAR:
     {
-      CGUIDialogProgress *bar = dynamic_cast<CGUIDialogProgress*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PROGRESS));
+      CGUIDialogProgress *bar = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogProgress>(WINDOW_DIALOG_PROGRESS);
       if (bar && bar->IsDialogRunning())
         value = std::to_string(bar->GetPercentage());
       return true;
@@ -404,7 +404,7 @@ bool CGUIControlsGUIInfo::GetInt(int& value, const CGUIListItem *gitem, int cont
     ///////////////////////////////////////////////////////////////////////////////////////////////
     case SYSTEM_PROGRESS_BAR:
     {
-      CGUIDialogProgress *bar = dynamic_cast<CGUIDialogProgress*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PROGRESS));
+      CGUIDialogProgress *bar = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogProgress>(WINDOW_DIALOG_PROGRESS);
       if (bar && bar->IsDialogRunning())
         value = bar->GetPercentage();
       return true;
@@ -805,7 +805,7 @@ bool CGUIControlsGUIInfo::GetBool(bool& value, const CGUIListItem *gitem, int co
 #endif
     case SYSTEM_HAS_INPUT_HIDDEN:
     {
-      CGUIDialogNumeric *pNumeric = dynamic_cast<CGUIDialogNumeric*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_NUMERIC));
+      CGUIDialogNumeric *pNumeric = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogNumeric>(WINDOW_DIALOG_NUMERIC);
 #if 0
       CGUIDialogKeyboardGeneric *pKeyboard = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogKeyboardGeneric>(WINDOW_DIALOG_KEYBOARD);
 #endif

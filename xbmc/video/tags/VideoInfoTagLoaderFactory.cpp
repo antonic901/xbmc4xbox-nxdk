@@ -11,6 +11,7 @@
 #include "FileItem.h"
 #include "ServiceBroker.h"
 #include "VideoTagLoaderNFO.h"
+#include "VideoTagLoaderPlugin.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 
@@ -21,6 +22,15 @@ IVideoInfoTagLoader* CVideoInfoTagLoaderFactory::CreateLoader(const CFileItem& i
                                                               bool lookInFolder,
                                                               bool forceRefresh)
 {
+  if (item.IsPlugin() && info && info->ID() == "metadata.local")
+  {
+    // Direct loading from plugin source with metadata.local scraper
+    CVideoTagLoaderPlugin* plugin = new CVideoTagLoaderPlugin(item, forceRefresh);
+    if (plugin->HasInfo())
+      return plugin;
+    delete plugin;
+  }
+
   CVideoTagLoaderNFO* nfo = new CVideoTagLoaderNFO(item, info, lookInFolder);
   if (nfo->HasInfo())
     return nfo;

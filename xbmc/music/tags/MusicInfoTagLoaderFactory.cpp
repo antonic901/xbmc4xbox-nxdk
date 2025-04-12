@@ -15,9 +15,6 @@
 #include "MusicInfoTagLoaderShn.h"
 #include "ServiceBroker.h"
 #include "TagLoaderTagLib.h"
-#if 0
-#include "addons/AudioDecoder.h"
-#endif
 #include "addons/ExtsMimeSupportList.h"
 #include "addons/addoninfo/AddonType.h"
 #include "utils/StringUtils.h"

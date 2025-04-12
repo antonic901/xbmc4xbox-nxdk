@@ -441,8 +441,8 @@ int CGUIWindowAddonBrowser::SelectAddonID(const std::vector<AddonType>& types,
     showMore = false;
 
   CGUIDialogSelect* dialog =
-      dynamic_cast<CGUIDialogSelect*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(
-          WINDOW_DIALOG_SELECT));
+      CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(
+          WINDOW_DIALOG_SELECT);
   if (!dialog)
     return -1;
 

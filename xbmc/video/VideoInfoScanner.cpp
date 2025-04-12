@@ -23,6 +23,7 @@
 #include "filesystem/DirectoryCache.h"
 #include "filesystem/File.h"
 #include "filesystem/MultiPathDirectory.h"
+#include "filesystem/PluginDirectory.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
@@ -73,7 +74,7 @@ namespace VIDEO
       if (m_showDialog && !CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOLIBRARY_BACKGROUNDUPDATE))
       {
         CGUIDialogExtendedProgressBar* dialog =
-          dynamic_cast<CGUIDialogExtendedProgressBar*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_EXT_PROGRESS));
+          CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogExtendedProgressBar>(WINDOW_DIALOG_EXT_PROGRESS);
         if (dialog)
            m_handle = dialog->GetHandle(g_localizeStrings.Get(314));
       }
@@ -263,7 +264,6 @@ namespace VIDEO
     if (content == CONTENT_NONE || ignoreFolder)
       return true;
 
-#if 0
     if (URIUtils::IsPlugin(strDirectory) && !CPluginDirectory::IsMediaLibraryScanningAllowed(TranslateContent(content), strDirectory))
     {
       CLog::Log(
@@ -272,7 +272,6 @@ namespace VIDEO
           CURL::GetRedacted(strDirectory), TranslateContent(content));
       return true;
     }
-#endif
 
     std::string hash, dbHash;
     if (content == CONTENT_MOVIES ||content == CONTENT_MUSICVIDEOS)

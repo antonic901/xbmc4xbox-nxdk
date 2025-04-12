@@ -31,7 +31,8 @@ void CGUIDialogVideoOSD::FrameMove()
   if (m_autoClosing)
   {
     // check for movement of mouse or a submenu open
-    if (CServiceBroker::GetGUI()->GetWindowManager().IsWindowActive(WINDOW_DIALOG_AUDIO_OSD_SETTINGS)
+    if (false
+                           || CServiceBroker::GetGUI()->GetWindowManager().IsWindowActive(WINDOW_DIALOG_AUDIO_OSD_SETTINGS)
                            || CServiceBroker::GetGUI()->GetWindowManager().IsWindowActive(WINDOW_DIALOG_SUBTITLE_OSD_SETTINGS)
                            || CServiceBroker::GetGUI()->GetWindowManager().IsWindowActive(WINDOW_DIALOG_VIDEO_OSD_SETTINGS)
                            || CServiceBroker::GetGUI()->GetWindowManager().IsWindowActive(WINDOW_DIALOG_CMS_OSD_SETTINGS)
@@ -83,10 +84,10 @@ bool CGUIDialogVideoOSD::OnMessage(CGUIMessage& message)
   case GUI_MSG_WINDOW_DEINIT:  // fired when OSD is hidden
     {
       // Remove our subdialogs if visible
-      CGUIDialog *pDialog = dynamic_cast<CGUIDialog*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_AUDIO_OSD_SETTINGS));
+      CGUIDialog *pDialog = CServiceBroker::GetGUI()->GetWindowManager().GetDialog(WINDOW_DIALOG_AUDIO_OSD_SETTINGS);
       if (pDialog && pDialog->IsDialogRunning())
         pDialog->Close(true);
-      pDialog = dynamic_cast<CGUIDialog*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_SUBTITLE_OSD_SETTINGS));
+      pDialog = CServiceBroker::GetGUI()->GetWindowManager().GetDialog(WINDOW_DIALOG_SUBTITLE_OSD_SETTINGS);
       if (pDialog && pDialog->IsDialogRunning())
         pDialog->Close(true);
     }

@@ -16,6 +16,7 @@
 #include "addons/addoninfo/AddonType.h"
 #include "application/AppParams.h"
 #include "application/ApplicationComponents.h"
+#include "application/ApplicationPowerHandling.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
@@ -34,7 +35,9 @@
 #include "storage/MediaManager.h"
 #include "storage/discs/IDiscDriveHandler.h"
 #include "utils/AlarmClock.h"
+#include "utils/CPUInfo.h"
 #include "utils/StringUtils.h"
+#include "utils/SystemInfo.h"
 #include "utils/TimeUtils.h"
 #include "windows/GUIMediaWindow.h"
 
@@ -68,7 +71,6 @@ std::string CSystemGUIInfo::GetSystemHeatInfo(int info) const
       text = StringUtils::Format("{}%", m_fanSpeed * 2);
       break;
     case SYSTEM_CPU_USAGE:
-#if 0
       if (CServiceBroker::GetCPUInfo()->SupportsCPUUsage())
 #if defined(TARGET_DARWIN) || defined(TARGET_WINDOWS)
         text = StringUtils::Format("{}%", CServiceBroker::GetCPUInfo()->GetUsedPercentage());
@@ -76,7 +78,6 @@ std::string CSystemGUIInfo::GetSystemHeatInfo(int info) const
         text = CServiceBroker::GetCPUInfo()->GetCoresUsageString();
 #endif
       else
-#endif
         text = g_localizeStrings.Get(10005); // Not available
       break;
   }
@@ -156,11 +157,7 @@ bool CSystemGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
     case SYSTEM_TOTAL_SPACE:
     case SYSTEM_FREE_SPACE_PERCENT:
     case SYSTEM_USED_SPACE_PERCENT:
-#if 0
       value = g_sysinfo.GetHddSpaceInfo(info.m_info);
-#else
-      value = g_localizeStrings.Get(10005); // Not available
-#endif
       return true;
     case SYSTEM_CPU_TEMPERATURE:
     case SYSTEM_GPU_TEMPERATURE:
@@ -176,18 +173,10 @@ bool CSystemGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
     case SYSTEM_UPTIME:
     case SYSTEM_TOTALUPTIME:
     case SYSTEM_BATTERY_LEVEL:
-#if 0
       value = g_sysinfo.GetInfo(info.m_info);
-#else
-      value = g_localizeStrings.Get(10005); // Not available
-#endif
       return true;
     case SYSTEM_PRIVACY_POLICY:
-#if 0
       value = g_sysinfo.GetPrivacyPolicy();
-#else
-      value = "Privacy policy is same as Kodi.";
-#endif
       return true;
     case SYSTEM_SCREEN_RESOLUTION:
     {
@@ -198,19 +187,19 @@ bool CSystemGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
       return true;
     }
     case SYSTEM_BUILD_VERSION_SHORT:
-      value = "1.0";
+      value = CSysInfo::GetVersionShort();
       return true;
     case SYSTEM_BUILD_VERSION:
-      value = "1.0.0";
+      value = CSysInfo::GetVersion();
       return true;
     case SYSTEM_BUILD_DATE:
-      value = "2025-03-21";
+      value = CSysInfo::GetBuildDate();
       return true;
     case SYSTEM_BUILD_VERSION_CODE:
-      value = "Nexus";
+      value = CSysInfo::GetVersionCode();
       return true;
     case SYSTEM_BUILD_VERSION_GIT:
-      value = "2374206";
+      value = CSysInfo::GetVersionGit();
       return true;
     case SYSTEM_FREE_MEMORY:
     case SYSTEM_FREE_MEMORY_PERCENT:
@@ -300,7 +289,7 @@ bool CSystemGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
       value = g_langInfo.GetTemperatureUnitString();
       return true;
     case SYSTEM_FRIENDLY_NAME:
-      value = "XBMC-NXDK";
+      value = CSysInfo::GetDeviceName();
       return true;
     case SYSTEM_STEREOSCOPIC_MODE:
     {
@@ -309,13 +298,9 @@ bool CSystemGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
       return true;
     }
     case SYSTEM_GET_CORE_USAGE:
-#if 0
       value = StringUtils::Format(
           "{:4.2f}",
           CServiceBroker::GetCPUInfo()->GetCoreInfo(std::stoi(info.GetData3())).m_usagePercent);
-#else
-      value = g_localizeStrings.Get(10005); // Not available
-#endif
       return true;
 #ifndef _XBOX
     case SYSTEM_RENDER_VENDOR:
@@ -364,64 +349,55 @@ bool CSystemGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // NETWORK_*
     ///////////////////////////////////////////////////////////////////////////////////////////////
+#if 0
     case NETWORK_IP_ADDRESS:
     {
-#if 0
       CNetworkInterface* iface = CServiceBroker::GetNetwork().GetFirstConnectedInterface();
       if (iface)
       {
         value = iface->GetCurrentIPAddress();
         return true;
       }
-#endif
       break;
     }
     case NETWORK_SUBNET_MASK:
     {
-#if 0
       CNetworkInterface* iface = CServiceBroker::GetNetwork().GetFirstConnectedInterface();
       if (iface)
       {
         value = iface->GetCurrentNetmask();
         return true;
       }
-#endif
       break;
     }
     case NETWORK_GATEWAY_ADDRESS:
     {
-#if 0
       CNetworkInterface* iface = CServiceBroker::GetNetwork().GetFirstConnectedInterface();
       if (iface)
       {
         value = iface->GetCurrentDefaultGateway();
         return true;
       }
-#endif
       break;
     }
     case NETWORK_DNS1_ADDRESS:
     {
-#if 0
       const std::vector<std::string> nss = CServiceBroker::GetNetwork().GetNameServers();
       if (nss.size() >= 1)
       {
         value = nss[0];
         return true;
       }
-#endif
       break;
     }
     case NETWORK_DNS2_ADDRESS:
     {
-#if 0
       const std::vector<std::string> nss = CServiceBroker::GetNetwork().GetNameServers();
       if (nss.size() >= 2)
       {
         value = nss[1];
         return true;
       }
-#endif
       break;
     }
     case NETWORK_DHCP_ADDRESS:
@@ -433,7 +409,6 @@ bool CSystemGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
     }
     case NETWORK_LINK_STATE:
     {
-#if 0
       std::string linkStatus = g_localizeStrings.Get(151);
       linkStatus += " ";
       CNetworkInterface* iface = CServiceBroker::GetNetwork().GetFirstConnectedInterface();
@@ -443,8 +418,8 @@ bool CSystemGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
         linkStatus += g_localizeStrings.Get(15208);
       value = linkStatus;
       return true;
-#endif
     }
+#endif
   }
 
   return false;
@@ -603,7 +578,6 @@ bool CSystemGUIInfo::GetBool(bool& value, const CGUIListItem *gitem, int context
     case SYSTEM_IDLE_SHUTDOWN_INHIBITED:
     case SYSTEM_IDLE_TIME:
     {
-#if 0
       auto& components = CServiceBroker::GetAppComponents();
       const auto appPower = components.GetComponent<CApplicationPowerHandling>();
       switch (info.m_info)
@@ -626,9 +600,6 @@ bool CSystemGUIInfo::GetBool(bool& value, const CGUIListItem *gitem, int context
         default:
           return false;
       }
-#else
-      return false;
-#endif
     }
     case SYSTEM_HASLOCKS:
       value = CServiceBroker::GetSettingsComponent()->GetProfileManager()->GetMasterProfile().getLockMode() != LOCK_MODE_EVERYONE;
@@ -669,16 +640,12 @@ bool CSystemGUIInfo::GetBool(bool& value, const CGUIListItem *gitem, int context
       return true;
     case SYSTEM_INTERNET_STATE:
     {
-#if 0
       g_sysinfo.GetInfo(info.m_info);
       value = g_sysinfo.HasInternet();
-#else
-      value = false;
-#endif
       return true;
     }
     case SYSTEM_HAS_CORE_ID:
-      value = false;
+      value = CServiceBroker::GetCPUInfo()->HasCoreId(info.GetData1());
       return true;
     case SYSTEM_DATE:
     {
@@ -721,7 +688,7 @@ bool CSystemGUIInfo::GetBool(bool& value, const CGUIListItem *gitem, int context
       value = g_alarmClock.HasAlarm(info.GetData3());
       return true;
     case SYSTEM_SUPPORTS_CPU_USAGE:
-      value = true;
+      value = CServiceBroker::GetCPUInfo()->SupportsCPUUsage();
       return true;
     case SYSTEM_GET_BOOL:
       value = CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(info.GetData3());

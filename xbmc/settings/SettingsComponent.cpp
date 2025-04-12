@@ -8,9 +8,10 @@
 
 #include "SettingsComponent.h"
 
-#include "utils/CompileInfo.h"
+#include "CompileInfo.h"
 #include "ServiceBroker.h"
 #include "Util.h"
+#include "application/AppParams.h"
 #include "filesystem/Directory.h"
 #include "filesystem/SpecialProtocol.h"
 #ifdef TARGET_DARWIN_EMBEDDED
@@ -44,9 +45,6 @@ void CSettingsComponent::Initialize()
 {
   if (m_state == State::DEINITED)
   {
-#ifdef _XBOX
-    InitDirectoriesXbox(true);
-#else
     const auto params = CServiceBroker::GetAppParams();
 
     // only the InitDirectories* for the current platform should return true
@@ -55,7 +53,8 @@ void CSettingsComponent::Initialize()
       inited = InitDirectoriesOSX(params->HasPlatformDirectories());
     if (!inited)
       inited = InitDirectoriesWin32(params->HasPlatformDirectories());
-#endif
+    if (!inited)
+      inited = InitDirectoriesXbox(true);
 
     m_settings->Initialize();
 
@@ -108,8 +107,6 @@ void CSettingsComponent::Deinitialize()
   {
     if (m_state == State::LOADED)
     {
-      m_subtitlesSettings.reset();
-
       m_settings->Unload();
 
       XFILE::IDirectory::UnregisterProfileManager();
@@ -133,11 +130,6 @@ std::shared_ptr<CSettings> CSettingsComponent::GetSettings()
 std::shared_ptr<CAdvancedSettings> CSettingsComponent::GetAdvancedSettings()
 {
   return m_advancedSettings;
-}
-
-std::shared_ptr<KODI::SUBTITLES::CSubtitlesSettings> CSettingsComponent::GetSubtitlesSettings()
-{
-  return m_subtitlesSettings;
 }
 
 std::shared_ptr<CProfileManager> CSettingsComponent::GetProfileManager()
@@ -378,26 +370,26 @@ bool CSettingsComponent::InitDirectoriesWin32(bool bPlatformDirectories)
 #endif
 }
 
-#ifdef _XBOX
 bool CSettingsComponent::InitDirectoriesXbox(bool bPlatformDirectories)
 {
+#ifdef _XBOX
   // TODO: set XBMC path to be parent path of XBE path (or make sure that Q:\\ is mounted to dir where XBE is located)
   std::string xbmcPath = "Q:\\";
   CSpecialProtocol::SetXBMCBinPath(xbmcPath);
-  CSpecialProtocol::SetXBMCPath(xbmcPath);
   CSpecialProtocol::SetXBMCBinAddonPath(xbmcPath + "addons");
 
   std::string strWin32UserFolder = "Q:\\home";
   CSpecialProtocol::SetLogPath(strWin32UserFolder);
-  CSpecialProtocol::SetHomePath(strWin32UserFolder);
   CSpecialProtocol::SetMasterProfilePath(URIUtils::AddFileToFolder(strWin32UserFolder, "userdata"));
   CSpecialProtocol::SetTempPath("Z:\\");
 
   CreateUserDirs();
 
   return true;
-}
+#else
+  return false;
 #endif
+}
 
 void CSettingsComponent::CreateUserDirs() const
 {

@@ -13,6 +13,7 @@
 #include "TextureCache.h"
 #include "Util.h"
 #include "application/Application.h"
+#include "application/ApplicationComponents.h"
 #include "application/ApplicationPlayer.h"
 #include "dialogs/GUIDialogContextMenu.h"
 #include "dialogs/GUIDialogKaiToast.h"
@@ -76,7 +77,8 @@ bool CGUIDialogVideoBookmarks::OnMessage(CGUIMessage& message)
   case GUI_MSG_WINDOW_INIT:
     {
       // don't init this dialog if we don't playback a file
-      const auto appPlayer = g_application.m_pPlayer;
+      const auto& components = CServiceBroker::GetAppComponents();
+      const auto appPlayer = components.GetComponent<CApplicationPlayer>();
       if (!appPlayer->IsPlaying())
         return false;
 
@@ -264,7 +266,8 @@ void CGUIDialogVideoBookmarks::OnRefreshList()
   }
 
   // add chapters if around
-  const auto appPlayer = g_application.m_pPlayer;
+  const auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
   for (int i = 1; i <= appPlayer->GetChapterCount(); ++i)
   {
     std::string chapterName;
@@ -362,7 +365,8 @@ void CGUIDialogVideoBookmarks::Clear()
 
 void CGUIDialogVideoBookmarks::GotoBookmark(int item)
 {
-  const auto appPlayer = g_application.m_pPlayer;
+  auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
   if (item < 0 || item >= m_vecItems->Size() || !appPlayer->HasPlayer())
     return;
 
@@ -401,7 +405,8 @@ bool CGUIDialogVideoBookmarks::AddBookmark(CVideoInfoTag* tag)
   bookmark.timeInSeconds = (int)g_application.GetTime();
   bookmark.totalTimeInSeconds = (int)g_application.GetTotalTime();
 
-  const auto appPlayer = g_application.m_pPlayer;
+  auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
 
   if (appPlayer->HasPlayer())
     bookmark.playerState = appPlayer->GetPlayerState();

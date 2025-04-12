@@ -36,9 +36,6 @@ using namespace KODI::GUILIB::GUIINFO;
 
 CPlayerGUIInfo::CPlayerGUIInfo()
   : m_appPlayer(CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>())
-#if 0
-    m_appVolume(CServiceBroker::GetAppComponents().GetComponent<CApplicationVolumeHandling>())
-#endif
 {
 }
 
@@ -182,7 +179,11 @@ bool CPlayerGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
       return true;
     case PLAYER_VOLUME:
       value =
+#if 0
+          StringUtils::Format("{:2.1f} dB", CAEUtil::PercentToGain(m_appVolume->GetVolumeRatio()));
+#else
           StringUtils::Format("{:2.1f} dB", static_cast<float>(g_application.GetVolume(false) + g_application.GetDynamicRangeCompressionLevel()) * 0.01f);
+#endif
       return true;
     case PLAYER_SUBTITLE_DELAY:
       value = StringUtils::Format("{:2.3f} s", m_appPlayer->GetVideoSettings().m_SubtitleDelay);
@@ -362,7 +363,11 @@ bool CPlayerGUIInfo::GetInt(int& value, const CGUIListItem *gitem, int contextWi
     // PLAYER_*
     ///////////////////////////////////////////////////////////////////////////////////////////////
     case PLAYER_VOLUME:
+#if 0
+      value = static_cast<int>(m_appVolume->GetVolumePercent());
+#else
       value = static_cast<int>(g_application.GetVolume());
+#endif
       return true;
     case PLAYER_PROGRESS:
       value = std::lrintf(g_application.GetPercentage());
@@ -411,8 +416,13 @@ bool CPlayerGUIInfo::GetBool(bool& value, const CGUIListItem *gitem, int context
       value = m_playerShowTime;
       return true;
     case PLAYER_MUTED:
+#if 0
+      value = (m_appVolume->IsMuted() ||
+               m_appVolume->GetVolumeRatio() <= CApplicationVolumeHandling::VOLUME_MINIMUM);
+#else
       value = (g_application.IsMuted() ||
                g_application.GetVolume(false) <= VOLUME_MINIMUM);
+#endif
       return true;
     case PLAYER_HAS_MEDIA:
       value = m_appPlayer->IsPlaying();
@@ -485,7 +495,7 @@ bool CPlayerGUIInfo::GetBool(bool& value, const CGUIListItem *gitem, int context
       return true;
     case PLAYER_SEEKBAR:
     {
-      CGUIDialog *seekBar = dynamic_cast<CGUIDialog*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_SEEK_BAR));
+      CGUIDialog *seekBar = CServiceBroker::GetGUI()->GetWindowManager().GetDialog(WINDOW_DIALOG_SEEK_BAR);
       value = seekBar ? seekBar->IsDialogRunning() : false;
       return true;
     }

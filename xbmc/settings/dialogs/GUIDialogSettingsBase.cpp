@@ -60,7 +60,6 @@ CGUIDialogSettingsBase::CGUIDialogSettingsBase(int windowId, const std::string& 
     m_pOriginalSpin(NULL),
     m_pOriginalSlider(NULL),
     m_pOriginalRadioButton(NULL),
-    m_pOriginalColorButton(nullptr),
     m_pOriginalCategoryButton(NULL),
     m_pOriginalButton(NULL),
     m_pOriginalEdit(NULL),

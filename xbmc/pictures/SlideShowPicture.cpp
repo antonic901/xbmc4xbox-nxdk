@@ -747,7 +747,7 @@ void CSlideShowPic::Move(float fDeltaX, float fDeltaY)
   m_fZoomLeft += fDeltaX;
   m_fZoomTop += fDeltaY;
   // reset the timer
- // m_transitionEnd.start = m_iCounter + m_transitionStart.length + (int)(CServiceBroker::GetWinSystem()->GetGfxContext().GetFPS() * CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_SLIDESHOW_STAYTIME));
+ // m_transitionEnd.start = m_iCounter + m_transitionStart.length + (int)(g_graphicsContext.GetFPS() * CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_SLIDESHOW_STAYTIME));
 }
 
 void CSlideShowPic::Render()
@@ -794,9 +794,6 @@ bool CSlideShowPic::UpdateVertexBuffer(Vertex* vertices)
 
 void CSlideShowPic::Render(float* x, float* y, CTexture* pTexture, UTILS::COLOR::Color color)
 {
-#ifdef HAS_XBOX_D3D
-  // TODO: implement this render method using PBKIT - Look in XBMC4Xbox how it's implemented using DX8
-#endif
 #ifdef HAS_DX
   Vertex vertex[5];
   for (int i = 0; i < 4; i++)
@@ -1019,6 +1016,7 @@ void CSlideShowPic::Render(float* x, float* y, CTexture* pTexture, UTILS::COLOR:
   glDisableVertexAttribArray(tex0Loc);
 
   renderSystem->DisableGUIShader();
-
+#elif NXDK
+  // TODO: implement this render method using PBKIT - Look in XBMC4Xbox how it's implemented using DX8
 #endif
 }

@@ -49,7 +49,7 @@ void CMusicLibraryQueue::ExportLibrary(const CLibExportSettings& settings, bool 
   CGUIDialogProgress* progress = NULL;
   if (showDialog)
   {
-    progress = dynamic_cast<CGUIDialogProgress*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PROGRESS));
+    progress = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogProgress>(WINDOW_DIALOG_PROGRESS);
     if (progress)
     {
       progress->SetHeading(CVariant{ 20196 }); //"Export music library"
@@ -86,7 +86,7 @@ void CMusicLibraryQueue::ImportLibrary(const std::string& xmlFile, bool showDial
   CGUIDialogProgress* progress = nullptr;
   if (showDialog)
   {
-    progress = dynamic_cast<CGUIDialogProgress*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PROGRESS));
+    progress = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogProgress>(WINDOW_DIALOG_PROGRESS);
     if (progress)
     {
       progress->SetHeading(CVariant{ 20197 }); //"Import music library"
@@ -194,7 +194,7 @@ void CMusicLibraryQueue::CleanLibrary(bool showDialog /* = false */)
   CGUIDialogProgress* progress = NULL;
   if (showDialog)
   {
-    progress = dynamic_cast<CGUIDialogProgress*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PROGRESS));
+    progress = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogProgress>(WINDOW_DIALOG_PROGRESS);
     if (progress)
     {
       progress->SetHeading(CVariant{ 700 });

@@ -393,7 +393,6 @@ static int PlayerControl(const std::vector<std::string>& params)
       }
     }
 #endif
-    return false;
   }
   else if (paramlow == "reset")
   {

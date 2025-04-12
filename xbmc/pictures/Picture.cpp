@@ -265,7 +265,6 @@ bool CPicture::ScaleImage(uint8_t* in_pixels,
                           unsigned int out_height,
                           unsigned int out_pitch)
 {
-  // TODO: we need libswscale from FFMpeg for this
 #if 0
   struct SwsContext* context =
       sws_getContext(in_width, in_height, PIX_FMT_BGRA, out_width, out_height, PIX_FMT_BGRA,
@@ -282,8 +281,9 @@ bool CPicture::ScaleImage(uint8_t* in_pixels,
     sws_freeContext(context);
     return true;
   }
-#endif
+#else
   CLog::Log(LOGWARNING, "{} - missing libswscale!", __FUNCTION__);
+#endif
   return false;
 }
 

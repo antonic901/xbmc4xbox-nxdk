@@ -33,6 +33,7 @@
 #include "dialogs/GUIDialogSmartPlaylistEditor.h"
 #include "filesystem/FileDirectoryFactory.h"
 #include "filesystem/MultiPathDirectory.h"
+#include "filesystem/PluginDirectory.h"
 #include "filesystem/SmartPlaylistDirectory.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIEditControl.h"
@@ -47,6 +48,7 @@
 #include "settings/AdvancedSettings.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
+#include "storage/MediaManager.h"
 #include "threads/IRunnable.h"
 #include "utils/FileUtils.h"
 #include "utils/LabelFormatter.h"
@@ -848,9 +850,7 @@ bool CGUIMediaWindow::Update(const std::string &strDirectory, bool updateFilterP
   {
     // Removable sources
     VECSOURCES removables;
-#if 0
     CServiceBroker::GetMediaManager().GetRemovableDrives(removables);
-#endif
     for (const auto& s : removables)
     {
       if (URIUtils::CompareWithoutSlashAtEnd(s.strPath, m_vecItems->GetPath()))
@@ -1116,12 +1116,8 @@ bool CGUIMediaWindow::OnClick(int iItem, const std::string &player)
   }
   else if (pItem->IsPlugin() && !pItem->GetProperty("isplayable").asBoolean())
   {
-#if 0
     bool resume = pItem->GetStartOffset() == STARTOFFSET_RESUME;
     return XFILE::CPluginDirectory::RunScriptWithParams(pItem->GetPath(), resume);
-#else
-    return false;
-#endif
   }
 #if defined(TARGET_ANDROID)
   else if (pItem->IsAndroidApp())
@@ -1193,7 +1189,6 @@ bool CGUIMediaWindow::OnSelect(int item)
  */
 bool CGUIMediaWindow::HaveDiscOrConnection(const std::string& strPath, int iDriveType)
 {
-#if 0
   if (iDriveType==CMediaSource::SOURCE_TYPE_DVD)
   {
     if (!CServiceBroker::GetMediaManager().IsDiscInDrive(strPath))
@@ -1204,17 +1199,17 @@ bool CGUIMediaWindow::HaveDiscOrConnection(const std::string& strPath, int iDriv
   }
   else if (iDriveType==CMediaSource::SOURCE_TYPE_REMOTE)
   {
+#if 0
     //! @todo Handle not connected to a remote share
     if (!CServiceBroker::GetNetwork().IsConnected())
     {
       HELPERS::ShowOKDialogText(CVariant{220}, CVariant{221});
       return false;
     }
+#endif
   }
 
   return true;
-#endif
-  return false;
 }
 
 /*!
@@ -1850,7 +1845,7 @@ bool CGUIMediaWindow::WaitForNetwork() const
   if (CServiceBroker::GetNetwork().IsAvailable())
     return true;
 
-  CGUIDialogProgress *progress = dynamic_cast<CGUIDialogProgress*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PROGRESS));
+  CGUIDialogProgress *progress = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogProgress>(WINDOW_DIALOG_PROGRESS);
   if (!progress)
     return true;
 
@@ -1869,9 +1864,8 @@ bool CGUIMediaWindow::WaitForNetwork() const
     }
   }
   progress->Close();
-  return true;
 #endif
-  return false;
+  return true;
 }
 
 void CGUIMediaWindow::UpdateFilterPath(const std::string &strDirectory, const CFileItemList &items, bool updateFilterPath)
@@ -2261,7 +2255,7 @@ bool CGUIMediaWindow::GetDirectoryItems(CURL &url, CFileItemList &items, bool us
 bool CGUIMediaWindow::WaitGetDirectoryItems(CGetDirectoryItems &items)
 {
   bool ret = true;
-  CGUIDialogBusy* dialog = dynamic_cast<CGUIDialogBusy*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_BUSY));
+  CGUIDialogBusy* dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogBusy>(WINDOW_DIALOG_BUSY);
   if (dialog && !dialog->IsDialogRunning())
   {
     if (!CGUIDialogBusy::Wait(&items))

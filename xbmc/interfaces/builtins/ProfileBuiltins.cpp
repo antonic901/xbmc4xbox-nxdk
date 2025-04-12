@@ -13,9 +13,7 @@
 #include "ServiceBroker.h"
 #include "Util.h"
 #include "dialogs/GUIDialogKaiToast.h"
-#if 0
 #include "favourites/FavouritesService.h"
-#endif
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
@@ -67,10 +65,8 @@ static int MasterMode(const std::vector<std::string>& params)
     g_passwordManager.bMasterUser = false;
     g_passwordManager.LockSources(true);
 
-#if 0
     // master mode turned OFF => refresh favourites due to possible visibility changes
     CServiceBroker::GetFavouritesService().RefreshFavourites();
-#endif
 
     CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Warning, g_localizeStrings.Get(20052),g_localizeStrings.Get(20053));
   }
@@ -79,10 +75,8 @@ static int MasterMode(const std::vector<std::string>& params)
     g_passwordManager.LockSources(false);
     g_passwordManager.bMasterUser = true;
 
-#if 0
     // master mode turned ON => refresh favourites due to possible visibility changes
     CServiceBroker::GetFavouritesService().RefreshFavourites();
-#endif
 
     CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Warning, g_localizeStrings.Get(20052),g_localizeStrings.Get(20054));
   }

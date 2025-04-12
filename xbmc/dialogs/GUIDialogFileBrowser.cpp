@@ -883,9 +883,9 @@ void CGUIDialogFileBrowser::SetSources(const VECSOURCES &shares)
 
 void CGUIDialogFileBrowser::OnAddNetworkLocation()
 {
+#if 0
   // ok, fire up the network location dialog
   std::string path;
-#if 0
   if (CGUIDialogNetworkSetup::ShowAndGetNetworkAddress(path))
   {
     // verify the path by doing a GetDirectory.
@@ -902,7 +902,7 @@ void CGUIDialogFileBrowser::OnAddNetworkLocation()
       CServiceBroker::GetMediaManager().AddNetworkLocation(path);
     }
   }
-#endif
+ #endif
   m_rootDir.SetSources(m_shares);
   Update(m_vecItems->GetPath());
 }

@@ -23,11 +23,16 @@
 #define CACHE_BUFFER_MODE_NONE 3
 #define CACHE_BUFFER_MODE_NETWORK 4
 
+class CProfileManager;
 class CSettingsManager;
 class CVariant;
 struct IntegerSettingOption;
 
 class TiXmlElement;
+namespace ADDON
+{
+  class IAddon;
+}
 
 class DatabaseSettings
 {
@@ -112,7 +117,7 @@ class CAdvancedSettings : public ISettingCallback, public ISettingsHandler
     void Uninitialize(CSettingsManager& settingsMgr);
     bool Initialized() const { return m_initialized; }
     void AddSettingsFile(const std::string &filename);
-    bool Load();
+    bool Load(const CProfileManager &profileManager);
 
     static void GetCustomTVRegexps(TiXmlElement *pRootElement, SETTINGS_TVSHOWLIST& settings);
     static void GetCustomRegexps(TiXmlElement *pRootElement, std::vector<std::string> &settings);

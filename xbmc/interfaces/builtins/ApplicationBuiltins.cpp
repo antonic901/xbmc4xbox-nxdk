@@ -10,6 +10,8 @@
 
 #include "ServiceBroker.h"
 #include "application/Application.h"
+#include "application/ApplicationComponents.h"
+#include "application/ApplicationPowerHandling.h"
 #include "input/Key.h"
 #include "interfaces/AnnouncementManager.h"
 #include "messaging/ApplicationMessenger.h"
@@ -32,6 +34,7 @@
  */
 static int Extract(const std::vector<std::string>& params)
 {
+#if 0
     // Detects if file is zip or rar then extracts
     std::string strDestDirect;
     if (params.size() < 2)
@@ -42,13 +45,10 @@ static int Extract(const std::vector<std::string>& params)
     URIUtils::AddSlashAtEnd(strDestDirect);
 
     if (URIUtils::IsZIP(params[0]))
-#if 0
       g_ZipManager.ExtractArchive(params[0],strDestDirect);
-#else
-      CLog::Log(LOGWARNING, "Extract archive is not supported");
-#endif
     else
       CLog::Log(LOGERROR, "Extract, No archive given");
+#endif
 
   return 0;
 }
@@ -141,11 +141,9 @@ static int ToggleDebug(const std::vector<std::string>& params)
  */
 static int ToggleDPMS(const std::vector<std::string>& params)
 {
-#if 0
   auto& components = CServiceBroker::GetAppComponents();
   const auto appPower = components.GetComponent<CApplicationPowerHandling>();
   appPower->ToggleDPMS(true);
-#endif
 
   return 0;
 }

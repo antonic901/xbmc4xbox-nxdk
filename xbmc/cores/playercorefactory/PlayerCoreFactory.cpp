@@ -109,7 +109,7 @@ void CPlayerCoreFactory::GetPlayers(const CFileItem& item, std::vector<std::stri
 
   ForcedPlayer defaultInputstreamPlayerOverride = ForcedPlayer::NONE;
 
-#ifndef _XBOX
+#if 0
   // If we are using an inpustream add-on
   if (!item.GetProperty(STREAM_PROPERTY_INPUTSTREAM).empty())
   {

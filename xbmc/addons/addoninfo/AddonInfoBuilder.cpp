@@ -8,7 +8,7 @@
 
 #include "AddonInfoBuilder.h"
 
-#include "utils/CompileInfo.h"
+#include "CompileInfo.h"
 #include "LangInfo.h"
 #include "addons/Repository.h"
 #include "addons/addoninfo/AddonInfo.h"

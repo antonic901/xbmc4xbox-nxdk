@@ -9,8 +9,11 @@
 #include "CharsetConverter.h"
 
 #include "LangInfo.h"
-#include "threads/Condition.h"
+#include "guilib/LocalizeStrings.h"
 #include "log.h"
+#include "settings/Settings.h"
+#include "settings/lib/Setting.h"
+#include "settings/lib/SettingDefinitions.h"
 #include "utils/StringUtils.h"
 #include "utils/Utf8Utils.h"
 
@@ -583,6 +586,18 @@ static struct SCharsetMapping
 
 CCharsetConverter::CCharsetConverter() = default;
 
+void CCharsetConverter::OnSettingChanged(const std::shared_ptr<const CSetting>& setting)
+{
+  if (setting == NULL)
+    return;
+
+  const std::string& settingId = setting->GetId();
+  if (settingId == CSettings::SETTING_LOCALE_CHARSET)
+    resetUserCharset();
+  else if (settingId == CSettings::SETTING_SUBTITLES_CHARSET)
+    resetSubtitleCharset();
+}
+
 void CCharsetConverter::clear()
 {
 }
@@ -879,4 +894,17 @@ bool CCharsetConverter::utf8logicalToVisualBiDi(const std::string& utf8StringSrc
 bool CCharsetConverter::utf8IsRTLBidiDirection(const std::string& utf8String)
 {
   return CInnerConverter::isBidiDirectionRTL(utf8String);
+}
+
+void CCharsetConverter::SettingOptionsCharsetsFiller(const SettingConstPtr& setting,
+                                                     std::vector<StringSettingOption>& list,
+                                                     std::string& current,
+                                                     void* data)
+{
+  std::vector<std::string> vecCharsets = g_charsetConverter.getCharsetLabels();
+  sort(vecCharsets.begin(), vecCharsets.end(), sortstringbyname());
+
+  list.emplace_back(g_localizeStrings.Get(13278), "DEFAULT"); // "Default"
+  for (int i = 0; i < (int) vecCharsets.size(); ++i)
+    list.emplace_back(vecCharsets[i], g_charsetConverter.getCharsetNameByLabel(vecCharsets[i]));
 }

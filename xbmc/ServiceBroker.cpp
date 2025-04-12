@@ -10,6 +10,7 @@
 
 #include "ServiceManager.h"
 #include "application/Application.h"
+#include "profiles/ProfileManager.h"
 #include "settings/SettingsComponent.h"
 #include "utils/log.h"
 
@@ -66,6 +67,11 @@ ADDON::CAddonMgr& CServiceBroker::GetAddonMgr()
   return g_application.m_ServiceManager->GetAddonMgr();
 }
 
+ADDON::CBinaryAddonCache& CServiceBroker::GetBinaryAddonCache()
+{
+  return g_application.m_ServiceManager->GetBinaryAddonCache();
+}
+
 ADDONS::CExtsMimeSupportList& CServiceBroker::GetExtsMimeSupportList()
 {
   return g_application.m_ServiceManager->GetExtsMimeSupportList();
@@ -104,6 +110,11 @@ std::shared_ptr<CSettingsComponent> CServiceBroker::GetSettingsComponent()
 CFavouritesService& CServiceBroker::GetFavouritesService()
 {
   return g_application.m_ServiceManager->GetFavouritesService();
+}
+
+ADDON::CServiceAddonManager& CServiceBroker::GetServiceAddons()
+{
+  return g_application.m_ServiceManager->GetServiceAddons();
 }
 
 ADDON::CRepositoryUpdater& CServiceBroker::GetRepositoryUpdater()

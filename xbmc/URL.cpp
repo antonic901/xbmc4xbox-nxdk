@@ -12,12 +12,17 @@
 #include "utils/StringUtils.h"
 #include "Util.h"
 #include "filesystem/File.h"
+#include "FileItem.h"
+#include "filesystem/StackDirectory.h"
+#include "ServiceBroker.h"
 #ifndef TARGET_POSIX
 #include <sys/stat.h>
 #endif
 
 #include <string>
 #include <vector>
+
+using namespace ADDON;
 
 CURL::~CURL() = default;
 
@@ -467,7 +472,17 @@ std::string CURL::GetWithoutUserDetails(bool redact) const
 
   if (IsProtocol("stack"))
   {
-    // TODO: handle this when stack:// is added
+    CFileItemList items;
+    XFILE::CStackDirectory dir;
+    dir.GetDirectory(*this,items);
+    std::vector<std::string> newItems;
+    for (int i=0;i<items.Size();++i)
+    {
+      CURL url(items[i]->GetPath());
+      items[i]->SetPath(url.GetWithoutUserDetails(redact));
+      newItems.push_back(items[i]->GetPath());
+    }
+    dir.ConstructStackPath(newItems, strURL);
     return strURL;
   }
 

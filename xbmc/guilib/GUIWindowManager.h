@@ -136,7 +136,29 @@ public:
   */
   bool DestroyWindows();
 
+  /*! \brief Return the window of type \code{T} with the given id or
+   * null if no window exists with the given id.
+   *
+   * \tparam T the window class type
+   * \param id the window id
+   * \return the window with for the given type \code{T} or null
+   */
+  template<typename T,
+           typename std::enable_if<std::is_base_of<CGUIWindow, T>::value>::type* = nullptr>
+  T* GetWindow(int id) const
+  {
+    return dynamic_cast<T*>(GetWindow(id));
+  }
+
   CGUIWindow* GetWindow(int id) const;
+
+  /*! \brief Return the dialog window with the given id or null.
+   *
+   * \param id the dialog window id
+   * \return the dialog window with the given id or null
+   */
+  CGUIDialog* GetDialog(int id) const;
+
   void SetCallback(IWindowManagerCallback& callback);
   void DeInitialize();
 

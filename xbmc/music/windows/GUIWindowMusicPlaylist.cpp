@@ -15,8 +15,10 @@
 #include "ServiceBroker.h"
 #include "Util.h"
 #include "application/Application.h"
+#include "application/ApplicationComponents.h"
 #include "application/ApplicationPlayer.h"
 #include "cores/playercorefactory/PlayerCoreFactory.h"
+#include "dialogs/GUIDialogSmartPlaylistEditor.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIKeyboardFactory.h"
 #include "guilib/GUIWindowManager.h"
@@ -25,6 +27,7 @@
 #include "music/tags/MusicInfoTag.h"
 #include "playlists/PlayListM3U.h"
 #include "profiles/ProfileManager.h"
+#include "settings/MediaSettings.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/LabelFormatter.h"
@@ -117,7 +120,8 @@ bool CGUIWindowMusicPlayList::OnMessage(CGUIMessage& message)
         SET_CONTROL_FOCUS(m_iLastControl, 0);
       }
 
-      const auto appPlayer = g_application.m_pPlayer;
+      const auto& components = CServiceBroker::GetAppComponents();
+      const auto appPlayer = components.GetComponent<CApplicationPlayer>();
       if (appPlayer->IsPlayingAudio() &&
           CServiceBroker::GetPlaylistPlayer().GetCurrentPlaylist() == PLAYLIST::TYPE_MUSIC)
       {
@@ -140,10 +144,8 @@ bool CGUIWindowMusicPlayList::OnMessage(CGUIMessage& message)
           CServiceBroker::GetPlaylistPlayer().SetShuffle(
               PLAYLIST::TYPE_MUSIC,
               !(CServiceBroker::GetPlaylistPlayer().IsShuffled(PLAYLIST::TYPE_MUSIC)));
-#if 0
           CMediaSettings::GetInstance().SetMusicPlaylistShuffled(
               CServiceBroker::GetPlaylistPlayer().IsShuffled(PLAYLIST::TYPE_MUSIC));
-#endif
           CServiceBroker::GetSettingsComponent()->GetSettings()->Save();
           UpdateButtons();
           Refresh();
@@ -197,11 +199,9 @@ bool CGUIWindowMusicPlayList::OnMessage(CGUIMessage& message)
                                                         PLAYLIST::RepeatState::NONE);
 
         // save settings
-#if 0
         CMediaSettings::GetInstance().SetMusicPlaylistRepeat(
             CServiceBroker::GetPlaylistPlayer().GetRepeat(PLAYLIST::TYPE_MUSIC) ==
             PLAYLIST::RepeatState::ALL);
-#endif
         CServiceBroker::GetSettingsComponent()->GetSettings()->Save();
 
         UpdateButtons();
@@ -265,7 +265,8 @@ bool CGUIWindowMusicPlayList::MoveCurrentPlayListItem(int iItem, int iAction, bo
   else
     iNew++;
 
-  const auto appPlayer = g_application.m_pPlayer;
+  const auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
 
   // is the currently playing item affected?
   bool bFixCurrentSong = false;
@@ -361,7 +362,8 @@ void CGUIWindowMusicPlayList::RemovePlayListItem(int iItem)
 {
   if (iItem < 0 || iItem > m_vecItems->Size()) return;
 
-  const auto appPlayer = g_application.m_pPlayer;
+  const auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
   // The current playing song can't be removed
   if (CServiceBroker::GetPlaylistPlayer().GetCurrentPlaylist() == PLAYLIST::TYPE_MUSIC &&
       appPlayer->IsPlayingAudio() && CServiceBroker::GetPlaylistPlayer().GetCurrentSong() == iItem)
@@ -396,7 +398,8 @@ void CGUIWindowMusicPlayList::UpdateButtons()
     CONTROL_ENABLE(CONTROL_BTNREPEAT);
     CONTROL_ENABLE(CONTROL_BTNPLAY);
 
-    const auto appPlayer = g_application.m_pPlayer;
+    const auto& components = CServiceBroker::GetAppComponents();
+    const auto appPlayer = components.GetComponent<CApplicationPlayer>();
     if (appPlayer->IsPlayingAudio() &&
         CServiceBroker::GetPlaylistPlayer().GetCurrentPlaylist() == PLAYLIST::TYPE_MUSIC)
     {
@@ -627,7 +630,6 @@ bool CGUIWindowMusicPlayList::OnContextButton(int itemNumber, CONTEXT_BUTTON but
     const std::shared_ptr<CProfileManager> profileManager = CServiceBroker::GetSettingsComponent()->GetProfileManager();
 
     std::string playlist = profileManager->GetUserDataItem("PartyMode.xsp");
-#if 0
     if (CGUIDialogSmartPlaylistEditor::EditPlaylist(playlist))
     {
       // apply new rules
@@ -635,8 +637,6 @@ bool CGUIWindowMusicPlayList::OnContextButton(int itemNumber, CONTEXT_BUTTON but
       g_partyModeManager.Enable();
     }
     return true;
-#endif
-    return false;
   }
 
   default:

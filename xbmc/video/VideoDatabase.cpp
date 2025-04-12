@@ -26,6 +26,7 @@
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
 #include "filesystem/MultiPathDirectory.h"
+#include "filesystem/PluginDirectory.h"
 #include "filesystem/StackDirectory.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
@@ -9413,7 +9414,8 @@ void CVideoDatabase::CleanDatabase(CGUIDialogProgressBarHandle* handle,
     }
     else if (showProgress)
     {
-      progress = dynamic_cast<CGUIDialogProgress*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PROGRESS));
+      progress = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogProgress>(
+          WINDOW_DIALOG_PROGRESS);
       if (progress)
       {
         progress->SetHeading(CVariant{700});
@@ -9475,11 +9477,9 @@ void CVideoDatabase::CleanDatabase(CGUIDialogProgressBarHandle* handle,
           SScanSettings settings;
           bool foundDirectly = false;
           ScraperPtr scraper = GetScraperForPath(fullPath, settings, foundDirectly);
-#if 0
           if (scraper &&
               CPluginDirectory::CheckExists(TranslateContent(scraper->Content()), fullPath))
             del = false;
-#endif
         }
         else
         {
@@ -9642,10 +9642,8 @@ void CVideoDatabase::CleanDatabase(CGUIDialogProgressBarHandle* handle,
           SScanSettings settings;
           bool foundDirectly = false;
           ScraperPtr scraper = GetScraperForPath(path, settings, foundDirectly);
-#if 0
           if (scraper && CPluginDirectory::CheckExists(TranslateContent(scraper->Content()), path))
             exists = true;
-#endif
         }
         else
           exists = CDirectory::Exists(path, false);
@@ -9877,7 +9875,7 @@ std::vector<int> CVideoDatabase::CleanMediaType(const std::string &mediaType, co
             del = false;
           else
           {
-            CGUIDialogYesNo* pDialog = dynamic_cast<CGUIDialogYesNo*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_YES_NO));
+            CGUIDialogYesNo* pDialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogYesNo>(WINDOW_DIALOG_YES_NO);
             if (pDialog != NULL)
             {
               CURL sourceUrl(sourcePath);
@@ -10010,7 +10008,7 @@ void CVideoDatabase::ExportToXML(const std::string &path, bool singleFile /* = t
       CDirectory::Create(tvshowsDir);
     }
 
-    progress = dynamic_cast<CGUIDialogProgress*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PROGRESS));
+    progress = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogProgress>(WINDOW_DIALOG_PROGRESS);
     // find all movies
     std::string sql = "select * from movie_view";
 
@@ -10585,7 +10583,7 @@ void CVideoDatabase::ImportFromXML(const std::string &path)
     TiXmlElement *root = xmlDoc.RootElement();
     if (!root) return;
 
-    progress = dynamic_cast<CGUIDialogProgress*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PROGRESS));
+    progress = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogProgress>(WINDOW_DIALOG_PROGRESS);
     if (progress)
     {
       progress->SetHeading(CVariant{648});

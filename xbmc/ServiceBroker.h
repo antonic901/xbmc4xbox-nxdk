@@ -15,6 +15,8 @@
 namespace ADDON
 {
 class CAddonMgr;
+class CBinaryAddonCache;
+class CServiceAddonManager;
 class CRepositoryUpdater;
 } // namespace ADDON
 
@@ -78,11 +80,13 @@ public:
   static void UnregisterAnnouncementManager();
 
   static ADDON::CAddonMgr& GetAddonMgr();
+  static ADDON::CBinaryAddonCache& GetBinaryAddonCache();
   static KODI::ADDONS::CExtsMimeSupportList& GetExtsMimeSupportList();
   static CContextMenuManager& GetContextMenuManager();
   static CDataCacheCore& GetDataCacheCore();
   static PLAYLIST::CPlayListPlayer& GetPlaylistPlayer();
   static CFavouritesService& GetFavouritesService();
+  static ADDON::CServiceAddonManager& GetServiceAddons();
   static ADDON::CRepositoryUpdater& GetRepositoryUpdater();
   static CFileExtensionProvider& GetFileExtensionProvider();
   static bool IsAddonInterfaceUp();

@@ -8,13 +8,12 @@
 
 #include "ContextMenus.h"
 
-#ifdef HAS_DVD_DRIVE
 #include "Autorun.h"
-#endif
 #include "GUIUserMessages.h"
 #include "PlayListPlayer.h"
 #include "ServiceBroker.h"
 #include "application/Application.h"
+#include "application/ApplicationComponents.h"
 #include "application/ApplicationPlayer.h"
 #include "filesystem/Directory.h"
 #include "guilib/GUIComponent.h"

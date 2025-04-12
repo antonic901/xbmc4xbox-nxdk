@@ -201,6 +201,7 @@ namespace xbmcutil
  */
 #define XBMC_GLOBAL_USE(classname) (*(xbmcutil::GlobalsSingleton<classname>::getQuick()))
 
+
 /**
  * For pattern (1) above, you can use the following macro. WARNING: This should only 
  * be used when the global in question is never accessed, directly or indirectly, from

@@ -53,4 +53,3 @@ typedef struct XBMC_keysym {
 
 /* This is the mask which refers to all hotkey bindings */
 #define XBMC_ALL_HOTKEYS		0xFFFFFFFF
-

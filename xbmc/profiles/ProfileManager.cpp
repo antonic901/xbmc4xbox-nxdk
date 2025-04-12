@@ -17,6 +17,8 @@
 #include "Util.h"
 #include "addons/Skin.h"
 #include "application/Application.h" //! @todo Remove me
+#include "application/ApplicationComponents.h"
+#include "application/ApplicationPowerHandling.h"
 #include "dialogs/GUIDialogKaiToast.h"
 #include "dialogs/GUIDialogYesNo.h"
 #include "filesystem/Directory.h"
@@ -43,6 +45,8 @@
 #include "PlayListPlayer.h" //! @todo Remove me
 #include "addons/AddonManager.h" //! @todo Remove me
 #include "addons/Service.h" //! @todo Remove me
+#include "application/Application.h" //! @todo Remove me
+#include "favourites/FavouritesService.h" //! @todo Remove me
 #include "utils/FileUtils.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
@@ -50,6 +54,7 @@
 #include "utils/XMLUtils.h"
 #include "utils/log.h"
 #include "video/VideoLibraryQueue.h" //! @todo Remove me
+#include "weather/WeatherManager.h" //! @todo Remove me
 
 //! @todo
 //! eventually the profile should dictate where special://masterprofile/ is
@@ -248,8 +253,11 @@ void CProfileManager::Clear()
 void CProfileManager::PrepareLoadProfile(unsigned int profileIndex)
 {
   CContextMenuManager &contextMenuManager = CServiceBroker::GetContextMenuManager();
+  ADDON::CServiceAddonManager &serviceAddons = CServiceBroker::GetServiceAddons();
 
   contextMenuManager.Deinit();
+
+  serviceAddons.Stop();
 }
 
 bool CProfileManager::LoadProfile(unsigned int index)
@@ -350,7 +358,10 @@ bool CProfileManager::LoadProfile(unsigned int index)
 void CProfileManager::FinalizeLoadProfile()
 {
   CContextMenuManager &contextMenuManager = CServiceBroker::GetContextMenuManager();
+  ADDON::CServiceAddonManager &serviceAddons = CServiceBroker::GetServiceAddons();
   ADDON::CAddonMgr &addonManager = CServiceBroker::GetAddonMgr();
+  CWeatherManager &weatherManager = CServiceBroker::GetWeatherManager();
+  CFavouritesService &favouritesManager = CServiceBroker::GetFavouritesService();
   PLAYLIST::CPlayListPlayer &playlistManager = CServiceBroker::GetPlaylistPlayer();
 
   if (m_lastUsedProfile != m_currentProfile)
@@ -373,12 +384,17 @@ void CProfileManager::FinalizeLoadProfile()
     return;
   }
 
+  weatherManager.Refresh();
+
   // Restart context menu manager
   contextMenuManager.Init();
+
+  favouritesManager.ReInit(GetProfileUserDataFolder());
 
   // Start these operations only when a profile is loaded, not on the login screen
   if (!m_profileLoadedForLogin || (m_profileLoadedForLogin && m_lastUsedProfile == 0))
   {
+    serviceAddons.Start();
     g_application.UpdateLibraries();
   }
 
@@ -406,6 +422,9 @@ void CProfileManager::LogOff()
 
   g_passwordManager.bMasterUser = false;
 
+  auto& components = CServiceBroker::GetAppComponents();
+  const auto appPower = components.GetComponent<CApplicationPowerHandling>();
+  appPower->WakeUpScreenSaverAndDPMS();
   CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_LOGIN_SCREEN, {}, false);
 }
 
@@ -416,7 +435,7 @@ bool CProfileManager::DeleteProfile(unsigned int index)
   if (profile == NULL)
     return false;
 
-  CGUIDialogYesNo* dlgYesNo = dynamic_cast<CGUIDialogYesNo*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_YES_NO));
+  CGUIDialogYesNo* dlgYesNo = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogYesNo>(WINDOW_DIALOG_YES_NO);
   if (dlgYesNo == NULL)
     return false;
 
@@ -664,12 +683,6 @@ void CProfileManager::OnSettingAction(const std::shared_ptr<const CSetting>& set
 {
   if (setting == nullptr)
     return;
-
-#if 0
-  const std::string& settingId = setting->GetId();
-  if (settingId == CSettings::SETTING_EVENTLOG_SHOW)
-    GetEventLog().ShowFullEventLog();
-#endif
 }
 
 void CProfileManager::SetCurrentProfileId(unsigned int profileId)

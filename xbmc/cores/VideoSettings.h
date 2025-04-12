@@ -40,6 +40,7 @@ enum EINTERLACEMETHOD
   VS_INTERLACEMETHOD_MAX // do not use and keep as last enum value.
 };
 
+
 enum ESCALINGMETHOD
 {
   VS_SCALINGMETHOD_NEAREST=0,

@@ -39,7 +39,6 @@ class CGUIButtonControl;
 class CGUIRadioButtonControl;
 class CGUISettingsSliderControl;
 class CGUILabelControl;
-class CGUIColorButtonControl;
 
 class CSetting;
 class CSettingAction;
@@ -172,7 +171,6 @@ protected:
   CGUISpinControlEx* m_pOriginalSpin;
   CGUISettingsSliderControl* m_pOriginalSlider;
   CGUIRadioButtonControl* m_pOriginalRadioButton;
-  CGUIColorButtonControl* m_pOriginalColorButton;
   CGUIButtonControl* m_pOriginalCategoryButton;
   CGUIButtonControl* m_pOriginalButton;
   CGUIEditControl* m_pOriginalEdit;

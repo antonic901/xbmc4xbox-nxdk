@@ -450,4 +450,3 @@ void CDisplaySettings::SettingOptionsResolutionsFiller(const SettingConstPtr& se
   if (res != RES_INVALID)
     current = res;
 }
-

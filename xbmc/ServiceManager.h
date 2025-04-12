@@ -13,6 +13,8 @@
 namespace ADDON
 {
 class CAddonMgr;
+class CBinaryAddonCache;
+class CServiceAddonManager;
 class CRepositoryUpdater;
 } // namespace ADDON
 
@@ -56,7 +58,9 @@ public:
   void DeinitStageOne();
 
   ADDON::CAddonMgr& GetAddonMgr();
+  ADDON::CBinaryAddonCache& GetBinaryAddonCache();
   KODI::ADDONS::CExtsMimeSupportList& GetExtsMimeSupportList();
+  ADDON::CServiceAddonManager& GetServiceAddons();
   ADDON::CRepositoryUpdater& GetRepositoryUpdater();
   CContextMenuManager& GetContextMenuManager();
   CDataCacheCore& GetDataCacheCore();
@@ -92,7 +96,9 @@ protected:
   };
 
   std::unique_ptr<ADDON::CAddonMgr> m_addonMgr;
+  std::unique_ptr<ADDON::CBinaryAddonCache> m_binaryAddonCache;
   std::unique_ptr<KODI::ADDONS::CExtsMimeSupportList> m_extsMimeSupportList;
+  std::unique_ptr<ADDON::CServiceAddonManager> m_serviceAddons;
   std::unique_ptr<ADDON::CRepositoryUpdater> m_repositoryUpdater;
   std::unique_ptr<CContextMenuManager, delete_contextMenuManager> m_contextMenuManager;
   std::unique_ptr<CDataCacheCore, delete_dataCacheCore> m_dataCacheCore;

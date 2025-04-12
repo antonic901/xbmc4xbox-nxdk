@@ -8,7 +8,7 @@
 
 #include "AddonManager.h"
 
-#include "utils/CompileInfo.h"
+#include "CompileInfo.h"
 #include "FileItem.h"
 #include "LangInfo.h"
 #include "ServiceBroker.h"
@@ -860,7 +860,7 @@ bool CAddonMgr::DisableAddon(const std::string& id, AddonDisabledReason disabled
   AddonPtr addon;
   if (GetAddon(id, addon, AddonType::UNKNOWN, OnlyEnabled::CHOICE_NO) && addon != nullptr)
   {
-    // TODO: add event logger
+    // TODO: add support for events
   }
 
   m_events.Publish(AddonEvents::Disabled(id));

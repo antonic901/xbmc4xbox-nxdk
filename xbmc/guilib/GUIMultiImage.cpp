@@ -29,6 +29,7 @@
 #include "input/Key.h"
 #include "WindowIDs.h"
 #include "utils/FileExtensionProvider.h"
+#include "TextureCache.h"
 #include "utils/Random.h"
 #include "utils/StringUtils.h"
 
@@ -234,11 +235,7 @@ void CGUIMultiImage::LoadDirectory()
    3. Bundled folder
    */
   CFileItem item(m_currentPath, false);
-#if 0
-  if (item.IsPicture() || CTextureCache::GetInstance().HasCachedImage(m_currentPath))
-#else
-  if (item.IsPicture())
-#endif
+  if (item.IsPicture() || CServiceBroker::GetTextureCache()->HasCachedImage(m_currentPath))
     m_files.push_back(m_currentPath);
   else // bundled folder?
     CServiceBroker::GetGUI()->GetTextureManager().GetBundledTexturesFromPath(m_currentPath, m_files);

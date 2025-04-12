@@ -128,6 +128,7 @@ bool CTagLoaderTagLib::Load(const std::string& strFileName, MUSIC_INFO::CMusicIn
   return Load(strFileName, tag, "", art);
 }
 
+
 #if 0
 template<>
 bool CTagLoaderTagLib::ParseTag(ASF::Tag *asf, EmbeddedArt *art, CMusicInfoTag& tag)
@@ -1002,6 +1003,7 @@ bool CTagLoaderTagLib::ParseTag(Tag *genericTag, EmbeddedArt *art, CMusicInfoTag
   return true;
 }
 #endif
+
 
 
 

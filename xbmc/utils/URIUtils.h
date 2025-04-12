@@ -13,6 +13,7 @@
 
 class CURL;
 class CAdvancedSettings;
+class CFileItem;
 
 class URIUtils
 {
@@ -28,6 +29,12 @@ public:
   static std::string GetExtension(const CURL& url);
   static std::string GetExtension(const std::string& strFileName);
 
+
+  /*! \brief Check if the CFileItem has a plugin path.
+   \param item The CFileItem.
+   \return true if there is a plugin path, false otherwise.
+  */
+  static bool HasPluginPath(const CFileItem& item);
 
   /*!
    \brief Check if there is a file extension
@@ -126,6 +133,7 @@ public:
   static bool IsInternetStream(const std::string& path, bool bStrictCheck = false);
   static bool IsInternetStream(const CURL& url, bool bStrictCheck = false);
   static bool IsStreamedFilesystem(const std::string& strPath);
+  static bool IsNetworkFilesystem(const std::string& strPath);
   static bool IsInAPK(const std::string& strFile);
   static bool IsInZIP(const std::string& strFile);
   static bool IsISO9660(const std::string& strFile);
@@ -212,6 +220,18 @@ public:
    \return Actual path without any "." or ".."
    */
   static std::string GetRealPath(const std::string &path);
+
+  /*!
+   \brief Updates the URL encoded hostname of the given path
+
+   This method must only be used to update paths encoded with
+   the old (Eden) URL encoding implementation to the new (Frodo)
+   URL encoding implementation (which does not URL encode -_.!().
+
+   \param strFilename Path to update
+   \return True if the path has been updated/changed otherwise false
+   */
+  static bool UpdateUrlEncoding(std::string &strFilename);
 
 private:
   static std::string resolvePath(const std::string &path);

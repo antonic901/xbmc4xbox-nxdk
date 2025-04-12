@@ -29,15 +29,9 @@
 #include "DetectDVDType.h"
 #endif
 #endif
-#ifdef HAS_DVD_DRIVE
 #include "Autorun.h"
-#include "AutorunMediaJob.h"
-#endif
 #include "GUIUserMessages.h"
 #include "dialogs/GUIDialogKaiToast.h"
-#ifdef HAS_DVD_DRIVE
-#include "dialogs/GUIDialogPlayEject.h"
-#endif
 #include "messaging/helpers/DialogOKHelper.h"
 #include "settings/AdvancedSettings.h"
 #include "settings/MediaSourceSettings.h"
@@ -202,9 +196,9 @@ void CMediaManager::GetNetworkLocations(VECSOURCES &locations, bool autolocation
     locations.push_back(share);
 #endif
 
-#if 0
     if (CServiceBroker::IsAddonInterfaceUp())
     {
+#if 0
       for (const auto& addon : CServiceBroker::GetVFSAddonCache().GetAddonInstances())
       {
         const auto& info = addon->GetProtocolInfo();
@@ -217,8 +211,8 @@ void CMediaManager::GetNetworkLocations(VECSOURCES &locations, bool autolocation
           locations.push_back(share);
         }
       }
-    }
 #endif
+    }
   }
 }
 

@@ -175,27 +175,6 @@ static int RunAddon(const std::vector<std::string>& params)
       CBuiltins::GetInstance().Execute(
           StringUtils::Format("RunScript({})", StringUtils::Join(params, ",")));
     }
-#if 0
-    else if (CServiceBroker::GetAddonMgr().GetAddon(addonid, addon, AddonType::GAMEDLL,
-                                                    OnlyEnabled::CHOICE_YES))
-    {
-      CFileItem item;
-
-      if (params.size() >= 2)
-      {
-        item = CFileItem(params[1], false);
-        item.GetGameInfoTag()->SetGameClient(addonid);
-      }
-      else
-        item = CFileItem(addon);
-
-      if (!g_application.PlayMedia(item, "", PLAYLIST::TYPE_NONE))
-      {
-        CLog::Log(LOGERROR, "RunAddon could not start {}", addonid);
-        return false;
-      }
-    }
-#endif
     else
       CLog::Log(
           LOGERROR,

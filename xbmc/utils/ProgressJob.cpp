@@ -52,7 +52,7 @@ bool CProgressJob::DoModal()
   // get a progress dialog if we don't already have one
   if (m_progressDialog == NULL)
   {
-    m_progressDialog = dynamic_cast<CGUIDialogProgress*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PROGRESS));
+    m_progressDialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogProgress>(WINDOW_DIALOG_PROGRESS);
 
     if (m_progressDialog == NULL)
       return false;

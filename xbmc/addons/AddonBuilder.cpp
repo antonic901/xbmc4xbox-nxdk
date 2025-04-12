@@ -16,6 +16,7 @@
 #include "addons/LanguageResource.h"
 #include "addons/PluginSource.h"
 #include "addons/Repository.h"
+#include "addons/Scraper.h"
 #include "addons/Service.h"
 #include "addons/Skin.h"
 #include "addons/UISoundsResource.h"
@@ -49,15 +50,16 @@ AddonPtr CAddonBuilder::Generate(const AddonInfoPtr& info, AddonType type)
       return std::make_shared<CAddon>(info, type);
   }
 
-#if 0
   // Handle audio encoder special cases
   if (type == AddonType::AUDIOENCODER)
   {
     // built in audio encoder
     if (StringUtils::StartsWithNoCase(info->ID(), "audioencoder.kodi.builtin."))
-      return std::make_shared<CAddonDll>(info, type);
+    {
+      CLog::Log(LOGINFO, "{} - 'audioencoder.kodi.builtin.*' are not supported", __FUNCTION__);
+      return AddonPtr();
+    }
   }
-#endif
 
   switch (type)
   {
@@ -94,8 +96,7 @@ AddonPtr CAddonBuilder::Generate(const AddonInfoPtr& info, AddonType type)
     case AddonType::SCRAPER_MUSICVIDEOS:
     case AddonType::SCRAPER_TVSHOWS:
     case AddonType::SCRAPER_LIBRARY:
-      CLog::Log(LOGINFO, "{} - Scraper addons are not supported", __FUNCTION__);
-      break;
+      return std::make_shared<CScraper>(info, type);
     case AddonType::SKIN:
       return std::make_shared<CSkinInfo>(info);
     case AddonType::RESOURCE_FONT:

@@ -11,6 +11,11 @@
 #include "FileItem.h"
 #include "ServiceBroker.h"
 #include "Util.h"
+#include "addons/AddonManager.h"
+#include "addons/gui/GUIWindowAddonBrowser.h"
+#include "addons/settings/SettingUrlEncodedString.h"
+#include "dialogs/GUIDialogFileBrowser.h"
+#include "dialogs/GUIDialogNumeric.h"
 #include "dialogs/GUIDialogSelect.h"
 #include "dialogs/GUIDialogSlider.h"
 #include "guilib/GUIComponent.h"
@@ -23,12 +28,15 @@
 #include "guilib/GUISpinControlEx.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
+#include "settings/MediaSourceSettings.h"
+#include "settings/SettingAddon.h"
 #include "settings/SettingControl.h"
 #include "settings/SettingDateTime.h"
 #include "settings/SettingPath.h"
 #include "settings/SettingUtils.h"
 #include "settings/lib/Setting.h"
 #include "settings/lib/SettingDefinitions.h"
+#include "storage/MediaManager.h"
 #include "utils/FileExtensionProvider.h"
 #include "utils/StringUtils.h"
 #include "utils/Variant.h"
@@ -36,6 +44,8 @@
 
 #include <set>
 #include <utility>
+
+using namespace ADDON;
 
 static std::string Localize(std::uint32_t code,
                             ILocalizer* localizer,
@@ -577,8 +587,8 @@ bool CGUIControlListSetting::OnClick()
     return false;
 
   CGUIDialogSelect* dialog =
-      dynamic_cast<CGUIDialogSelect*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(
-          WINDOW_DIALOG_SELECT));
+      CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(
+          WINDOW_DIALOG_SELECT);
   if (dialog == NULL)
     return false;
 
@@ -646,11 +656,45 @@ bool CGUIControlListSetting::OnClick()
       dialog->SetHeading(CVariant{ Localize(m_pSetting->GetLabel()) });
       dialog->SetItems(options);
       dialog->SetMultiSelection(control->CanMultiSelect());
+#if 0
+      dialog->EnableButton2(bAllowNewOption, strAddButton);
+#endif
 
       dialog->Open();
 
       if (!dialog->IsConfirmed())
         return false;
+
+#if 0
+      if (dialog->IsButton2Pressed())
+      {
+        // Get new list value
+        std::string strLabel;
+        bool bValidType = false;
+        while (!bValidType && CGUIKeyboardFactory::ShowAndGetInput(
+          strLabel, CVariant{ Localize(control->GetAddButtonLabel()) }, false))
+        {
+          // Validate new value is unique and truncate at any comma
+          StringUtils::Trim(strLabel);
+          strLabel = strLabel.substr(0, strLabel.find(','));
+          if (!strLabel.empty())
+          {
+            bValidType = !std::any_of(options.begin(), options.end(), [&](const auto& p) {
+              return p->GetProperty("value").asString() == strLabel;
+            });
+          }
+          if (bValidType)
+          { // Add new value to the list of options
+            CFileItemPtr pItem(new CFileItem(strLabel));
+            pItem->Select(true);
+            pItem->SetProperty("value", strLabel);
+            options.Add(pItem);
+            bValueAdded = true;
+          }
+        }
+      }
+      bRepeat = dialog->IsButton2Pressed();
+#endif
     }
   }
 
@@ -851,8 +895,60 @@ bool CGUIControlButtonSetting::OnClick()
   {
     std::shared_ptr<const CSettingControlButton> buttonControl =
         std::static_pointer_cast<const CSettingControlButton>(control);
-    if (controlFormat == "path" || controlFormat == "file" || controlFormat == "image")
+    if (controlFormat == "addon")
+    {
+      // prompt for the addon
+      std::shared_ptr<CSettingAddon> setting;
+      std::vector<std::string> addonIDs;
+      if (m_pSetting->GetType() == SettingType::List)
+      {
+        std::shared_ptr<CSettingList> settingList =
+            std::static_pointer_cast<CSettingList>(m_pSetting);
+        setting = std::static_pointer_cast<CSettingAddon>(settingList->GetDefinition());
+        for (const SettingPtr& addon : settingList->GetValue())
+          addonIDs.push_back(std::static_pointer_cast<CSettingAddon>(addon)->GetValue());
+      }
+      else
+      {
+        setting = std::static_pointer_cast<CSettingAddon>(m_pSetting);
+        addonIDs.push_back(setting->GetValue());
+      }
+
+      if (CGUIWindowAddonBrowser::SelectAddonID(
+              setting->GetAddonType(), addonIDs, setting->AllowEmpty(),
+              buttonControl->ShowAddonDetails(), m_pSetting->GetType() == SettingType::List,
+              buttonControl->ShowInstalledAddons(), buttonControl->ShowInstallableAddons(),
+              buttonControl->ShowMoreAddons()) != 1)
+        return false;
+
+      if (m_pSetting->GetType() == SettingType::List)
+        std::static_pointer_cast<CSettingList>(m_pSetting)->FromString(addonIDs);
+      else
+        SetValid(setting->SetValue(addonIDs[0]));
+    }
+    else if (controlFormat == "path" || controlFormat == "file" || controlFormat == "image")
       SetValid(GetPath(std::static_pointer_cast<CSettingPath>(m_pSetting), m_localizer));
+    else if (controlFormat == "date")
+    {
+      std::shared_ptr<CSettingDate> settingDate =
+          std::static_pointer_cast<CSettingDate>(m_pSetting);
+
+      KODI::TIME::SystemTime systemdate;
+      settingDate->GetDate().GetAsSystemTime(systemdate);
+      if (CGUIDialogNumeric::ShowAndGetDate(systemdate, Localize(buttonControl->GetHeading())))
+        SetValid(settingDate->SetDate(CDateTime(systemdate)));
+    }
+    else if (controlFormat == "time")
+    {
+      std::shared_ptr<CSettingTime> settingTime =
+          std::static_pointer_cast<CSettingTime>(m_pSetting);
+
+      KODI::TIME::SystemTime systemtime;
+      settingTime->GetTime().GetAsSystemTime(systemtime);
+
+      if (CGUIDialogNumeric::ShowAndGetTime(systemtime, Localize(buttonControl->GetHeading())))
+        SetValid(settingTime->SetTime(CDateTime(systemtime)));
+    }
     else if (controlFormat == "action")
     {
       // simply call the OnSettingAction callback and whoever knows what to
@@ -921,6 +1017,34 @@ void CGUIControlButtonSetting::Update(bool fromControl, bool updateDisplayOnly)
       {
         case SettingType::String:
         {
+          if (controlFormat == "addon")
+          {
+            std::vector<std::string> addonIDs;
+            if (m_pSetting->GetType() == SettingType::List)
+            {
+              for (const auto& addonSetting :
+                   std::static_pointer_cast<CSettingList>(m_pSetting)->GetValue())
+                addonIDs.push_back(
+                    std::static_pointer_cast<CSettingAddon>(addonSetting)->GetValue());
+            }
+            else
+              addonIDs.push_back(std::static_pointer_cast<CSettingString>(setting)->GetValue());
+
+            std::vector<std::string> addonNames;
+            for (const auto& addonID : addonIDs)
+            {
+              ADDON::AddonPtr addon;
+              if (CServiceBroker::GetAddonMgr().GetAddon(addonID, addon,
+                                                         ADDON::OnlyEnabled::CHOICE_YES))
+                addonNames.push_back(addon->Name());
+            }
+
+            if (addonNames.empty())
+              strText = g_localizeStrings.Get(231); // None
+            else
+              strText = StringUtils::Join(addonNames, ", ");
+          }
+          else
           {
             std::string strValue = std::static_pointer_cast<CSettingString>(setting)->GetValue();
             if (controlFormat == "path" || controlFormat == "file" || controlFormat == "image")
@@ -997,7 +1121,6 @@ bool CGUIControlButtonSetting::GetPath(const std::shared_ptr<CSettingPath>& path
 
   std::string path = pathSetting->GetValue();
 
-#if 0
   VECSOURCES shares;
   bool localSharesOnly = false;
   const std::vector<std::string>& sources = pathSetting->GetSources();
@@ -1046,7 +1169,6 @@ bool CGUIControlButtonSetting::GetPath(const std::shared_ptr<CSettingPath>& path
 
   if (!result)
     return false;
-#endif
 
   return pathSetting->SetValue(path);
 }
@@ -1141,7 +1263,6 @@ bool CGUIControlEditSetting::OnClick()
     return false;
 
   // update our string
-#if 0
   if (m_pSetting->GetControl()->GetFormat() == "urlencoded")
   {
     std::shared_ptr<CSettingUrlEncodedString> urlEncodedSetting =
@@ -1149,7 +1270,6 @@ bool CGUIControlEditSetting::OnClick()
     SetValid(urlEncodedSetting->SetDecodedValue(m_pEdit->GetLabel2()));
   }
   else
-#endif
     SetValid(m_pSetting->FromString(m_pEdit->GetLabel2()));
 
   return IsValid();
@@ -1165,7 +1285,6 @@ void CGUIControlEditSetting::Update(bool fromControl, bool updateDisplayOnly)
   std::shared_ptr<const CSettingControlEdit> control =
       std::static_pointer_cast<const CSettingControlEdit>(m_pSetting->GetControl());
 
-#if 0
   if (control->GetFormat() == "urlencoded")
   {
     std::shared_ptr<CSettingUrlEncodedString> urlEncodedSetting =
@@ -1173,7 +1292,6 @@ void CGUIControlEditSetting::Update(bool fromControl, bool updateDisplayOnly)
     m_pEdit->SetLabel2(urlEncodedSetting->GetDecodedValue());
   }
   else
-#endif
     m_pEdit->SetLabel2(m_pSetting->ToString());
 }
 

@@ -10,6 +10,7 @@
 
 #include "FileItem.h"
 #include "FilesystemInstaller.h"
+#include "GUIPassword.h"
 #include "GUIUserMessages.h" // for callback
 #include "ServiceBroker.h"
 #include "URL.h"
@@ -21,6 +22,7 @@
 #include "addons/addoninfo/AddonInfo.h"
 #include "addons/addoninfo/AddonType.h"
 #include "dialogs/GUIDialogExtendedProgressBar.h"
+#include "favourites/FavouritesService.h"
 #include "filesystem/Directory.h"
 #include "filesystem/File.h"
 #include "guilib/GUIComponent.h"
@@ -242,10 +244,8 @@ bool CAddonInstaller::InstallModal(const std::string& addonID,
                                    ADDON::AddonPtr& addon,
                                    InstallModalPrompt promptForInstall)
 {
-#if 0
   if (!g_passwordManager.CheckMenuLock(WINDOW_ADDON_BROWSER))
     return false;
-#endif
 
   // we assume that addons that are enabled don't get to this routine (i.e. that GetAddon() has been called)
   if (CServiceBroker::GetAddonMgr().GetAddon(addonID, addon, OnlyEnabled::CHOICE_NO))
@@ -403,10 +403,8 @@ bool CAddonInstaller::DoInstall(const AddonPtr& addon,
 
 bool CAddonInstaller::InstallFromZip(const std::string &path)
 {
-#if 0
   if (!g_passwordManager.CheckMenuLock(WINDOW_ADDON_BROWSER))
     return false;
-#endif
 
   CLog::Log(LOGDEBUG, "CAddonInstaller: installing from zip '{}'", CURL::GetRedacted(path));
 
@@ -926,6 +924,11 @@ bool CAddonInstallJob::DoWork()
     }
   }
 
+  bool notify = (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
+                     CSettings::SETTING_ADDONS_NOTIFICATIONS) ||
+                 m_isAutoUpdate == AutoUpdateJob::CHOICE_NO) &&
+                !IsModal() && m_dependsInstall == DependencyJob::CHOICE_NO;
+
   if (m_isAutoUpdate == AutoUpdateJob::CHOICE_YES &&
       m_addon->LifecycleState() == AddonLifecycleState::BROKEN)
   {
@@ -937,6 +940,8 @@ bool CAddonInstallJob::DoWork()
   {
     CLog::Log(LOGDEBUG, "CAddonInstallJob[{}]: installed addon marked as deprecated",
               m_addon->ID());
+    std::string text =
+        StringUtils::Format(g_localizeStrings.Get(24168), m_addon->LifecycleStateDescription());
   }
 
   // and we're done!
@@ -1229,7 +1234,6 @@ bool CAddonUnInstallJob::DoWork()
 
 void CAddonUnInstallJob::ClearFavourites()
 {
-#if 0
   bool bSave = false;
   CFileItemList items;
   CServiceBroker::GetFavouritesService().GetAll(items);
@@ -1244,5 +1248,4 @@ void CAddonUnInstallJob::ClearFavourites()
 
   if (bSave)
     CServiceBroker::GetFavouritesService().Save(items);
-#endif
 }

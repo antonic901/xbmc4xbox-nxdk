@@ -8,10 +8,32 @@
 
 #include <stdlib.h>
 #include "DirectoryFactory.h"
+#include "MultiPathDirectory.h"
+#include "StackDirectory.h"
+#include "FileDirectoryFactory.h"
+#include "PlaylistDirectory.h"
+#include "MusicDatabaseDirectory.h"
+#include "MusicSearchDirectory.h"
+#include "VideoDatabaseDirectory.h"
+#include "AddonsDirectory.h"
+#include "SourcesDirectory.h"
 #include "utils/log.h"
 
+#ifdef TARGET_POSIX
+#include "platform/posix/filesystem/PosixDirectory.h"
+#elif defined(TARGET_WINDOWS)
+#include "platform/win32/filesystem/Win32Directory.h"
+#elif defined(_XBOX)
+#include "platform/xbox/filesystem/XboxDirectory.h"
+#endif
+#include "PluginDirectory.h"
+#include "ZipDirectory.h"
+#include "FileItem.h"
 #include "URL.h"
+#include "ServiceBroker.h"
 #include "utils/StringUtils.h"
+
+using namespace ADDON;
 
 using namespace XFILE;
 
@@ -23,6 +45,35 @@ using namespace XFILE;
  */
 IDirectory* CDirectoryFactory::Create(const CURL& url)
 {
+  CFileItem item(url.Get(), true);
+  IFileDirectory* pDir = CFileDirectoryFactory::Create(url, &item);
+  if (pDir)
+    return pDir;
+
+#ifdef TARGET_POSIX
+  if (url.GetProtocol().empty() || url.IsProtocol("file"))
+  {
+    return new CPosixDirectory();
+  }
+#elif defined(TARGET_WINDOWS)
+  if (url.GetProtocol().empty() || url.IsProtocol("file")) return new CWin32Directory();
+#elif defined(_XBOX)
+  if (url.GetProtocol().empty() || url.IsProtocol("file")) return new CXboxDirectory();
+#else
+#error Local directory access is not implemented for this platform
+#endif
+  if (url.IsProtocol("sources")) return new CSourcesDirectory();
+  if (url.IsProtocol("addons")) return new CAddonsDirectory();
+  if (url.IsProtocol("plugin")) return new CPluginDirectory();
+  if (url.IsProtocol("zip")) return new CZipDirectory();
+  if (url.IsProtocol("multipath")) return new CMultiPathDirectory();
+  if (url.IsProtocol("stack")) return new CStackDirectory();
+  if (url.IsProtocol("playlistmusic")) return new CPlaylistDirectory();
+  if (url.IsProtocol("playlistvideo")) return new CPlaylistDirectory();
+  if (url.IsProtocol("musicdb")) return new CMusicDatabaseDirectory();
+  if (url.IsProtocol("musicsearch")) return new CMusicSearchDirectory();
+  if (url.IsProtocol("videodb")) return new CVideoDatabaseDirectory();
+
   CLog::Log(LOGWARNING, "{} - unsupported protocol({}) in {}", __FUNCTION__, url.GetProtocol(),
             url.GetRedacted());
   return NULL;

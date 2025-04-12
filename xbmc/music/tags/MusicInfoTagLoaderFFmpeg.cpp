@@ -26,12 +26,14 @@ static int vfs_file_read(void *h, uint8_t* buf, int size)
 
 static int64_t vfs_file_seek(void *h, int64_t pos, int whence)
 {
-  CFile* pFile = static_cast<CFile*>(h);
 #if 0
+  CFile* pFile = static_cast<CFile*>(h);
   if (whence == AVSEEK_SIZE)
     return pFile->GetLength();
   else
     return pFile->Seek(pos, whence & ~AVSEEK_FORCE);
+#else
+  return -1;
 #endif
 }
 

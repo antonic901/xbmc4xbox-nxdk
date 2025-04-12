@@ -26,6 +26,7 @@
 #include "application/ApplicationPowerHandling.h"
 #include "application/ApplicationSkinHandling.h"
 #include "playlists/PlayListFactory.h"
+#include "ServiceBroker.h"
 #include "messaging/ApplicationMessenger.h"
 #include "messaging/ThreadMessage.h"
 
@@ -200,7 +201,6 @@ bool CApplication::ProcessAndStartPlaylist(const std::string& strPlayList,
 {
   CLog::Log(LOGDEBUG, "CApplication::ProcessAndStartPlaylist({}, {})", strPlayList, playlistId);
 
-#if 0
   // initial exit conditions
   // no songs in playlist just return
   if (playlist.size() == 0)
@@ -229,7 +229,6 @@ bool CApplication::ProcessAndStartPlaylist(const std::string& strPlayList,
     CServiceBroker::GetPlaylistPlayer().Play(track, "");
     return true;
   }
-#endif
   return false;
 }
 

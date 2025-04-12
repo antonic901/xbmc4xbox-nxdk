@@ -13,6 +13,7 @@
 #include "dialogs/GUIDialogFileBrowser.h"
 #include "guilib/LocalizeStrings.h"
 #include "interfaces/AnnouncementManager.h"
+#include "interfaces/builtins/Builtins.h"
 #include "messaging/helpers/DialogHelper.h"
 #include "messaging/helpers/DialogOKHelper.h"
 #include "music/MusicLibraryQueue.h"
@@ -320,10 +321,8 @@ void CMediaSettings::OnSettingAction(const std::shared_ptr<const CSetting>& sett
         HELPERS::ShowOKDialogText(CVariant{700}, CVariant{703});
     }
   }
-#if 0
   else if (settingId == CSettings::SETTING_VIDEOLIBRARY_EXPORT)
     CBuiltins::GetInstance().Execute("exportlibrary(video)");
-#endif
   else if (settingId == CSettings::SETTING_VIDEOLIBRARY_IMPORT)
   {
     std::string path;

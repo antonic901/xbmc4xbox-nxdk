@@ -11,7 +11,7 @@
 #include "GUIPassword.h"
 #include "ServiceBroker.h"
 #include "addons/Skin.h"
-#include "application/Application.h"
+#include "application/ApplicationComponents.h"
 #include "application/ApplicationPlayer.h"
 #include "dialogs/GUIDialogYesNo.h"
 #include "guilib/GUIComponent.h"
@@ -72,7 +72,8 @@ void CGUIDialogVideoSettings::OnSettingChanged(const std::shared_ptr<const CSett
 
   CGUIDialogSettingsManualBase::OnSettingChanged(setting);
 
-  const auto appPlayer = g_application.m_pPlayer;
+  auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
 
   const std::string &settingId = setting->GetId();
   if (settingId == SETTING_VIDEO_INTERLACEMETHOD)
@@ -262,7 +263,8 @@ bool CGUIDialogVideoSettings::Save()
     db.EraseAllVideoSettings();
     db.Close();
 
-    const auto appPlayer = g_application.m_pPlayer;
+    const auto& components = CServiceBroker::GetAppComponents();
+    const auto appPlayer = components.GetComponent<CApplicationPlayer>();
 
     CMediaSettings::GetInstance().GetDefaultVideoSettings() = appPlayer->GetVideoSettings();
     CMediaSettings::GetInstance().GetDefaultVideoSettings().m_SubtitleStream = -1;
@@ -322,7 +324,8 @@ void CGUIDialogVideoSettings::InitializeSettings()
 
   bool usePopup = g_SkinInfo->HasSkinFile("DialogSlider.xml");
 
-  const auto appPlayer = g_application.m_pPlayer;
+  const auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
 
   const CVideoSettings videoSettings = appPlayer->GetVideoSettings();
 
@@ -435,13 +438,16 @@ void CGUIDialogVideoSettings::InitializeSettings()
   if (appPlayer->Supports(RENDERFEATURE_NONLINSTRETCH))
     AddToggle(groupVideo, SETTING_VIDEO_NONLIN_STRETCH, 659, SettingLevel::Basic, videoSettings.m_CustomNonLinStretch);
 
-#if 0
   // tone mapping
   if (appPlayer->Supports(RENDERFEATURE_TONEMAP))
   {
+#if 0
     bool visible = !(CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
                          CServiceBroker::GetWinSystem()->SETTING_WINSYSTEM_IS_HDR_DISPLAY) &&
                      CServiceBroker::GetWinSystem()->IsHDRDisplay());
+#else
+    bool visible = false;
+#endif
     entries.clear();
     entries.push_back(TranslatableIntegerSettingOption(36554, VS_TONEMAPMETHOD_OFF));
     entries.push_back(TranslatableIntegerSettingOption(36555, VS_TONEMAPMETHOD_REINHARD));
@@ -457,6 +463,7 @@ void CGUIDialogVideoSettings::InitializeSettings()
 
   // stereoscopic settings
   entries.clear();
+#if 0
   entries.push_back(TranslatableIntegerSettingOption(16316, RENDER_STEREO_MODE_OFF));
   entries.push_back(TranslatableIntegerSettingOption(36503, RENDER_STEREO_MODE_SPLIT_HORIZONTAL));
   entries.push_back(TranslatableIntegerSettingOption(36504, RENDER_STEREO_MODE_SPLIT_VERTICAL));
@@ -475,7 +482,8 @@ void CGUIDialogVideoSettings::AddVideoStreams(const std::shared_ptr<CSettingGrou
   if (group == NULL || settingId.empty())
     return;
 
-  const auto appPlayer = g_application.m_pPlayer;
+  auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
 
   m_videoStream = appPlayer->GetVideoStream();
   if (m_videoStream < 0)
@@ -490,7 +498,8 @@ void CGUIDialogVideoSettings::VideoStreamsOptionFiller(
     int& current,
     void* data)
 {
-  const auto appPlayer = g_application.m_pPlayer;
+  const auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
 
   int videoStreamCount = appPlayer->GetVideoStreamCount();
   // cycle through each video stream and add it to our list control

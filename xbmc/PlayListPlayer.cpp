@@ -18,6 +18,7 @@
 #include "application/ApplicationPlayer.h"
 #include "application/ApplicationPowerHandling.h"
 #include "dialogs/GUIDialogKaiToast.h"
+#include "filesystem/PluginDirectory.h"
 #include "filesystem/VideoDatabaseFile.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
@@ -562,9 +563,7 @@ void CPlayListPlayer::SetShuffle(Id playlistId, bool bYesNo, bool bNotify /* = f
   }
 
   // its likely that the playlist changed
-#if 0
   if (CServiceBroker::GetGUI() != nullptr)
-#endif
   {
     CGUIMessage msg(GUI_MSG_PLAYLIST_CHANGED, 0, 0);
     CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
@@ -624,9 +623,7 @@ void CPlayListPlayer::SetRepeat(Id playlistId, RepeatState state, bool bNotify /
   }
 
   // its likely that the playlist changed
-#if 0
   if (CServiceBroker::GetGUI() != nullptr)
-#endif
   {
     CGUIMessage msg(GUI_MSG_PLAYLIST_CHANGED, 0, 0);
     CServiceBroker::GetGUI()->GetWindowManager().SendMessage(msg);
@@ -655,7 +652,8 @@ void CPlayListPlayer::ReShuffle(Id playlistId, int iPosition)
   // so we shuffle starting at two positions below the current item
   else if (playlistId == m_iCurrentPlayList)
   {
-    const auto appPlayer = g_application.m_pPlayer;
+    const auto& components = CServiceBroker::GetAppComponents();
+    const auto appPlayer = components.GetComponent<CApplicationPlayer>();
     if ((appPlayer->IsPlayingAudio() && playlistId == TYPE_MUSIC) ||
         (appPlayer->IsPlayingVideo() && playlistId == TYPE_VIDEO))
     {
@@ -797,7 +795,8 @@ void CPlayListPlayer::AnnouncePropertyChanged(Id playlistId,
                                               const std::string& strProperty,
                                               const CVariant& value)
 {
-  const auto appPlayer = g_application.m_pPlayer;
+  const auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
 
   if (strProperty.empty() || value.isNull() ||
       (playlistId == TYPE_VIDEO && !appPlayer->IsPlayingVideo()) ||
@@ -818,7 +817,8 @@ int PLAYLIST::CPlayListPlayer::GetMessageMask()
 
 void PLAYLIST::CPlayListPlayer::OnApplicationMessage(KODI::MESSAGING::ThreadMessage* pMsg)
 {
-  const auto appPlayer = g_application.m_pPlayer;
+  auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
 
   auto wakeScreensaver = []() {
     auto& components = CServiceBroker::GetAppComponents();
@@ -951,14 +951,12 @@ void PLAYLIST::CPlayListPlayer::OnApplicationMessage(KODI::MESSAGING::ThreadMess
         if (list->Size() == 1 && !(*list)[0]->IsPlayList())
         {
           CFileItemPtr item = (*list)[0];
-#if 0
           // if the item is a plugin we need to resolve the URL to ensure the infotags are filled.
           if (URIUtils::HasPluginPath(*item) &&
               !XFILE::CPluginDirectory::GetResolvedPluginResult(*item))
           {
             return;
           }
-#endif
           if (item->IsAudio() || item->IsVideo())
             Play(item, pMsg->strParam);
           else

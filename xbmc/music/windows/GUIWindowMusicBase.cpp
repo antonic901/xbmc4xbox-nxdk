@@ -13,7 +13,9 @@
 #include "ServiceBroker.h"
 #include "Util.h"
 #include "application/Application.h"
+#include "application/ApplicationComponents.h"
 #include "application/ApplicationPlayer.h"
+#include "dialogs/GUIDialogMediaSource.h"
 #include "input/Key.h"
 #include "music/MusicDbUrl.h"
 #include "music/MusicLibraryQueue.h"
@@ -25,13 +27,16 @@
 #ifdef HAS_CDDA_RIPPER
 #include "cdrip/CDDARipper.h"
 #endif
+#include "Autorun.h"
 #include "FileItem.h"
 #include "GUIInfoManager.h"
 #include "GUIPassword.h"
 #include "PartyModeManager.h"
 #include "URL.h"
+#include "addons/gui/GUIDialogAddonInfo.h"
 #include "cores/playercorefactory/PlayerCoreFactory.h"
 #include "dialogs/GUIDialogProgress.h"
+#include "dialogs/GUIDialogSmartPlaylistEditor.h"
 #include "dialogs/GUIDialogYesNo.h"
 #include "filesystem/Directory.h"
 #include "filesystem/MusicDatabaseDirectory.h"
@@ -48,6 +53,7 @@
 #include "settings/MediaSourceSettings.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
+#include "storage/MediaManager.h"
 #include "utils/FileUtils.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
@@ -133,7 +139,7 @@ bool CGUIWindowMusicBase::OnMessage(CGUIMessage& message)
 
   case GUI_MSG_WINDOW_INIT:
     {
-      m_dlgProgress = dynamic_cast<CGUIDialogProgress*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_PROGRESS));
+      m_dlgProgress = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogProgress>(WINDOW_DIALOG_PROGRESS);
 
       m_musicdatabase.Open();
 
@@ -190,12 +196,10 @@ bool CGUIWindowMusicBase::OnMessage(CGUIMessage& message)
         {
           OnQueueItem(iItem);
         }
-#if 0
         else if (iAction == ACTION_QUEUE_ITEM_NEXT)
         {
           OnQueueItem(iItem, true);
         }
-#endif
         else if (iAction == ACTION_SHOW_INFO)
         {
           OnItemInfo(iItem);
@@ -213,7 +217,8 @@ bool CGUIWindowMusicBase::OnMessage(CGUIMessage& message)
         // use play button to add folders of items to temp playlist
         else if (iAction == ACTION_PLAYER_PLAY)
         {
-          const auto appPlayer = g_application.m_pPlayer;
+          const auto& components = CServiceBroker::GetAppComponents();
+          const auto appPlayer = components.GetComponent<CApplicationPlayer>();
           // if playback is paused or playback speed != 1, return
           if (appPlayer->IsPlayingAudio())
           {
@@ -308,9 +313,7 @@ void CGUIWindowMusicBase::OnItemInfo(int iItem)
 
   if (!m_vecItems->IsPlugin() && (item->IsPlugin() || item->IsScript()))
   {
-#if 0
     CGUIDialogAddonInfo::ShowForItem(item);
-#endif
     return;
   }
 
@@ -399,9 +402,7 @@ void CGUIWindowMusicBase::OnQueueItem(int iItem, bool first)
 
 void CGUIWindowMusicBase::UpdateButtons()
 {
-#if 0
   CONTROL_ENABLE_ON_CONDITION(CONTROL_BTNRIP, CServiceBroker::GetMediaManager().IsAudio());
-#endif
 
   CONTROL_ENABLE_ON_CONDITION(CONTROL_BTNSCAN,
                               !(m_vecItems->IsVirtualDirectoryRoot() ||
@@ -473,14 +474,12 @@ void CGUIWindowMusicBase::GetContextButtons(int itemNumber, CContextButtons &but
 #endif
     }
 
-#if 0
     // enable CDDB lookup if the current dir is CDDA
     if (CServiceBroker::GetMediaManager().IsDiscInDrive() && m_vecItems->IsCDDA() &&
         (profileManager->GetCurrentProfile().canWriteDatabases() || g_passwordManager.bMasterUser))
     {
       buttons.Add(CONTEXT_BUTTON_CDDB, 16002);
     }
-#endif
   }
   CGUIMediaWindow::GetContextButtons(itemNumber, buttons);
 }
@@ -522,12 +521,9 @@ bool CGUIWindowMusicBase::OnContextButton(int itemNumber, CONTEXT_BUTTON button)
   case CONTEXT_BUTTON_EDIT_SMART_PLAYLIST:
     {
       std::string playlist = item->IsSmartPlayList() ? item->GetPath() : m_vecItems->GetPath(); // save path as activatewindow will destroy our items
-#if 0
       if (CGUIDialogSmartPlaylistEditor::EditPlaylist(playlist, "music"))
         Refresh(true); // need to update
       return true;
-#endif
-      return false;
     }
 
   case CONTEXT_BUTTON_PLAY_WITH:
@@ -582,15 +578,11 @@ bool CGUIWindowMusicBase::OnContextButton(int itemNumber, CONTEXT_BUTTON button)
 
 bool CGUIWindowMusicBase::OnAddMediaSource()
 {
-#if 0
   return CGUIDialogMediaSource::ShowAndAddMediaSource("music");
-#endif
-  return false;
 }
 
 void CGUIWindowMusicBase::OnRipCD()
 {
-#if 0
   if (CServiceBroker::GetMediaManager().IsAudio())
   {
     if (!g_application.CurrentFileItem().IsCDDA())
@@ -602,12 +594,10 @@ void CGUIWindowMusicBase::OnRipCD()
     else
       HELPERS::ShowOKDialogText(CVariant{257}, CVariant{20099});
   }
-#endif
 }
 
 void CGUIWindowMusicBase::OnRipTrack(int iItem)
 {
-#if 0
   if (CServiceBroker::GetMediaManager().IsAudio())
   {
     if (!g_application.CurrentFileItem().IsCDDA())
@@ -620,7 +610,6 @@ void CGUIWindowMusicBase::OnRipTrack(int iItem)
     else
       HELPERS::ShowOKDialogText(CVariant{257}, CVariant{20099});
   }
-#endif
 }
 
 void CGUIWindowMusicBase::PlayItem(int iItem)

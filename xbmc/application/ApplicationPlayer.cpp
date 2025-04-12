@@ -11,9 +11,7 @@
 #include "ServiceBroker.h"
 #include "cores/DataCacheCore.h"
 #include "cores/IPlayer.h"
-#if 0
-#include "cores/VideoPlayer/VideoPlayer.h"
-#endif
+#include "FileItem.h"
 #include "cores/playercorefactory/PlayerCoreFactory.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"

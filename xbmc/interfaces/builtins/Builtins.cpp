@@ -113,7 +113,7 @@ bool CBuiltins::IsSystemPowerdownCommand(const std::string& execString)
   }
   else if (execute == "shutdown")
   {
-#ifndef _XBOX
+#if 0
     switch (CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_POWERMANAGEMENT_SHUTDOWNSTATE))
     {
       case POWERSTATE_SHUTDOWN:
@@ -124,8 +124,6 @@ bool CBuiltins::IsSystemPowerdownCommand(const std::string& execString)
       default:
         return false;
     }
-#else
-    return true;
 #endif
   }
   return false;
@@ -168,6 +166,7 @@ int CBuiltins::Execute(const std::string& execString)
   else
 #if 0
     return CServiceBroker::GetInputManager().ExecuteBuiltin(execute, params);
-#endif
+#else
     return -1;
+#endif
 }

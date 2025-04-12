@@ -13,12 +13,19 @@
 #include <string>
 #include <vector>
 
+namespace ADDON
+{
+enum class AddonType;
+class CAddonMgr;
+struct AddonEvent;
+}
+
 class CAdvancedSettings;
 
 class CFileExtensionProvider
 {
 public:
-  CFileExtensionProvider();
+  CFileExtensionProvider(ADDON::CAddonMgr& addonManager);
   ~CFileExtensionProvider();
 
   /*!
@@ -52,6 +59,11 @@ public:
   std::string GetFileFolderExtensions() const;
 
   /*!
+   * @brief Returns whether a url protocol from add-ons use encoded hostnames
+   */
+  bool EncodedHostName(const std::string& protocol) const;
+
+  /*!
    * @brief Returns true if related provider can operate related file
    *
    * @note Thought for cases e.g. by ISO, where can be a video or also a SACD.
@@ -59,8 +71,20 @@ public:
   bool CanOperateExtension(const std::string& path) const;
 
 private:
+  std::string GetAddonExtensions(ADDON::AddonType type) const;
+  std::string GetAddonFileFolderExtensions(ADDON::AddonType type) const;
+  void SetAddonExtensions();
+  void SetAddonExtensions(ADDON::AddonType type);
+
+  void OnAddonEvent(const ADDON::AddonEvent& event);
+
   // Construction properties
   std::shared_ptr<CAdvancedSettings> m_advancedSettings;
+  ADDON::CAddonMgr &m_addonManager;
+
+  // File extension properties
+  std::map<ADDON::AddonType, std::string> m_addonExtensions;
+  std::map<ADDON::AddonType, std::string> m_addonFileFolderExtensions;
 
   // Protocols from add-ons with encoded host names
   std::vector<std::string> m_encoded;

@@ -13,12 +13,16 @@
 #include "URL.h"
 #include "application/AppParams.h"
 #include "filesystem/SpecialProtocol.h"
+#include "network/DNSNameCache.h"
+#include "profiles/ProfileManager.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 #include "settings/lib/Setting.h"
 #include "settings/lib/SettingsManager.h"
+#include "utils/FileUtils.h"
 #include "utils/LangCodeExpander.h"
 #include "utils/StringUtils.h"
+#include "utils/SystemInfo.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/XMLUtils.h"
@@ -30,6 +34,8 @@
 #include <string>
 #include <vector>
 
+using namespace ADDON;
+
 CAdvancedSettings::CAdvancedSettings()
 {
   m_initialized = false;
@@ -38,8 +44,10 @@ CAdvancedSettings::CAdvancedSettings()
 
 void CAdvancedSettings::OnSettingsLoaded()
 {
+  const std::shared_ptr<CProfileManager> profileManager = CServiceBroker::GetSettingsComponent()->GetProfileManager();
+
   // load advanced settings
-  Load();
+  Load(*profileManager);
 
   // default players?
   CLog::Log(LOGINFO, "Default Video Player: {}", m_videoDefaultPlayer);
@@ -442,7 +450,7 @@ void CAdvancedSettings::Initialize()
 
   m_openGlDebugging = false;
 
-  m_userAgent = "XBMC/Xbox; NXDK";
+  m_userAgent = g_sysinfo.GetUserAgent();
 
   m_nfsTimeout = 30;
   m_nfsRetries = -1;
@@ -450,7 +458,7 @@ void CAdvancedSettings::Initialize()
   m_initialized = true;
 }
 
-bool CAdvancedSettings::Load()
+bool CAdvancedSettings::Load(const CProfileManager &profileManager)
 {
   // NOTE: This routine should NOT set the default of any of these parameters
   //       it should instead use the versions of GetString/Integer/Float that
@@ -460,7 +468,7 @@ bool CAdvancedSettings::Load()
   for (unsigned int i = 0; i < m_settingsFiles.size(); i++)
     ParseSettingsFile(m_settingsFiles[i]);
 
-  ParseSettingsFile("special://masterprofile/advancedsettings.xml");
+  ParseSettingsFile(profileManager.GetUserDataItem("advancedsettings.xml"));
 
   // Add the list of disc stub extensions (if any) to the list of video extensions
   if (!m_discStubExtensions.empty())
@@ -472,9 +480,7 @@ bool CAdvancedSettings::Load()
 void CAdvancedSettings::ParseSettingsFile(const std::string &file)
 {
   CXBMCTinyXML advancedXML;
-#if 0
   if (!CFileUtils::Exists(file))
-#endif
   {
     CLog::Log(LOGINFO, "No settings file to load ({})", file);
     return;
@@ -1099,6 +1105,23 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
       if (filter->FirstChild())
         m_musicTagsFromFileFilters.push_back(filter->FirstChild()->ValueStr());
       filter = filter->NextSibling("filter");
+    }
+  }
+
+  TiXmlElement* pHostEntries = pRootElement->FirstChildElement("hosts");
+  if (pHostEntries)
+  {
+    TiXmlElement* element = pHostEntries->FirstChildElement("entry");
+    while(element)
+    {
+      if(!element->NoChildren())
+      {
+        std::string name  = XMLUtils::GetAttribute(element, "name");
+        std::string value = element->FirstChild()->ValueStr();
+        if (!name.empty())
+          CDNSNameCache::Add(name, value);
+      }
+      element = element->NextSiblingElement("entry");
     }
   }
 

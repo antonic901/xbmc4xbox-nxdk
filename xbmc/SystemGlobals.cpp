@@ -5,8 +5,8 @@
  *  SPDX-License-Identifier: GPL-2.0-or-later
  *  See LICENSES/README.md for more information.
  */
-
 #include "utils/AlarmClock.h"
+#include "GUIInfoManager.h"
 #include "filesystem/DirectoryCache.h"
 #include "GUIPassword.h"
 #include "utils/LangCodeExpander.h"
@@ -27,4 +27,4 @@ std::map<std::string, std::string> CSpecialProtocol::m_pathMap;
 
   CPartyModeManager     g_partyModeManager;
 
-  CAlarmClock        g_alarmClock;
+  CAlarmClock        g_alarmClock;;

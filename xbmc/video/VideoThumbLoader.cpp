@@ -93,12 +93,13 @@ bool CThumbExtractor::DoWork()
 
   // For HTTP/FTP we only allow extraction when on a LAN
   if (URIUtils::IsRemote(m_item.GetPath()) &&
-     //!URIUtils::IsOnLAN(m_item.GetPath())  &&
+     !URIUtils::IsOnLAN(m_item.GetPath())  &&
      (URIUtils::IsFTP(m_item.GetPath())    ||
       URIUtils::IsHTTP(m_item.GetPath())))
     return false;
 
   bool result=false;
+#if 0
   if (m_thumb)
   {
     CLog::Log(LOGDEBUG, "{} - trying to extract thumb from video file {}", __FUNCTION__,
@@ -106,7 +107,6 @@ bool CThumbExtractor::DoWork()
     // construct the thumb cache file
     CTextureDetails details;
     details.file = CTextureCache::GetCacheFile(m_target) + ".jpg";
-#if 0
     result = CDVDFileInfo::ExtractThumb(m_item, details, m_fillStreamDetails ? &m_item.GetVideoInfoTag()->m_streamDetails : nullptr, m_pos);
     if (result)
     {
@@ -126,7 +126,6 @@ bool CThumbExtractor::DoWork()
         }
       }
     }
-#endif
   }
   else if (!m_item.IsPlugin() &&
            (!m_item.HasVideoInfoTag() ||
@@ -135,10 +134,9 @@ bool CThumbExtractor::DoWork()
     // No tag or no details set, so extract them
     CLog::Log(LOGDEBUG, "{} - trying to extract filestream details from video file {}",
               __FUNCTION__, CURL::GetRedacted(m_item.GetPath()));
-#if 0
     result = CDVDFileInfo::GetFileStreamDetails(&m_item);
-#endif
   }
+#endif
 
   if (result)
   {
@@ -757,40 +755,6 @@ void CVideoThumbLoader::DetectAndAddMissingItemData(CFileItem &item)
       item.SetProperty("SubtitleLanguage." + index, details.GetSubtitleLanguage(i).c_str());
     }
   }
-
-#if 0
-  const CStereoscopicsManager &stereoscopicsManager = CServiceBroker::GetGUI()->GetStereoscopicsManager();
-
-  std::string stereoMode;
-
-  // detect stereomode for videos
-  if (item.HasVideoInfoTag())
-    stereoMode = item.GetVideoInfoTag()->m_streamDetails.GetStereoMode();
-
-  if (stereoMode.empty())
-  {
-    std::string path = item.GetPath();
-    if (item.IsVideoDb() && item.HasVideoInfoTag())
-      path = item.GetVideoInfoTag()->GetPath();
-
-    // check for custom stereomode setting in video settings
-    CVideoSettings itemVideoSettings;
-    m_videoDatabase->Open();
-    if (m_videoDatabase->GetVideoSettings(item, itemVideoSettings) && itemVideoSettings.m_StereoMode != RENDER_STEREO_MODE_OFF)
-    {
-      stereoMode = CStereoscopicsManager::ConvertGuiStereoModeToString(static_cast<RENDER_STEREO_MODE>(itemVideoSettings.m_StereoMode));
-    }
-    m_videoDatabase->Close();
-
-    // still empty, try grabbing from filename
-    //! @todo in case of too many false positives due to using the full path, extract the filename only using string utils
-    if (stereoMode.empty())
-      stereoMode = stereoscopicsManager.DetectStereoModeByString(path);
-  }
-
-  if (!stereoMode.empty())
-    item.SetProperty("stereomode", CStereoscopicsManager::NormalizeStereoMode(stereoMode));
-#endif
 }
 
 const ArtMap& CVideoThumbLoader::GetArtFromCache(const std::string &mediaType, const int id)

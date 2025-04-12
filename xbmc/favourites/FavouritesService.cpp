@@ -19,8 +19,8 @@
 #include "utils/FileUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/XBMCTinyXML.h"
-#include "utils/Variant.h"
 #include "utils/log.h"
+#include "utils/Variant.h"
 
 #include <mutex>
 

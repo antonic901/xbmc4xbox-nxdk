@@ -616,4 +616,3 @@ private:
   bool m_fromService;
 };
 #endif //undef SWIG
-

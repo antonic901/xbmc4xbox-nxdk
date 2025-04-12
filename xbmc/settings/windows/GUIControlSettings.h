@@ -24,7 +24,6 @@ class CGUIButtonControl;
 class CGUIRadioButtonControl;
 class CGUISettingsSliderControl;
 class CGUILabelControl;
-class CGUIColorButtonControl;
 
 class CSetting;
 class CSettingControlSlider;

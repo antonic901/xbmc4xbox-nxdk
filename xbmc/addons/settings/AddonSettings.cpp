@@ -15,11 +15,13 @@
 #include "addons/addoninfo/AddonInfo.h"
 #include "addons/addoninfo/AddonType.h"
 #include "addons/binary-addons/AddonInstanceHandler.h"
+#include "addons/gui/GUIDialogAddonSettings.h"
 #include "addons/settings/SettingUrlEncodedString.h"
 #include "filesystem/Directory.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/LocalizeStrings.h"
 #include "messaging/ApplicationMessenger.h"
+#include "settings/SettingAddon.h"
 #include "settings/SettingConditions.h"
 #include "settings/SettingControl.h"
 #include "settings/SettingDateTime.h"
@@ -208,10 +210,8 @@ void CAddonSettings::OnSettingAction(const std::shared_ptr<const CSetting>& sett
   if (actionData.empty())
     return;
 
-#if 0
   if (closeDialog)
     CGUIDialogAddonSettings::SaveAndClose();
-#endif
 
   CServiceBroker::GetAppMessenger()->SendMsg(TMSG_EXECUTE_BUILT_IN, -1, -1, nullptr, actionData);
 }
@@ -1139,7 +1139,6 @@ SettingPtr CAddonSettings::InitializeFromOldSettingAddon(const std::string& sett
                                                          const std::string& defaultValue,
                                                          const int settingLabel)
 {
-#if 0
   // get addon types
   std::string addonTypeStr = XMLUtils::GetAttribute(settingElement, "addontype");
   const auto addonTypesStr = StringUtils::Split(addonTypeStr, ",");
@@ -1201,8 +1200,6 @@ SettingPtr CAddonSettings::InitializeFromOldSettingAddon(const std::string& sett
   setting->SetControl(control);
 
   return setting;
-#endif
-  return nullptr;
 }
 
 SettingPtr CAddonSettings::InitializeFromOldSettingEnums(

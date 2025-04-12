@@ -111,7 +111,7 @@ bool RemoveItem(CFileItemList& items, const std::shared_ptr<CFileItem>& item)
 bool ShouldEnableMoveItems()
 {
   auto& mgr = CServiceBroker::GetGUI()->GetWindowManager();
-  CGUIWindowFavourites* window = dynamic_cast<CGUIWindowFavourites*>(mgr.GetWindow(WINDOW_FAVOURITES));
+  CGUIWindowFavourites* window = mgr.GetWindow<CGUIWindowFavourites>(WINDOW_FAVOURITES);
   if (window && window->IsActive())
   {
     const CGUIViewState* state = window->GetViewState();

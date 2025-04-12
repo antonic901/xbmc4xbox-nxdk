@@ -17,6 +17,7 @@
 #include "addons/AddonManager.h"
 #include "addons/AddonRepos.h"
 #include "addons/AddonSystemSettings.h"
+#include "addons/kodi-dev-kit/include/kodi/addon-instance/AudioDecoder.h" // KODI_ADDON_AUDIODECODER_TRACK_EXT
 #include "addons/ExtsMimeSupportList.h"
 #include "addons/IAddon.h"
 #include "addons/addoninfo/AddonInfo.h"
@@ -282,8 +283,8 @@ static const std::string LOCAL_CACHE =
 
 int CGUIDialogAddonInfo::AskForVersion(std::vector<std::pair<CAddonVersion, std::string>>& versions)
 {
-  auto dialog = dynamic_cast<CGUIDialogSelect*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(
-      WINDOW_DIALOG_SELECT));
+  auto dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(
+      WINDOW_DIALOG_SELECT);
   dialog->Reset();
   dialog->SetHeading(CVariant{21338});
   dialog->SetUseDetails(true);
@@ -514,11 +515,6 @@ bool CGUIDialogAddonInfo::CanRun() const
   {
     if (m_localAddon->Type() == AddonType::SCRIPT)
       return true;
-
-#if 0
-    if (GAME::CGameUtils::IsStandaloneGame(m_localAddon))
-      return true;
-#endif
   }
 
   return false;
@@ -630,8 +626,8 @@ bool CGUIDialogAddonInfo::ShowDependencyList(Reactivate reactivate, EntryPoint e
 {
   if (entryPoint != EntryPoint::INSTALL || m_showDepDialogOnInstall)
   {
-    auto pDialog = dynamic_cast<CGUIDialogSelect*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(
-        WINDOW_DIALOG_SELECT));
+    auto pDialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(
+        WINDOW_DIALOG_SELECT);
     CFileItemList items;
 
     for (const auto& it : m_depsInstalledWithAvailable)
@@ -753,16 +749,14 @@ void CGUIDialogAddonInfo::ShowSupportList()
     list =
         CServiceBroker::GetExtsMimeSupportList().GetSupportedExtsAndMimeTypes(m_localAddon->ID());
 
-  auto pDialog = dynamic_cast<CGUIDialogSelect*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(
-      WINDOW_DIALOG_SELECT));
+  auto pDialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogSelect>(
+      WINDOW_DIALOG_SELECT);
   CFileItemList items;
   for (const auto& entry : list)
   {
-#if 0
     // Ignore included extension about track support
     if (StringUtils::EndsWith(entry.m_name, KODI_ADDON_AUDIODECODER_TRACK_EXT))
       continue;
-#endif
 
     std::string label;
     if (entry.m_type == AddonSupportType::Extension)
@@ -801,8 +795,8 @@ bool CGUIDialogAddonInfo::ShowForItem(const CFileItemPtr& item)
     return false;
 
   CGUIDialogAddonInfo* dialog =
-      dynamic_cast<CGUIDialogAddonInfo*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(
-          WINDOW_DIALOG_ADDON_INFO));
+      CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogAddonInfo>(
+          WINDOW_DIALOG_ADDON_INFO);
   if (!dialog)
     return false;
   if (!dialog->SetItem(item))

@@ -288,16 +288,12 @@ void CSkinInfo::LoadTimers()
   const std::string timersPath =
       CSpecialProtocol::TranslatePathConvertCase(GetSkinPath("Timers.xml"));
   CLog::LogF(LOGINFO, "Trying to load skin timers from {}", timersPath);
-#if 0
   m_skinTimerManager.LoadTimers(timersPath);
-#endif
 }
 
 void CSkinInfo::ProcessTimers()
 {
-#if 0
   m_skinTimerManager.Process();
-#endif
 }
 void CSkinInfo::ResolveIncludes(TiXmlElement* node,
                                 std::map<INFO::InfoPtr, bool>* xmlIncludeConditions /* = nullptr */)
@@ -406,7 +402,7 @@ void CSkinInfo::OnPostInstall(bool update, bool modal)
                     HELPERS::ShowYesNoDialogText(CVariant{Name()}, CVariant{24099}) ==
                         DialogResponse::CHOICE_YES))
   {
-    CGUIDialogKaiToast *toast = dynamic_cast<CGUIDialogKaiToast*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_KAI_TOAST));
+    CGUIDialogKaiToast *toast = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogKaiToast>(WINDOW_DIALOG_KAI_TOAST);
     if (toast)
     {
       toast->ResetTimer();
@@ -422,39 +418,27 @@ void CSkinInfo::OnPostInstall(bool update, bool modal)
 
 void CSkinInfo::Unload()
 {
-#if 0
   m_skinTimerManager.Stop();
-#endif
 }
 
 bool CSkinInfo::TimerIsRunning(const std::string& timer) const
 {
-#if 0
   return m_skinTimerManager.TimerIsRunning(timer);
-#endif
-  return false;
 }
 
 float CSkinInfo::GetTimerElapsedSeconds(const std::string& timer) const
 {
-#if 0
   return m_skinTimerManager.GetTimerElapsedSeconds(timer);
-#endif
-  return 0.0f;
 }
 
 void CSkinInfo::TimerStart(const std::string& timer) const
 {
-#if 0
   m_skinTimerManager.TimerStart(timer);
-#endif
 }
 
 void CSkinInfo::TimerStop(const std::string& timer) const
 {
-#if 0
   m_skinTimerManager.TimerStop(timer);
-#endif
 }
 
 void CSkinInfo::SettingOptionsSkinColorsFiller(const SettingConstPtr& setting,

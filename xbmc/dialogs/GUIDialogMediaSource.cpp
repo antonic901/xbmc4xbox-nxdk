@@ -122,7 +122,7 @@ bool CGUIDialogMediaSource::OnMessage(CGUIMessage& message)
 // \return True if the media source is added, false otherwise.
 bool CGUIDialogMediaSource::ShowAndAddMediaSource(const std::string &type)
 {
-  CGUIDialogMediaSource *dialog = dynamic_cast<CGUIDialogMediaSource*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_MEDIA_SOURCE));
+  CGUIDialogMediaSource *dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogMediaSource>(WINDOW_DIALOG_MEDIA_SOURCE);
   if (!dialog) return false;
   dialog->Initialize();
   dialog->SetShare(CMediaSource());
@@ -163,7 +163,7 @@ bool CGUIDialogMediaSource::ShowAndEditMediaSource(const std::string &type, cons
 bool CGUIDialogMediaSource::ShowAndEditMediaSource(const std::string &type, const CMediaSource &share)
 {
   std::string strOldName = share.strName;
-  CGUIDialogMediaSource *dialog = dynamic_cast<CGUIDialogMediaSource*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_MEDIA_SOURCE));
+  CGUIDialogMediaSource *dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogMediaSource>(WINDOW_DIALOG_MEDIA_SOURCE);
   if (!dialog) return false;
   dialog->Initialize();
   dialog->SetShare(share);
@@ -272,22 +272,6 @@ void CGUIDialogMediaSource::OnPathBrowse(int item)
     share1.m_ignore = true;
     extraShares.push_back(share1);
 
-#ifndef _XBOX
-    // add the recordings dir as needed
-    if (CPVRDirectory::HasRadioRecordings())
-    {
-      share1.strPath = PVR::CPVRRecordingsPath::PATH_ACTIVE_RADIO_RECORDINGS;
-      share1.strName = g_localizeStrings.Get(19017); // Recordings
-      extraShares.push_back(share1);
-    }
-    if (CPVRDirectory::HasDeletedRadioRecordings())
-    {
-      share1.strPath = PVR::CPVRRecordingsPath::PATH_DELETED_RADIO_RECORDINGS;
-      share1.strName = g_localizeStrings.Get(19184); // Deleted recordings
-      extraShares.push_back(share1);
-    }
-#endif
-
     if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetString(CSettings::SETTING_AUDIOCDS_RECORDINGPATH) != "")
     {
       share1.strPath = "special://recordings/";
@@ -326,22 +310,6 @@ void CGUIDialogMediaSource::OnPathBrowse(int item)
     share1.strPath = "special://videoplaylists/";
     share1.strName = g_localizeStrings.Get(20012);
     extraShares.push_back(share1);
-
-#ifndef _XBOX
-    // add the recordings dir as needed
-    if (CPVRDirectory::HasTVRecordings())
-    {
-      share1.strPath = PVR::CPVRRecordingsPath::PATH_ACTIVE_TV_RECORDINGS;
-      share1.strName = g_localizeStrings.Get(19017); // Recordings
-      extraShares.push_back(share1);
-    }
-    if (CPVRDirectory::HasDeletedTVRecordings())
-    {
-      share1.strPath = PVR::CPVRRecordingsPath::PATH_DELETED_TV_RECORDINGS;
-      share1.strName = g_localizeStrings.Get(19184); // Deleted recordings
-      extraShares.push_back(share1);
-    }
-#endif
   }
   else if (m_type == "pictures")
   {

@@ -12,11 +12,15 @@
 #include "DatabaseManager.h"
 #include "PlayListPlayer.h"
 #include "addons/AddonManager.h"
+#include "addons/BinaryAddonCache.h"
 #include "addons/ExtsMimeSupportList.h"
 #include "addons/RepositoryUpdater.h"
+#include "addons/Service.h"
+#include "addons/binary-addons/BinaryAddonManager.h"
 #include "cores/DataCacheCore.h"
 #include "cores/playercorefactory/PlayerCoreFactory.h"
 #include "favourites/FavouritesService.h"
+#include "interfaces/generic/ScriptInvocationManager.h"
 #include "profiles/ProfileManager.h"
 #include "storage/MediaManager.h"
 #include "utils/FileExtensionProvider.h"
@@ -49,7 +53,7 @@ bool CServiceManager::InitForTesting()
   }
 
   m_extsMimeSupportList.reset(new ADDONS::CExtsMimeSupportList(*m_addonMgr));
-  m_fileExtensionProvider.reset(new CFileExtensionProvider());
+  m_fileExtensionProvider.reset(new CFileExtensionProvider(*m_addonMgr));
 
   init_level = 1;
   return true;
@@ -90,11 +94,16 @@ bool CServiceManager::InitStageTwo(const std::string& profilesUserDataFolder)
 
   m_dataCacheCore.reset(new CDataCacheCore());
 
+  m_binaryAddonCache.reset(new ADDON::CBinaryAddonCache());
+  m_binaryAddonCache->Init();
+
   m_favouritesService.reset(new CFavouritesService(profilesUserDataFolder));
+
+  m_serviceAddons.reset(new ADDON::CServiceAddonManager(*m_addonMgr));
 
   m_contextMenuManager.reset(new CContextMenuManager(*m_addonMgr));
 
-  m_fileExtensionProvider.reset(new CFileExtensionProvider());
+  m_fileExtensionProvider.reset(new CFileExtensionProvider(*m_addonMgr));
 
   m_weatherManager.reset(new CWeatherManager());
 
@@ -120,7 +129,7 @@ void CServiceManager::DeinitStageThree()
 {
   init_level = 2;
   m_playerCoreFactory.reset();
-  m_contextMenuManager->Init();
+  m_contextMenuManager->Deinit();
 }
 
 void CServiceManager::DeinitStageTwo()
@@ -130,7 +139,9 @@ void CServiceManager::DeinitStageTwo()
   m_weatherManager.reset();
   m_fileExtensionProvider.reset();
   m_contextMenuManager.reset();
+  m_serviceAddons.reset();
   m_favouritesService.reset();
+  m_binaryAddonCache.reset();
   m_dataCacheCore.reset();
   m_extsMimeSupportList.reset();
   m_repositoryUpdater.reset();
@@ -156,6 +167,16 @@ ADDON::CAddonMgr& CServiceManager::GetAddonMgr()
 ADDONS::CExtsMimeSupportList& CServiceManager::GetExtsMimeSupportList()
 {
   return *m_extsMimeSupportList;
+}
+
+ADDON::CBinaryAddonCache& CServiceManager::GetBinaryAddonCache()
+{
+  return *m_binaryAddonCache;
+}
+
+ADDON::CServiceAddonManager& CServiceManager::GetServiceAddons()
+{
+  return *m_serviceAddons;
 }
 
 ADDON::CRepositoryUpdater& CServiceManager::GetRepositoryUpdater()

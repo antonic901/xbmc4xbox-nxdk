@@ -16,7 +16,9 @@
 #include "addons/AddonManager.h"
 #include "addons/addoninfo/AddonInfo.h"
 #include "addons/addoninfo/AddonType.h"
+#include "addons/gui/GUIDialogAddonSettings.h"
 #include "application/Application.h"
+#include "application/ApplicationComponents.h"
 #include "application/ApplicationPlayer.h"
 #include "cores/IPlayer.h"
 #include "dialogs/GUIDialogContextMenu.h"
@@ -176,7 +178,8 @@ bool CGUIDialogSubtitles::OnMessage(CGUIMessage& message)
   }
   else if (message.GetMessage() == GUI_MSG_WINDOW_DEINIT)
   {
-    const auto appPlayer = g_application.m_pPlayer;
+    auto& components = CServiceBroker::GetAppComponents();
+    const auto appPlayer = components.GetComponent<CApplicationPlayer>();
     // Resume the video if the user has requested it
     if (appPlayer->IsPaused() && m_pausedOnRun)
       appPlayer->Pause();
@@ -194,7 +197,8 @@ void CGUIDialogSubtitles::OnInitWindow()
 {
   // Pause the video if the user has requested it
   m_pausedOnRun = false;
-  const auto appPlayer = g_application.m_pPlayer;
+  auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
   if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
           CSettings::SETTING_SUBTITLES_PAUSEONSEARCH) &&
       !appPlayer->IsPaused())
@@ -315,7 +319,8 @@ bool CGUIDialogSubtitles::SetService(const std::string &service)
       SET_CONTROL_FILENAME(CONTROL_NAMELOGO, icon);
     }
 
-    const auto appPlayer = g_application.m_pPlayer;
+    const auto& components = CServiceBroker::GetAppComponents();
+    const auto appPlayer = components.GetComponent<CApplicationPlayer>();
     if (appPlayer->GetSubtitleCount() == 0)
       SET_CONTROL_HIDDEN(CONTROL_SUBSEXIST);
     else
@@ -369,7 +374,8 @@ void CGUIDialogSubtitles::Search(const std::string &search/*=""*/)
     AudioStreamInfo info;
     std::string strLanguage;
 
-    const auto appPlayer = g_application.m_pPlayer;
+    const auto& components = CServiceBroker::GetAppComponents();
+    const auto appPlayer = components.GetComponent<CApplicationPlayer>();
     appPlayer->GetAudioStreamInfo(CURRENT_STREAM, info);
 
     if (!g_LangCodeExpander.Lookup(info.language, strLanguage))
@@ -405,7 +411,8 @@ void CGUIDialogSubtitles::OnSearchComplete(const CFileItemList *items)
   m_updateSubsList = true;
   MarkDirtyRegion();
 
-  const auto appPlayer = g_application.m_pPlayer;
+  const auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
   if (!items->IsEmpty() && appPlayer->GetSubtitleCount() == 0 &&
       m_LastAutoDownloaded != g_application.CurrentFile() &&
       CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
@@ -443,9 +450,7 @@ void CGUIDialogSubtitles::OnSubtitleServiceContextMenu(int itemIdx)
                                                  AddonType::SUBTITLE_MODULE,
                                                  OnlyEnabled::CHOICE_YES))
       {
-#if 0
         CGUIDialogAddonSettings::ShowForAddon(addon);
-#endif
       }
       else
       {
@@ -692,6 +697,7 @@ void CGUIDialogSubtitles::ClearServices()
 
 void CGUIDialogSubtitles::SetSubtitles(const std::string &subtitle)
 {
-  const auto appPlayer = g_application.m_pPlayer;
+  auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
   appPlayer->AddSubtitle(subtitle);
 }

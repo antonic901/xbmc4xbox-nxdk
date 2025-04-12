@@ -11,6 +11,7 @@
 #include "addons/AddonManager.h"
 #include "addons/IAddonManagerCallback.h"
 #include "addons/addoninfo/AddonInfo.h"
+#include "addons/gui/GUIDialogAddonSettings.h"
 #include "dialogs/GUIDialogKaiToast.h"
 #include "dialogs/GUIDialogYesNo.h"
 #include "guilib/GUIComponent.h"
@@ -55,7 +56,7 @@ CAddonStatusHandler::CAddonStatusHandler(const std::string& addonID,
   CLog::Log(LOGINFO,
             "Called Add-on status handler for '{}' of clientName:{}, clientID:{}, instanceID:{} "
             "(same Thread={})",
-            (double)status, m_addon->Name(), m_addon->ID(), m_instanceId, sameThread ? "yes" : "no");
+            static_cast<int>(status), m_addon->Name(), m_addon->ID(), m_instanceId, sameThread ? "yes" : "no");
 
   m_status = status;
 
@@ -101,7 +102,7 @@ void CAddonStatusHandler::Process()
   /* Some required settings are missing/invalid */
   else if (m_status == ADDON_STATUS_NEED_SETTINGS)
   {
-    CGUIDialogYesNo* pDialogYesNo = dynamic_cast<CGUIDialogYesNo*>(CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_YES_NO));
+    CGUIDialogYesNo* pDialogYesNo = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogYesNo>(WINDOW_DIALOG_YES_NO);
     if (!pDialogYesNo) return;
 
     pDialogYesNo->SetHeading(CVariant{heading});
@@ -114,7 +115,6 @@ void CAddonStatusHandler::Process()
     if (!m_addon->HasSettings(m_instanceId))
       return;
 
-#if 0
     if (CGUIDialogAddonSettings::ShowForAddon(m_addon))
     {
       //! @todo Doesn't dialogaddonsettings save these automatically? It should do this.
@@ -123,7 +123,6 @@ void CAddonStatusHandler::Process()
           .GetCallbackForType(m_addon->Type())
           ->RequestRestart(m_addon->ID(), m_instanceId, true);
     }
-#endif
   }
 }
 

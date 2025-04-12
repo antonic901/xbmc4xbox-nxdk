@@ -103,18 +103,11 @@ static bool IsGameType(AddonType type)
 
 static bool IsStandaloneGame(const AddonPtr& addon)
 {
-#if 0
-  return GAME::CGameUtils::IsStandaloneGame(addon);
-#endif
   return false;
 }
 
 static bool IsEmulator(const AddonPtr& addon)
 {
-#if 0
-  return addon->Type() == AddonType::GAMEDLL &&
-         std::static_pointer_cast<GAME::CGameClient>(addon)->SupportsPath();
-#endif
   return false;
 }
 
@@ -130,11 +123,6 @@ static bool IsGameResource(const AddonPtr& addon)
 
 static bool IsGameSupportAddon(const AddonPtr& addon)
 {
-#if 0
-  return addon->Type() == AddonType::GAMEDLL &&
-         !std::static_pointer_cast<GAME::CGameClient>(addon)->SupportsPath() &&
-         !std::static_pointer_cast<GAME::CGameClient>(addon)->SupportsStandalone();
-#endif
   return false;
 }
 

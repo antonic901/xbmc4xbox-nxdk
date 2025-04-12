@@ -8,6 +8,7 @@
 
 #include "TimeUtils.h"
 #include "XBDateTime.h"
+#include "guilib/GraphicContext.h"
 
 #if   defined(TARGET_DARWIN)
 #include <mach/mach_time.h>
@@ -70,7 +71,7 @@ void CTimeUtils::UpdateFrameTime(bool flip)
   unsigned int last = frameTime;
   while (frameTime < currentTime)
   {
-    frameTime += (unsigned int)(1000 / CServiceBroker::GetWinSystem()->GetGfxContext().GetFPS());
+    frameTime += (unsigned int)(1000 / g_graphicsContext.GetFPS());
     // observe wrap around
     if (frameTime < last)
       break;

@@ -23,6 +23,7 @@
 #include "guilib/GUIButtonControl.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIControlGroupList.h"
+#include "GUIDialogFileBrowser.h"
 #include "GUIUserMessages.h"
 #include "GUIPassword.h"
 #include "ServiceBroker.h"
@@ -31,6 +32,8 @@
 #include "settings/MediaSourceSettings.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
+#include "GUIDialogMediaSource.h"
+#include "storage/MediaManager.h"
 #include "profiles/ProfileManager.h"
 #include "profiles/dialogs/GUIDialogLockSettings.h"
 #include "guilib/GUIWindowManager.h"
@@ -294,11 +297,7 @@ bool CGUIDialogContextMenu::OnContextButton(const std::string &type, const CFile
   switch (button)
   {
   case CONTEXT_BUTTON_EJECT_DRIVE:
-#if 0
-    return g_mediaManager.Eject(item->GetPath());
-#else
-    return false;
-#endif
+    return CServiceBroker::GetMediaManager().Eject(item->GetPath());
 
 #ifdef HAS_DVD_DRIVE
   case CONTEXT_BUTTON_EJECT_DISC:
@@ -323,11 +322,7 @@ bool CGUIDialogContextMenu::OnContextButton(const std::string &type, const CFile
     else if (!g_passwordManager.IsProfileLockUnlocked())
       return false;
 
-#if 0
     return CGUIDialogMediaSource::ShowAndEditMediaSource(type, *share);
-#else
-    return false;
-#endif
 
   case CONTEXT_BUTTON_REMOVE_SOURCE:
   {
@@ -418,10 +413,8 @@ bool CGUIDialogContextMenu::OnContextButton(const std::string &type, const CFile
 
       std::string strThumb;
       VECSOURCES shares;
-#if 0
-      g_mediaManager.GetLocalDrives(shares);
+      CServiceBroker::GetMediaManager().GetLocalDrives(shares);
       if (!CGUIDialogFileBrowser::ShowAndGetImage(items, shares, g_localizeStrings.Get(1030), strThumb))
-#endif
         return false;
 
       if (strThumb == "thumb://Current")

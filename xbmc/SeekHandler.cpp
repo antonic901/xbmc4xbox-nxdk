@@ -193,7 +193,6 @@ int CSeekHandler::GetSeekSize() const
 
 void CSeekHandler::SetSeekSize(double seekSize)
 {
-#if 0
   const auto& components = CServiceBroker::GetAppComponents();
   const auto appPlayer = components.GetComponent<CApplicationPlayer>();
   int64_t playTime = appPlayer->GetTime();
@@ -203,7 +202,6 @@ void CSeekHandler::SetSeekSize(double seekSize)
   m_seekSize = seekSize > 0
     ? std::min(seekSize, maxSeekSize)
     : std::max(seekSize, minSeekSize);
-#endif
 }
 
 bool CSeekHandler::InProgress() const
