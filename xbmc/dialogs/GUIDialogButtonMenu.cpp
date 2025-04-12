@@ -37,8 +37,7 @@ void CGUIDialogButtonMenu::FrameMove()
   // get the active control, and put it's label into the label control
   const CGUIControl *pControl = GetFocusedControl();
   if (pControl && (pControl->GetControlType() == CGUIControl::GUICONTROL_BUTTON ||
-                   pControl->GetControlType() == CGUIControl::GUICONTROL_TOGGLEBUTTON ||
-                   pControl->GetControlType() == CGUIControl::GUICONTROL_COLORBUTTON))
+                   pControl->GetControlType() == CGUIControl::GUICONTROL_TOGGLEBUTTON))
   {
     SET_CONTROL_LABEL(CONTROL_BUTTON_LABEL, pControl->GetDescription());
   }

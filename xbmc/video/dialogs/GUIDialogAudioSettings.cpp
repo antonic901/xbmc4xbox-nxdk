@@ -11,7 +11,7 @@
 #include "GUIPassword.h"
 #include "ServiceBroker.h"
 #include "addons/Skin.h"
-#include "Application.h"
+#include "application/Application.h"
 #include "application/ApplicationComponents.h"
 #include "application/ApplicationPlayer.h"
 #include "cores/IPlayer.h"

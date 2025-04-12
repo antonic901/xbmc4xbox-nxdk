@@ -41,7 +41,7 @@
 #include <algorithm>
 #include <sstream>
 
-#include <fstrcmp.h>
+#include <fstrcmp/fstrcmp.h>
 
 using namespace XFILE;
 using namespace MUSIC_GRABBER;

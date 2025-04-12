@@ -16,8 +16,6 @@
 #include "application/Application.h"
 #include "application/ApplicationComponents.h"
 #include "application/ApplicationPlayer.h"
-#include "application/ApplicationVolumeHandling.h"
-#include "cores/AudioEngine/Utils/AEUtil.h"
 #include "cores/DataCacheCore.h"
 #include "cores/EdlEdit.h"
 #include "guilib/GUIComponent.h"
@@ -37,8 +35,7 @@
 using namespace KODI::GUILIB::GUIINFO;
 
 CPlayerGUIInfo::CPlayerGUIInfo()
-  : m_appPlayer(CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>()),
-    m_appVolume(CServiceBroker::GetAppComponents().GetComponent<CApplicationVolumeHandling>())
+  : m_appPlayer(CServiceBroker::GetAppComponents().GetComponent<CApplicationPlayer>())
 {
 }
 
@@ -182,7 +179,11 @@ bool CPlayerGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
       return true;
     case PLAYER_VOLUME:
       value =
+#if 0
           StringUtils::Format("{:2.1f} dB", CAEUtil::PercentToGain(m_appVolume->GetVolumeRatio()));
+#else
+          StringUtils::Format("{:2.1f} dB", static_cast<float>(g_application.GetVolume(false) + g_application.GetDynamicRangeCompressionLevel()) * 0.01f);
+#endif
       return true;
     case PLAYER_SUBTITLE_DELAY:
       value = StringUtils::Format("{:2.3f} s", m_appPlayer->GetVideoSettings().m_SubtitleDelay);
@@ -362,7 +363,11 @@ bool CPlayerGUIInfo::GetInt(int& value, const CGUIListItem *gitem, int contextWi
     // PLAYER_*
     ///////////////////////////////////////////////////////////////////////////////////////////////
     case PLAYER_VOLUME:
+#if 0
       value = static_cast<int>(m_appVolume->GetVolumePercent());
+#else
+      value = static_cast<int>(g_application.GetVolume());
+#endif
       return true;
     case PLAYER_PROGRESS:
       value = std::lrintf(g_application.GetPercentage());
@@ -411,8 +416,13 @@ bool CPlayerGUIInfo::GetBool(bool& value, const CGUIListItem *gitem, int context
       value = m_playerShowTime;
       return true;
     case PLAYER_MUTED:
+#if 0
       value = (m_appVolume->IsMuted() ||
                m_appVolume->GetVolumeRatio() <= CApplicationVolumeHandling::VOLUME_MINIMUM);
+#else
+      value = (g_application.IsMuted() ||
+               g_application.GetVolume(false) <= VOLUME_MINIMUM);
+#endif
       return true;
     case PLAYER_HAS_MEDIA:
       value = m_appPlayer->IsPlaying();
@@ -520,10 +530,12 @@ bool CPlayerGUIInfo::GetBool(bool& value, const CGUIListItem *gitem, int context
     case PLAYER_HAS_PROGRAMS:
       value = (m_appPlayer->GetProgramsCount() > 1) ? true : false;
       return true;
+#if 0
     case PLAYER_HAS_RESOLUTIONS:
       value = CServiceBroker::GetWinSystem()->GetGfxContext().IsFullScreenRoot() &&
               CResolutionUtils::HasWhitelist();
       return true;
+#endif
     case PLAYER_HASDURATION:
       value = g_application.GetTotalTime() > 0;
       return true;

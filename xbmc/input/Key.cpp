@@ -22,6 +22,7 @@
 #include <windows.h>
 #endif
 #include "input/Key.h"
+#include "input/ButtonTranslator.h"
 
 CKey::CKey(void)
 {
@@ -289,8 +290,5 @@ CAction& CAction::operator=(const CAction& rhs)
 
 bool CAction::IsAnalog() const
 {
-#if 0
   return CButtonTranslator::IsAnalog(m_id);
-#endif
-  return false;
 }

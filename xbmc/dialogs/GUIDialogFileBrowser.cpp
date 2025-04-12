@@ -27,8 +27,6 @@
 #include "guilib/LocalizeStrings.h"
 #include "input/Key.h"
 #include "messaging/helpers/DialogOKHelper.h"
-#include "network/GUIDialogNetworkSetup.h"
-#include "network/Network.h"
 #include "profiles/ProfileManager.h"
 #include "settings/MediaSourceSettings.h"
 #include "settings/SettingsComponent.h"
@@ -567,12 +565,14 @@ bool CGUIDialogFileBrowser::HaveDiscOrConnection( int iDriveType )
   }
   else if ( iDriveType == CMediaSource::SOURCE_TYPE_REMOTE )
   {
+#if 0
     //! @todo Handle not connected to a remote share
     if ( !CServiceBroker::GetNetwork().IsConnected() )
     {
       HELPERS::ShowOKDialogText(CVariant{220}, CVariant{221});
       return false;
     }
+#endif
   }
 
   return true;
@@ -883,6 +883,7 @@ void CGUIDialogFileBrowser::SetSources(const VECSOURCES &shares)
 
 void CGUIDialogFileBrowser::OnAddNetworkLocation()
 {
+#if 0
   // ok, fire up the network location dialog
   std::string path;
   if (CGUIDialogNetworkSetup::ShowAndGetNetworkAddress(path))
@@ -901,6 +902,7 @@ void CGUIDialogFileBrowser::OnAddNetworkLocation()
       CServiceBroker::GetMediaManager().AddNetworkLocation(path);
     }
   }
+ #endif
   m_rootDir.SetSources(m_shares);
   Update(m_vecItems->GetPath());
 }
@@ -936,6 +938,7 @@ bool CGUIDialogFileBrowser::OnPopupMenu(int iItem)
     {
       std::string strOldPath=m_selectedPath,newPath=m_selectedPath;
       VECSOURCES shares=m_shares;
+#if 0
       if (CGUIDialogNetworkSetup::ShowAndGetNetworkAddress(newPath))
       {
         CServiceBroker::GetMediaManager().SetLocationPath(strOldPath, newPath);
@@ -959,6 +962,7 @@ bool CGUIDialogFileBrowser::OnPopupMenu(int iItem)
         Update(m_Directory->GetPath());
         m_viewControl.SetSelectedItem(iItem);
       }
+#endif
     }
     else
     {

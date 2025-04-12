@@ -25,6 +25,7 @@
 #include "music/ContextMenus.h"
 #include "utils/StringUtils.h"
 #include "utils/log.h"
+#include "utils/Variant.h"
 #include "video/ContextMenus.h"
 
 #include <iterator>

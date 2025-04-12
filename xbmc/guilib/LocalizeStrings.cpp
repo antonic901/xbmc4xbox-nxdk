@@ -8,6 +8,7 @@
 
 #include "LocalizeStrings.h"
 
+#include "addons/LanguageResource.h"
 #include "filesystem/Directory.h"
 #include "filesystem/SpecialProtocol.h"
 #include "threads/SharedSection.h"
@@ -102,14 +103,12 @@ static bool LoadStr2Mem(const std::string &pathname_in, const std::string &langu
   {
     bool exists = false;
     std::string lang;
-#if 0
     // check if there's a language addon using the old language naming convention
     if (ADDON::CLanguageResource::FindLegacyLanguage(language, lang))
     {
       pathname = CSpecialProtocol::TranslatePathConvertCase(pathname_in + lang);
       exists = XFILE::CDirectory::Exists(pathname);
     }
-#endif
 
     if (!exists)
       return false;

@@ -14,6 +14,7 @@
 #include "guilib/GUIWindow.h"
 #include "playlists/SmartPlayList.h"
 #include "view/GUIViewControl.h"
+#include "threads/Event.h" // FIXME: this shouldn't be included here
 
 #include <atomic>
 

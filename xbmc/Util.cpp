@@ -19,6 +19,7 @@
 #include "guilib/LocalizeStrings.h"
 #include "guilib/GraphicContext.h"
 #include "guilib/TextureManager.h"
+#include "storage/MediaManager.h"
 #include "settings/AdvancedSettings.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
@@ -287,9 +288,7 @@ std::string CUtil::GetFileDigest(const std::string& strPath, KODI::UTILITY::CDig
 
 void CUtil::GetDVDDriveIcon(const std::string& strPath, std::string& strIcon)
 {
-#if 0
   if (!CServiceBroker::GetMediaManager().IsDiscInDrive(strPath))
-#endif
   {
     strIcon = "DefaultDVDEmpty.png";
     return ;

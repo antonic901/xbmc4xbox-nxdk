@@ -709,7 +709,9 @@ bool CGUIDialogAddonInfo::ShowDependencyList(Reactivate reactivate, EntryPoint e
         for (auto& it : items)
           pDialog->Add(*it);
         pDialog->EnableButton(reactivate == Reactivate::CHOICE_NO, 186);
+#if 0
         pDialog->SetButtonFocus(true);
+#endif
         pDialog->Open();
 
         if (pDialog->IsButtonPressed())
@@ -781,7 +783,9 @@ void CGUIDialogAddonInfo::ShowSupportList()
   pDialog->SetUseDetails(true);
   for (auto& it : items)
     pDialog->Add(*it);
+#if 0
   pDialog->SetButtonFocus(true);
+#endif
   pDialog->Open();
 }
 

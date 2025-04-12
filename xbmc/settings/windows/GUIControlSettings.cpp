@@ -656,13 +656,16 @@ bool CGUIControlListSetting::OnClick()
       dialog->SetHeading(CVariant{ Localize(m_pSetting->GetLabel()) });
       dialog->SetItems(options);
       dialog->SetMultiSelection(control->CanMultiSelect());
+#if 0
       dialog->EnableButton2(bAllowNewOption, strAddButton);
+#endif
 
       dialog->Open();
 
       if (!dialog->IsConfirmed())
         return false;
 
+#if 0
       if (dialog->IsButton2Pressed())
       {
         // Get new list value
@@ -691,6 +694,7 @@ bool CGUIControlListSetting::OnClick()
         }
       }
       bRepeat = dialog->IsButton2Pressed();
+#endif
     }
   }
 

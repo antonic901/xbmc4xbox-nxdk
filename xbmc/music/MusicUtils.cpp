@@ -760,9 +760,7 @@ void QueueItem(const std::shared_ptr<CFileItem>& itemIn, QueuePosition pos)
 bool GetItemsForPlayList(const std::shared_ptr<CFileItem>& item, CFileItemList& queuedItems)
 {
   CAsyncGetItemsForPlaylist getItems(item, queuedItems);
-  return CGUIDialogBusy::Wait(&getItems,
-                              500, // 500ms before busy dialog appears
-                              true); // can be cancelled
+  return CGUIDialogBusy::Wait(&getItems);
 }
 
 bool IsItemPlayable(const CFileItem& item)

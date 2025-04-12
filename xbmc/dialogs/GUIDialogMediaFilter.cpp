@@ -416,7 +416,7 @@ void CGUIDialogMediaFilter::InitializeSettings()
       }
     }
 
-    std::string settingId = StringUtils::Format("filter.{}.{}", filter.mediaType, filter.field);
+    std::string settingId = StringUtils::Format("filter.{}.{}", filter.mediaType, static_cast<int>(filter.field));
     if (filter.controlType == "edit")
     {
       CVariant data;
@@ -519,7 +519,7 @@ void CGUIDialogMediaFilter::InitializeSettings()
 
       CLog::Log(LOGWARNING,
                 "CGUIDialogMediaFilter: filter {} of media type {} with unknown control type '{}'",
-                filter.field, filter.mediaType, filter.controlType);
+                static_cast<int>(filter.field), filter.mediaType, filter.controlType);
       continue;
     }
 
@@ -531,7 +531,7 @@ void CGUIDialogMediaFilter::InitializeSettings()
       CLog::Log(LOGWARNING,
                 "CGUIDialogMediaFilter: failed to create filter {} of media type {} with control "
                 "type '{}'",
-                filter.field, filter.mediaType, filter.controlType);
+                static_cast<int>(filter.field), filter.mediaType, filter.controlType);
       continue;
     }
 

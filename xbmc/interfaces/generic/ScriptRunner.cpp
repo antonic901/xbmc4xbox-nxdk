@@ -135,6 +135,7 @@ bool CScriptRunner::WaitOnScriptResult(int scriptId,
       // observe the script until it's finished while showing the busy dialog
       CRunningScriptObserver scriptObs(scriptId, m_scriptDone);
 
+#if 0
       auto& wm = CServiceBroker::GetGUI()->GetWindowManager();
       if (wm.IsWindowTopMost(WINDOW_DIALOG_PROGRESS))
       {
@@ -142,7 +143,8 @@ bool CScriptRunner::WaitOnScriptResult(int scriptId,
         if (!progress->WaitOnEvent(m_scriptDone))
           cancelled = true;
       }
-      else if (!CGUIDialogBusy::WaitOnEvent(m_scriptDone, 200))
+#endif
+      if (!CGUIDialogBusy::WaitOnEvent(m_scriptDone, 200))
         cancelled = true;
 
       scriptObs.Abort();

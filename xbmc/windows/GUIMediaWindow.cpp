@@ -2258,7 +2258,7 @@ bool CGUIMediaWindow::WaitGetDirectoryItems(CGetDirectoryItems &items)
   CGUIDialogBusy* dialog = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogBusy>(WINDOW_DIALOG_BUSY);
   if (dialog && !dialog->IsDialogRunning())
   {
-    if (!CGUIDialogBusy::Wait(&items, 100, true))
+    if (!CGUIDialogBusy::Wait(&items))
     {
       // cancelled
       ret = false;

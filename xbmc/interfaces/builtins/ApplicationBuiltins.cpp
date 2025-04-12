@@ -9,7 +9,7 @@
 #include "ApplicationBuiltins.h"
 
 #include "ServiceBroker.h"
-#include "Application.h"
+#include "application/Application.h"
 #include "application/ApplicationComponents.h"
 #include "application/ApplicationPowerHandling.h"
 #include "input/Key.h"

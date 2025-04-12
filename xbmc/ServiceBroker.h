@@ -124,7 +124,6 @@ public:
 
 private:
   std::shared_ptr<CAppParams> m_appParams;
-  std::unique_ptr<CLog> m_logging;
   std::shared_ptr<ANNOUNCEMENT::CAnnouncementManager> m_pAnnouncementManager;
   CGUIComponent* m_pGUI;
   std::shared_ptr<CSettingsComponent> m_pSettingsComponent;

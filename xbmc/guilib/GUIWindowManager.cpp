@@ -27,6 +27,7 @@
 #include "input/Key.h"
 #include "messaging/ApplicationMessenger.h"
 #include "messaging/helpers/DialogHelper.h"
+#include "GUIPassword.h"
 #include "GUIInfoManager.h"
 #include "threads/SingleLock.h"
 #include "utils/URIUtils.h"
@@ -37,6 +38,9 @@
 #include "utils/Variant.h"
 #include "utils/StringUtils.h"
 #include "utils/log.h"
+
+// Dialog includes
+#include "dialogs/GUIDialogYesNo.h"
 
 #include <mutex>
 
@@ -506,7 +510,6 @@ void CGUIWindowManager::ActivateWindow_Internal(int iWindowID, const std::vector
   // debug
   CLog::Log(LOGDEBUG, "Activating window ID: %i", iWindowID);
 
-#if 0
   if (!g_passwordManager.CheckMenuLock(iWindowID))
   {
     CLog::Log(LOGERROR, "MasterCode is Wrong: Window with id %d will not be loaded! Enter a correct MasterCode!", iWindowID);
@@ -514,7 +517,6 @@ void CGUIWindowManager::ActivateWindow_Internal(int iWindowID, const std::vector
       ActivateWindow(WINDOW_HOME);
     return;
   }
-#endif
 
   // first check existence of the window we wish to activate.
   CGUIWindow *pNewWindow = GetWindow(iWindowID);
@@ -692,7 +694,6 @@ void CGUIWindowManager::OnApplicationMessage(ThreadMessage* pMsg)
     if (!pMsg->lpVoid && pMsg->param1 < 0 && pMsg->param2 < 0)
       return;
 
-#if 0
     auto dialog = static_cast<CGUIDialogYesNo*>(GetWindow(WINDOW_DIALOG_YES_NO));
     if (!dialog)
       return;
@@ -706,7 +707,6 @@ void CGUIWindowManager::OnApplicationMessage(ThreadMessage* pMsg)
       options.text = pMsg->param2;
       pMsg->SetResult(dialog->ShowAndGetInput(options));
     }
-#endif
 
     break;
   }
@@ -1162,31 +1162,24 @@ int CGUIWindowManager::GetActiveWindowID()
   if (HasModalDialog())
     iWin = GetTopMostModalDialogID() & WINDOW_ID_MASK;
 
+  const auto& components = CServiceBroker::GetAppComponents();
+  const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+
   // If the window is FullScreenVideo check for special cases
   if (iWin == WINDOW_FULLSCREEN_VIDEO)
   {
-#if 0
     // check if we're in a DVD menu
     if (g_application.m_pPlayer->IsInMenu())
       iWin = WINDOW_VIDEO_MENU;
-    // check for LiveTV and switch to it's virtual window
-    else if (g_PVRManager.IsStarted() && g_application.CurrentFileItem().HasPVRChannelInfoTag())
-      iWin = WINDOW_FULLSCREEN_LIVETV;
     // special casing for numeric seek
-    else if (CSeekHandler::GetInstance().HasTimeCode())
+    else if (appPlayer->GetSeekHandler().HasTimeCode())
       iWin = WINDOW_VIDEO_TIME_SEEK;
-#endif
   }
   if (iWin == WINDOW_VISUALISATION)
   {
-#if 0
-    // special casing for PVR radio
-    if (g_PVRManager.IsStarted() && g_application.CurrentFileItem().HasPVRChannelInfoTag())
-      iWin = WINDOW_FULLSCREEN_RADIO;
     // special casing for numeric seek
-    else if (CSeekHandler::GetInstance().HasTimeCode())
+    if (appPlayer->GetSeekHandler().HasTimeCode())
       iWin = WINDOW_VIDEO_TIME_SEEK;
-#endif
   }
   // Return the window id
   return iWin;

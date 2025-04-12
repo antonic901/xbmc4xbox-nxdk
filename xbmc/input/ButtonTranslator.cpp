@@ -29,6 +29,7 @@
 #include "guilib/WindowIDs.h"
 #include "input/Key.h"
 #include "input/XBMC_keytable.h"
+#include "interfaces/builtins/Builtins.h"
 #include "system.h"
 #include "Util.h"
 #include "utils/log.h"
@@ -555,9 +556,7 @@ bool CButtonTranslator::Load(bool AlwaysLoad)
       CFileItemList files;
       XFILE::CDirectory::GetDirectory(DIRS_TO_CHECK[dirIndex], files, ".xml", XFILE::DIR_FLAG_DEFAULTS);
       // Sort the list for filesystem based priorities, e.g. 01-keymap.xml, 02-keymap-overrides.xml
-#if 0
       files.Sort(SortByFile, SortOrderAscending);
-#endif
       for(int fileIndex = 0; fileIndex<files.Size(); ++fileIndex)
       {
         if (!files[fileIndex]->m_bIsFolder)
@@ -576,9 +575,7 @@ bool CButtonTranslator::Load(bool AlwaysLoad)
           CFileItemList files;
           XFILE::CDirectory::GetDirectory(devicedir, files, ".xml", XFILE::DIR_FLAG_DEFAULTS);
           // Sort the list for filesystem based priorities, e.g. 01-keymap.xml, 02-keymap-overrides.xml
-#if 0
           files.Sort(SortByFile, SortOrderAscending);
-#endif
           for(int fileIndex = 0; fileIndex<files.Size(); ++fileIndex)
           {
             if (!files[fileIndex]->m_bIsFolder)
@@ -1142,10 +1139,8 @@ bool CButtonTranslator::TranslateActionString(const char *szAction, int &action)
   action = ACTION_NONE;
   std::string strAction = szAction;
   StringUtils::ToLower(strAction);
-#if 0
   if (CBuiltins::GetInstance().HasCommand(strAction))
     action = ACTION_BUILT_IN_FUNCTION;
-#endif
 
   for (unsigned int index=0;index < ARRAY_SIZE(actions);++index)
   {

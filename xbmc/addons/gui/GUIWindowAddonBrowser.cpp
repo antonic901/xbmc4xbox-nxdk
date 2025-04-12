@@ -228,13 +228,13 @@ bool CGUIWindowAddonBrowser::OnClick(int iItem, const std::string& player)
   if (item->GetPath() == "addons://update_all/")
   {
     UpdateAddons updater;
-    CGUIDialogBusy::Wait(&updater, 100, true);
+    CGUIDialogBusy::Wait(&updater);
     return true;
   }
   if (item->GetPath() == "addons://update_allowed/")
   {
     UpdateAllowedAddons updater;
-    CGUIDialogBusy::Wait(&updater, 100, true);
+    CGUIDialogBusy::Wait(&updater);
     return true;
   }
   if (!item->m_bIsFolder)
