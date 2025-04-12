@@ -28,7 +28,7 @@ int64_t CurrentHostCounter(void)
 {
 #if defined(TARGET_DARWIN)
   return( (int64_t)CVGetCurrentHostTime() );
-#elif defined(TARGET_WINDOWS) || defined(NXDK)
+#elif defined(TARGET_WINDOWS) || defined(_XBOX)
   LARGE_INTEGER PerformanceCount;
   QueryPerformanceCounter(&PerformanceCount);
   return( (int64_t)PerformanceCount.QuadPart );
@@ -47,7 +47,7 @@ int64_t CurrentHostFrequency(void)
 {
 #if defined(TARGET_DARWIN)
   return( (int64_t)CVGetHostClockFrequency() );
-#elif defined(TARGET_WINDOWS) || defined(NXDK)
+#elif defined(TARGET_WINDOWS) || defined(_XBOX)
   LARGE_INTEGER Frequency;
   QueryPerformanceFrequency(&Frequency);
   return( (int64_t)Frequency.QuadPart );
