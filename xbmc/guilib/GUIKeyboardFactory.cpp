@@ -29,6 +29,7 @@
 #include "utils/StringUtils.h"
 #include "utils/Variant.h"
 
+#include "dialogs/GUIDialogKeyboardGeneric.h"
 #if defined(TARGET_DARWIN_IOS)
 #include "dialogs/GUIDialogKeyboardTouch.h"
 #endif
@@ -92,7 +93,6 @@ bool CGUIKeyboardFactory::ShowAndGetInput(std::string& aTextString, CVariant hea
   else if (heading.isInteger() && heading.asInteger())
     headingStr = g_localizeStrings.Get((uint32_t)heading.asInteger());
 
-#if 0
 #if defined(TARGET_DARWIN_IOS)
   kb = (CGUIDialogKeyboardTouch*)CServiceBroker::GetGUI()->GetWindowManager().GetWindow(WINDOW_DIALOG_KEYBOARD_TOUCH);
 #else
@@ -106,7 +106,6 @@ bool CGUIKeyboardFactory::ShowAndGetInput(std::string& aTextString, CVariant hea
     confirmed = kb->ShowAndGetInput(keyTypedCB, aTextString, aTextString, headingStr, hiddenInput);
     g_activedKeyboard = NULL;
   }
-#endif
 
   if (confirmed)
   {

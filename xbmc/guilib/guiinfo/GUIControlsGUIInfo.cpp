@@ -11,9 +11,7 @@
 #include "FileItem.h"
 #include "ServiceBroker.h"
 #include "URL.h"
-#if 0
 #include "dialogs/GUIDialogKeyboardGeneric.h"
-#endif
 #include "dialogs/GUIDialogNumeric.h"
 #include "dialogs/GUIDialogProgress.h"
 #include "guilib/GUIComponent.h"
@@ -806,16 +804,12 @@ bool CGUIControlsGUIInfo::GetBool(bool& value, const CGUIListItem *gitem, int co
     case SYSTEM_HAS_INPUT_HIDDEN:
     {
       CGUIDialogNumeric *pNumeric = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogNumeric>(WINDOW_DIALOG_NUMERIC);
-#if 0
       CGUIDialogKeyboardGeneric *pKeyboard = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogKeyboardGeneric>(WINDOW_DIALOG_KEYBOARD);
-#endif
 
       if (pNumeric && pNumeric->IsActive())
         value = pNumeric->IsInputHidden();
-#if 0
       else if (pKeyboard && pKeyboard->IsActive())
         value = pKeyboard->IsInputHidden();
-#endif
       return true;
     }
   }

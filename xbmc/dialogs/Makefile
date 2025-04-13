@@ -7,6 +7,7 @@ SRCS += \
 	$(CURDIR)/xbmc/dialogs/GUIDialogFileBrowser.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogGamepad.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogKaiToast.cpp \
+	$(CURDIR)/xbmc/dialogs/GUIDialogKeyboardGeneric.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogMediaFilter.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogMediaSource.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogNumeric.cpp \
