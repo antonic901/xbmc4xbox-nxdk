@@ -12,9 +12,12 @@ SRCS += \
 	$(CURDIR)/xbmc/dialogs/GUIDialogNumeric.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogOK.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogProgress.cpp \
+	$(CURDIR)/xbmc/dialogs/GUIDialogSeekBar.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogSelect.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogSlider.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogSmartPlaylistEditor.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogSmartPlaylistRule.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogSubMenu.cpp \
+	$(CURDIR)/xbmc/dialogs/GUIDialogTextViewer.cpp \
+	$(CURDIR)/xbmc/dialogs/GUIDialogVolumeBar.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogYesNo.cpp
