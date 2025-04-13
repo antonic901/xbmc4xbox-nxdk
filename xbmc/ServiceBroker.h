@@ -55,6 +55,7 @@ class CMediaManager;
 class CCPUInfo;
 class CTextureCache;
 class CJobManager;
+class CKeyboardLayoutManager;
 
 namespace KODI
 {
@@ -122,6 +123,11 @@ public:
   static void UnregisterAppMessenger();
   static std::shared_ptr<KODI::MESSAGING::CApplicationMessenger> GetAppMessenger();
 
+  static void RegisterKeyboardLayoutManager(
+      const std::shared_ptr<CKeyboardLayoutManager>& keyboardLayoutManager);
+  static void UnregisterKeyboardLayoutManager();
+  static std::shared_ptr<CKeyboardLayoutManager> GetKeyboardLayoutManager();
+
 private:
   std::shared_ptr<CAppParams> m_appParams;
   std::shared_ptr<ANNOUNCEMENT::CAnnouncementManager> m_pAnnouncementManager;
@@ -131,6 +137,7 @@ private:
   std::shared_ptr<CTextureCache> m_textureCache;
   std::shared_ptr<CJobManager> m_jobManager;
   std::shared_ptr<KODI::MESSAGING::CApplicationMessenger> m_appMessenger;
+  std::shared_ptr<CKeyboardLayoutManager> m_keyboardLayoutManager;
 };
 
 XBMC_GLOBAL_REF(CServiceBroker, g_serviceBroker);
