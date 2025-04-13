@@ -29,6 +29,7 @@
 #include "music/GUIViewStateMusic.h"
 #include "pictures/GUIViewStatePictures.h"
 #include "profiles/ProfileManager.h"
+#include "programs/GUIViewStatePrograms.h"
 #include "settings/MediaSourceSettings.h"
 #include "settings/SettingUtils.h"
 #include "settings/Settings.h"
@@ -107,6 +108,9 @@ CGUIViewState* CGUIViewState::GetViewState(int windowId, const CFileItemList& it
   if (items.GetPath() == "special://musicplaylists/")
     return new CGUIViewStateWindowMusicNav(items);
 
+  if (url.IsProtocol("androidapp"))
+    return new CGUIViewStateWindowPrograms(items);
+
   if (windowId == WINDOW_MUSIC_NAV)
     return new CGUIViewStateWindowMusicNav(items);
 
@@ -124,6 +128,9 @@ CGUIViewState* CGUIViewState::GetViewState(int windowId, const CFileItemList& it
 
   if (windowId == WINDOW_PICTURES)
     return new CGUIViewStateWindowPictures(items);
+
+  if (windowId == WINDOW_PROGRAMS)
+    return new CGUIViewStateWindowPrograms(items);
 
   if (windowId == WINDOW_ADDON_BROWSER)
     return new CGUIViewStateAddonBrowser(items);
