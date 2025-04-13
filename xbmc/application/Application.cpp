@@ -166,6 +166,12 @@ void CApplication::SeekPercentage(float percent)
 {
 }
 
+// SwitchToFullScreen() returns true if a switch is made, else returns false
+bool CApplication::SwitchToFullScreen(bool force /* = false */)
+{
+  return false;
+}
+
 bool CApplication::IsMuted() const
 {
   return false;

@@ -42,6 +42,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/PlayerUtils.cpp \
 	$(CURDIR)/xbmc/utils/POUtils.cpp \
 	$(CURDIR)/xbmc/utils/ProgressJob.cpp \
+	$(CURDIR)/xbmc/utils/RecentlyAddedJob.cpp \
 	$(CURDIR)/xbmc/utils/RegExp.cpp \
 	$(CURDIR)/xbmc/utils/RingBuffer.cpp \
 	$(CURDIR)/xbmc/utils/ScraperParser.cpp \

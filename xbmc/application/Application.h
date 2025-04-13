@@ -136,6 +136,8 @@ public:
 
   std::unique_ptr<CServiceManager> m_ServiceManager;
 
+  bool SwitchToFullScreen(bool force = false);
+
 protected:
   CFileItemPtr m_itemCurrentFile;
 
