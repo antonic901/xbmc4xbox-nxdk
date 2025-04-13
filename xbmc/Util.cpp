@@ -12,6 +12,7 @@
 #include "FileItem.h"
 #include "filesystem/Directory.h"
 #include "filesystem/MultiPathDirectory.h"
+#include "filesystem/SpecialProtocol.h"
 #include "filesystem/StackDirectory.h"
 #include "profiles/ProfileManager.h"
 #include "URL.h"
@@ -29,6 +30,7 @@
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
+#include <array>
 #include <fstrcmp/fstrcmp.h>
 
 using namespace XFILE;
@@ -239,6 +241,15 @@ bool CUtil::IsPicture(const std::string& strFile)
 {
   return URIUtils::HasExtension(strFile,
                   CServiceBroker::GetFileExtensionProvider().GetPictureExtensions()+ "|.tbn|.dds");
+}
+
+std::string CUtil::GetSplashPath()
+{
+  std::array<std::string, 4> candidates {{ "special://home/media/splash.jpg", "special://home/media/splash.png", "special://xbmc/media/splash.jpg", "special://xbmc/media/splash.png" }};
+  auto it = std::find_if(candidates.begin(), candidates.end(), [](std::string const& file) { return XFILE::CFile::Exists(file); });
+  if (it == candidates.end())
+    throw std::runtime_error("No splash image found");
+  return CSpecialProtocol::TranslatePathConvertCase(*it);
 }
 
 bool CUtil::ExcludeFileOrFolder(const std::string& strFileOrFolder, const std::vector<std::string>& regexps)
