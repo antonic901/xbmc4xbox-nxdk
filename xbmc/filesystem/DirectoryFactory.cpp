@@ -8,6 +8,7 @@
 
 #include <stdlib.h>
 #include "DirectoryFactory.h"
+#include "SpecialProtocolDirectory.h"
 #include "MultiPathDirectory.h"
 #include "StackDirectory.h"
 #include "FileDirectoryFactory.h"
@@ -15,6 +16,8 @@
 #include "MusicDatabaseDirectory.h"
 #include "MusicSearchDirectory.h"
 #include "VideoDatabaseDirectory.h"
+#include "FavouritesDirectory.h"
+#include "LibraryDirectory.h"
 #include "AddonsDirectory.h"
 #include "SourcesDirectory.h"
 #include "utils/log.h"
@@ -30,6 +33,7 @@
 #include "ZipDirectory.h"
 #include "FileItem.h"
 #include "URL.h"
+#include "ResourceDirectory.h"
 #include "ServiceBroker.h"
 #include "utils/StringUtils.h"
 
@@ -62,6 +66,7 @@ IDirectory* CDirectoryFactory::Create(const CURL& url)
 #else
 #error Local directory access is not implemented for this platform
 #endif
+  if (url.IsProtocol("special")) return new CSpecialProtocolDirectory();
   if (url.IsProtocol("sources")) return new CSourcesDirectory();
   if (url.IsProtocol("addons")) return new CAddonsDirectory();
   if (url.IsProtocol("plugin")) return new CPluginDirectory();
@@ -73,6 +78,9 @@ IDirectory* CDirectoryFactory::Create(const CURL& url)
   if (url.IsProtocol("musicdb")) return new CMusicDatabaseDirectory();
   if (url.IsProtocol("musicsearch")) return new CMusicSearchDirectory();
   if (url.IsProtocol("videodb")) return new CVideoDatabaseDirectory();
+  if (url.IsProtocol("library")) return new CLibraryDirectory();
+  if (url.IsProtocol("favourites")) return new CFavouritesDirectory();
+  if (url.IsProtocol("resource")) return new CResourceDirectory();
 
   CLog::Log(LOGWARNING, "{} - unsupported protocol({}) in {}", __FUNCTION__, url.GetProtocol(),
             url.GetRedacted());

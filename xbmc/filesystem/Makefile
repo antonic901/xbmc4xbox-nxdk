@@ -7,25 +7,34 @@ SRCS += \
 	$(CURDIR)/xbmc/filesystem/DirectoryCache.cpp \
 	$(CURDIR)/xbmc/filesystem/DirectoryFactory.cpp \
 	$(CURDIR)/xbmc/filesystem/DirectoryHistory.cpp \
+	$(CURDIR)/xbmc/filesystem/FavouritesDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/File.cpp \
 	$(CURDIR)/xbmc/filesystem/FileCache.cpp \
 	$(CURDIR)/xbmc/filesystem/FileDirectoryFactory.cpp \
 	$(CURDIR)/xbmc/filesystem/FileFactory.cpp \
 	$(CURDIR)/xbmc/filesystem/IDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/IFile.cpp \
+	$(CURDIR)/xbmc/filesystem/ImageFile.cpp \
+	$(CURDIR)/xbmc/filesystem/LibraryDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/MultiPathDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/MultiPathFile.cpp \
 	$(CURDIR)/xbmc/filesystem/MusicDatabaseDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/MusicDatabaseFile.cpp \
 	$(CURDIR)/xbmc/filesystem/MusicFileDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/MusicSearchDirectory.cpp \
+	$(CURDIR)/xbmc/filesystem/OverrideDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/OverrideFile.cpp \
 	$(CURDIR)/xbmc/filesystem/PlaylistDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/PlaylistFileDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/PluginDirectory.cpp \
+	$(CURDIR)/xbmc/filesystem/PluginFile.cpp \
+	$(CURDIR)/xbmc/filesystem/ResourceDirectory.cpp \
+	$(CURDIR)/xbmc/filesystem/ResourceFile.cpp \
 	$(CURDIR)/xbmc/filesystem/SmartPlaylistDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/SourcesDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/SpecialProtocol.cpp \
+	$(CURDIR)/xbmc/filesystem/SpecialProtocolDirectory.cpp \
+	$(CURDIR)/xbmc/filesystem/SpecialProtocolFile.cpp \
 	$(CURDIR)/xbmc/filesystem/StackDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/VideoDatabaseDirectory.cpp \
 	$(CURDIR)/xbmc/filesystem/VideoDatabaseFile.cpp \

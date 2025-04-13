@@ -21,7 +21,11 @@
 #include "ZipFile.h"
 #include "MusicDatabaseFile.h"
 #include "VideoDatabaseFile.h"
+#include "PluginFile.h"
+#include "SpecialProtocolFile.h"
 #include "MultiPathFile.h"
+#include "ImageFile.h"
+#include "ResourceFile.h"
 #include "URL.h"
 #include "utils/log.h"
 #include "utils/StringUtils.h"
@@ -45,9 +49,12 @@ IFile* CFileFactory::CreateLoader(const CURL& url)
   if (url.IsProtocol("zip")) return new CZipFile();
   else if (url.IsProtocol("musicdb")) return new CMusicDatabaseFile();
   else if (url.IsProtocol("videodb")) return new CVideoDatabaseFile();
+  else if (url.IsProtocol("plugin")) return new CPluginFile();
   else if (url.IsProtocol("library")) return nullptr;
   else if (url.IsProtocol("pvr")) return nullptr;
+  else if (url.IsProtocol("special")) return new CSpecialProtocolFile();
   else if (url.IsProtocol("multipath")) return new CMultiPathFile();
+  else if (url.IsProtocol("image")) return new CImageFile();
 #ifdef TARGET_POSIX
   else if (url.IsProtocol("file") || url.GetProtocol().empty())
   {
@@ -68,6 +75,7 @@ IFile* CFileFactory::CreateLoader(const CURL& url)
     return new CWin32File();
   }
 #endif // TARGET_WINDOWS
+  else if (url.IsProtocol("resource")) return new CResourceFile();
 
   if (url.IsProtocol("ftp")
   ||  url.IsProtocol("ftps")
