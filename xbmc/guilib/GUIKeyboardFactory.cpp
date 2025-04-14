@@ -25,6 +25,9 @@
 #include "GUIKeyboardFactory.h"
 #include "GUIUserMessages.h"
 #include "GUIWindowManager.h"
+#include "dialogs/GUIDialogOK.h"
+#include "settings/Settings.h"
+#include "settings/SettingsComponent.h"
 #include "utils/md5.h"
 #include "utils/StringUtils.h"
 #include "utils/Variant.h"
@@ -170,9 +173,7 @@ bool CGUIKeyboardFactory::ShowAndVerifyNewPassword(std::string& newPassword, CVa
     StringUtils::ToLower(newPassword);
     return true;
   }
-#if 0
   CGUIDialogOK::ShowAndGetInput(CVariant{12341}, CVariant{12344});
-#endif
   return false;
 }
 
@@ -198,7 +199,7 @@ int CGUIKeyboardFactory::ShowAndVerifyPassword(std::string& strPassword, const s
   else
     strHeadingTemp = StringUtils::Format("%s - %i %s",
                                          g_localizeStrings.Get(12326).c_str(),
-                                         3 - iRetries,
+                                         CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_MASTERLOCK_MAXRETRIES) - iRetries,
                                          g_localizeStrings.Get(12343).c_str());
 
   std::string strUserInput;

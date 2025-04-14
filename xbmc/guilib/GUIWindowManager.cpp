@@ -37,12 +37,70 @@
 #include "GUITexture.h"
 #include "utils/Variant.h"
 #include "utils/StringUtils.h"
-#include "utils/log.h"
+#include "SeekHandler.h"
+
+#include "windows/GUIWindowHome.h"
+#include "settings/windows/GUIWindowSettings.h"
+#include "windows/GUIWindowFileManager.h"
+#include "settings/windows/GUIWindowSettingsCategory.h"
+#include "music/windows/GUIWindowMusicPlaylist.h"
+#include "music/windows/GUIWindowMusicNav.h"
+#include "music/windows/GUIWindowMusicPlaylistEditor.h"
+#include "video/windows/GUIWindowVideoPlaylist.h"
+#include "music/dialogs/GUIDialogMusicInfo.h"
+#include "video/dialogs/GUIDialogVideoInfo.h"
+#include "video/windows/GUIWindowVideoNav.h"
+#include "profiles/windows/GUIWindowSettingsProfile.h"
+#include "programs/GUIWindowPrograms.h"
+#include "pictures/GUIWindowPictures.h"
+#include "weather/GUIWindowWeather.h"
+#include "windows/GUIWindowLoginScreen.h"
+#include "addons/gui/GUIWindowAddonBrowser.h"
+#include "music/windows/GUIWindowVisualisation.h"
+#include "windows/GUIWindowSystemInfo.h"
+#include "pictures/GUIWindowSlideShow.h"
+#include "windows/GUIWindowSplash.h"
+#include "windows/GUIWindowStartup.h"
+#include "video/dialogs/GUIDialogVideoOSD.h"
 
 // Dialog includes
+#include "music/dialogs/GUIDialogMusicOSD.h"
+#include "music/dialogs/GUIDialogVisualisationPresetList.h"
+#include "dialogs/GUIDialogTextViewer.h"
+#include "dialogs/GUIDialogMediaSource.h"
+#include "video/dialogs/GUIDialogVideoSettings.h"
+#include "video/dialogs/GUIDialogAudioSettings.h"
+#include "video/dialogs/GUIDialogVideoBookmarks.h"
+#include "profiles/dialogs/GUIDialogProfileSettings.h"
+#include "profiles/dialogs/GUIDialogLockSettings.h"
+#include "settings/dialogs/GUIDialogContentSettings.h"
+#include "dialogs/GUIDialogBusy.h"
+#include "dialogs/GUIDialogKeyboardGeneric.h"
 #include "dialogs/GUIDialogYesNo.h"
+#include "dialogs/GUIDialogOK.h"
+#include "dialogs/GUIDialogProgress.h"
+#include "dialogs/GUIDialogExtendedProgressBar.h"
+#include "dialogs/GUIDialogSelect.h"
+#include "dialogs/GUIDialogSeekBar.h"
+#include "dialogs/GUIDialogKaiToast.h"
+#include "dialogs/GUIDialogVolumeBar.h"
+#include "dialogs/GUIDialogNumeric.h"
+#include "dialogs/GUIDialogGamepad.h"
+#include "dialogs/GUIDialogSubMenu.h"
+#include "favourites/GUIDialogFavourites.h"
+#include "dialogs/GUIDialogButtonMenu.h"
+#include "dialogs/GUIDialogContextMenu.h"
+#include "music/dialogs/GUIDialogSongInfo.h"
+#include "dialogs/GUIDialogSmartPlaylistEditor.h"
+#include "dialogs/GUIDialogSmartPlaylistRule.h"
+#include "pictures/GUIDialogPictureInfo.h"
+#include "addons/gui/GUIDialogAddonSettings.h"
+#include "addons/gui/GUIDialogAddonInfo.h"
 
-#include <mutex>
+#include "dialogs/GUIDialogSlider.h"
+#include "dialogs/GUIDialogPlayEject.h"
+#include "dialogs/GUIDialogMediaFilter.h"
+#include "video/dialogs/GUIDialogSubtitles.h"
 
 using namespace KODI::MESSAGING;
 
@@ -70,7 +128,74 @@ void CGUIWindowManager::Initialize()
 
 void CGUIWindowManager::CreateWindows()
 {
+  Add(new CGUIWindowHome);
+  Add(new CGUIWindowPrograms);
+  Add(new CGUIWindowPictures);
+  Add(new CGUIWindowFileManager);
+  Add(new CGUIWindowSettings);
+  Add(new CGUIWindowSystemInfo);
+  Add(new CGUIWindowSettingsCategory);
+  Add(new CGUIWindowVideoNav);
+  Add(new CGUIWindowVideoPlaylist);
+  Add(new CGUIWindowLoginScreen);
+  Add(new CGUIWindowSettingsProfile);
   Add(new CGUIWindow(WINDOW_SKIN_SETTINGS, "SkinSettings.xml"));
+  Add(new CGUIWindowAddonBrowser);
+  Add(new CGUIDialogYesNo);
+  Add(new CGUIDialogProgress);
+  Add(new CGUIDialogExtendedProgressBar);
+  Add(new CGUIDialogKeyboardGeneric);
+  Add(new CGUIDialogVolumeBar);
+  Add(new CGUIDialogSeekBar);
+  Add(new CGUIDialogSubMenu);
+  Add(new CGUIDialogContextMenu);
+  Add(new CGUIDialogKaiToast);
+  Add(new CGUIDialogNumeric);
+  Add(new CGUIDialogGamepad);
+  Add(new CGUIDialogButtonMenu);
+  Add(new CGUIDialogSlider);
+  Add(new CGUIDialogMusicOSD);
+  Add(new CGUIDialogVisualisationPresetList);
+  Add(new CGUIDialogVideoSettings);
+  Add(new CGUIDialogAudioSettings);
+  Add(new CGUIDialogVideoBookmarks);
+  // Don't add the filebrowser dialog - it's created and added when it's needed
+  Add(new CGUIDialogMediaSource);
+  Add(new CGUIDialogProfileSettings);
+  Add(new CGUIDialogFavourites);
+  Add(new CGUIDialogSongInfo);
+  Add(new CGUIDialogSmartPlaylistEditor);
+  Add(new CGUIDialogSmartPlaylistRule);
+  Add(new CGUIDialogBusy);
+  Add(new CGUIDialogPictureInfo);
+  Add(new CGUIDialogAddonInfo);
+  Add(new CGUIDialogAddonSettings);
+
+  Add(new CGUIDialogLockSettings);
+
+  Add(new CGUIDialogContentSettings);
+
+  Add(new CGUIDialogPlayEject);
+
+  Add(new CGUIDialogMediaFilter);
+  Add(new CGUIDialogSubtitles);
+
+  Add(new CGUIWindowMusicPlayList);
+  Add(new CGUIWindowMusicNav);
+  Add(new CGUIWindowMusicPlaylistEditor);
+
+  Add(new CGUIDialogSelect);
+  Add(new CGUIDialogMusicInfo);
+  Add(new CGUIDialogOK);
+  Add(new CGUIDialogVideoInfo);
+  Add(new CGUIDialogTextViewer);
+  Add(new CGUIWindowVisualisation);
+  Add(new CGUIWindowSlideShow);
+
+  Add(new CGUIDialogVideoOSD);
+  Add(new CGUIWindowWeather);
+  Add(new CGUIWindowStartup);
+  Add(new CGUIWindowSplash);
 }
 
 bool CGUIWindowManager::DestroyWindows()
@@ -149,6 +274,7 @@ bool CGUIWindowManager::DestroyWindows()
     Delete(WINDOW_DIALOG_OSD_TELETEXT);
 
     Delete(WINDOW_DIALOG_TEXT_VIEWER);
+    Delete(WINDOW_DIALOG_PLAY_EJECT);
     Delete(WINDOW_STARTUP_ANIM);
     Delete(WINDOW_LOGIN_SCREEN);
     Delete(WINDOW_VISUALISATION);
@@ -504,7 +630,7 @@ void CGUIWindowManager::ActivateWindow_Internal(int iWindowID, const std::vector
   // translate virtual windows
   if (iWindowID == WINDOW_START)
   { // virtual start window
-    iWindowID = WINDOW_HOME/*g_SkinInfo->GetStartWindow()*/;
+    iWindowID = g_SkinInfo->GetStartWindow();
   }
 
   // debug
@@ -665,9 +791,7 @@ void CGUIWindowManager::OnApplicationMessage(ThreadMessage* pMsg)
     {
       CAction *action = static_cast<CAction *>(pMsg->lpVoid);
       if (pMsg->param1 == WINDOW_INVALID)
-      {
         g_application.OnAction(*action);
-      }
       else
       {
         CGUIWindow *pWindow = GetWindow(pMsg->param1);

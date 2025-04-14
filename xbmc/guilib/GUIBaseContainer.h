@@ -32,17 +32,13 @@
 #include "IGUIContainer.h"
 #include "utils/Stopwatch.h"
 
-#ifdef NXDK
-// should be part of Settings.h
-#include "utils/XBMCTinyXML.h"
-#endif
-
 /*!
  \ingroup controls
  \brief
  */
 
 class IListProvider;
+class TiXmlNode;
 
 class CGUIBaseContainer : public IGUIContainer
 {
