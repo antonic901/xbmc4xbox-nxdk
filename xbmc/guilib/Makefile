@@ -7,12 +7,14 @@ SRCS += \
 	$(CURDIR)/xbmc/guilib/GUIBaseContainer.cpp \
 	$(CURDIR)/xbmc/guilib/GUIBorderedImage.cpp \
 	$(CURDIR)/xbmc/guilib/GUIButtonControl.cpp \
+	$(CURDIR)/xbmc/guilib/GUIColorButtonControl.cpp \
 	$(CURDIR)/xbmc/guilib/GUIColorManager.cpp \
 	$(CURDIR)/xbmc/guilib/GUIComponent.cpp \
 	$(CURDIR)/xbmc/guilib/GUIControl.cpp \
 	$(CURDIR)/xbmc/guilib/GUIControlFactory.cpp \
 	$(CURDIR)/xbmc/guilib/GUIControlGroup.cpp \
 	$(CURDIR)/xbmc/guilib/GUIControlGroupList.cpp \
+	$(CURDIR)/xbmc/guilib/GUIControlLookup.cpp \
 	$(CURDIR)/xbmc/guilib/GUIDialog.cpp \
 	$(CURDIR)/xbmc/guilib/GUIEditControl.cpp \
 	$(CURDIR)/xbmc/guilib/GUIFadeLabelControl.cpp \
@@ -35,9 +37,7 @@ SRCS += \
 	$(CURDIR)/xbmc/guilib/GUIPanelContainer.cpp \
 	$(CURDIR)/xbmc/guilib/GUIProgressControl.cpp \
 	$(CURDIR)/xbmc/guilib/GUIRadioButtonControl.cpp \
-	$(CURDIR)/xbmc/guilib/GUIPanelContainer.cpp \
-	$(CURDIR)/xbmc/guilib/GUIMultiImage.cpp \
-	$(CURDIR)/xbmc/guilib/GUIPanelContainer.cpp \
+	$(CURDIR)/xbmc/guilib/GUIRangesControl.cpp \
 	$(CURDIR)/xbmc/guilib/GUIRenderingControl.cpp \
 	$(CURDIR)/xbmc/guilib/GUIResizeControl.cpp \
 	$(CURDIR)/xbmc/guilib/GUIScrollBarControl.cpp \
