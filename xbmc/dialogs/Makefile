@@ -12,6 +12,7 @@ SRCS += \
 	$(CURDIR)/xbmc/dialogs/GUIDialogMediaSource.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogNumeric.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogOK.cpp \
+	$(CURDIR)/xbmc/dialogs/GUIDialogPlayEject.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogProgress.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogSeekBar.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogSelect.cpp \
