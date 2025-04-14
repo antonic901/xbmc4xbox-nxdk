@@ -1,8 +1,10 @@
 SRCS += \
 	$(CURDIR)/xbmc/dialogs/GUIDialogBoxBase.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogBusy.cpp \
+	$(CURDIR)/xbmc/dialogs/GUIDialogBusyNoCancel.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogButtonMenu.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogContextMenu.cpp \
+	$(CURDIR)/xbmc/dialogs/GUIDialogColorPicker.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogExtendedProgressBar.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogFileBrowser.cpp \
 	$(CURDIR)/xbmc/dialogs/GUIDialogGamepad.cpp \
