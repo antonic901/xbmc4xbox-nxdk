@@ -1,4 +1,4 @@
-XBE_TITLE = XBMC4Xbox
+XBE_TITLE = XBMC
 
 NXDK_CXX = y
 #DEBUG = y

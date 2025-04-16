@@ -1,0 +1,26 @@
+<addons>
+  <addon>kodi.resource</addon>
+  <addon>metadata.album.universal</addon>
+  <addon>metadata.artists.universal</addon>
+  <addon>metadata.common.allmusic.com</addon>
+  <addon>metadata.common.fanart.tv</addon>
+  <addon>metadata.common.musicbrainz.org</addon>
+  <addon>metadata.common.theaudiodb.com</addon>
+  <addon>metadata.local</addon>
+  <addon>metadata.musicvideos.theaudiodb.com</addon>
+  <addon>metadata.movies.themoviedb.org</addon>
+  <addon>repository.xbmc.org</addon>
+  <addon>resource.images.weathericons.default</addon>
+  <addon>resource.language.en_gb</addon>
+  <addon>resource.uisounds.kodi</addon>
+  <addon>screensaver.xbmc.builtin.black</addon>
+  <addon>screensaver.xbmc.builtin.dim</addon>
+  <addon>skin.estuary</addon>
+  <addon>webinterface.default</addon>
+  <addon>xbmc.addon</addon>
+  <addon>xbmc.core</addon>
+  <addon>xbmc.gui</addon>
+  <addon>xbmc.metadata</addon>
+  <addon>xbmc.python</addon>
+  <addon>xbmc.webinterface</addon>
+</addons>
