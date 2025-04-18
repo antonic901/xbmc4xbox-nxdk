@@ -49,6 +49,7 @@ SRCS += \
 	$(CURDIR)/xbmc/utils/ScraperUrl.cpp \
 	$(CURDIR)/xbmc/utils/SortUtils.cpp \
 	$(CURDIR)/xbmc/utils/Speed.cpp \
+	$(CURDIR)/xbmc/utils/Splash.cpp \
 	$(CURDIR)/xbmc/utils/StreamDetails.cpp \
 	$(CURDIR)/xbmc/utils/StreamUtils.cpp \
 	$(CURDIR)/xbmc/utils/StringUtils.cpp \
