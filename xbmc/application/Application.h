@@ -21,6 +21,7 @@
  */
 
 #include "application/ApplicationComponents.h"
+#include "application/ApplicationSettingsHandling.h"
 #include "guilib/IMsgTargetCallback.h"
 #include "guilib/IWindowManagerCallback.h"
 #include "messaging/IMessageTarget.h"
@@ -53,7 +54,8 @@ namespace PLAYLIST
 class CApplication : public IWindowManagerCallback,
                      public IMsgTargetCallback,
                      public KODI::MESSAGING::IMessageTarget,
-                     public CApplicationComponents
+                     public CApplicationComponents,
+                     public CApplicationSettingsHandling
 {
   friend class CApplicationPlayer;
 public:

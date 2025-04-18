@@ -3,5 +3,6 @@ SRCS += \
 	$(CURDIR)/xbmc/application/ApplicationActionListeners.cpp \
 	$(CURDIR)/xbmc/application/ApplicationPlayer.cpp \
 	$(CURDIR)/xbmc/application/ApplicationPowerHandling.cpp \
+	$(CURDIR)/xbmc/application/ApplicationSettingsHandling.cpp \
 	$(CURDIR)/xbmc/application/ApplicationSkinHandling.cpp \
 	$(CURDIR)/xbmc/application/AppParams.cpp
