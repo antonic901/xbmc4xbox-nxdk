@@ -21,6 +21,7 @@
  */
 
 #include "application/ApplicationComponents.h"
+#include "application/ApplicationEnums.h"
 #include "application/ApplicationPlayerCallback.h"
 #include "application/ApplicationSettingsHandling.h"
 #include "guilib/IMsgTargetCallback.h"
@@ -63,9 +64,17 @@ public:
   CApplication(void);
   virtual ~CApplication(void);
 
+  bool Create();
+  bool Initialize();
+  int Run();
+  bool Cleanup();
+
   void FrameMove(bool processEvents, bool processGUI = true) override;
   void Render() override;
 
+  bool CreateGUI();
+
+  bool Stop(int exitCode);
   bool IsCurrentThread() const;
   const std::string& CurrentFile();
   CFileItem& CurrentFileItem();

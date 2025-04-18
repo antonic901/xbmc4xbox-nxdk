@@ -58,8 +58,27 @@ CApplication::~CApplication(void)
   DeregisterComponent(typeid(CApplicationActionListeners));
 }
 
+bool CApplication::Create()
+{
+  // TODO: implement this
+  return false;
+}
+
+bool CApplication::CreateGUI()
+{
+  // TODO: implement this
+  return false;
+}
+
+bool CApplication::Initialize()
+{
+  // TODO: implement this
+  return false;
+}
+
 void CApplication::Render()
 {
+  // Handle rendering
 }
 
 bool CApplication::OnAction(const CAction &action)
@@ -78,6 +97,24 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
 
 void CApplication::FrameMove(bool processEvents, bool processGUI)
 {
+}
+
+int CApplication::Run()
+{
+  // TODO: implement this
+  return 0;
+}
+
+bool CApplication::Cleanup()
+{
+  // TODO: implement this
+  return false;
+}
+
+bool CApplication::Stop(int exitCode)
+{
+  // TODO: implement this
+  return false;
 }
 
 bool CApplication::PlayMedia(CFileItem& item, const std::string& player, PLAYLIST::Id playlistId)
