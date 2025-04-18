@@ -18,25 +18,57 @@
  *
  */
 
-#include "application/Application.h"
+#include "Application.h"
 
 #include "PlayListPlayer.h"
 #include "ServiceManager.h"
+#include "Util.h"
+#include "addons/AddonManager.h"
+#include "addons/RepositoryUpdater.h"
+#include "addons/Service.h"
+#include "addons/Skin.h"
 #include "application/ApplicationActionListeners.h"
+#include "application/ApplicationPlayer.h"
 #include "application/ApplicationPowerHandling.h"
 #include "application/ApplicationSkinHandling.h"
 #include "application/ApplicationStackHelper.h"
+#include "guilib/GUIComponent.h"
+#include "guilib/GUIFontManager.h"
 #include "playlists/PlayListFactory.h"
+
+#include "GUIPassword.h"
 #include "ServiceBroker.h"
+#include "TextureCache.h"
+#include "guilib/LocalizeStrings.h"
+#include "input/Key.h"
 #include "messaging/ApplicationMessenger.h"
 #include "messaging/ThreadMessage.h"
 
 #include "playlists/PlayList.h"
 #include "playlists/SmartPlayList.h"
+#include "profiles/ProfileManager.h"
+#include "settings/DisplaySettings.h"
+#include "settings/MediaSettings.h"
+#include "settings/Settings.h"
+#include "settings/SettingsComponent.h"
+#include "utils/SystemInfo.h"
+#include "utils/Splash.h"
 
-#include "input/Key.h"
+// Windows includes
+#include "guilib/GUIWindowManager.h"
+#include "video/PlayerController.h"
 
+#include "DatabaseManager.h"
+#include "storage/MediaManager.h"
+
+#include "addons/AddonSystemSettings.h"
+
+#include <mutex>
+
+using namespace ADDON;
 using namespace KODI::MESSAGING;
+
+using namespace std::chrono_literals;
 
 CApplication::CApplication(void)
   : m_pPlayer(new CApplicationPlayer)
@@ -72,8 +104,204 @@ bool CApplication::CreateGUI()
 
 bool CApplication::Initialize()
 {
-  // TODO: implement this
-  return false;
+#if defined(HAS_DVD_DRIVE) && !defined(TARGET_WINDOWS) // somehow this throws an "unresolved external symbol" on win32
+  // turn off cdio logging
+  cdio_loglevel_default = CDIO_LOG_ERROR;
+#endif
+
+  // load the language and its translated strings
+  if (!LoadLanguage(false))
+    return false;
+
+  // load media manager sources (e.g. root addon type sources depend on language strings to be available)
+  CServiceBroker::GetMediaManager().LoadSources();
+
+  const std::shared_ptr<CProfileManager> profileManager = CServiceBroker::GetSettingsComponent()->GetProfileManager();
+
+  // TODO: initialize network
+
+  // initialize (and update as needed) our databases
+  CDatabaseManager &databaseManager = m_ServiceManager->GetDatabaseManager();
+
+  CEvent event(true);
+  CServiceBroker::GetJobManager()->Submit([&databaseManager, &event]() {
+    databaseManager.Initialize();
+    event.Set();
+  });
+
+  std::string localizedStr = g_localizeStrings.Get(24150);
+  int iDots = 1;
+  while (!event.Wait(1000ms))
+  {
+    if (databaseManager.IsUpgrading())
+      CSplash::GetInstance().Show(std::string(iDots, ' ') + localizedStr + std::string(iDots, '.'));
+
+    if (iDots == 3)
+      iDots = 1;
+    else
+      ++iDots;
+  }
+  CSplash::GetInstance().Show("");
+
+  // GUI depends on seek handler
+  GetComponent<CApplicationPlayer>()->GetSeekHandler().Configure();
+
+  const auto skinHandling = GetComponent<CApplicationSkinHandling>();
+
+  bool uiInitializationFinished = false;
+
+  if (CServiceBroker::GetGUI()->GetWindowManager().Initialized())
+  {
+    const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+
+    CServiceBroker::GetGUI()->GetWindowManager().CreateWindows();
+
+    skinHandling->m_confirmSkinChange = false;
+
+    std::vector<AddonInfoPtr> incompatibleAddons;
+    event.Reset();
+
+    // Addon migration
+    if (CServiceBroker::GetAddonMgr().GetIncompatibleEnabledAddonInfos(incompatibleAddons))
+    {
+      if (CAddonSystemSettings::GetInstance().GetAddonAutoUpdateMode() == AUTO_UPDATES_ON)
+      {
+        CServiceBroker::GetJobManager()->Submit(
+            [&event, &incompatibleAddons]() {
+              if (CServiceBroker::GetRepositoryUpdater().CheckForUpdates())
+                CServiceBroker::GetRepositoryUpdater().Await();
+
+              incompatibleAddons = CServiceBroker::GetAddonMgr().MigrateAddons();
+              event.Set();
+            },
+            CJob::PRIORITY_DEDICATED);
+        localizedStr = g_localizeStrings.Get(24151);
+        iDots = 1;
+        while (!event.Wait(1000ms))
+        {
+          CSplash::GetInstance().Show(std::string(iDots, ' ') + localizedStr +
+                                      std::string(iDots, '.'));
+          if (iDots == 3)
+            iDots = 1;
+          else
+            ++iDots;
+        }
+        m_incompatibleAddons = incompatibleAddons;
+      }
+      else
+      {
+        // If no update is active disable all incompatible addons during start
+        m_incompatibleAddons =
+            CServiceBroker::GetAddonMgr().DisableIncompatibleAddons(incompatibleAddons);
+      }
+    }
+
+    // Start splashscreen and load skin
+    CSplash::GetInstance().Show("");
+    skinHandling->m_confirmSkinChange = true;
+
+    auto setting = settings->GetSetting(CSettings::SETTING_LOOKANDFEEL_SKIN);
+    if (!setting)
+    {
+      CLog::Log(LOGFATAL, "Failed to load setting for: {}", CSettings::SETTING_LOOKANDFEEL_SKIN);
+      return false;
+    }
+
+    CServiceBroker::RegisterTextureCache(std::make_shared<CTextureCache>());
+
+    std::string skinId = settings->GetString(CSettings::SETTING_LOOKANDFEEL_SKIN);
+    if (!skinHandling->LoadSkin(skinId))
+    {
+      CLog::Log(LOGERROR, "Failed to load skin '{}'", skinId);
+      std::string defaultSkin =
+          std::static_pointer_cast<const CSettingString>(setting)->GetDefault();
+      if (!skinHandling->LoadSkin(defaultSkin))
+      {
+        CLog::Log(LOGFATAL, "Default skin '{}' could not be loaded! Terminating..", defaultSkin);
+        return false;
+      }
+    }
+
+    // initialize splash window after splash screen disappears
+    // because we need a real window in the background which gets
+    // rendered while we load the main window or enter the master lock key
+    CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_SPLASH);
+
+    if (settings->GetBool(CSettings::SETTING_MASTERLOCK_STARTUPLOCK) &&
+        profileManager->GetMasterProfile().getLockMode() != LOCK_MODE_EVERYONE &&
+        !profileManager->GetMasterProfile().getLockCode().empty())
+    {
+      g_passwordManager.CheckStartUpLock();
+    }
+
+    // check if we should use the login screen
+    if (profileManager->UsingLoginScreen())
+    {
+      CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_LOGIN_SCREEN);
+    }
+    else
+    {
+      // activate the configured start window
+      int firstWindow = g_SkinInfo->GetFirstWindow();
+      CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(firstWindow);
+
+      if (CServiceBroker::GetGUI()->GetWindowManager().IsWindowActive(WINDOW_STARTUP_ANIM))
+      {
+        CLog::Log(LOGWARNING, "CApplication::Initialize - startup.xml taints init process");
+      }
+
+      // the startup window is considered part of the initialization as it most likely switches to the final window
+      uiInitializationFinished = firstWindow != WINDOW_STARTUP_ANIM;
+    }
+  }
+  else //No GUI Created
+  {
+    uiInitializationFinished = true;
+  }
+
+  if (!m_ServiceManager->InitStageThree(profileManager))
+  {
+    CLog::Log(LOGERROR, "Application - Init3 failed");
+  }
+
+  g_sysinfo.Refresh();
+
+  CLog::Log(LOGINFO, "removing tempfiles");
+  CUtil::RemoveTempFiles();
+
+  if (!profileManager->UsingLoginScreen())
+  {
+    UpdateLibraries();
+    SetLoggingIn(false);
+  }
+
+  m_slowTimer.StartZero();
+
+  // register action listeners
+  const auto appListener = GetComponent<CApplicationActionListeners>();
+  const auto appPlayer = GetComponent<CApplicationPlayer>();
+  appListener->RegisterActionListener(&appPlayer->GetSeekHandler());
+  appListener->RegisterActionListener(&CPlayerController::GetInstance());
+
+  CServiceBroker::GetRepositoryUpdater().Start();
+  if (!profileManager->UsingLoginScreen())
+    CServiceBroker::GetServiceAddons().Start();
+
+  CLog::Log(LOGINFO, "initialize done");
+
+  const auto appPower = GetComponent<CApplicationPowerHandling>();
+  appPower->CheckOSScreenSaverInhibitionSetting();
+  // reset our screensaver (starts timers etc.)
+  appPower->ResetScreenSaver();
+
+  // if the user interfaces has been fully initialized let everyone know
+  if (uiInitializationFinished)
+  {
+    CGUIMessage msg(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_UI_READY);
+    CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
+  }
+
+  return true;
 }
 
 void CApplication::Render()

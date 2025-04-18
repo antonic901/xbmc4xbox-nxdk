@@ -31,7 +31,8 @@
 #include "utils/GlobalsHandling.h"
 
 #include <atomic>
-#include <map>
+#include <chrono>
+#include <deque>
 #include <memory>
 #include <string>
 #include <vector>
@@ -41,6 +42,11 @@ class CFileItem;
 class CFileItemList;
 class CKey;
 class CServiceManager;
+
+namespace ADDON
+{
+  class CAddonInfo;
+}
 
 namespace PLAYLIST
 {
@@ -151,7 +157,13 @@ public:
   bool SwitchToFullScreen(bool force = false);
 
 protected:
+  // timer information
+  CStopWatch m_slowTimer;
+
   bool m_bInitializing = true;
+
+  std::vector<std::shared_ptr<ADDON::CAddonInfo>>
+      m_incompatibleAddons; /*!< Result of addon migration (incompatible addon infos) */
 
 private:
   mutable CCriticalSection m_critSection; /*!< critical section for all changes to this class, except for changes to triggers */
