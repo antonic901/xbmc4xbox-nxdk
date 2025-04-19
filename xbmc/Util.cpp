@@ -966,6 +966,15 @@ void CUtil::GetSkinThemes(std::vector<std::string>& vecTheme)
   std::sort(vecTheme.begin(), vecTheme.end(), sortstringbyname());
 }
 
+void CUtil::InitRandomSeed()
+{
+  // Init random seed
+  auto now = std::chrono::steady_clock::now();
+  auto seed = now.time_since_epoch();
+
+  srand(static_cast<unsigned int>(seed.count()));
+}
+
 int CUtil::LookupRomanDigit(char roman_digit)
 {
   switch (roman_digit)
@@ -1127,4 +1136,22 @@ int CUtil::GetRandomNumber()
 #endif
 
   return rand();
+}
+
+void CUtil::CopyUserDataIfNeeded(const std::string& strPath,
+                                 const std::string& file,
+                                 const std::string& destname)
+{
+  std::string destPath;
+  if (destname.empty())
+    destPath = URIUtils::AddFileToFolder(strPath, file);
+  else
+    destPath = URIUtils::AddFileToFolder(strPath, destname);
+
+  if (!CFile::Exists(destPath))
+  {
+    // need to copy it across
+    std::string srcPath = URIUtils::AddFileToFolder("special://xbmc/userdata/", file);
+    CFile::Copy(srcPath, destPath);
+  }
 }

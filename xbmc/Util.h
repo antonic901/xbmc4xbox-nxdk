@@ -114,6 +114,8 @@ public:
   static bool SupportsReadFileOperations(const std::string& strPath);
   static std::string GetDefaultFolderThumb(const std::string &folderThumb);
 
+  static void InitRandomSeed();
+
   // Get decimal integer representation of roman digit, ivxlcdm are valid
   // return 0 for other chars;
   static int LookupRomanDigit(char roman_digit);
@@ -130,6 +132,12 @@ public:
   static double ConvertMilliSecsToSecs(int64_t offset) { return offset / 1000.0; }
   static int64_t ConvertMilliSecsToSecsInt(int64_t offset) { return offset / 1000; }
   static int64_t ConvertMilliSecsToSecsIntRounded(int64_t offset) { return ConvertMilliSecsToSecsInt(offset + 499); }
+
+  /** \brief Copy files from the application bundle over to the user data directory in Application Support/Kodi.
+  */
+  static void CopyUserDataIfNeeded(const std::string& strPath,
+                                   const std::string& file,
+                                   const std::string& destname = "");
 };
 
 

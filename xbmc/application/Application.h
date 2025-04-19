@@ -48,6 +48,11 @@ namespace ADDON
   class CAddonInfo;
 }
 
+namespace ANNOUNCEMENT
+{
+  class CAnnouncementManager;
+}
+
 namespace PLAYLIST
 {
   class CPlayList;
@@ -157,15 +162,21 @@ public:
   bool SwitchToFullScreen(bool force = false);
 
 protected:
+  std::shared_ptr<ANNOUNCEMENT::CAnnouncementManager> m_pAnnouncementManager;
+
   // timer information
   CStopWatch m_slowTimer;
 
   bool m_bInitializing = true;
 
+  std::chrono::time_point<std::chrono::steady_clock> m_lastRenderTime;
+
   std::vector<std::shared_ptr<ADDON::CAddonInfo>>
       m_incompatibleAddons; /*!< Result of addon migration (incompatible addon infos) */
 
 private:
+  void PrintStartupLog();
+
   mutable CCriticalSection m_critSection; /*!< critical section for all changes to this class, except for changes to triggers */
 };
 

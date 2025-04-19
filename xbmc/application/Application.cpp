@@ -22,6 +22,7 @@
 
 #include "PlayListPlayer.h"
 #include "ServiceManager.h"
+#include "URL.h"
 #include "Util.h"
 #include "addons/AddonManager.h"
 #include "addons/RepositoryUpdater.h"
@@ -39,7 +40,10 @@
 #include "GUIPassword.h"
 #include "ServiceBroker.h"
 #include "TextureCache.h"
+#include "filesystem/Directory.h"
+#include "filesystem/SpecialProtocol.h"
 #include "guilib/LocalizeStrings.h"
+#include "input/KeyboardLayoutManager.h"
 #include "input/Key.h"
 #include "messaging/ApplicationMessenger.h"
 #include "messaging/ThreadMessage.h"
@@ -47,12 +51,17 @@
 #include "playlists/PlayList.h"
 #include "playlists/SmartPlayList.h"
 #include "profiles/ProfileManager.h"
+#include "settings/AdvancedSettings.h"
 #include "settings/DisplaySettings.h"
 #include "settings/MediaSettings.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
+#include "utils/CPUInfo.h"
 #include "utils/SystemInfo.h"
 #include "utils/Splash.h"
+#include "utils/log.h"
+
+#include "interfaces/AnnouncementManager.h"
 
 // Windows includes
 #include "guilib/GUIWindowManager.h"
@@ -66,6 +75,7 @@
 #include <mutex>
 
 using namespace ADDON;
+using namespace XFILE;
 using namespace KODI::MESSAGING;
 
 using namespace std::chrono_literals;
@@ -92,8 +102,95 @@ CApplication::~CApplication(void)
 
 bool CApplication::Create()
 {
-  // TODO: implement this
-  return false;
+  m_bStop = false;
+
+  RegisterSettings();
+
+  CServiceBroker::RegisterCPUInfo(CCPUInfo::GetCPUInfo());
+
+  // Register JobManager service
+  CServiceBroker::RegisterJobManager(std::make_shared<CJobManager>());
+
+  // Announcement service
+  m_pAnnouncementManager = std::make_shared<ANNOUNCEMENT::CAnnouncementManager>();
+  m_pAnnouncementManager->Start();
+  CServiceBroker::RegisterAnnouncementManager(m_pAnnouncementManager);
+
+  const auto appMessenger = std::make_shared<CApplicationMessenger>();
+  CServiceBroker::RegisterAppMessenger(appMessenger);
+
+  const auto keyboardLayoutManager = std::make_shared<CKeyboardLayoutManager>();
+  CServiceBroker::RegisterKeyboardLayoutManager(keyboardLayoutManager);
+
+  m_ServiceManager.reset(new CServiceManager());
+
+  if (!m_ServiceManager->InitStageOne())
+  {
+    return false;
+  }
+
+  // here we register all global classes for the CApplicationMessenger,
+  // after that we can send messages to the corresponding modules
+  appMessenger->RegisterReceiver(this);
+  appMessenger->RegisterReceiver(&CServiceBroker::GetPlaylistPlayer());
+  appMessenger->SetGUIThread(CThread::GetCurrentThreadId());
+  appMessenger->SetProcessThread(CThread::GetCurrentThreadId());
+
+  // copy required files
+  CUtil::CopyUserDataIfNeeded("special://masterprofile/", "RssFeeds.xml");
+  CUtil::CopyUserDataIfNeeded("special://masterprofile/", "favourites.xml");
+  CUtil::CopyUserDataIfNeeded("special://masterprofile/", "Lircmap.xml");
+
+  CLog::Init(CSpecialProtocol::TranslatePath("special://logpath"));
+
+#ifdef TARGET_POSIX //! @todo Win32 has no special://home/ mapping by default, so we
+  //!       must create these here. Ideally this should be using special://home/ and
+  //!      be platform agnostic (i.e. unify the InitDirectories*() functions)
+  if (!CServiceBroker::GetAppParams()->HasPlatformDirectories())
+#endif
+  {
+    CDirectory::Create("special://xbmc/addons");
+  }
+
+  PrintStartupLog();
+
+  // TODO: initialize network adapter and network protocols
+
+  CLog::Log(LOGINFO, "loading settings");
+  const auto settingsComponent = CServiceBroker::GetSettingsComponent();
+  if (!settingsComponent->Load())
+    return false;
+
+  CLog::Log(LOGINFO, "creating subdirectories");
+  const std::shared_ptr<CProfileManager> profileManager = settingsComponent->GetProfileManager();
+  const std::shared_ptr<CSettings> settings = settingsComponent->GetSettings();
+  CLog::Log(LOGINFO, "userdata folder: {}",
+            CURL::GetRedacted(profileManager->GetProfileUserDataFolder()));
+  CLog::Log(LOGINFO, "recording folder: {}",
+            CURL::GetRedacted(settings->GetString(CSettings::SETTING_AUDIOCDS_RECORDINGPATH)));
+  CLog::Log(LOGINFO, "screenshots folder: {}",
+            CURL::GetRedacted(settings->GetString(CSettings::SETTING_DEBUG_SCREENSHOTPATH)));
+  CDirectory::Create(profileManager->GetUserDataFolder());
+  CDirectory::Create(profileManager->GetProfileUserDataFolder());
+  profileManager->CreateProfileFolders();
+
+  if (!m_ServiceManager->InitStageTwo(
+          settingsComponent->GetProfileManager()->GetProfileUserDataFolder()))
+  {
+    return false;
+  }
+
+  // load the keyboard layouts
+  if (!keyboardLayoutManager->Load())
+  {
+    CLog::Log(LOGFATAL, "CApplication::Create: Unable to load keyboard layouts");
+    return false;
+  }
+
+  CUtil::InitRandomSeed();
+
+  m_lastRenderTime = std::chrono::steady_clock::now();
+  return true;
 }
 
 bool CApplication::CreateGUI()
@@ -118,7 +215,7 @@ bool CApplication::Initialize()
 
   const std::shared_ptr<CProfileManager> profileManager = CServiceBroker::GetSettingsComponent()->GetProfileManager();
 
-  // TODO: initialize network
+  // TODO: wait for network connection
 
   // initialize (and update as needed) our databases
   CDatabaseManager &databaseManager = m_ServiceManager->GetDatabaseManager();
@@ -526,4 +623,12 @@ bool CApplication::LoadLanguage(bool reload)
 
 void CApplication::SetLoggingIn(bool switchingProfiles)
 {
+}
+
+void CApplication::PrintStartupLog()
+{
+  CLog::Log(LOGINFO, "-----------------------------------------------------------------------");
+  CLog::Log(LOGNOTICE, "Starting XBMC. Built on {}", __DATE__);
+  CSpecialProtocol::LogPaths();
+  CLog::Log(LOGINFO, "-----------------------------------------------------------------------");
 }
