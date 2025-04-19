@@ -12,17 +12,17 @@
 
 void CMessagePrinter::DisplayMessage(const std::string& message)
 {
-  debugPrint(message.c_str());
+  debugPrint("%s", message.c_str());
 }
 
 void CMessagePrinter::DisplayWarning(const std::string& warning)
 {
-  debugPrint(warning.c_str());
+  debugPrint("%s", warning.c_str());
 }
 
 void CMessagePrinter::DisplayError(const std::string& error)
 {
-  debugPrint(error.c_str());
+  debugPrint("%s", error.c_str());
 }
 
 void CMessagePrinter::DisplayHelpMessage(const std::vector<std::pair<std::string, std::string>>& help)
@@ -33,5 +33,5 @@ void CMessagePrinter::DisplayHelpMessage(const std::vector<std::pair<std::string
   {
     message.append(line.first + "\t" + line.second + "\r\n");
   }
-  debugPrint(message.c_str());
+  debugPrint("%s", message.c_str());
 }
