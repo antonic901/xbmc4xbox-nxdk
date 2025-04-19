@@ -98,59 +98,66 @@ BOOL FileTimeToLocalFileTime(const FILETIME *lpFileTime, LPFILETIME lpLocalFileT
 
 BOOL SystemTimeToFileTime(const SYSTEMTIME *lpSystemTime, LPFILETIME lpFileTime)
 {
-  struct tm t = {0};
-  t.tm_year = lpSystemTime->wYear - 1900;
-  t.tm_mon = lpSystemTime->wMonth - 1;
-  t.tm_mday = lpSystemTime->wDay;
-  t.tm_hour = lpSystemTime->wHour;
-  t.tm_min = lpSystemTime->wMinute;
-  t.tm_sec = lpSystemTime->wSecond;
+  TIME_FIELDS timefields;
+  timefields.Year = lpSystemTime->wYear;
+  timefields.Day = lpSystemTime->wDay;
+  timefields.Hour = lpSystemTime->wHour;
+  timefields.Minute = lpSystemTime->wMinute;
+  timefields.Second = lpSystemTime->wSecond;
+  timefields.Millisecond = lpSystemTime->wMilliseconds;
 
-  time_t posixTime = mktime(&t);
-  if (posixTime == -1)
-    return 0;
+  LARGE_INTEGER filetime;
+  if (!RtlTimeFieldsToTime(&timefields, &filetime))
+  {
+    SetLastError(ERROR_INVALID_PARAMETER);
+    return FALSE;
+  }
 
-  uint64_t timeIn100ns = ((uint64_t)posixTime * HUNDRED_NS_PER_SECOND) + EPOCH_DIFFERENCE;
-  timeIn100ns += lpSystemTime->wMilliseconds * 10000ULL;
-
-  lpFileTime->dwLowDateTime = (uint32_t)timeIn100ns;
-  lpFileTime->dwHighDateTime = (uint32_t)(timeIn100ns >> 32);
-  return 1;
+  lpFileTime->dwLowDateTime = filetime.LowPart;
+  lpFileTime->dwHighDateTime = filetime.HighPart;
+  return TRUE;
 }
 
 LONG CompareFileTime(const FILETIME *lpFileTime1, const FILETIME *lpFileTime2)
 {
-  uint64_t time1 = ((uint64_t)lpFileTime1->dwHighDateTime << 32) | lpFileTime1->dwLowDateTime;
-  uint64_t time2 = ((uint64_t)lpFileTime2->dwHighDateTime << 32) | lpFileTime2->dwLowDateTime;
+  ULARGE_INTEGER filetime1;
+  ULARGE_INTEGER filetime2;
 
-  if (time1 < time2)
+  filetime1.LowPart = lpFileTime1->dwLowDateTime;
+  filetime1.HighPart = lpFileTime1->dwHighDateTime;
+  filetime2.LowPart = lpFileTime2->dwLowDateTime;
+  filetime2.HighPart = lpFileTime2->dwHighDateTime;
+
+  if (filetime1.QuadPart < filetime2.QuadPart)
     return -1;
-  else if (time1 > time2)
+  if (filetime1.QuadPart > filetime2.QuadPart)
     return 1;
-  else
-    return 0;
+  return 0;
 }
 
 BOOL FileTimeToSystemTime(const FILETIME *lpFileTime, LPSYSTEMTIME lpSystemTime)
 {
-  uint64_t lpFileTimeValue = ((uint64_t)lpFileTime->dwHighDateTime << 32) | lpFileTime->dwLowDateTime;
+  LARGE_INTEGER filetime;
+  filetime.HighPart = lpFileTime->dwHighDateTime;
+  if (filetime.QuadPart < 0)
+  {
+    SetLastError(ERROR_INVALID_PARAMETER);
+    return FALSE;
+  }
 
-  time_t unixTime = (lpFileTimeValue / HUNDRED_NS_PER_SECOND) - EPOCH_DIFFERENCE;
+  TIME_FIELDS timefields;
+  RtlTimeToTimeFields(&filetime, &timefields);
 
-  struct tm* utcTime = gmtime(&unixTime);
-  if (!utcTime)
-    return 0;
+  lpSystemTime->wYear = timefields.Year;
+  lpSystemTime->wMonth = timefields.Month;
+  lpSystemTime->wDay = timefields.Day;
+  lpSystemTime->wDayOfWeek = timefields.Weekday;
+  lpSystemTime->wHour = timefields.Hour;
+  lpSystemTime->wMinute = timefields.Minute;
+  lpSystemTime->wSecond = timefields.Second;
+  lpSystemTime->wMilliseconds = timefields.Millisecond;
 
-  lpSystemTime->wYear = utcTime->tm_year + 1900;
-  lpSystemTime->wMonth = utcTime->tm_mon + 1;
-  lpSystemTime->wDay = utcTime->tm_mday;
-  lpSystemTime->wHour = utcTime->tm_hour;
-  lpSystemTime->wMinute = utcTime->tm_min;
-  lpSystemTime->wSecond = utcTime->tm_sec;
-  lpSystemTime->wMilliseconds = (lpFileTimeValue % HUNDRED_NS_PER_SECOND) / 10000;
-  lpSystemTime->wDayOfWeek = utcTime->tm_wday;
-
-  return 1;
+  return TRUE;
 }
 
 BOOL LocalFileTimeToFileTime(const FILETIME *lpLocalFileTime, LPFILETIME lpFileTime)
