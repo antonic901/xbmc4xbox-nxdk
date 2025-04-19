@@ -21,6 +21,7 @@
  */
 
 #include "application/ApplicationComponents.h"
+#include "application/ApplicationPlayerCallback.h"
 #include "application/ApplicationSettingsHandling.h"
 #include "guilib/IMsgTargetCallback.h"
 #include "guilib/IWindowManagerCallback.h"
@@ -55,9 +56,9 @@ class CApplication : public IWindowManagerCallback,
                      public IMsgTargetCallback,
                      public KODI::MESSAGING::IMessageTarget,
                      public CApplicationComponents,
+                     public CApplicationPlayerCallback,
                      public CApplicationSettingsHandling
 {
-  friend class CApplicationPlayer;
 public:
   CApplication(void);
   virtual ~CApplication(void);
@@ -141,8 +142,6 @@ public:
   bool SwitchToFullScreen(bool force = false);
 
 protected:
-  CFileItemPtr m_itemCurrentFile;
-
   bool m_bInitializing = true;
 
 private:

@@ -25,6 +25,7 @@
 #include "application/ApplicationActionListeners.h"
 #include "application/ApplicationPowerHandling.h"
 #include "application/ApplicationSkinHandling.h"
+#include "application/ApplicationStackHelper.h"
 #include "playlists/PlayListFactory.h"
 #include "ServiceBroker.h"
 #include "messaging/ApplicationMessenger.h"
@@ -39,17 +40,18 @@ using namespace KODI::MESSAGING;
 
 CApplication::CApplication(void)
   : m_pPlayer(new CApplicationPlayer)
-  , m_itemCurrentFile(new CFileItem)
 {
   // register application components
   RegisterComponent(std::make_shared<CApplicationActionListeners>(m_critSection));
   RegisterComponent(std::make_shared<CApplicationPlayer>());
   RegisterComponent(std::make_shared<CApplicationPowerHandling>());
   RegisterComponent(std::make_shared<CApplicationSkinHandling>(this, this, m_bInitializing));
+  RegisterComponent(std::make_shared<CApplicationStackHelper>());
 }
 
 CApplication::~CApplication(void)
 {
+  DeregisterComponent(typeid(CApplicationStackHelper));
   DeregisterComponent(typeid(CApplicationSkinHandling));
   DeregisterComponent(typeid(CApplicationPowerHandling));
   DeregisterComponent(typeid(CApplicationPlayer));
