@@ -21,6 +21,9 @@
 #include "GUIAudioManager.h"
 #include "GUISound.h"
 #include "input/Key.h"
+#include "input/WindowTranslator.h"
+#include "input/actions/ActionIDs.h"
+#include "input/actions/ActionTranslator.h"
 #include "filesystem/Directory.h"
 #include "threads/SingleLock.h"
 #include "utils/URIUtils.h"
@@ -346,10 +349,8 @@ bool CGUIAudioManager::Load()
       TiXmlNode* pIdNode = pWindow->FirstChild("name");
       if (pIdNode)
       {
-#if 0
         if (pIdNode->FirstChild())
-          id = CButtonTranslator::TranslateWindow(pIdNode->FirstChild()->Value());
-#endif
+          id = CWindowTranslator::TranslateWindow(pIdNode->FirstChild()->Value());
       }
 
       CWindowSounds sounds;

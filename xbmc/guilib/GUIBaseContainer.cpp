@@ -293,7 +293,7 @@ void CGUIBaseContainer::RenderItem(float posX, float posY, CGUIListItem *item, b
 
 bool CGUIBaseContainer::OnAction(const CAction &action)
 {
-  if (action.GetID() >= KEY_ASCII)
+  if (action.GetID() >= KEY_UNICODE)
   {
     OnJumpLetter((char)(action.GetID() & 0xff));
     return true;
