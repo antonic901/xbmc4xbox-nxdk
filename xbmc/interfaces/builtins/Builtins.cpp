@@ -22,6 +22,7 @@
 #include "SkinBuiltins.h"
 #include "SystemBuiltins.h"
 #include "WeatherBuiltins.h"
+#include "input/InputManager.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/ExecString.h"
@@ -78,10 +79,8 @@ bool CBuiltins::HasCommand(const std::string& execString)
   const std::string function = exec.GetFunction();
   const std::vector<std::string> parameters = exec.GetParams();
 
-#if 0
   if (CServiceBroker::GetInputManager().HasBuiltin(function))
     return true;
-#endif
 
   const auto& it = m_command.find(function);
   if (it != m_command.end())
@@ -164,9 +163,5 @@ int CBuiltins::Execute(const std::string& execString)
     }
   }
   else
-#if 0
     return CServiceBroker::GetInputManager().ExecuteBuiltin(execute, params);
-#else
-    return -1;
-#endif
 }

@@ -14,7 +14,8 @@
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/WindowIDs.h"
-#include "input/Key.h"
+#include "input/InputManager.h"
+#include "input/actions/ActionIDs.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 
@@ -31,7 +32,7 @@ void CGUIDialogVideoOSD::FrameMove()
   if (m_autoClosing)
   {
     // check for movement of mouse or a submenu open
-    if (false
+    if (CServiceBroker::GetInputManager().IsMouseActive()
                            || CServiceBroker::GetGUI()->GetWindowManager().IsWindowActive(WINDOW_DIALOG_AUDIO_OSD_SETTINGS)
                            || CServiceBroker::GetGUI()->GetWindowManager().IsWindowActive(WINDOW_DIALOG_SUBTITLE_OSD_SETTINGS)
                            || CServiceBroker::GetGUI()->GetWindowManager().IsWindowActive(WINDOW_DIALOG_VIDEO_OSD_SETTINGS)

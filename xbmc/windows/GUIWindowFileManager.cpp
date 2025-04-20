@@ -32,7 +32,7 @@
 #include "guilib/GUIKeyboardFactory.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
-#include "input/Key.h"
+#include "input/InputManager.h"
 #include "interfaces/generic/ScriptInvocationManager.h"
 #include "messaging/ApplicationMessenger.h"
 #include "messaging/helpers/DialogOKHelper.h"
@@ -308,9 +308,7 @@ bool CGUIWindowFileManager::OnMessage(CGUIMessage& message)
         if (iAction == ACTION_HIGHLIGHT_ITEM || iAction == ACTION_MOUSE_LEFT_CLICK)
         {
           OnMark(list, iItem);
-#if 0
           if (!CServiceBroker::GetInputManager().IsMouseActive())
-#endif
           {
             //move to next item
             CGUIMessage msg(GUI_MSG_ITEM_SELECT, GetID(), iControl, iItem + 1);

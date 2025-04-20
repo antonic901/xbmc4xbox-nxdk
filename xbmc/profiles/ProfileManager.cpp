@@ -28,6 +28,7 @@
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/LocalizeStrings.h"
+#include "input/InputManager.h"
 #include "music/MusicLibraryQueue.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
@@ -311,6 +312,9 @@ bool CProfileManager::LoadProfile(unsigned int index)
   CreateProfileFolders();
 
   CServiceBroker::GetDatabaseManager().Initialize();
+  CServiceBroker::GetInputManager().LoadKeymaps();
+
+  CServiceBroker::GetInputManager().SetMouseEnabled(settings->GetBool(CSettings::SETTING_INPUT_ENABLEMOUSE));
 
   CGUIComponent* gui = CServiceBroker::GetGUI();
   if (gui)

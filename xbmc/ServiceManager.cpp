@@ -20,6 +20,7 @@
 #include "cores/DataCacheCore.h"
 #include "cores/playercorefactory/PlayerCoreFactory.h"
 #include "favourites/FavouritesService.h"
+#include "input/InputManager.h"
 #include "interfaces/generic/ScriptInvocationManager.h"
 #include "profiles/ProfileManager.h"
 #include "storage/MediaManager.h"
@@ -102,6 +103,8 @@ bool CServiceManager::InitStageTwo(const std::string& profilesUserDataFolder)
   m_serviceAddons.reset(new ADDON::CServiceAddonManager(*m_addonMgr));
 
   m_contextMenuManager.reset(new CContextMenuManager(*m_addonMgr));
+  m_inputManager.reset(new CInputManager());
+  m_inputManager->InitializeInputs();
 
   m_fileExtensionProvider.reset(new CFileExtensionProvider(*m_addonMgr));
 
@@ -138,6 +141,7 @@ void CServiceManager::DeinitStageTwo()
 
   m_weatherManager.reset();
   m_fileExtensionProvider.reset();
+  m_inputManager.reset();
   m_contextMenuManager.reset();
   m_serviceAddons.reset();
   m_favouritesService.reset();
@@ -202,6 +206,11 @@ PLAYLIST::CPlayListPlayer& CServiceManager::GetPlaylistPlayer()
 CFavouritesService& CServiceManager::GetFavouritesService()
 {
   return *m_favouritesService;
+}
+
+CInputManager& CServiceManager::GetInputManager()
+{
+  return *m_inputManager;
 }
 
 CFileExtensionProvider& CServiceManager::GetFileExtensionProvider()

@@ -45,6 +45,7 @@ class CContextMenuManager;
 class CDataCacheCore;
 class IApplicationComponent;
 class CFavouritesService;
+class CInputManager;
 class CFileExtensionProvider;
 class CWeatherManager;
 class CPlayerCoreFactory;
@@ -89,6 +90,7 @@ public:
   static CFavouritesService& GetFavouritesService();
   static ADDON::CServiceAddonManager& GetServiceAddons();
   static ADDON::CRepositoryUpdater& GetRepositoryUpdater();
+  static CInputManager& GetInputManager();
   static CFileExtensionProvider& GetFileExtensionProvider();
   static bool IsAddonInterfaceUp();
   static bool IsServiceManagerUp();
