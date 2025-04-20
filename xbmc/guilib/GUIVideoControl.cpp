@@ -38,6 +38,7 @@ void CGUIVideoControl::Process(unsigned int currentTime, CDirtyRegionList &dirty
 
 void CGUIVideoControl::Render()
 {
+  // TODO: revisit this method and compare it with XBMC4Xbox!
   auto& components = CServiceBroker::GetAppComponents();
   const auto appPlayer = components.GetComponent<CApplicationPlayer>();
   if (appPlayer->IsRenderingVideo())
@@ -49,25 +50,28 @@ void CGUIVideoControl::Render()
       appPower->ResetScreenSaver();
     }
 
-    CServiceBroker::GetWinSystem()->GetGfxContext().SetViewWindow(m_posX, m_posY, m_posX + m_width, m_posY + m_height);
+    g_graphicsContext.SetViewWindow(m_posX, m_posY, m_posX + m_width, m_posY + m_height);
+#if 0
+    // Fix for wrong position of subtitle in windowed mode
     TransformMatrix mat;
-    CServiceBroker::GetWinSystem()->GetGfxContext().SetTransform(mat, 1.0, 1.0);
+    g_graphicsContext.SetTransform(mat, 1.0, 1.0);
+#endif
 
     UTILS::COLOR::Color alpha =
-        CServiceBroker::GetWinSystem()->GetGfxContext().MergeAlpha(0xFF000000) >> 24;
+        g_graphicsContext.MergeAlpha(0xFF000000) >> 24;
     if (appPlayer->IsRenderingVideoLayer())
     {
-      CRect old = CServiceBroker::GetWinSystem()->GetGfxContext().GetScissors();
+      CRect old = g_graphicsContext.GetScissors();
       CRect region = GetRenderRegion();
       region.Intersect(old);
-      CServiceBroker::GetWinSystem()->GetGfxContext().SetScissors(region);
-      CServiceBroker::GetWinSystem()->GetGfxContext().Clear(0);
-      CServiceBroker::GetWinSystem()->GetGfxContext().SetScissors(old);
+      g_graphicsContext.SetScissors(region);
+      g_graphicsContext.Clear(0);
+      g_graphicsContext.SetScissors(old);
     }
     else
       appPlayer->Render(false, alpha);
 
-    CServiceBroker::GetWinSystem()->GetGfxContext().RemoveTransform();
+    g_graphicsContext.RemoveTransform();
   }
   CGUIControl::Render();
 }

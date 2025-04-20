@@ -12,7 +12,6 @@
 #include "GUIComponent.h"
 #include "GUIControlFactory.h"
 #include "GUIControlGroup.h"
-#include "GUIControlProfiler.h"
 #include "GUIInfoManager.h"
 #include "GUIWindowManager.h"
 #include "ServiceBroker.h"
@@ -173,7 +172,7 @@ bool CGUIWindow::Load(TiXmlElement *pRootElement)
 
   // set the scaling resolution so that any control creation or initialisation can
   // be done with respect to the correct aspect ratio
-  CServiceBroker::GetWinSystem()->GetGfxContext().SetScalingResolution(m_coordsRes, m_needsScaling);
+  g_graphicsContext.SetScalingResolution(m_coordsRes, m_needsScaling);
 
   // now load in the skin file
   SetDefaults();
@@ -325,10 +324,10 @@ void CGUIWindow::DoProcess(unsigned int currentTime, CDirtyRegionList &dirtyregi
   if (!IsControlDirty() && CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_guiSmartRedraw)
     return;
 
-  CServiceBroker::GetWinSystem()->GetGfxContext().SetRenderingResolution(m_coordsRes, m_needsScaling);
-  CServiceBroker::GetWinSystem()->GetGfxContext().AddGUITransform();
+  g_graphicsContext.SetRenderingResolution(m_coordsRes, m_needsScaling);
+  g_graphicsContext.AddGUITransform();
   CGUIControlGroup::DoProcess(currentTime, dirtyregions);
-  CServiceBroker::GetWinSystem()->GetGfxContext().RemoveTransform();
+  g_graphicsContext.RemoveTransform();
 
   // check if currently focused control can have it
   // and fallback to default control if not
@@ -345,13 +344,11 @@ void CGUIWindow::DoRender()
   // to occur.
   if (!m_bAllocated) return;
 
-  CServiceBroker::GetWinSystem()->GetGfxContext().SetRenderingResolution(m_coordsRes, m_needsScaling);
+  g_graphicsContext.SetRenderingResolution(m_coordsRes, m_needsScaling);
 
-  CServiceBroker::GetWinSystem()->GetGfxContext().AddGUITransform();
+  g_graphicsContext.AddGUITransform();
   CGUIControlGroup::DoRender();
-  CServiceBroker::GetWinSystem()->GetGfxContext().RemoveTransform();
-
-  if (CGUIControlProfiler::IsRunning()) CGUIControlProfiler::Instance().EndFrame();
+  g_graphicsContext.RemoveTransform();
 }
 
 void CGUIWindow::AfterRender()
@@ -367,7 +364,7 @@ void CGUIWindow::AfterRender()
 
 void CGUIWindow::Close_Internal(bool forceClose /*= false*/, int nextWindowID /*= 0*/, bool enableSound /*= true*/)
 {
-  std::unique_lock<CCriticalSection> lock(CServiceBroker::GetWinSystem()->GetGfxContext());
+  std::unique_lock<CCriticalSection> lock(g_graphicsContext);
 
   if (!m_active)
     return;
@@ -399,7 +396,7 @@ void CGUIWindow::Close(bool forceClose /*= false*/, int nextWindowID /*= 0*/, bo
   if (!CServiceBroker::GetAppMessenger()->IsProcessThread())
   {
     // make sure graphics lock is not held
-    CSingleExit leaveIt(CServiceBroker::GetWinSystem()->GetGfxContext());
+    CSingleExit leaveIt(g_graphicsContext);
     int param2 = (forceClose ? 0x01 : 0) | (enableSound ? 0x02 : 0);
     if (bWait)
       CServiceBroker::GetAppMessenger()->SendMsg(TMSG_GUI_WINDOW_CLOSE, nextWindowID, param2,
@@ -487,9 +484,9 @@ CPoint CGUIWindow::GetPosition() const
 // OnMouseAction - called by OnAction()
 EVENT_RESULT CGUIWindow::OnMouseAction(const CAction &action)
 {
-  CServiceBroker::GetWinSystem()->GetGfxContext().SetScalingResolution(m_coordsRes, m_needsScaling);
+  g_graphicsContext.SetScalingResolution(m_coordsRes, m_needsScaling);
   CPoint mousePoint(action.GetAmount(0), action.GetAmount(1));
-  CServiceBroker::GetWinSystem()->GetGfxContext().InvertFinalCoords(mousePoint.x, mousePoint.y);
+  g_graphicsContext.InvertFinalCoords(mousePoint.x, mousePoint.y);
 
   // create the mouse event
   CMouseEvent event(action.GetID(), action.GetHoldTime(), action.GetAmount(2), action.GetAmount(3));
@@ -734,7 +731,7 @@ bool CGUIWindow::NeedLoad() const
 
 void CGUIWindow::AllocResources(bool forceLoad /*= false */)
 {
-  std::unique_lock<CCriticalSection> lock(CServiceBroker::GetWinSystem()->GetGfxContext());
+  std::unique_lock<CCriticalSection> lock(g_graphicsContext);
 
 #ifdef _DEBUG
   const auto start = std::chrono::steady_clock::now();
@@ -996,13 +993,13 @@ void CGUIWindow::SetDefaults()
 
 CRect CGUIWindow::GetScaledBounds() const
 {
-  std::unique_lock<CCriticalSection> lock(CServiceBroker::GetWinSystem()->GetGfxContext());
-  CServiceBroker::GetWinSystem()->GetGfxContext().SetScalingResolution(m_coordsRes, m_needsScaling);
+  std::unique_lock<CCriticalSection> lock(g_graphicsContext);
+  g_graphicsContext.SetScalingResolution(m_coordsRes, m_needsScaling);
   CPoint pos(GetPosition());
   CRect rect(pos.x, pos.y, pos.x + m_width, pos.y + m_height);
   float z = 0;
-  CServiceBroker::GetWinSystem()->GetGfxContext().ScaleFinalCoords(rect.x1, rect.y1, z);
-  CServiceBroker::GetWinSystem()->GetGfxContext().ScaleFinalCoords(rect.x2, rect.y2, z);
+  g_graphicsContext.ScaleFinalCoords(rect.x1, rect.y1, z);
+  g_graphicsContext.ScaleFinalCoords(rect.x2, rect.y2, z);
   return rect;
 }
 
@@ -1068,7 +1065,7 @@ void CGUIWindow::ClearBackground()
   m_clearBackground.Update();
   UTILS::COLOR::Color color = m_clearBackground;
   if (color)
-    CServiceBroker::GetWinSystem()->GetGfxContext().Clear(color);
+    g_graphicsContext.Clear(color);
 }
 
 void CGUIWindow::SetID(int id)

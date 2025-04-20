@@ -22,7 +22,6 @@
 #include "utils/ColorUtils.h"
 #include "utils/Digest.h"
 #include "utils/Variant.h"
-#include "windowing/WinSystem.h"
 
 using namespace KODI::GUILIB;
 
@@ -449,7 +448,7 @@ void CGUIEditControl::ProcessText(unsigned int currentTime)
     m_clipRect.x1 += leftTextWidth + spaceWidth;
   }
 
-  if (CServiceBroker::GetWinSystem()->GetGfxContext().SetClipRegion(m_clipRect.x1, m_clipRect.y1, m_clipRect.Width(), m_clipRect.Height()))
+  if (g_graphicsContext.SetClipRegion(m_clipRect.x1, m_clipRect.y1, m_clipRect.Width(), m_clipRect.Height()))
   {
     uint32_t align = m_label.GetLabelInfo().align & XBFONT_CENTER_Y; // start aligned left
     if (m_label2.GetTextWidth() < m_clipRect.Width())
@@ -484,7 +483,7 @@ void CGUIEditControl::ProcessText(unsigned int currentTime)
     changed |= m_label2.SetColor(GetTextColor());
     changed |= m_label2.SetOverflow(CGUILabel::OVER_FLOW_CLIP);
     changed |= m_label2.Process(currentTime);
-    CServiceBroker::GetWinSystem()->GetGfxContext().RestoreClipRegion();
+    g_graphicsContext.RestoreClipRegion();
   }
   if (changed)
     MarkDirtyRegion();
@@ -494,10 +493,10 @@ void CGUIEditControl::RenderText()
 {
   m_label.Render();
 
-  if (CServiceBroker::GetWinSystem()->GetGfxContext().SetClipRegion(m_clipRect.x1, m_clipRect.y1, m_clipRect.Width(), m_clipRect.Height()))
+  if (g_graphicsContext.SetClipRegion(m_clipRect.x1, m_clipRect.y1, m_clipRect.Width(), m_clipRect.Height()))
   {
     m_label2.Render();
-    CServiceBroker::GetWinSystem()->GetGfxContext().RestoreClipRegion();
+    g_graphicsContext.RestoreClipRegion();
   }
 }
 
@@ -667,6 +666,7 @@ void CGUIEditControl::OnSMSCharacter(unsigned int key)
 
 void CGUIEditControl::OnPasteClipboard()
 {
+#ifndef _XBOX
   std::wstring unicode_text;
   std::string utf8_text;
 
@@ -686,6 +686,7 @@ void CGUIEditControl::OnPasteClipboard()
     m_cursorPos += unicode_text.length();
     UpdateText();
   }
+#endif
 }
 
 void CGUIEditControl::SetInputValidation(StringValidation::Validator inputValidator, void *data /* = NULL */)

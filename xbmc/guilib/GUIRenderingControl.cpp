@@ -39,15 +39,15 @@ bool CGUIRenderingControl::InitCallback(IRenderingCallback *callback)
     return false;
 
   std::unique_lock<CCriticalSection> lock(m_rendering);
-  CServiceBroker::GetWinSystem()->GetGfxContext().CaptureStateBlock();
-  float x = CServiceBroker::GetWinSystem()->GetGfxContext().ScaleFinalXCoord(GetXPosition(), GetYPosition());
-  float y = CServiceBroker::GetWinSystem()->GetGfxContext().ScaleFinalYCoord(GetXPosition(), GetYPosition());
-  float w = CServiceBroker::GetWinSystem()->GetGfxContext().ScaleFinalXCoord(GetXPosition() + GetWidth(), GetYPosition() + GetHeight()) - x;
-  float h = CServiceBroker::GetWinSystem()->GetGfxContext().ScaleFinalYCoord(GetXPosition() + GetWidth(), GetYPosition() + GetHeight()) - y;
+  g_graphicsContext.CaptureStateBlock();
+  float x = g_graphicsContext.ScaleFinalXCoord(GetXPosition(), GetYPosition());
+  float y = g_graphicsContext.ScaleFinalYCoord(GetXPosition(), GetYPosition());
+  float w = g_graphicsContext.ScaleFinalXCoord(GetXPosition() + GetWidth(), GetYPosition() + GetHeight()) - x;
+  float h = g_graphicsContext.ScaleFinalYCoord(GetXPosition() + GetWidth(), GetYPosition() + GetHeight()) - y;
   if (x < 0) x = 0;
   if (y < 0) y = 0;
-  if (x + w > CServiceBroker::GetWinSystem()->GetGfxContext().GetWidth()) w = CServiceBroker::GetWinSystem()->GetGfxContext().GetWidth() - x;
-  if (y + h > CServiceBroker::GetWinSystem()->GetGfxContext().GetHeight()) h = CServiceBroker::GetWinSystem()->GetGfxContext().GetHeight() - y;
+  if (x + w > g_graphicsContext.GetWidth()) w = g_graphicsContext.GetWidth() - x;
+  if (y + h > g_graphicsContext.GetHeight()) h = g_graphicsContext.GetHeight() - y;
 
   void *device = NULL;
 #if TARGET_WINDOWS
@@ -58,7 +58,7 @@ bool CGUIRenderingControl::InitCallback(IRenderingCallback *callback)
   else
     return false;
 
-  CServiceBroker::GetWinSystem()->GetGfxContext().ApplyStateBlock();
+  g_graphicsContext.ApplyStateBlock();
   return true;
 }
 
@@ -89,11 +89,11 @@ void CGUIRenderingControl::Render()
     // set the viewport - note: We currently don't have any control over how
     // the addon renders, so the best we can do is attempt to define
     // a viewport??
-    CServiceBroker::GetWinSystem()->GetGfxContext().SetViewPort(m_posX, m_posY, m_width, m_height);
-    CServiceBroker::GetWinSystem()->GetGfxContext().CaptureStateBlock();
+    g_graphicsContext.SetViewPort(m_posX, m_posY, m_width, m_height);
+    g_graphicsContext.CaptureStateBlock();
     m_callback->Render();
-    CServiceBroker::GetWinSystem()->GetGfxContext().ApplyStateBlock();
-    CServiceBroker::GetWinSystem()->GetGfxContext().RestoreViewPort();
+    g_graphicsContext.ApplyStateBlock();
+    g_graphicsContext.RestoreViewPort();
   }
 
   CGUIControl::Render();
@@ -105,9 +105,9 @@ void CGUIRenderingControl::FreeResources(bool immediately)
 
   if (!m_callback) return;
 
-  CServiceBroker::GetWinSystem()->GetGfxContext().CaptureStateBlock(); //! @todo locking
+  g_graphicsContext.CaptureStateBlock(); //! @todo locking
   m_callback->Stop();
-  CServiceBroker::GetWinSystem()->GetGfxContext().ApplyStateBlock();
+  g_graphicsContext.ApplyStateBlock();
   m_callback = NULL;
 }
 

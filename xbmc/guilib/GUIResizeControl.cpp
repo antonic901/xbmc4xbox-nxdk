@@ -10,7 +10,6 @@
 
 #include "GUIMessage.h"
 #include "input/Key.h"
-#include "input/mouse/MouseStat.h"
 
 using namespace UTILS;
 
@@ -132,6 +131,7 @@ void CGUIResizeControl::OnRight()
 
 EVENT_RESULT CGUIResizeControl::OnMouseEvent(const CPoint &point, const CMouseEvent &event)
 {
+#if 0
   if (event.m_id == ACTION_MOUSE_DRAG || event.m_id == ACTION_MOUSE_DRAG_END)
   {
     if (static_cast<HoldAction>(event.m_state) == HoldAction::DRAG)
@@ -147,6 +147,7 @@ EVENT_RESULT CGUIResizeControl::OnMouseEvent(const CPoint &point, const CMouseEv
     Resize(event.m_offsetX, event.m_offsetY);
     return EVENT_RESULT_HANDLED;
   }
+#endif
   return EVENT_RESULT_UNHANDLED;
 }
 

@@ -113,7 +113,7 @@ bool CGUIDialogKaiToast::DoWork()
     m_toastDisplayTime = toast.displayTime;
     m_toastMessageTime = toast.messageTime;
 
-    std::unique_lock<CCriticalSection> lock2(CServiceBroker::GetWinSystem()->GetGfxContext());
+    std::unique_lock<CCriticalSection> lock2(g_graphicsContext);
 
     if(!Initialize())
       return false;

@@ -29,7 +29,6 @@
 #include "GUIMultiImage.h"
 #include "GUIPanelContainer.h"
 #include "GUIProgressControl.h"
-#include "GUIRSSControl.h"
 #include "GUIRadioButtonControl.h"
 #include "GUIRangesControl.h"
 #include "GUIRenderingControl.h"
@@ -42,23 +41,17 @@
 #include "GUITextBox.h"
 #include "GUIToggleButtonControl.h"
 #include "GUIVideoControl.h"
-#include "GUIVisualisationControl.h"
 #include "GUIWrappingListContainer.h"
 #include "LocalizeStrings.h"
 #include "addons/Skin.h"
-#include "cores/RetroPlayer/guicontrols/GUIGameControl.h"
-#include "games/controllers/guicontrols/GUIGameController.h"
 #include "input/Key.h"
-#include "pvr/guilib/GUIEPGGridContainer.h"
 #include "utils/CharsetConverter.h"
-#include "utils/RssManager.h"
 #include "utils/StringUtils.h"
 #include "utils/XMLUtils.h"
 #include "utils/log.h"
 
 using namespace KODI;
 using namespace KODI::GUILIB;
-using namespace PVR;
 
 typedef struct
 {
@@ -1221,27 +1214,6 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
         parentID, id, posX, posY, width, height);
     }
     break;
-  case CGUIControl::GUICONTROL_GAME:
-    {
-      control = new RETRO::CGUIGameControl(parentID, id, posX, posY, width, height);
-
-      GUIINFO::CGUIInfoLabel videoFilter;
-      GetInfoLabel(pControlNode, "videofilter", videoFilter, parentID);
-      static_cast<RETRO::CGUIGameControl*>(control)->SetVideoFilter(videoFilter);
-
-      GUIINFO::CGUIInfoLabel stretchMode;
-      GetInfoLabel(pControlNode, "stretchmode", stretchMode, parentID);
-      static_cast<RETRO::CGUIGameControl*>(control)->SetStretchMode(stretchMode);
-
-      GUIINFO::CGUIInfoLabel rotation;
-      GetInfoLabel(pControlNode, "rotation", rotation, parentID);
-      static_cast<RETRO::CGUIGameControl*>(control)->SetRotation(rotation);
-
-      GUIINFO::CGUIInfoLabel pixels;
-      GetInfoLabel(pControlNode, "pixels", pixels, parentID);
-      static_cast<RETRO::CGUIGameControl*>(control)->SetPixels(pixels);
-    }
-    break;
   case CGUIControl::GUICONTROL_FADELABEL:
     {
       control = new CGUIFadeLabelControl(
@@ -1253,16 +1225,6 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
       // check whether or not a scroll tag was specified.
       if (scrollValue != CGUIControl::FOCUS)
         static_cast<CGUIFadeLabelControl*>(control)->SetScrolling(scrollValue == CGUIControl::ALWAYS);
-    }
-    break;
-  case CGUIControl::GUICONTROL_RSS:
-    {
-      control = new CGUIRSSControl(
-        parentID, id, posX, posY, width, height,
-        labelInfo, textColor3, headlineColor, strRSSTags);
-      RssUrls::const_iterator iter = CRssManager::GetInstance().GetUrls().find(iUrlSet);
-      if (iter != CRssManager::GetInstance().GetUrls().end())
-        static_cast<CGUIRSSControl*>(control)->SetUrlSet(iUrlSet);
     }
     break;
   case CGUIControl::GUICONTROL_BUTTON:
@@ -1451,16 +1413,6 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
       wcontrol->SetUnFocusActions(unfocusActions);
     }
     break;
-  case CGUIControl::GUICONTAINER_EPGGRID:
-    {
-      CGUIEPGGridContainer *epgGridContainer = new CGUIEPGGridContainer(parentID, id, posX, posY, width, height, orientation, scrollTime, preloadItems, timeBlocks, rulerUnit, textureProgressIndicator);
-      control = epgGridContainer;
-      epgGridContainer->LoadLayout(pControlNode);
-      epgGridContainer->SetRenderOffset(offset);
-      epgGridContainer->SetType(viewType, viewLabel);
-      epgGridContainer->SetPageControl(pageControl);
-    }
-    break;
   case CGUIControl::GUICONTAINER_FIXEDLIST:
     {
       CScroller scroller;
@@ -1542,14 +1494,8 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
       scontrol->SetReverse(bReverse);
     }
     break;
-  case CGUIControl::GUICONTROL_VISUALISATION:
-    control = new CGUIVisualisationControl(parentID, id, posX, posY, width, height);
-    break;
   case CGUIControl::GUICONTROL_RENDERADDON:
     control = new CGUIRenderingControl(parentID, id, posX, posY, width, height);
-    break;
-  case CGUIControl::GUICONTROL_GAMECONTROLLER:
-    control = new GAME::CGUIGameController(parentID, id, posX, posY, width, height);
     break;
   case CGUIControl::GUICONTROL_COLORBUTTON:
   {

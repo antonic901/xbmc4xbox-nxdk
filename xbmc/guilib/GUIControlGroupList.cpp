@@ -9,7 +9,6 @@
 #include "GUIControlGroupList.h"
 
 #include "GUIAction.h"
-#include "GUIControlProfiler.h"
 #include "GUIFont.h" // for XBFONT_* definitions
 #include "GUIMessage.h"
 #include "guilib/guiinfo/GUIInfoLabels.h"
@@ -44,9 +43,7 @@ void CGUIControlGroupList::Process(unsigned int currentTime, CDirtyRegionList &d
   for (iControls it = m_children.begin(); it != m_children.end(); ++it)
   {
     CGUIControl *control = *it;
-    GUIPROFILER_VISIBILITY_BEGIN(control);
     control->UpdateVisibility(nullptr);
-    GUIPROFILER_VISIBILITY_END(control);
   }
 
   // visibility status of some of the list items may have changed. Thus, the group list size
@@ -72,9 +69,9 @@ void CGUIControlGroupList::Process(unsigned int currentTime, CDirtyRegionList &d
     // with respect to animations
     CGUIControl *control = *it;
     if (m_orientation == VERTICAL)
-      CServiceBroker::GetWinSystem()->GetGfxContext().SetOrigin(m_posX, m_posY + pos - m_scroller.GetValue());
+      g_graphicsContext.SetOrigin(m_posX, m_posY + pos - m_scroller.GetValue());
     else
-      CServiceBroker::GetWinSystem()->GetGfxContext().SetOrigin(m_posX + pos - m_scroller.GetValue(), m_posY);
+      g_graphicsContext.SetOrigin(m_posX + pos - m_scroller.GetValue(), m_posY);
     control->DoProcess(currentTime, dirtyregions);
 
     if (control->IsVisible())
@@ -88,7 +85,7 @@ void CGUIControlGroupList::Process(unsigned int currentTime, CDirtyRegionList &d
 
       pos += Size(control) + m_itemGap;
     }
-    CServiceBroker::GetWinSystem()->GetGfxContext().RestoreOrigin();
+    g_graphicsContext.RestoreOrigin();
   }
   CGUIControl::Process(currentTime, dirtyregions);
 }
@@ -96,7 +93,7 @@ void CGUIControlGroupList::Process(unsigned int currentTime, CDirtyRegionList &d
 void CGUIControlGroupList::Render()
 {
   // we run through the controls, rendering as we go
-  bool render(CServiceBroker::GetWinSystem()->GetGfxContext().SetClipRegion(m_posX, m_posY, m_width, m_height));
+  bool render(g_graphicsContext.SetClipRegion(m_posX, m_posY, m_width, m_height));
   float pos = GetAlignOffset();
   float focusedPos = 0;
   CGUIControl *focusedControl = NULL;
@@ -113,24 +110,24 @@ void CGUIControlGroupList::Render()
     else
     {
       if (m_orientation == VERTICAL)
-        CServiceBroker::GetWinSystem()->GetGfxContext().SetOrigin(m_posX, m_posY + pos - m_scroller.GetValue());
+        g_graphicsContext.SetOrigin(m_posX, m_posY + pos - m_scroller.GetValue());
       else
-        CServiceBroker::GetWinSystem()->GetGfxContext().SetOrigin(m_posX + pos - m_scroller.GetValue(), m_posY);
+        g_graphicsContext.SetOrigin(m_posX + pos - m_scroller.GetValue(), m_posY);
       control->DoRender();
     }
     if (control->IsVisible())
       pos += Size(control) + m_itemGap;
-    CServiceBroker::GetWinSystem()->GetGfxContext().RestoreOrigin();
+    g_graphicsContext.RestoreOrigin();
   }
   if (focusedControl)
   {
     if (m_orientation == VERTICAL)
-      CServiceBroker::GetWinSystem()->GetGfxContext().SetOrigin(m_posX, m_posY + focusedPos - m_scroller.GetValue());
+      g_graphicsContext.SetOrigin(m_posX, m_posY + focusedPos - m_scroller.GetValue());
     else
-      CServiceBroker::GetWinSystem()->GetGfxContext().SetOrigin(m_posX + focusedPos - m_scroller.GetValue(), m_posY);
+      g_graphicsContext.SetOrigin(m_posX + focusedPos - m_scroller.GetValue(), m_posY);
     focusedControl->DoRender();
   }
-  if (render) CServiceBroker::GetWinSystem()->GetGfxContext().RestoreClipRegion();
+  if (render) g_graphicsContext.RestoreClipRegion();
   CGUIControl::Render();
 }
 
@@ -543,6 +540,7 @@ float CGUIControlGroupList::GetAlignOffset() const
 
 EVENT_RESULT CGUIControlGroupList::OnMouseEvent(const CPoint &point, const CMouseEvent &event)
 {
+#if 0
   if (event.m_id == ACTION_MOUSE_WHEEL_UP || event.m_id == ACTION_MOUSE_WHEEL_DOWN)
   {
     // find the current control and move to the next or previous
@@ -583,6 +581,7 @@ EVENT_RESULT CGUIControlGroupList::OnMouseEvent(const CPoint &point, const CMous
     SetInvalid();
     return EVENT_RESULT_HANDLED;
   }
+#endif
 
   return EVENT_RESULT_UNHANDLED;
 }

@@ -14,7 +14,6 @@
 #include "ServiceBroker.h"
 #include "guilib/guiinfo/GUIInfoLabels.h"
 #include "input/Key.h"
-#include "input/mouse/MouseStat.h"
 #include "utils/MathUtils.h"
 #include "utils/StringUtils.h"
 
@@ -638,6 +637,7 @@ void CGUISliderControl::SetFromPosition(const CPoint &point, bool guessSelector 
 
 EVENT_RESULT CGUISliderControl::OnMouseEvent(const CPoint &point, const CMouseEvent &event)
 {
+#if 0
   m_dragging = false;
   if (event.m_id == ACTION_MOUSE_DRAG || event.m_id == ACTION_MOUSE_DRAG_END)
   {
@@ -700,6 +700,7 @@ EVENT_RESULT CGUISliderControl::OnMouseEvent(const CPoint &point, const CMouseEv
     SendWindowMessage(msg);
     return EVENT_RESULT_HANDLED;
   }
+#endif
   return EVENT_RESULT_UNHANDLED;
 }
 

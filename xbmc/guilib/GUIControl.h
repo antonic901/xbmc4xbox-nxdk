@@ -18,7 +18,7 @@
 #include "guiinfo/GUIInfoBool.h"
 #include "guiinfo/GUIInfoColor.h" // needed for CGUIInfoColor to handle infolabel'ed colors
 #include "utils/ColorUtils.h"
-#include "windowing/GraphicContext.h" // needed by any rendering operation (all controls)
+#include "guilib/GraphicContext.h" // needed by any rendering operation (all controls)
 
 #include <vector>
 

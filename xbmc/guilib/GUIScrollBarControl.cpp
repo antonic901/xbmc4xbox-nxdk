@@ -10,7 +10,6 @@
 
 #include "GUIMessage.h"
 #include "input/Key.h"
-#include "input/mouse/MouseStat.h"
 #include "utils/StringUtils.h"
 
 #define MIN_NIB_SIZE 4.0f
@@ -316,6 +315,7 @@ void GUIScrollBarControl::SetFromPosition(const CPoint &point)
 
 EVENT_RESULT GUIScrollBarControl::OnMouseEvent(const CPoint &point, const CMouseEvent &event)
 {
+#if 0
   if (event.m_id == ACTION_MOUSE_DRAG || event.m_id == ACTION_MOUSE_DRAG_END)
   {
     if (static_cast<HoldAction>(event.m_state) == HoldAction::DRAG)
@@ -367,6 +367,7 @@ EVENT_RESULT GUIScrollBarControl::OnMouseEvent(const CPoint &point, const CMouse
     SendWindowMessage(msg);
     return EVENT_RESULT_HANDLED;
   }
+#endif
 
   return EVENT_RESULT_UNHANDLED;
 }

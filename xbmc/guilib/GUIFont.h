@@ -164,9 +164,11 @@ public:
 
   uint32_t GetStyle() const { return m_style; }
 
+#if 0
   CGUIFontTTF* GetFont() const { return m_font; }
 
   void SetFont(CGUIFontTTF* font);
+#endif
 
 protected:
   std::string m_strFontName;
@@ -175,7 +177,9 @@ protected:
   UTILS::COLOR::Color m_textColor;
   float m_lineSpacing;
   float m_origHeight;
+#if 0
   CGUIFontTTF* m_font; // the font object has the size information
+#endif
 
 private:
   bool ClippedRegionIsEmpty(

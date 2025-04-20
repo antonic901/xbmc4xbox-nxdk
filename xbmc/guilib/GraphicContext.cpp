@@ -870,7 +870,7 @@ void CGraphicContext::RestoreCameraPosition()
   UpdateCameraPosition(m_cameras.top());
 }
 
-CRect CGraphicContext::generateAABB(const CRect &rect) const
+CRect CGraphicContext::GenerateAABB(const CRect &rect) const
 {
 // ------------------------
 // |(x1, y1)      (x2, y2)|

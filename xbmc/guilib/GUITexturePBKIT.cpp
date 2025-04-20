@@ -25,11 +25,11 @@
 #ifdef NXDK
 
 CGUITexturePBKIT::CGUITexturePBKIT(float posX, float posY, float width, float height, const CTextureInfo &texture)
-: CGUITextureBase(posX, posY, width, height, texture)
+: CGUITexture(posX, posY, width, height, texture)
 {
 }
 
-void CGUITexturePBKIT::Begin(color_t color)
+void CGUITexturePBKIT::Begin(UTILS::COLOR::Color color)
 {
   std::shared_ptr<CTexture> texture = m_texture.m_textures[m_currentFrame];
 #if 0
@@ -205,7 +205,7 @@ void CGUITexturePBKIT::Draw(float *x, float *y, float *z, const CRect &texture, 
 #endif
 }
 
-void CGUITexturePBKIT::DrawQuad(const CRect &rect, color_t color, CTexture *texture, const CRect *texCoords)
+void CGUITexturePBKIT::DrawQuad(const CRect &rect, UTILS::COLOR::Color color, CTexture *texture, const CRect *texCoords)
 {
 #if 0
   struct CUSTOMVERTEX {

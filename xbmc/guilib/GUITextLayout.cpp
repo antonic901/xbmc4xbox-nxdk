@@ -66,7 +66,7 @@ void CGUITextLayout::Render(float x,
   if (angle)
   {
     static const float degrees_to_radians = 0.01745329252f;
-    CServiceBroker::GetWinSystem()->GetGfxContext().AddTransform(TransformMatrix::CreateZRotation(angle * degrees_to_radians, x, y, CServiceBroker::GetWinSystem()->GetGfxContext().GetScalingPixelRatio()));
+    g_graphicsContext.AddTransform(TransformMatrix::CreateZRotation(angle * degrees_to_radians, x, y, g_graphicsContext.GetScalingPixelRatio()));
   }
   // center our text vertically
   if (alignment & XBFONT_CENTER_Y)
@@ -88,7 +88,7 @@ void CGUITextLayout::Render(float x,
   }
   m_font->End();
   if (angle)
-    CServiceBroker::GetWinSystem()->GetGfxContext().RemoveTransform();
+    g_graphicsContext.RemoveTransform();
 }
 
 bool CGUITextLayout::UpdateScrollinfo(CScrollInfo &scrollInfo)
@@ -122,7 +122,7 @@ void CGUITextLayout::RenderScrolling(float x,
   if (angle)
   {
     static const float degrees_to_radians = 0.01745329252f;
-    CServiceBroker::GetWinSystem()->GetGfxContext().AddTransform(TransformMatrix::CreateZRotation(angle * degrees_to_radians, x, y, CServiceBroker::GetWinSystem()->GetGfxContext().GetScalingPixelRatio()));
+    g_graphicsContext.AddTransform(TransformMatrix::CreateZRotation(angle * degrees_to_radians, x, y, g_graphicsContext.GetScalingPixelRatio()));
   }
   // center our text vertically
   if (alignment & XBFONT_CENTER_Y)
@@ -144,7 +144,7 @@ void CGUITextLayout::RenderScrolling(float x,
   }
   m_font->End();
   if (angle)
-    CServiceBroker::GetWinSystem()->GetGfxContext().RemoveTransform();
+    g_graphicsContext.RemoveTransform();
 }
 
 void CGUITextLayout::RenderOutline(float x,

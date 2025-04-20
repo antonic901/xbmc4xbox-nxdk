@@ -68,7 +68,7 @@ void CGUIDialogProgress::Open(const std::string &param /* = "" */)
   CLog::Log(LOGDEBUG, "DialogProgress::Open called {}", m_active ? "(already running)!" : "");
 
   {
-    std::unique_lock<CCriticalSection> lock(CServiceBroker::GetWinSystem()->GetGfxContext());
+    std::unique_lock<CCriticalSection> lock(g_graphicsContext);
     ShowProgressBar(true);
   }
 

@@ -18,14 +18,16 @@
 #include "threads/SingleLock.h"
 #include "utils/ColorUtils.h"
 #include "utils/GlobalsHandling.h"
-#include "windowing/GraphicContext.h"
+#include "guilib/GraphicContext.h"
 
 #include <utility>
 #include <vector>
 
 // Forward
 class CGUIFont;
+#if 0
 class CGUIFontTTF;
+#endif
 class CXBMCTinyXML;
 class TiXmlNode;
 class CSetting;
@@ -95,7 +97,9 @@ public:
   CGUIFont* GetDefaultFont(bool border = false);
 
   void Clear();
+#if 0
   void FreeFontFile(CGUIFontTTF* pFont);
+#endif
 
   static void SettingOptionsFontsFiller(const std::shared_ptr<const CSetting>& setting,
                                         std::vector<StringSettingOption>& list,
@@ -116,11 +120,15 @@ protected:
                                        const RESOLUTION_INFO& sourceRes,
                                        bool preserveAspect);
   void LoadFonts(const TiXmlNode* fontNode);
+#if 0
   CGUIFontTTF* GetFontFile(const std::string& fontIdent);
+#endif
   static void GetStyle(const TiXmlNode* fontNode, int& iStyle);
 
   std::vector<std::unique_ptr<CGUIFont>> m_vecFonts;
+#if 0
   std::vector<std::unique_ptr<CGUIFontTTF>> m_vecFontFiles;
+#endif
   std::vector<OrigFontInfo> m_vecFontInfo;
   RESOLUTION_INFO m_skinResolution;
   bool m_canReload{true};

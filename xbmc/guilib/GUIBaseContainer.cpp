@@ -200,7 +200,7 @@ void CGUIBaseContainer::ProcessItem(float posX, float posY, CGUIListItemPtr& ite
   if (!m_focusedLayout || !m_layout) return;
 
   // set the origin
-  CServiceBroker::GetWinSystem()->GetGfxContext().SetOrigin(posX, posY);
+  g_graphicsContext.SetOrigin(posX, posY);
 
   if (m_bInvalidated)
     item->SetInvalid();
@@ -243,7 +243,7 @@ void CGUIBaseContainer::ProcessItem(float posX, float posY, CGUIListItemPtr& ite
       item->GetLayout()->Process(item.get(), m_parentID, currentTime, dirtyregions);
   }
 
-  CServiceBroker::GetWinSystem()->GetGfxContext().RestoreOrigin();
+  g_graphicsContext.RestoreOrigin();
 }
 
 void CGUIBaseContainer::Render()
@@ -255,7 +255,7 @@ void CGUIBaseContainer::Render()
   int cacheBefore, cacheAfter;
   GetCacheOffsets(cacheBefore, cacheAfter);
 
-  if (CServiceBroker::GetWinSystem()->GetGfxContext().SetClipRegion(m_posX, m_posY, m_width, m_height))
+  if (g_graphicsContext.SetClipRegion(m_posX, m_posY, m_width, m_height))
   {
     CPoint origin = CPoint(m_posX, m_posY) + m_renderOffset;
     float pos = (m_orientation == VERTICAL) ? origin.y : origin.x;
@@ -308,7 +308,7 @@ void CGUIBaseContainer::Render()
         RenderItem(focusedPos, origin.y, focusedItem.get(), true);
     }
 
-    CServiceBroker::GetWinSystem()->GetGfxContext().RestoreClipRegion();
+    g_graphicsContext.RestoreClipRegion();
   }
 
   CGUIControl::Render();
@@ -320,7 +320,7 @@ void CGUIBaseContainer::RenderItem(float posX, float posY, CGUIListItem *item, b
   if (!m_focusedLayout || !m_layout) return;
 
   // set the origin
-  CServiceBroker::GetWinSystem()->GetGfxContext().SetOrigin(posX, posY);
+  g_graphicsContext.SetOrigin(posX, posY);
 
   if (focused)
   {
@@ -334,7 +334,7 @@ void CGUIBaseContainer::RenderItem(float posX, float posY, CGUIListItem *item, b
     else if (item->GetLayout())
       item->GetLayout()->Render(item, m_parentID);
   }
-  CServiceBroker::GetWinSystem()->GetGfxContext().RestoreOrigin();
+  g_graphicsContext.RestoreOrigin();
 }
 
 bool CGUIBaseContainer::OnAction(const CAction &action)
@@ -765,6 +765,7 @@ bool CGUIBaseContainer::OnMouseOver(const CPoint &point)
 
 EVENT_RESULT CGUIBaseContainer::OnMouseEvent(const CPoint &point, const CMouseEvent &event)
 {
+#if 0
   if (event.m_id == ACTION_MOUSE_LEFT_CLICK ||
       event.m_id == ACTION_MOUSE_DOUBLE_CLICK ||
       event.m_id == ACTION_MOUSE_RIGHT_CLICK)
@@ -850,6 +851,7 @@ EVENT_RESULT CGUIBaseContainer::OnMouseEvent(const CPoint &point, const CMouseEv
     m_gestureActive = false;
     return EVENT_RESULT_HANDLED;
   }
+#endif
   return EVENT_RESULT_UNHANDLED;
 }
 

@@ -30,14 +30,17 @@
 #include <stack>
 #include <map>
 #include "threads/CriticalSection.h"  // base class
-#include "TransformMatrix.h"        // for the members m_guiTransform etc.
-#include "Geometry.h"               // for CRect/CPoint
+#include "utils/TransformMatrix.h"        // for the members m_guiTransform etc.
+#include "utils/Geometry.h"               // for CRect/CPoint
 
 #include "utils/GlobalsHandling.h"
 
 #ifdef NXDK
 #include <windows.h>
 #endif
+
+// required by clients
+#include "ServiceBroker.h"
 
 /*!
  \ingroup graphics
@@ -203,6 +206,10 @@ public:
     if (alpha > 255) alpha = 255;
     return ((alpha << 24) & 0xff000000) | (color & 0xffffff);
   }
+  inline DWORD MergeColor(UTILS::COLOR::Color color) const
+  {
+    return m_finalTransform.TransformColor(color);
+  }
 
   void SetOrigin(float x, float y);
   void RestoreOrigin();
@@ -273,7 +280,7 @@ public:
       UpdateFinalTransform(TransformMatrix());
   }
 
-  CRect generateAABB(const CRect &rect) const;
+  CRect GenerateAABB(const CRect &rect) const;
 
   int GetMaxTextureSize() const { return m_maxTextureSize; };
 protected:

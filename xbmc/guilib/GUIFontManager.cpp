@@ -9,13 +9,15 @@
 #include "GUIFontManager.h"
 
 #include "GUIComponent.h"
+#if 0
 #include "GUIFontTTF.h"
+#endif
 #include "GUIWindowManager.h"
 #include "addons/AddonManager.h"
 #include "addons/FontResource.h"
 #include "addons/Skin.h"
 #include "addons/addoninfo/AddonType.h"
-#include "windowing/GraphicContext.h"
+#include "guilib/GraphicContext.h"
 
 #include <mutex>
 #if defined(HAS_GLES) || defined(HAS_GL)
@@ -30,7 +32,9 @@
 #include "settings/lib/Setting.h"
 #include "settings/lib/SettingDefinitions.h"
 #include "utils/FileUtils.h"
+#if 0
 #include "utils/FontUtils.h"
+#endif
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/XMLUtils.h"
@@ -135,6 +139,7 @@ CGUIFont* GUIFontManager::LoadTTF(const std::string& strFontName,
                                   const RESOLUTION_INFO* sourceRes,
                                   bool preserveAspect)
 {
+#if 0
   CWinSystemBase* const winSystem = CServiceBroker::GetWinSystem();
   if (!winSystem)
   {
@@ -236,6 +241,8 @@ CGUIFont* GUIFontManager::LoadTTF(const std::string& strFontName,
   m_vecFontInfo.emplace_back(fontInfo);
 
   return pNewFont;
+#endif
+  return nullptr;
 }
 
 bool GUIFontManager::OnMessage(CGUIMessage& message)
@@ -274,6 +281,7 @@ bool GUIFontManager::OnMessage(CGUIMessage& message)
 
 void GUIFontManager::ReloadTTFFonts(void)
 {
+#if 0
   CWinSystemBase* const winSystem = CServiceBroker::GetWinSystem();
   if (m_vecFonts.empty() || !winSystem)
     return; // we haven't even loaded fonts in yet
@@ -311,6 +319,7 @@ void GUIFontManager::ReloadTTFFonts(void)
 
     font->SetFont(pFontFile);
   }
+#endif
 }
 
 void GUIFontManager::Unload(const std::string& strFontName)
@@ -325,6 +334,7 @@ void GUIFontManager::Unload(const std::string& strFontName)
   }
 }
 
+#if 0
 void GUIFontManager::FreeFontFile(CGUIFontTTF* pFont)
 {
   for (auto it = m_vecFontFiles.begin(); it != m_vecFontFiles.end(); ++it)
@@ -347,6 +357,7 @@ CGUIFontTTF* GUIFontManager::GetFontFile(const std::string& fontIdent)
 
   return nullptr;
 }
+#endif
 
 CGUIFont* GUIFontManager::GetFont(const std::string& strFontName, bool fallback /*= true*/)
 {
@@ -405,7 +416,9 @@ CGUIFont* GUIFontManager::GetDefaultFont(bool border)
 void GUIFontManager::Clear()
 {
   m_vecFonts.clear();
+#if 0
   m_vecFontFiles.clear();
+#endif
   m_vecFontInfo.clear();
 
 #if defined(HAS_GLES) || defined(HAS_GL)
@@ -525,6 +538,7 @@ void GUIFontManager::SettingOptionsFontsFiller(const SettingConstPtr& setting,
                                                std::string& current,
                                                void* data)
 {
+#if 0
   CFileItemList itemsRoot;
   CFileItemList items;
 
@@ -546,6 +560,7 @@ void GUIFontManager::SettingOptionsFontsFiller(const SettingConstPtr& setting,
 
     list.emplace_back(item->GetLabel(), item->GetLabel());
   }
+#endif
 }
 
 void GUIFontManager::Initialize()
@@ -556,6 +571,7 @@ void GUIFontManager::Initialize()
 
 void GUIFontManager::LoadUserFonts()
 {
+#if 0
   if (!XFILE::CDirectory::Exists(UTILS::FONT::FONTPATH::USER))
     return;
 
@@ -655,6 +671,7 @@ void GUIFontManager::LoadUserFonts()
     }
   }
   CLog::LogF(LOGDEBUG, "Updating user fonts cache... DONE");
+#endif
 }
 
 std::vector<std::string> GUIFontManager::GetUserFontsFamilyNames()

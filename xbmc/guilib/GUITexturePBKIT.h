@@ -29,20 +29,21 @@
  */
 
 #include "GUITexture.h"
+#include "utils/ColorUtils.h"
 
 #ifdef NXDK
 
-class CGUITexturePBKIT : public CGUITextureBase
+class CGUITexturePBKIT : public CGUITexture
 {
 public:
   CGUITexturePBKIT(float posX, float posY, float width, float height, const CTextureInfo& texture);
-  static void DrawQuad(const CRect &coords, color_t color, CTexture *texture = NULL, const CRect *texCoords = NULL);
+  static void DrawQuad(const CRect &coords, UTILS::COLOR::Color color, CTexture *texture = NULL, const CRect *texCoords = NULL);
 protected:
-  void Begin(color_t color);
+  void Begin(UTILS::COLOR::Color color);
   void Draw(float *x, float *y, float *z, const CRect &texture, const CRect &diffuse, int orientation);
   void End();
 private:
-  color_t m_col;
+  UTILS::COLOR::Color m_col;
 };
 
 #endif
