@@ -36,6 +36,7 @@ class CExtsMimeSupportList;
 }
 } // namespace KODI
 
+class CInputManager;
 class CFileExtensionProvider;
 class CPlayerCoreFactory;
 class CDatabaseManager;
@@ -69,6 +70,7 @@ public:
   int init_level = 0;
 
   CFavouritesService& GetFavouritesService();
+  CInputManager& GetInputManager();
   CFileExtensionProvider& GetFileExtensionProvider();
 
   CWeatherManager& GetWeatherManager();
@@ -104,6 +106,7 @@ protected:
   std::unique_ptr<CDataCacheCore, delete_dataCacheCore> m_dataCacheCore;
   std::unique_ptr<PLAYLIST::CPlayListPlayer> m_playlistPlayer;
   std::unique_ptr<CFavouritesService, delete_favouritesService> m_favouritesService;
+  std::unique_ptr<CInputManager> m_inputManager;
   std::unique_ptr<CFileExtensionProvider> m_fileExtensionProvider;
   std::unique_ptr<CWeatherManager> m_weatherManager;
   std::unique_ptr<CPlayerCoreFactory> m_playerCoreFactory;
