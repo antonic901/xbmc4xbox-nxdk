@@ -21,6 +21,7 @@
  */
 
 #include "application/ApplicationComponents.h"
+#include "application/ApplicationEnums.h"
 #include "application/ApplicationPlayerCallback.h"
 #include "application/ApplicationSettingsHandling.h"
 #include "guilib/IMsgTargetCallback.h"
@@ -30,7 +31,8 @@
 #include "utils/GlobalsHandling.h"
 
 #include <atomic>
-#include <map>
+#include <chrono>
+#include <deque>
 #include <memory>
 #include <string>
 #include <vector>
@@ -38,8 +40,19 @@
 class CAction;
 class CFileItem;
 class CFileItemList;
+class CGUIComponent;
 class CKey;
 class CServiceManager;
+
+namespace ADDON
+{
+  class CAddonInfo;
+}
+
+namespace ANNOUNCEMENT
+{
+  class CAnnouncementManager;
+}
 
 namespace PLAYLIST
 {
@@ -63,9 +76,17 @@ public:
   CApplication(void);
   virtual ~CApplication(void);
 
+  bool Create();
+  bool Initialize();
+  int Run();
+  bool Cleanup();
+
   void FrameMove(bool processEvents, bool processGUI = true) override;
   void Render() override;
 
+  bool CreateGUI();
+
+  bool Stop(int exitCode);
   bool IsCurrentThread() const;
   const std::string& CurrentFile();
   CFileItem& CurrentFileItem();
@@ -87,7 +108,7 @@ public:
   void Restart(bool bSamePosition = true);
 
   void Process() override;
-
+  void ProcessSlow();
   /*!
    \brief Returns the total time in fractional seconds of the currently playing media
 
@@ -134,18 +155,38 @@ public:
     return true;
   }
 
-  // should be part of XBApplicationEx.h
-  bool m_bStop = false;
-
   std::unique_ptr<CServiceManager> m_ServiceManager;
 
   bool SwitchToFullScreen(bool force = false);
 
 protected:
+  std::shared_ptr<ANNOUNCEMENT::CAnnouncementManager> m_pAnnouncementManager;
+  std::unique_ptr<CGUIComponent> m_pGUI;
+
+  // timer information
+  CStopWatch m_frameTime;
+  CStopWatch m_slowTimer;
+  XbmcThreads::EndTime<> m_guiRefreshTimer;
+
   bool m_bInitializing = true;
 
+  std::chrono::time_point<std::chrono::steady_clock> m_lastRenderTime;
+  bool m_skipGuiRender = false;
+
+  std::vector<std::shared_ptr<ADDON::CAddonInfo>>
+      m_incompatibleAddons; /*!< Result of addon migration (incompatible addon infos) */
+
+public:
+  bool m_bStop{false};
+  bool m_AppFocused{true};
+
 private:
+  void PrintStartupLog();
+
   mutable CCriticalSection m_critSection; /*!< critical section for all changes to this class, except for changes to triggers */
+
+  CCriticalSection m_frameMoveGuard;              /*!< critical section for synchronizing GUI actions from inside and outside (python) */
+  int m_ExitCode{EXITCODE_QUIT};
 };
 
 XBMC_GLOBAL_REF(CApplication,g_application);
