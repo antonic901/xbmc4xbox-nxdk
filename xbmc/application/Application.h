@@ -108,7 +108,7 @@ public:
   void Restart(bool bSamePosition = true);
 
   void Process() override;
-
+  void ProcessSlow();
   /*!
    \brief Returns the total time in fractional seconds of the currently playing media
 
