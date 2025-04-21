@@ -157,8 +157,6 @@ public:
 
   std::unique_ptr<CServiceManager> m_ServiceManager;
 
-  bool SwitchToFullScreen(bool force = false);
-
 protected:
   std::shared_ptr<ANNOUNCEMENT::CAnnouncementManager> m_pAnnouncementManager;
   std::unique_ptr<CGUIComponent> m_pGUI;

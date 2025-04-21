@@ -633,7 +633,7 @@ void CApplication::FrameMove(bool processEvents, bool processGUI)
       }
     }
 
-    CServiceBroker::GetInputManager().Process(CServiceBroker::GetGUI()->GetWindowManager().GetFocusedWindow(), frameTime);
+    CServiceBroker::GetInputManager().Process(CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindowOrDialog(), frameTime);
 
     if (processGUI && renderGUI)
     {
@@ -860,12 +860,6 @@ float CApplication::GetCachePercentage() const
 
 void CApplication::SeekPercentage(float percent)
 {
-}
-
-// SwitchToFullScreen() returns true if a switch is made, else returns false
-bool CApplication::SwitchToFullScreen(bool force /* = false */)
-{
-  return false;
 }
 
 bool CApplication::IsMuted() const

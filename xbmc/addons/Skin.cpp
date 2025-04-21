@@ -279,8 +279,8 @@ void CSkinInfo::LoadIncludes()
   std::string includesPath =
       CSpecialProtocol::TranslatePathConvertCase(GetSkinPath("Includes.xml"));
   CLog::Log(LOGINFO, "Loading skin includes from {}", includesPath);
-  m_includes.ClearIncludes();
-  m_includes.LoadIncludes(includesPath);
+  m_includes.Clear();
+  m_includes.Load(includesPath);
 }
 
 void CSkinInfo::LoadTimers()
@@ -301,7 +301,7 @@ void CSkinInfo::ResolveIncludes(TiXmlElement* node,
   if(xmlIncludeConditions)
     xmlIncludeConditions->clear();
 
-  m_includes.ResolveIncludes(node, xmlIncludeConditions);
+  m_includes.Resolve(node, xmlIncludeConditions);
 }
 
 int CSkinInfo::GetStartWindow() const
