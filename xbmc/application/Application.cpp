@@ -20,6 +20,7 @@
 
 #include "Application.h"
 
+#include "GUIInfoManager.h"
 #include "PlayListPlayer.h"
 #include "ServiceManager.h"
 #include "URL.h"
@@ -503,7 +504,92 @@ bool CApplication::Initialize()
 
 void CApplication::Render()
 {
-  // TODO: implement rendering
+  // do not render if we are stopped or in background
+  if (m_bStop)
+    return;
+
+  const auto appPlayer = GetComponent<CApplicationPlayer>();
+  const auto appPower = GetComponent<CApplicationPowerHandling>();
+
+  bool hasRendered = false;
+
+  // Whether externalplayer is playing and we're unfocused
+  bool extPlayerActive = appPlayer->IsExternalPlaying() && !m_AppFocused;
+
+  if (!extPlayerActive && g_graphicsContext.IsFullScreenVideo() &&
+      !appPlayer->IsPausedPlayback())
+  {
+    appPower->ResetScreenSaver();
+  }
+
+#ifdef NXDK
+#if 0
+  if(!m_pd3dDevice)
+    return;
+
+  g_graphicsContext.Lock();
+
+  m_pd3dDevice->BeginScene();
+
+  //SWATHWIDTH of 4 improves fillrates (performance investigator)
+#ifdef HAS_XBOX_D3D
+  m_pd3dDevice->SetRenderState(D3DRS_SWATHWIDTH, 4);
+#endif
+#endif
+#else
+  if (!CServiceBroker::GetRenderSystem()->BeginRender())
+    return;
+#endif
+  // render gui layer
+  if (appPower->GetRenderGUI() && !m_skipGuiRender)
+  {
+    {
+      hasRendered |= CServiceBroker::GetGUI()->GetWindowManager().Render();
+    }
+    // execute post rendering actions (finalize window closing)
+    CServiceBroker::GetGUI()->GetWindowManager().AfterRender();
+
+    m_lastRenderTime = std::chrono::steady_clock::now();
+  }
+
+  // render video layer
+  CServiceBroker::GetGUI()->GetWindowManager().RenderEx();
+
+#ifdef NXDK
+#if 0
+  // reset image scaling and effect states
+  g_graphicsContext.SetRenderingResolution(g_graphicsContext.GetResInfo(), false);
+
+  m_pd3dDevice->EndScene();
+#ifdef HAS_XBOX_D3D
+  m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
+#endif
+  g_graphicsContext.Unlock();
+#endif
+#else
+  CServiceBroker::GetRenderSystem()->EndRender();
+#endif
+
+  // reset our info cache - we do this at the end of Render so that it is
+  // fresh for the next process(), or after a windowclose animation (where process()
+  // isn't called)
+  CGUIInfoManager& infoMgr = CServiceBroker::GetGUI()->GetInfoManager();
+  infoMgr.ResetCache();
+  infoMgr.GetInfoProviders().GetGUIControlsInfoProvider().ResetContainerMovingCache();
+
+  if (hasRendered)
+  {
+    infoMgr.GetInfoProviders().GetSystemInfoProvider().UpdateFPS();
+  }
+
+#if 0
+  // Should we call m_pd3dDevice->Present( NULL, NULL, NULL, NULL ) here or above?
+  // Is the Flip() function in the graphics context just for presenting the rendered scene?
+  CServiceBroker::GetWinSystem()->GetGfxContext().Flip(hasRendered,
+                                                       appPlayer->IsRenderingVideoLayer());
+#endif
+
+  CTimeUtils::UpdateFrameTime(hasRendered);
 }
 
 bool CApplication::OnAction(const CAction &action)

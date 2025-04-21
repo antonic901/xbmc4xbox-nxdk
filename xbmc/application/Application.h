@@ -155,9 +155,6 @@ public:
     return true;
   }
 
-  // should be part of XBApplicationEx.h
-  bool m_bStop = false;
-
   std::unique_ptr<CServiceManager> m_ServiceManager;
 
   bool SwitchToFullScreen(bool force = false);
@@ -178,6 +175,10 @@ protected:
 
   std::vector<std::shared_ptr<ADDON::CAddonInfo>>
       m_incompatibleAddons; /*!< Result of addon migration (incompatible addon infos) */
+
+public:
+  bool m_bStop{false};
+  bool m_AppFocused{true};
 
 private:
   void PrintStartupLog();
