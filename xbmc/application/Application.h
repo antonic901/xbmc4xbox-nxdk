@@ -167,11 +167,14 @@ protected:
   std::unique_ptr<CGUIComponent> m_pGUI;
 
   // timer information
+  CStopWatch m_frameTime;
   CStopWatch m_slowTimer;
+  XbmcThreads::EndTime<> m_guiRefreshTimer;
 
   bool m_bInitializing = true;
 
   std::chrono::time_point<std::chrono::steady_clock> m_lastRenderTime;
+  bool m_skipGuiRender = false;
 
   std::vector<std::shared_ptr<ADDON::CAddonInfo>>
       m_incompatibleAddons; /*!< Result of addon migration (incompatible addon infos) */

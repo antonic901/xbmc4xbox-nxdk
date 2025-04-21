@@ -34,6 +34,7 @@
 #include "application/ApplicationPowerHandling.h"
 #include "application/ApplicationSkinHandling.h"
 #include "application/ApplicationStackHelper.h"
+#include "dialogs/GUIDialogKaiToast.h"
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIFontManager.h"
 #include "interfaces/generic/ScriptInvocationManager.h"
@@ -62,6 +63,7 @@
 #include "utils/CPUInfo.h"
 #include "utils/SystemInfo.h"
 #include "utils/Splash.h"
+#include "utils/TimeUtils.h"
 #include "utils/log.h"
 
 #include "interfaces/AnnouncementManager.h"
@@ -520,7 +522,73 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
 
 void CApplication::FrameMove(bool processEvents, bool processGUI)
 {
-  // TODO: process events, gamepads, gui controls etc.
+  const auto appPlayer = GetComponent<CApplicationPlayer>();
+  bool renderGUI = GetComponent<CApplicationPowerHandling>()->GetRenderGUI();
+  if (processEvents)
+  {
+    // currently we calculate the repeat time (ie time from last similar keypress) just global as fps
+    float frameTime = m_frameTime.GetElapsedSeconds();
+    m_frameTime.StartZero();
+    // never set a frametime less than 2 fps to avoid problems when debugging and on breaks
+    if (frameTime > 0.5f)
+      frameTime = 0.5f;
+
+    if (processGUI && renderGUI)
+    {
+      std::unique_lock<CCriticalSection> lock(g_graphicsContext);
+      // check if there are notifications to display
+      CGUIDialogKaiToast *toast = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogKaiToast>(WINDOW_DIALOG_KAI_TOAST);
+      if (toast && toast->DoWork())
+      {
+        if (!toast->IsDialogRunning())
+        {
+          toast->Open();
+        }
+      }
+    }
+
+    CServiceBroker::GetInputManager().Process(CServiceBroker::GetGUI()->GetWindowManager().GetFocusedWindow(), frameTime);
+
+    if (processGUI && renderGUI)
+    {
+      appPlayer->GetSeekHandler().FrameMove();
+    }
+  }
+
+  if (processGUI && renderGUI)
+  {
+    m_skipGuiRender = false;
+
+    /*! @todo look into the possibility to use this for GBM
+    int fps = 0;
+
+    // This code reduces rendering fps of the GUI layer when playing videos in fullscreen mode
+    // it makes only sense on architectures with multiple layers
+    if (CServiceBroker::GetWinSystem()->GetGfxContext().IsFullScreenVideo() && !m_appPlayer.IsPausedPlayback() && m_appPlayer.IsRenderingVideoLayer())
+      fps = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_LIMITGUIUPDATE);
+
+    auto now = std::chrono::steady_clock::now();
+
+    auto frameTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - m_lastRenderTime).count();
+    if (fps > 0 && frameTime * fps < 1000)
+      m_skipGuiRender = true;
+    */
+
+    if (CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_guiSmartRedraw && m_guiRefreshTimer.IsTimePast())
+    {
+      CServiceBroker::GetGUI()->GetWindowManager().SendMessage(GUI_MSG_REFRESH_TIMER, 0, 0);
+      m_guiRefreshTimer.Set(500ms);
+    }
+
+    if (!m_bStop)
+    {
+      if (!m_skipGuiRender)
+        CServiceBroker::GetGUI()->GetWindowManager().Process(CTimeUtils::GetFrameTime());
+    }
+    CServiceBroker::GetGUI()->GetWindowManager().FrameMove();
+  }
+
+  appPlayer->FrameMove();
 }
 
 int CApplication::Run()
