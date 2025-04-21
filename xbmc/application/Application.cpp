@@ -28,6 +28,7 @@
 #include "addons/RepositoryUpdater.h"
 #include "addons/Service.h"
 #include "addons/Skin.h"
+#include "application/AppParams.h"
 #include "application/ApplicationActionListeners.h"
 #include "application/ApplicationPlayer.h"
 #include "application/ApplicationPowerHandling.h"
@@ -498,7 +499,7 @@ bool CApplication::Initialize()
 
 void CApplication::Render()
 {
-  // Handle rendering
+  // TODO: implement rendering
 }
 
 bool CApplication::OnAction(const CAction &action)
@@ -517,12 +518,56 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
 
 void CApplication::FrameMove(bool processEvents, bool processGUI)
 {
+  // TODO: process events, gamepads, gui controls etc.
 }
 
 int CApplication::Run()
 {
-  // TODO: implement this
-  return 0;
+  CLog::Log(LOGINFO, "Running the application...");
+
+  std::chrono::time_point<std::chrono::steady_clock> lastFrameTime;
+  std::chrono::milliseconds frameTime;
+  const unsigned int noRenderFrameTime = 15; // Simulates ~66fps
+
+  CFileItemList& playlist = CServiceBroker::GetAppParams()->GetPlaylist();
+  if (playlist.Size() > 0)
+  {
+    CServiceBroker::GetPlaylistPlayer().Add(PLAYLIST::TYPE_MUSIC, playlist);
+    CServiceBroker::GetPlaylistPlayer().SetCurrentPlaylist(PLAYLIST::TYPE_MUSIC);
+    CServiceBroker::GetAppMessenger()->PostMsg(TMSG_PLAYLISTPLAYER_PLAY, -1);
+  }
+
+  // Run the app
+  while (!m_bStop)
+  {
+    // Animate and render a frame
+
+    lastFrameTime = std::chrono::steady_clock::now();
+    Process();
+
+    bool renderGUI = GetComponent<CApplicationPowerHandling>()->GetRenderGUI();
+    if (!m_bStop)
+    {
+      FrameMove(true, renderGUI);
+    }
+
+    if (renderGUI && !m_bStop)
+    {
+      Render();
+    }
+    else if (!renderGUI)
+    {
+      auto now = std::chrono::steady_clock::now();
+      frameTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastFrameTime);
+      if (frameTime.count() < noRenderFrameTime)
+        KODI::TIME::Sleep(std::chrono::milliseconds(noRenderFrameTime - frameTime.count()));
+    }
+  }
+
+  Cleanup();
+
+  CLog::Log(LOGINFO, "Exiting the application...");
+  return m_ExitCode;
 }
 
 bool CApplication::Cleanup()
@@ -559,6 +604,7 @@ bool CApplication::OnMessage(CGUIMessage& message)
 
 void CApplication::Process()
 {
+  // process app messages, jobs, cleanup unused textures etc.
 }
 
 void CApplication::Restart(bool bSamePosition)
