@@ -27,11 +27,13 @@ Milestone 1 (one) is dealing with GUILIB and everything related to it. That incl
 * [ ] - Properly create and initialize application -> Implement CApplication::Create(...), CApplication::Initialize(...), CApplication::Render(...), CApplication::Process(...) etc.
 * [ ] - Font rendering - implementation of CGUIFontTTF, CGUIFont and CGUIFontManager. `freetype` lib is required for this
 
+**FOR DEVS: to quickly test CGraphicContext, texture loading and texture rendering we can use CSplash. CSplash is using texture loader and graphic context to load and render splash image. If that doesn't work then everything else regarding rendering and textures won't work.**
+
 ### Milestone 2
 Milestone 2 (two) should add support for basic joypads and audio.
 
 * [ ] - UI audio - implement CGUIAudioManager and CAudioContext which is used for GUI audio actions which are WMA files
-* [ ] - Joypad input - implement basic support for input devices, aka joypads
+* [ ] - Joypad input - implement basic support for input devices, aka joypads -> check `CInputManager::ProcessPeripherals`
 
 ### Milestone 3
 Milestone 3 (three) should add support for reading HDD, partitions, free space, DVD drive support etc.
