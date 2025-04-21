@@ -68,6 +68,7 @@
 #include "video/PlayerController.h"
 
 #include "DatabaseManager.h"
+#include "input/InputManager.h"
 #include "storage/MediaManager.h"
 
 #include "addons/AddonSystemSettings.h"
@@ -79,6 +80,8 @@ using namespace XFILE;
 using namespace KODI::MESSAGING;
 
 using namespace std::chrono_literals;
+
+#define D3DCREATE_MULTITHREADED 0
 
 CApplication::CApplication(void)
   : m_pPlayer(new CApplicationPlayer)
@@ -195,8 +198,100 @@ bool CApplication::Create()
 
 bool CApplication::CreateGUI()
 {
-  // TODO: implement this
-  return false;
+  m_frameMoveGuard.lock();
+
+  const auto appPower = GetComponent<CApplicationPowerHandling>();
+  appPower->SetRenderGUI(true);
+
+  // Retrieve the matching resolution based on GUI settings
+  bool sav_res = false;
+  CDisplaySettings::GetInstance().SetCurrentResolution(CDisplaySettings::GetInstance().GetDisplayResolution());
+  CLog::Log(LOGINFO, "Checking resolution {}",
+            CDisplaySettings::GetInstance().GetCurrentResolution());
+  if (!g_graphicsContext.IsValidResolution(CDisplaySettings::GetInstance().GetCurrentResolution()))
+  {
+    // TODO: get best resolution for Xbox and set that one
+    CLog::Log(LOGINFO, "Setting safe mode {}", RES_NTSC_4x3);
+    // defer saving resolution after window was created
+    CDisplaySettings::GetInstance().SetCurrentResolution(RES_NTSC_4x3);
+    sav_res = true;
+  }
+
+#if 0
+  // Transfer the new resolution information to our graphics context
+  g_graphicsContext.SetD3DParameters(&m_d3dpp);
+  g_graphicsContext.SetVideoResolution(CDisplaySettings::Get().GetCurrentResolution(), TRUE);
+  
+  if ( FAILED( hr = m_pD3D->CreateDevice(0, D3DDEVTYPE_HAL, NULL,
+                                         D3DCREATE_MULTITHREADED | D3DCREATE_HARDWARE_VERTEXPROCESSING,
+                                         &m_d3dpp, &m_pd3dDevice ) ) )
+  {
+    // try software vertex processing
+    if ( FAILED( hr = m_pD3D->CreateDevice(0, D3DDEVTYPE_HAL, NULL,
+                                          D3DCREATE_MULTITHREADED | D3DCREATE_SOFTWARE_VERTEXPROCESSING,
+                                          &m_d3dpp, &m_pd3dDevice ) ) )
+    {
+      // and slow as arse reference processing
+      if ( FAILED( hr = m_pD3D->CreateDevice(0, D3DDEVTYPE_REF, NULL,
+                                            D3DCREATE_MULTITHREADED | D3DCREATE_SOFTWARE_VERTEXPROCESSING,
+                                            &m_d3dpp, &m_pd3dDevice ) ) )
+      {
+
+        CLog::Log(LOGFATAL, "XBAppEx: Could not create D3D device!" );
+        CLog::Log(LOGFATAL, " width/height:(%ix%i)" , m_d3dpp.BackBufferWidth, m_d3dpp.BackBufferHeight);
+        CLog::Log(LOGFATAL, " refreshrate:%i" , m_d3dpp.FullScreen_RefreshRateInHz);
+        if (m_d3dpp.Flags & D3DPRESENTFLAG_WIDESCREEN)
+          CLog::Log(LOGFATAL, " 16:9 widescreen");
+        else
+          CLog::Log(LOGFATAL, " 4:3");
+
+        if (m_d3dpp.Flags & D3DPRESENTFLAG_INTERLACED)
+          CLog::Log(LOGFATAL, " interlaced");
+        if (m_d3dpp.Flags & D3DPRESENTFLAG_PROGRESSIVE)
+          CLog::Log(LOGFATAL, " progressive");
+        return hr;
+      }
+    }
+  }
+
+  g_graphicsContext.SetD3DDevice(m_pd3dDevice);
+  g_graphicsContext.CaptureStateBlock();
+  // set filters
+  g_graphicsContext.Get3DDevice()->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTEXF_LINEAR /*g_settings.m_minFilter*/ );
+  g_graphicsContext.Get3DDevice()->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTEXF_LINEAR /*g_settings.m_maxFilter*/ );
+  CUtil::InitGamma();
+  
+  // set GUI res and force the clear of the screen
+  g_graphicsContext.SetVideoResolution(CDisplaySettings::Get().GetCurrentResolution(), TRUE, true);
+#endif
+
+  const std::shared_ptr<CSettings> settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+
+  // Set default screen saver mode
+  auto screensaverModeSetting = std::static_pointer_cast<CSettingString>(settings->GetSetting(CSettings::SETTING_SCREENSAVER_MODE));
+  {
+    // If OS has no screen saver, use Kodi one by default
+    screensaverModeSetting->SetDefault("screensaver.xbmc.builtin.dim");
+  }
+
+  if (sav_res)
+    CDisplaySettings::GetInstance().SetCurrentResolution(RES_NTSC_4x3, true);
+
+  m_pGUI.reset(new CGUIComponent());
+  m_pGUI->Init();
+
+  // Splash requires gui component!!
+  CSplash::GetInstance().Show("");
+
+  // The key mappings may already have been loaded by a peripheral
+  CLog::Log(LOGINFO, "load keymapping");
+  if (!CServiceBroker::GetInputManager().LoadKeymaps())
+    return false;
+
+  RESOLUTION_INFO info = g_graphicsContext.GetResInfo();
+  CLog::Log(LOGINFO, "GUI format {}x{}, Display {}", info.iWidth, info.iHeight, info.strMode);
+
+  return true;
 }
 
 bool CApplication::Initialize()

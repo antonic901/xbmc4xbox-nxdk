@@ -40,6 +40,7 @@
 class CAction;
 class CFileItem;
 class CFileItemList;
+class CGUIComponent;
 class CKey;
 class CServiceManager;
 
@@ -163,6 +164,7 @@ public:
 
 protected:
   std::shared_ptr<ANNOUNCEMENT::CAnnouncementManager> m_pAnnouncementManager;
+  std::unique_ptr<CGUIComponent> m_pGUI;
 
   // timer information
   CStopWatch m_slowTimer;
@@ -178,6 +180,8 @@ private:
   void PrintStartupLog();
 
   mutable CCriticalSection m_critSection; /*!< critical section for all changes to this class, except for changes to triggers */
+
+  CCriticalSection m_frameMoveGuard;              /*!< critical section for synchronizing GUI actions from inside and outside (python) */
 };
 
 XBMC_GLOBAL_REF(CApplication,g_application);
