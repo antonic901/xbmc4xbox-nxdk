@@ -8,8 +8,12 @@
 
 #include "platform/xbmc.h"
 
+#include <hal/video.h>
+
 int main()
 {
+  XVideoSetMode(640, 480, 32, REFRESH_DEFAULT);
+
   int status = XBMC_Run(true);
   
   return status;
