@@ -23,7 +23,7 @@ namespace
 
 constexpr std::array<ThreadPriorityStruct, 5> nativeThreadPriorityMap = {{
     {ThreadPriority::LOWEST, THREAD_PRIORITY_IDLE},
-    {ThreadPriority::BELOW_NORMAL, THREAD_PRIOIRTY_BELOW_NORMAL},
+    {ThreadPriority::BELOW_NORMAL, THREAD_PRIORITY_BELOW_NORMAL},
     {ThreadPriority::NORMAL, THREAD_PRIORITY_NORMAL},
     {ThreadPriority::ABOVE_NORMAL, THREAD_PRIORITY_ABOVE_NORMAL},
     {ThreadPriority::HIGHEST, THREAD_PRIORITY_HIGHEST},

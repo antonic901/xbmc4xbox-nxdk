@@ -34,10 +34,6 @@ int MultiByteToWideChar(unsigned int codePage, unsigned long flags,
                         const char* multiByteStr, int multiByteLen,
                         wchar_t* wideStr, int wideLen);
 
-BOOL FileTimeToLocalFileTime(const FILETIME *lpFileTime, LPFILETIME lpLocalFileTime);
-BOOL SystemTimeToFileTime(const SYSTEMTIME *lpSystemTime, LPFILETIME lpFileTime);
-LONG CompareFileTime(const FILETIME *lpFileTime1, const FILETIME *lpFileTime2);
-BOOL FileTimeToSystemTime(const FILETIME *lpFileTime, LPSYSTEMTIME lpSystemTime);
 BOOL LocalFileTimeToFileTime(const FILETIME *lpLocalFileTime, LPFILETIME lpFileTime);
 
 double atof (const char* str);
