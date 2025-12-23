@@ -1,37 +1,33 @@
 {
-  "version": "0.2.0",
+  "version": "1.0.0",
   "configurations": [
+  {
+    "name": "XEMU (Debug)",
+    "type": "cppdbg",
+    "request": "launch",
+    "program": "${workspaceFolder}/build/xbmc.exe",
+    "targetArchitecture": "x86",
+    "miDebuggerServerAddress": "127.0.0.1:1234",
+    "miDebuggerPath": "gdb",
+    "cwd": "${workspaceFolder}/build",
+    "stopAtEntry": false,
+    "externalConsole": false,
+    "MIMode": "gdb",
+    "preLaunchTask": "Start xemu",
+    "setupCommands": [
       {
-          "name": "(gdb) Attach xemu",
-          "type": "cppdbg",
-          "request": "launch",
-          "program": "${workspaceFolder}/main.exe",
-          "args": [],
-          "cwd": "${workspaceFolder}",
-          "environment": [],
-          "externalConsole": false,
-          "stopAtEntry": true,
-          "MIMode": "gdb",
-          "filterStdout": false,
-          "targetArchitecture": "x86",
-          "miDebuggerServerAddress": "localhost:1234",
-          "setupCommands": [
-              {
-                  "description": "Enable pretty-printing for gdb",
-                  "text": "-enable-pretty-printing",
-                  "ignoreFailures": true
-              },
-              {
-                  "description": "Set Disassembly Flavor to Intel",
-                  "text": "-gdb-set disassembly-flavor intel",
-                  "ignoreFailures": true
-              }
-          ],
-          "customLaunchSetupCommands": [],
-          //"preLaunchTask": "Build",
-          "logging": {
-              "engineLogging": false
-          }
+        "text": "set architecture i386"
+      },
+      {
+        "text": "set osabi none"
+      },
+      {
+        "text": "set disassembly-flavor intel"
+      },
+      {
+        "text": "add-symbol-file ${workspaceFolder}/build/updater.exe 0x11000"
       }
+    ]
+  }
   ]
 }
