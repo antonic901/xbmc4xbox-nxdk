@@ -23,6 +23,7 @@
 #include "application/Application.h"
 #include "messaging/ApplicationMessenger.h"
 #include "TextureManager.h"
+#include "settings/DisplaySettings.h"
 #include "utils/MathUtils.h"
 
 using namespace std;
@@ -733,10 +734,7 @@ void CGraphicContext::ApplyStateBlock()
 
 const RESOLUTION_INFO &CGraphicContext::GetResInfo() const
 {
-#if 0
-  return CDisplaySettings::Get().GetResolutionInfo(m_Resolution);
-#endif
-  return RESOLUTION_INFO();
+  return CDisplaySettings::GetInstance().GetResolutionInfo(m_Resolution);
 }
 
 void CGraphicContext::GetGUIScaling(const RESOLUTION_INFO &res, float &scaleX, float &scaleY, TransformMatrix *matrix /* = NULL */)

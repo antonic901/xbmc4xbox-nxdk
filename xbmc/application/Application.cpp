@@ -804,7 +804,7 @@ void CApplication::Restart(bool bSamePosition)
 
 const std::string& CApplication::CurrentFile()
 {
-  return "";
+  return StringUtils::Empty;
 }
 
 std::shared_ptr<CFileItem> CApplication::CurrentFileItemPtr()
