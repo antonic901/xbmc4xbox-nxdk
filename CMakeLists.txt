@@ -643,9 +643,9 @@ target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/libiconv)
 target_link_libraries(xbmc PUBLIC ${NXDK_DIR}/lib/pcre.lib)
 target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/pcre)
 
-# Bring in sqlite support
-target_link_libraries(xbmc PUBLIC ${NXDK_DIR}/lib/sqlite.lib)
-target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/sqlite)
+# Bring in SQLite library
+add_subdirectory(lib/sqlite)
+target_link_libraries(xbmc PUBLIC sqlite)
 
 # Bring in FMT library
 message(STATUS "Downloading fmtlib")
