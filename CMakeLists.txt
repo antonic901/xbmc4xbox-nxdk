@@ -557,6 +557,7 @@ add_executable(xbmc
   xbmc/utils/Utf8Utils.cpp
   xbmc/utils/Variant.cpp
   xbmc/utils/XBMCTinyXML.cpp
+  xbmc/utils/XBMCTinyXML2.cpp
   xbmc/utils/XMLUtils.cpp
   xbmc/utils/auto_buffer.cpp
   xbmc/utils/log.cpp
@@ -676,6 +677,19 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(json)
 target_link_libraries(xbmc PRIVATE nlohmann_json::nlohmann_json)
+
+# Bring in TinyXML2
+message(STATUS "Downloading tinyxml2")
+FetchContent_Declare(
+  tinyxml2
+  GIT_REPOSITORY https://github.com/leethomason/tinyxml2.git
+  GIT_TAG        11.0.0
+  GIT_PROGRESS  TRUE
+  PATCH_COMMAND ${GIT_EXECUTABLE} apply ${CMAKE_SOURCE_DIR}/lib/tinyxml2_nxdk.patch
+)
+set(tinyxml2_BUILD_TESTING OFF CACHE BOOL "Disable tinyxml2 tests")
+FetchContent_MakeAvailable(tinyxml2)
+target_link_libraries(xbmc PRIVATE tinyxml2::tinyxml2)
 
 #Pre-build commands
 

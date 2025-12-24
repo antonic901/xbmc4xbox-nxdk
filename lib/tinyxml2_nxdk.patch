@@ -1,0 +1,22 @@
+diff --git a/tinyxml2.cpp b/tinyxml2.cpp
+index 66ef0c9..55dd009 100644
+--- a/tinyxml2.cpp
++++ b/tinyxml2.cpp
+@@ -32,7 +32,7 @@ distribution.
+ #   include <cstdarg>
+ #endif
+ 
+-#if defined(_MSC_VER) && (_MSC_VER >= 1400 ) && (!defined WINCE)
++#if defined(_MSC_VER) && (_MSC_VER >= 1400 ) && (!defined WINCE) && (!defined NXDK)
+ 	// Microsoft Visual Studio, version 2005 and higher. Not WinCE.
+ 	/*int _snprintf_s(
+ 	   char *buffer,
+@@ -2311,7 +2311,7 @@ static FILE* callfopen( const char* filepath, const char* mode )
+ {
+     TIXMLASSERT( filepath );
+     TIXMLASSERT( mode );
+-#if defined(_MSC_VER) && (_MSC_VER >= 1400 ) && (!defined WINCE)
++#if defined(_MSC_VER) && (_MSC_VER >= 1400 ) && (!defined WINCE) && (!defined NXDK)
+     FILE* fp = 0;
+     const errno_t err = fopen_s( &fp, filepath, mode );
+     if ( err ) {
