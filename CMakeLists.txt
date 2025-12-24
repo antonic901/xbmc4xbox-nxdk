@@ -16,6 +16,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(NXDK_DEBUG_FLAG "y" CACHE STRING "Enable debug build for the NXDK submodule. 'y' or 'n'.")
 endif()
 
+find_package(Git REQUIRED)
+
 project(xbmc C CXX ASM)
 
 include(FetchContent)
@@ -624,10 +626,6 @@ target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/net/lwip/src/include ${N
 target_link_libraries(xbmc PUBLIC ${NXDK_DIR}/lib/crossguid.lib)
 target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/crossguid/crossguid/include/crossguid/guid.hpp)
 
-# Bring in fmt support
-target_link_libraries(xbmc PUBLIC ${NXDK_DIR}/lib/fmt.lib)
-target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/fmt/fmt/include)
-
 # Bring in fribidi support
 target_link_libraries(xbmc PUBLIC ${NXDK_DIR}/lib/fribidi.lib)
 target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/fribidi/fribidi/lib)
@@ -652,12 +650,28 @@ target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/sqlite)
 target_link_libraries(xbmc PUBLIC ${NXDK_DIR}/lib/tinyxml.lib)
 target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/tinyxml)
 
+# Bring in FMT library
+message(STATUS "Downloading fmtlib")
+FetchContent_Declare(
+  fmt
+  GIT_REPOSITORY https://github.com/fmtlib/fmt
+  GIT_TAG        12.1.0
+  GIT_PROGRESS TRUE
+  PATCH_COMMAND ${GIT_EXECUTABLE} apply ${CMAKE_SOURCE_DIR}/lib/fmt_nxdk.patch
+)
+set(FMT_OS OFF CACHE BOOL "Disale OS module")
+add_definitions(
+  -DFMT_USE_WRITE_CONSOLE
+)
+FetchContent_MakeAvailable(fmt)
+target_link_libraries(xbmc PRIVATE fmt::fmt)
+
 # Bring in JSON library
 message(STATUS "Downloading nlohmann_json")
 FetchContent_Declare(
   json
   GIT_REPOSITORY https://github.com/nlohmann/json.git
-  GIT_TAG v3.12.0
+  GIT_TAG        v3.12.0
   GIT_PROGRESS TRUE
 )
 FetchContent_MakeAvailable(json)
