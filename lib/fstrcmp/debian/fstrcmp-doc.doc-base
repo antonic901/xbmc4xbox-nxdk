@@ -1,0 +1,10 @@
+Document: fstrcmp
+Title: Fstrcmp Manuals
+Author: Software Source Code Repository Owner
+Abstract: Fstrcmp Manuals
+Section: Programming
+
+Format: PDF
+Files: /usr/share/doc/fstrcmp/building.pdf*
+ /usr/share/doc/fstrcmp/readme.pdf*
+ /usr/share/doc/fstrcmp/reference.pdf*

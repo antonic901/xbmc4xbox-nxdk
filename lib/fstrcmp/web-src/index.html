@@ -1,0 +1,220 @@
+.\"
+.\" fstrcmp - fuzzy string compare library
+.\" Copyright (C) 2009 Peter Miller
+.\" Written by Peter Miller <pmiller@opensource.org.au>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 3 of the License, or (at
+.\" your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program. If not, see <http://www.gnu.org/licenses/>.
+.\"
+.ad l
+.hy 0
+.so etc/version.so
+<!DOCTYPE HTML PUBLIC
+    "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd"
+    >
+.br
+<html>
+<head>
+<title>
+fstrcmp \*(v)
+</title>
+</head>
+.br
+<body>
+<img src="icon1.128.png" align="left" alt="" />
+<img src="icon1.128.png" align="right" alt="" />
+<h1 align="center">
+fstrcmp \*(v)
+</h1>
+The fstrcmp project provides a library that is used to
+make fuzzy comparisons of strings and byte arrays,
+including multi-byte character strings.
+<p>
+This can be useful in error messages, enabling the suggestion of likely
+valid alternatives.  In compilers, this can reduce the cascade of
+secondary errors.
+.br
+.br
+<h2> Download </h2>
+The following files are available for download:
+<p>
+<table align="center">
+<tr> <th> File </th><th> Description </th> </tr>
+.br
+<tr>
+    <td> <a href="fstrcmp-\*(V).README" >fstrcmp-\*(V).README</a> </td>
+    <td> The README file form the tarball. </td> </tr>
+.br
+<tr>
+    <td> <a href="fstrcmp-\*(V).tar.gz" >fstrcmp-\*(V).tar.gz</a> </td>
+    <td> The complete source. </td> </tr>
+.br
+<tr>
+    <td> <a href="fstrcmp-\*(V).ae" >fstrcmp-\*(V).ae</a> </td>
+    <td> The complete source, in <a href="http://aegis.sourceforge.net/"
+    >aedist</a> format. </td> </tr>
+.br
+<tr>
+    <td> <a href="fstrcmp-\*(V).pdf" >fstrcmp-\*(V).pdf</a> </td>
+    <td> The reference manual, in PDF format.
+    </td> </tr>
+.br
+<tr>
+    <td> <a href="debian/" >debian</a> </td>
+    <td> Pre-built debian packages for Ubuntu 9.04 Jaunty i386
+    </td> </tr>
+</table>
+
+.br
+.\" ------------------------------------------------------------------------
+<h2>License</h2>
+The library is licensed under the <a
+href="http://www.gnu.org/licenses/gpl.txt" >GNU GPL</a>.
+The code is derived from the fuzzy comparisons functions in <a
+href="http://www.gnu.org/software/gettext/" >GNU Gettext</a>, which is
+GNU GPL licensed.  The GNU Gettext fuzzy comparisons functions were,
+in turn, derived from <a href="http://www.gnu.org/software/diffutils/"
+>GNU Diff</a>, which is also GNU GPL licensed.
+<p>
+These license details are important, because only GPL licensed programs,
+or compatibly licensed programs, may link against this library.
+
+.\" ------------------------------------------------------------------------
+<h2> Services provided by SourceForge </h2>
+
+<ul>
+<li>
+    Mailing list is <a
+    href="mailto:fstrcmp-users@lists.sourceforgeSystem.net"
+    >fstrcmp-users@lists.sourceforge.net</a>, and you can subscribe <a
+    href="https://lists.sourceforge.net/lists/listinfo/fstrcmp-users"
+    >here</a>.
+<li>
+    SourceForge <a href="http://sourceforge.net/projects/fstrcmp/"
+    >project</a> page.
+<li>
+    SourceForge <a
+    href="http://sourceforge.net/project/platformdownload.php?group_id=264276"
+    >download</a> page.
+<li>
+    SourceForge <a href="https://sourceforge.net/tracker/?group_id=264276"
+    >trackers</a> page: the <a
+.nf
+href="https://sourceforge.net/tracker/?\
+atid=1117296&amp;group_id=264276&amp;func=browse"
+.fi
+    >bug tracker</a>, the <a
+.nf
+href="http://sourceforge.net/tracker/?\
+atid=1117298&amp;group_id=264276&amp;func=browse"
+.fi
+    >patch tracker</a>, and <a
+.nf
+href="http://sourceforge.net/tracker/?\
+atid=1117299&amp;group_id=264276&amp;func=browse"
+.fi
+    >feature requests</a>.
+</ul>
+..
+
+.\" ------------------------------------------------------------------------
+.br
+<hr>
+<table border=0><tr><td valign="top">
+<a href="http://www.fsf.org/">
+<img
+.br
+src="http://upload.wikimedia.org/wikipedia/commons/b/bf/\
+GNU-FDL-ic%C3%B4ne-Transparente.PNG"
+border=0 width=129 height=122 alt="" /></a>
+.br
+</td><td valign="top" width="15%">
+.br
+The fstrcmp project is maintained by
+<a href="mailto:pmiller@opensource.org.au"
+>Peter Miller &lt;pmiller@opensource.org.au&gt;</a>
+and is freely distributable under the terms and conditions of the
+<a href="http://www.gnu.org/licenses/gpl.txt">GNU GPL</a>.
+.br
+</td><td valign="top">
+.br
+<a href="http://www.opensource.org/docs/definition.php">
+<img
+.nf
+src="http://www.opensource.org/trademarks/opensource/web/opensource-110x95.png"
+border="0" width="110" height="95" alt="" /></a>
+.fi
+</td><td valign="top" align="right">
+fstrcmp is developed using <a
+href="http://aegis.sourceforge.net/">Aegis</a>, a transaction based
+software configuration management system.
+The Aegis <a
+.nf
+href="http://aegis.sourceforge.net/cgi-bin/aeget/fstrcmp.\*(v)?menu"
+.fi
+>repository</a> for this project is available.
+.br
+</td><td valign="top">
+.br
+<a href="http://aegis.sourceforge.net/" ><img
+src="http://aegis.sourceforge.net/aegis.png"
+border=0 alt="" /></a>
+.br
+</td><td valign="top" align="right">
+.br
+There is more <a
+href="http://miller.emu.id.au/pmiller/software/"
+>Software by Peter Miller</a>
+at his home page.
+</td><td valign="top">
+.br
+<a href="http://miller.emu.id.au/pmiller/" ><img
+.nf
+src="http://miller.emu.id.au/pmiller/pmiller_2003_colour.64.png"
+.fi
+border=0 alt="" /></a>
+</td></tr></table>
+.\" ------------------------------------------------------------------------
+.br
+<hr>
+<a href="http://sourceforge.net/"><img
+.nf
+src="http://sourceforge.net/sflogo.php?group_id=264276&amp;type=5"
+.fi
+width="210" height="62" border="0" alt="SourceForge.net Logo"
+align="right"></a>
+This page is hosted by <a href="http://sourceforge.net/">SourceForge</a>.
+<br>
+This page has been accessed approximately
+<img
+.nf
+src="http://miller.emu.id.au/cgi-bin/web_hit_counter?pmiller_fstrcmp_\*(v)"
+.fi
+alt="number" /> times since
+.ds MO1 Jan
+.ds MO2 Feb
+.ds MO3 Mar
+.ds MO4 Apr
+.ds MO5 May
+.ds MO6 Jun
+.ds MO7 Jul
+.ds MO8 Aug
+.ds MO9 Sep
+.ds MO10 Oct
+.ds MO11 Nov
+.ds MO12 Dec
+.nr y4 \n[yr]+1900
+\n[dy]-\*[MO\n[mo]]-\n[y4].
+</body>
+</html>

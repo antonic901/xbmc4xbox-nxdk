@@ -1,0 +1,85 @@
+'\" t
+.\"
+.\" fstrcmp - fuzzy string compare library
+.\" Copyright (C) 2009 Peter Miller
+.\" Written by Peter Miller <pmiller@opensource.org.au>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 3 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program. If not, see <http://www.gnu.org/licenses/>.
+.\"
+.TH "Read Me" fstrcmp fstrcmp "Reference Manual"
+.so etc/version.so
+.hy 0
+.ad l
+.SH NAME
+fstrcmp \- fuzzy string compare library
+.XX "" "The README file"
+.SH DESCRIPTION
+The \f[I]fstrcmp\fP package provides a library which may be used to make
+fuzzy comparisons of strings and byte arrays.  It also provides simple
+commands for use in shell scripts.
+.SS License
+The library is licensed under the GNU GPL.  The code is derived from the
+fuzzy comparisons functions in GNU Gettext, which is GNU GPL licensed.
+The GNU Gettext fuzzy comparisons functions were, in turn, derived from
+GNU Diff, which is also GNU GPL licensed.
+.PP
+These license details are important, because only GPL licensed programs,
+or compatibly licensed programs, may link against this library.
+.br
+.ne 1i
+.SH HOME PAGE
+The latest version of \f[I]fstrcmp\fP is available on the Web from:
+.TS
+center,tab(;);
+l l s
+l l l.
+URL:;http://fstrcmp.sourceforge.net/
+File:;index.html;# the fstrcmp page
+File:;fstrcmp.\*(v).README;# Description, from the tar file
+File:;fstrcmp.\*(v).lsm;# Description, LSM format
+File:;fstrcmp.\*(v).tar.gz;# the complete source
+File:;fstrcmp.\*(v).pdf;# Reference Manual
+.TE
+.br
+.ne 1i
+.SH BUILDING FSTRCMP
+Full instructions for building \f[I]fstrcmp\fP may be found in the
+\f[I]BUILDING\fP file included in the source distribution.
+.br
+.ne 1i
+.so man/man1/z_copyright.so
+.PP
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or (at
+your option) any later version.
+.PP
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+.PP
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+.PP
+It should be in the \f[I]LICENSE\fP file included in the source distribution.
+.br
+.bp
+.SH RELEASE NOTES
+.XX "" "Release Notes"
+This section details the various features and bug fixes of the various
+releases.  For excruciating and complete detail, and also credits for
+those of you who have generously sent me suggestions and bug reports,
+see the \f[I]etc/CHANGES.*\fP files.
+.so etc/new.so

@@ -1,0 +1,52 @@
+Source: fstrcmp
+Section: devel
+Priority: optional
+Maintainer: Peter Miller <pmiller@opensource.org.au>
+Homepage: http://fstrcmp.sourceforge.net/
+DM-Upload-Allowed: yes
+Build-Depends: autotools-dev, debhelper (>= 5), dh-autoreconf, ghostscript,
+ groff, libtool
+Standards-Version: 3.9.3
+
+Package: fstrcmp
+Architecture: any
+Description: fuzzy comparison of strings
+ This package provides a command to make fuzzy string comparisons.
+Depends: ${misc:Depends}, ${shlibs:Depends}, libfstrcmp0
+Breaks: libfstrcmp-dev (<< 0.5)
+Replaces: libfstrcmp-dev (<< 0.5)
+
+Package: fstrcmp-doc
+Architecture: all
+Section: doc
+Description: fuzzy string compare library - documentation
+ This package provides a library which may be used to make a variety fuzzy
+ comparisons, on strings and arrays of bytes, including wide character strings
+ and multi-byte character strings.
+Depends: ${misc:Depends}
+
+Package: libfstrcmp0
+Section: libs
+Architecture: any
+Description: fuzzy string compare library - runtime library
+ library of fuzzy string comparison functions
+Depends: ${misc:Depends}, ${shlibs:Depends}
+
+Package: libfstrcmp0-dbg
+Section: debug
+Priority: extra
+Architecture: any
+Description: fuzzy string compare library - debugging symbols
+ library of fuzzy string comparison functions
+Depends: ${misc:Depends}, ${shlibs:Depends}, libfstrcmp0 (= ${binary:Version})
+
+Package: libfstrcmp-dev
+Section: libdevel
+Architecture: any
+Description: fuzzy string compare library - development files
+ This package provides a library which may be used to make a variety fuzzy
+ comparisons, on strings and arrays of bytes, including wide character strings
+ and multi-byte character strings.
+Depends: ${misc:Depends}, ${shlibs:Depends}, libfstrcmp0 (= ${binary:Version})
+Breaks: fstrcmp (<< 0.5)
+Replaces: fstrcmp (<< 0.5)

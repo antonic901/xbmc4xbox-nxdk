@@ -1,0 +1,14 @@
+usr/include/fstrcmp.h
+usr/lib/libfstrcmp.a
+usr/lib/libfstrcmp.so
+usr/lib/pkgconfig/fstrcmp.pc
+usr/share/man/man3/fmemcmp.3
+usr/share/man/man3/fmemcmpi.3
+usr/share/man/man3/fstrcasecmp.3
+usr/share/man/man3/fstrcasecmpi.3
+usr/share/man/man3/fstrcmp.3
+usr/share/man/man3/fstrcmpi.3
+usr/share/man/man3/fstrcoll.3
+usr/share/man/man3/fstrcolli.3
+usr/share/man/man3/fwcscmp.3
+usr/share/man/man3/fwcscmpi.3

@@ -1,0 +1,38 @@
+.\"
+.\" ${project trunk_name} - ${project trunk_description}
+.\" Copyright (C) ${date %Y} ${user name}
+.\" Written by ${user email}
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 3 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program. If not, see <http://www.gnu.org/licenses/>.
+.\"
+.ds n) ${basename ${trim_ext $filename}}
+.TH ${basename ${trim_ext $filename}} 3
+.SH NAME
+${basename ${trim_ext $filename}} \- insert description here
+.XX "${basename ${trim_ext $filename}}(3)" "insert description here"
+.SH SYNOPSIS
+#include <lib/fstrcmp.h>
+.br
+void ${basename ${trim_ext $filename}}(void);
+.SH DESCRIPTION
+The ${basename ${trim_ext $filename}} function may be used to
+.SH COPYRIGHT
+.so etc/version.so
+.if n .ds C) (C)
+.if t .ds C) \(co
+fstrcmp version \*(v)
+.br
+Copyright \*(C) ${date %Y} ${user name}
+.SH AUTHOR
+Written by ${user email}

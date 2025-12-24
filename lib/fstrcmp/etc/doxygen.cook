@@ -1,0 +1,127 @@
+/*
+ * fstrcmp - fuzzy string compare library
+ * Copyright (C) 2009 Peter Miller
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+doxygen = [find_command doxygen];
+if [doxygen] then
+{
+#if 0
+    integration-build-targets += web-site/doc-external/index.html;
+    all += web-site/doc-internal/index.html;
+#endif
+}
+
+web-site/doc-internal/files =
+    [match_mask lib/%0%.h [source_files]]
+    ;
+
+web-site/doc-external/files =
+    [sort
+        lib/fstrcmp.h
+        [collect c_incl -nc -ns -eia -nsri
+            [addprefix -I [search_list]]
+            [resolve lib/fstrcmp.h]
+            [addprefix -rlp\= [search_list]]
+        ]
+    ]
+    ;
+
+/*
+ * The function below is used to remove not names not existing in the
+ * filesystem from a list of path.  It is used to clean the
+ * INCLUDE_PATH path variable in doxygen.cfg since doxygen issue a
+ * warning for directory it's unable to find.
+ */
+function remove_not_existing_paths =
+{
+    result = ;
+    paths = arg;
+    loop
+    {
+        tmp_path = [head [paths]];
+        if [not [tmp_path]] then
+            loopstop;
+        if [exists [tmp_path]] then
+            result = [result] [tmp_path];
+        paths = [tail [paths]];
+    }
+
+    return [result];
+}
+
+web-site/%/index.html: [web-site/%/files] etc/doxygen.cfg
+    set shallow
+{
+    rm -rf web-site/% doxygen-tmp;
+    cat [resolve etc/doxygen.cfg] - > Doxyfile;
+data
+# The OUTPUT_DIRECTORY tag is used to specify the (relative or
+# absolute) base path where the generated documentation will be
+# put.  If a relative path is entered, it will be relative to the
+# location where doxygen was started. If left blank the current
+# directory will be used.
+OUTPUT_DIRECTORY       = doxygen-tmp
+
+# documented source files. You may enter file names like "myfile.cpp"
+# or directories like "/usr/src/myproject". Separate the files or
+# directories with spaces.
+INPUT = [unsplit " \\\n" [resolve [web-site/%/files]]]
+
+# The PROJECT_NUMBER tag can be used to enter a project or revision
+# number.  This could be handy for archiving the generated
+# documentation or if some version control system is used.
+PROJECT_NUMBER = [version]
+
+# The INCLUDE_PATH tag can be used to specify one or more directories that
+# contain include files that are not input files but should be processed by
+# the preprocessor.
+INCLUDE_PATH = [remove_not_existing_paths
+             [unsplit " \\\n" [addprefix -I [search_list] ] ] ]
+
+# If the FULL_PATH_NAMES tag is set to YES then the STRIP_FROM_PATH tag
+# can be used to strip a user defined part of the path. Stripping is
+# only done if one of the specified strings matches the left-hand part of
+# the path. It is allowed to use relative paths in the argument list.
+
+STRIP_FROM_PATH        = [addsuffix "/" [search_path] [split ":" [search_list]]]
+dataend
+    [doxygen] Doxyfile -d web-site/% 2>&1 | tee doxygen.output.tmp
+            /*
+             * Have Cook tell us how long
+             * it takes to cook.
+             */
+            set meter
+        ;
+
+    /*
+     * Test file exists and has a size greater of zero, otherwise fail
+     * this build step.  This is to cope with the fact that Doxygen
+     * exits with an exit status of zero even if it finds errors.
+     */
+    test ! -s doxygen.output.tmp;
+
+    rm -rf web-site/%;
+    mv doxygen-tmp/html web-site/%;
+    if [in % doc-internal] then
+    {
+        mkdir -p man/man3;
+        mv "doxygen-tmp/man/man3/*.3" man/man3/.
+            set errok;
+    }
+    rm -rf Doxyfile doxygen-tmp
+        set errok ;
+}

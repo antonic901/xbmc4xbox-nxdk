@@ -1,0 +1,89 @@
+/*
+ * fstrcmp - fuzzy string compare library
+ * Copyright (C) 2009 Peter Miller
+ * Written by Peter Miller <pmiller@opensource.org.au>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+integration-build-targets +=
+    [fromto web-src/%0% web-site/%0%
+        [match_mask web-src/%0%.html [source_files]]
+    ]
+    [fromto web-src/%0%.png.uue web-site/%0%.png
+        [match_mask web-src/%0%.png.uue [source_files]]
+    ]
+    [fromto web-src/%0%.png.uue web-site/%0%.128.png
+        [match_mask web-src/%0%.png.uue [source_files]]
+    ]
+    [fromto web-src/%0%.png.uue web-site/%0%.64.png
+        [match_mask web-src/%0%.png.uue [source_files]]
+    ]
+    web-site/[project_minus].README
+    web-site/[project_minus].pdf
+    ;
+
+
+web-src/%.html.d: web-src/%.html
+        set no-cascade
+{
+    c_incl -nc -ns -eia -r -nrec
+        [addprefix "-I" [search_list]]
+        -prefix "'cascade web-src/"%".html ='"
+        -suffix "';'"
+        [resolve web-src/%.html]
+        [prepost "-rlp=" "" [search_list]] /* remove leading path */
+        -o [target];
+}
+
+#include-cooked [addsuffix ".d" [match_mask web-src/%.html [source_files]]]
+
+web-site/%.html: web-src/%.html: etc/version.so
+    set shallow
+{
+    roffpp
+        [addprefix "-I" [search_list]]
+        [resolve web-src/%.html]
+    | groff -Tascii -t -P-bcu -man
+    > [target];
+    validate [target];
+}
+
+
+%0%: %0%.uue
+{
+    uudecode -o [target] [resolve %0%.uue];
+}
+
+web-src/%1.%2.png: web-src/%1.png
+{
+    convert [resolve web-src/%1.png] -scale %2 [target];
+}
+
+web-site/%.png: web-src/%.png
+    set shallow
+{
+    cp [resolve web-src/%.png] [target];
+}
+
+
+web-site/[project_minus].README: README
+{
+    cp [resolve README] [target];
+}
+
+web-site/[project_minus].pdf: etc/reference.pdf
+{
+    cp [resolve etc/reference.pdf] [target];
+}

@@ -1,0 +1,12 @@
+.so man/man1/fstrcmp.1
+.so man/man1/fstrcmp_license.1
+.so man/man3/fmemcmp.3
+.so man/man3/fmemcmpi.3
+.so man/man3/fstrcasecmp.3
+.so man/man3/fstrcasecmpi.3
+.so man/man3/fstrcmp.3
+.so man/man3/fstrcmpi.3
+.so man/man3/fstrcoll.3
+.so man/man3/fstrcolli.3
+.so man/man3/fwcscmp.3
+.so man/man3/fwcscmpi.3

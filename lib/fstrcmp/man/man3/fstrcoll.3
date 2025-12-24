@@ -1,0 +1,63 @@
+.\"
+.\" fstrcmp - fuzzy string compare library
+.\" Copyright (C) 2009, 2011 Peter Miller
+.\" Written by Peter Miller <pmiller@opensource.org.au>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 3 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program. If not, see <http://www.gnu.org/licenses/>.
+.\"
+.ds n) fstrcoll
+.TH fstrcoll 3
+.SH NAME
+fstrcoll \- fuzzy comparison of two strings using the current locale
+.if require_index \{
+.XX "fstrcoll(3)" "fuzzy comparison of two strings using the current locale"
+.\}
+.SH SYNOPSIS
+#include <fstrcmp.h>
+.sp 0.3
+#define FSTRCMP_IDENTICAL
+.br
+#define FSTRCMP_THRESHOLD
+.br
+#define FSTRCMP_ERROR
+.sp 0.3
+double fstrcoll(const char *string1, const char *string2);
+.SH DESCRIPTION
+The \f[B]strcoll\fP() function compares the two strings
+\f[I]sting1\fP and \f[I]string2\fP.
+The comparison is based on strings interpreted as appropriate for the
+program's current locale for category LC_CTYPE.
+.SH RETURN VALUE
+The \f[B]fstrcoll\fP function returns a floating point value between
+0.0 and FSTRCMP_IDENTICAL.  A value of 0.0 means the strings are
+utterly un-alike.  A value of FSTRCMP_IDENTICAL means the strings are
+identical.  A value of more than FSTRCMP_THRESHOLD (it lies between 0.0
+and FSTRCMP_IDENTICAL) would be considered "similar" by most people.
+.PP
+A value of FSTRCMP_ERROR (always negative) indicates a \f[I]malloc\fP(3)
+or \f[I]mbstowcs\fP(3) failure.
+.SH SEE ALSO
+.TP 8n
+\f[I]fstrcmp\fP(3)
+fuzzy comparison of two strings
+.TP 8n
+\f[I]fstrcolli\fP(3)
+fuzzy comparison of two strings using the current locale
+.TP 8n
+\f[I]strcoll\fP(3)
+compare two strings using the current locale
+.TP 8n
+\f[I]mbstowcs\fP(3)
+convert a multibyte string to a wide-character string
+.so man/man1/z_copyright.so

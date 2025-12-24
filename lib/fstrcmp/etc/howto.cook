@@ -1,0 +1,460 @@
+/*
+ * fstrcmp - fuzzy string compare library
+ * Copyright (C) 2009, 2012 Peter Miller
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * It is assumed that the following variables are assigned on the command line:
+ *
+ * project      The name of the Aegis project.
+ * change       The number of the Aegis change.
+ * version      The version of this change
+ * search_path  The search path from the development directory back into
+ *              the baseline, colon separated.
+ */
+
+#include "functions"
+
+default_target: all
+    set default;
+
+/*
+ * always remove targets before recreating them
+ */
+set unlink;
+
+/*
+ * always create directories for targets if they don't yet exist.
+ */
+set mkdir;
+
+/*
+ * Make sure time mod-time of targets is consistent with the ingredients.
+ * (During integration builds, adjust beack agressively.)
+ */
+set time-adjust;
+if [match_mask %1D%2 [version]] then
+    set time-adjust-back;
+
+/*
+ * Use file fingerprints to supplement file-modified times.
+ */
+set fingerprint;
+
+/* -------------------------------------------------------------------------
+ *
+ * determine the short version:
+ * no change or delta number
+ */
+version_short = [fromto %1.C%2 %1 [subst D C [version]]];
+
+version_shorter = [split "." [version_short]] _ _;
+version_shorter =
+    [unsplit "." [word 1 [version_shorter]]
+                 [word 2 [version_shorter]]];
+project_short = [fromto %.[version_short] % [project]];
+/* project_minus = [project_short]-[version_short]; */
+project_minus = [project_short]-[version];
+
+/* -------------------------------------------------------------------------
+ * Section: Search path
+ *
+ * The aegis search path (colon separated) is turned into a cook
+ * search_list (separate words).
+ */
+
+search_list = .;
+search_tmp = [tail [split ':' [search_path]]];
+search_name = bl;
+loop
+{
+    search_dir = [head [search_tmp]];
+    if [not [search_dir]] then
+        loopstop;
+    search_tmp = [tail [search_tmp]];
+
+    if [not [exists [search_name]]] then
+        ln -s [search_dir] [search_name]
+            set clearstat;
+    search_list = [search_list] [search_name];
+    search_name = [search_name]bl;
+}
+
+/* -------------------------------------------------------------------------
+ * Section: Utilities
+ *
+ * The include files in the lib/ directory define the interface between
+ * the lib/ contents and the programs.
+ */
+
+CPPFLAGS = [addprefix "-I" [search_list]];
+CC = gcc;
+CFLAGS = -Werror -Wall -Wextra
+    -Wformat\=2
+    -Wswitch-default
+    -Wswitch-enum
+    -Wdeclaration-after-statement
+    -Wshadow
+    -Wpointer-arith
+    -Wwrite-strings
+    -Wstrict-prototypes
+    -Wold-style-definition
+    -Wmissing-prototypes
+    -Wmissing-declarations
+    -Wnested-externs
+    -g
+    ;
+LDFLAGS = -Wl,--as-needed;
+LIBS = ;
+
+/* -------------------------------------------------------------------------
+ * Section: Compile Flags
+ *
+ * If you need to add specific options for a particular .c file,
+ * use the full name of the file, with a _CFLAGS suffix.
+ * (See the C recipe, below, for how this is referenced.)
+ */
+/* lib/version.c_CFLAGS = "-D'VERSION=\""[version]"\"'"; */
+
+/*
+ * If you need to add specific options for a particular .c file,
+ * use the full name of the file, with a _CFLAGS suffix.
+ * (See the C recipe, below, for how this is referenced.)
+ */
+/* lib/name2_CFLAGS = -DEXTRA_STUFF; */
+
+/* -------------------------------------------------------------------------
+ * Section: Primary Source Files
+ *
+ * Ask Aegis for the manifest of primary source files.
+ * It is almost *never* a good idea to alter this section in any way.
+ * If you are not an experiences Aegis user, do not edit this section.
+ */
+
+project_files = [collect aegis -l pf -p [project] -c [change] -terse];
+change_files = [shell aegis -l cf -p [project] -c [change] -terse];
+source_files = [sort [project_files] [change_files]];
+
+/* -------------------------------------------------------------------------
+ * Section: Libraries
+ *
+ * For each library, construct the object list for that library.
+ *
+ * The relevant portion of the directory structure looks like this
+ *
+ *    lib/
+ *        libfstrcmp.la
+ *        source.file1.c
+ *        source.file2.c
+ *        ...
+ */
+
+lib/libfstrcmp_obj =
+    [patsubst %0%.c %0%.lo      [filter lib/%0%.c [source_files]]]
+    [patsubst %0%.y %0%.yacc.lo [filter lib/%0%.y [source_files]]]
+    [patsubst %0%.l %0%.lex.lo  [filter lib/%0%.l [source_files]]]
+    ;
+
+lib/libfstrcmp.la : [lib/libfstrcmp_obj]
+    set unlink
+{
+    /*
+     * We include the "hidden" libtool output files because we need to
+     * fingerprint somethign that actually changes, and the .la file is
+     * pretty much static.
+     */
+    local version-info =
+        [collect aesub "'${project_specific aemakegen:version-info}'" ];
+    libtool --mode\=link
+    [CC] [CPPFLAGS] [CFLAGS]
+        -o lib/libfstrcmp.la
+        [resolve [lib/libfstrcmp_obj]]
+        [LIBS]
+        -version-info [version-info]
+
+        /*
+         * If you don't specify -rpath it doesn't make the shared
+         * library, even though the Debian people Really Don't Like
+         * Rpath.  We really really want the .so so we can check out
+         * version-info using the aede-policy soname.
+         */
+        -rpath /usr/local/bin
+        ;
+}
+
+/* -------------------------------------------------------------------------
+ * Section: Programs
+ *
+ * For each program, construct the object list for that program.
+ * Because Make only had macros, not a full 3GL, you have to enumerate
+ * each one explicitly.
+ *
+ * The relevant portion of the directory structure looks like this
+ *
+ *    progA/
+ *        source.file.c ...
+ *    progB/
+ *        source.file.c ...
+ *    bin/
+ *        progA
+ *        progB
+ *
+ * The list of programs is determinted automatically from the sourec files,
+ * and the list of objects for each one.
+ */
+
+programs =
+    [stringset /* remove duplicates */
+        [patsubst %/main.c % [filter %/main.c [source_files]]]
+    ];
+
+loop prog = [programs]
+{
+    bin/[prog]_obj =
+        [patsubst %0%.c      %0%.o [filter [prog]/%0%.c [source_files]]]
+        [patsubst %0%.y %0%.yacc.o [filter [prog]/%0%.y [source_files]]]
+        [patsubst %0%.l %0%.lex.o  [filter [prog]/%0%.l [source_files]]]
+        ;
+    bin/[prog]_libs = lib/libfstrcmp.la;
+}
+
+/*
+ * We can use a single pattern recipe to make all of the programs.
+ */
+
+bin/% bin/.libs/%: [[target]_obj] [defined-or-null [target]_libs]
+        /* [fromto %%0%%.la %%0.libs/%%.so [defined-or-null [target]_libs]] */
+    set gate-first shallow /* tests need them */
+    if [defined [target]_obj]
+{
+    rm -f bin/.libs/lt-%;
+    libtool --mode\=link
+    [CC] -o [target]
+        [LDFLAGS]
+        [resolve [[target]_obj] [defined-or-null [target]_libs]]
+        ;
+
+    /*
+     * libtool creates bin/% as a script, which, when executed, does the
+     * actual link.  But this link puts its results in bin/.libs, and
+     * that directory will not be writable for executables sourced from
+     * the baseline.  So we goose it into linking now, which would seem
+     * to defeat the purpose.
+     */
+    [target] -V;
+}
+
+/* --------------------------------------------------------------------------
+ * Section: What to make
+ *
+ * The ``all'' targets are each of the commands.
+ */
+
+all = [addprefix "bin/" [programs]];
+all: [all];
+
+integration-build-targets = web-site/[project_minus].ae;
+integration-build-targets: [integration-build-targets];
+
+if [match_mask %1D%2 [version]] then
+    all += integration-build-targets;
+
+/* --------------------------------------------------------------------------
+ * Section: Compiling C Source Files
+ */
+
+#if 0
+%0%.o: %0%.c
+{
+    rm -f %0.libs/%.o %0.libs/%.lo;
+    libtool --mode\=compile
+    [CC] [CFLAGS]
+        [defined-or-null %0%.c_CFLAGS]
+        [defined-or-null [dir %0%.c]_CFLAGS]
+        [CPPFLAGS]
+        -c [resolve %0%.c]
+        -o [target];
+}
+#endif
+
+cascade %0%.lo = %0%.o %0.libs/%.lo;
+
+%0%.lo %0%.o %0.libs/%.o: %0%.c
+{
+    rm -f %0%.lo %0.libs/%.o %0.libs/%.lo;
+    libtool --mode\=compile
+    [CC] [CFLAGS]
+        [defined-or-null %0%.c_CFLAGS]
+        [defined-or-null [dir %0%.c]_CFLAGS]
+        [CPPFLAGS]
+        -c [resolve %0%.c]
+        -o [target];
+    md5sum %0%.o %0.libs/%.o | sed "'s|^|# |'" >> [target];
+}
+
+/* force this one to be shallow */
+if [not [exists lib/version.lo]] then
+    lib/version.lo: .;
+
+/* --------------------------------------------------------------------------
+ * Section: Maintaining C Include Dependencies
+ *
+ * How to manage C include dependencies, straight out of the Cook manual.
+ */
+
+/*
+ * There is a special list of files you must use, in preference to the
+ * standard C files.  This ensures appropriate operating system insulation
+ * is always in place.
+ */
+c_incl_excludes =
+    [fromto lib/ac/%0%.h -ex\=%0%.h
+        [match_mask lib/ac/%0%.h [source_files]]
+    ]
+    ;
+
+%0%.c.d: %0%.c
+    set no-cascade
+{
+    /*
+     * Generated files may use excluded headers, because we
+     * have no control over the quality of generated code.
+     */
+    local ex = ;
+    if [not [match %%.yacc %]] then
+    {
+        if [not [filter lib/ac/%%0%% %0%.c]] then
+            ex = [c_incl_excludes];
+    }
+
+    c_incl -nc -ns -eia -nrec
+        -nsri /* essential for Aegis development */
+        [filter -I%%0%% [CPPFLAGS]]
+        -prefix "'cascade %0%.c ='"
+        -suffix "';'"
+        [resolve %0%.c]
+        [addprefix -rlp\= [search_list]]
+        [ex]
+        -o [target];
+}
+
+#include-cooked-nowarn [addsuffix ".d" [filter %0%.c [source_files]]]
+
+%0%.h.d: %0%.h: lib/config.h
+    set no-cascade
+{
+    /*
+     * Generated files may use excluded headers, because we
+     * have no control over the quality of generated code.
+     */
+    local ex = ;
+    if [not [match %%.yacc %]] then
+    {
+        if [not [filter lib/ac/%%0%% %0%.c]] then
+            ex = [c_incl_excludes];
+    }
+    if [in %0%.h lib/fstrcmp.h] then
+    {
+        ex = [stringset [ex] - "-ex=stddef.h" ];
+    }
+
+    c_incl -nc -ns -eia -nrec
+        -nsri /* essential for Aegis development */
+        [filter -I%%0%% [CPPFLAGS]]
+        -prefix "'cascade %0%.h ='"
+        -suffix "';'"
+        [resolve %0%.h]
+        [addprefix -rlp\= [search_list]]
+        [ex]
+        -o [target];
+}
+
+#include-cooked-nowarn [addsuffix ".d" [filter %0%.h [source_files]]]
+
+/*
+ * If the relationship between a target and a derived ingredient
+ * appears only in a derived cookbook, it is likely that a clean build
+ * (solely from primary source files) will fail.  It is recommended that
+ * relationships such as this be placed in a primary source cookbook.
+ */
+
+cascade lib/ac/errno.h =  lib/config.h;
+cascade lib/ac/stddef.h = lib/config.h;
+cascade lib/ac/stdio.h =  lib/config.h;
+cascade lib/ac/stdlib.h = lib/config.h;
+cascade lib/ac/string.h = lib/config.h;
+cascade lib/ac/fcntl.h =  lib/config.h;
+
+/* --------------------------------------------------------------------------
+ * Section: Using Yacc Source Files
+ *
+ * How to have yacc read .y files and generate .yacc.c and .yacc.h files.
+ * This section allows you to have more than one yacc file in a program
+ * (or library) by editing the generated ``yy'' identifiers into something
+ * more unique.
+ */
+
+/* yacc = yacc; */
+yacc = bison -y;
+yacc_flags = ;
+
+/* LIBS += -ly; */
+
+%0%.yacc.c %0%.yacc.h: %0%.y
+    single-thread y.tab.c y.tab.h
+{
+    local name = [substitute / _ %0%_];
+    [yacc] -d [yacc_flags] [resolve %0%.y];
+    sed -e "'s|[yY][yY]|"[name]"|g'" y.tab.c > %0%.yacc.c;
+    sed -e "'s|[yY][yY]|"[name]"|g'" y.tab.h > %0%.yacc.h;
+    rm y.tab.c y.tab.h;
+}
+
+yacc_d_files =
+    [patsubst %0%.y %0%.yacc.c.d [filter %0%.y [source_files]]]
+    [patsubst %0%.y %0%.yacc.h.d [filter %0%.y [source_files]]]
+    ;;
+#include-cooked-nowarn [yacc_d_files]
+
+/* --------------------------------------------------------------------------
+ * Section: Change Set
+ */
+
+web-site/[project_minus].ae: [source_files]
+{
+    aedist --send --entire-source -p [project] -c [change] -ndh -naa
+        -o [target];
+}
+
+/* --------------------------------------------------------------------------
+ * Section: scripts
+ *
+ * see etc/autoconf.cook for how the scripts are cooked
+ */
+
+scripts = [fromto script/%.sh.in % [match_mask script/%.sh.in [source_files]]];
+
+all += [addprefix bin/ [scripts]];
+
+
+/* ---------------------------------------------------------------------- */
+#include-cooked etc/autoconf.cook
+#include-cooked etc/doxygen.cook
+#include-cooked etc/makefile.cook
+#include-cooked etc/tags.cook
+#include-cooked etc/metrics.cook
+#include-cooked etc/documentation.cook
+#include-cooked etc/i18n.cook
+#include-cooked web-src/module.cook

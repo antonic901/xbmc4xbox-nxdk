@@ -1,0 +1,721 @@
+#
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#
+#    W   W    A    RRRR   N   N   III  N   N  III  N   N   GGG
+#    W   W   A A   R   R  NN  N    I   NN  N   I   NN  N  G   G
+#    W   W  A   A  RRRR   N N N    I   N N N   I   N N N  G
+#    W W W  AAAAA  R R    N  NN    I   N  NN   I   N  NN  G  GG
+#    W W W  A   A  R  R   N   N    I   N   N   I   N   N  G   G
+#     W W   A   A  R   R  N   N   III  N   N  III  N   N   GGG
+#
+# Warning: DO NOT send patches which fix this file. IT IS NOT the original
+# source file. This file is GENERATED from the Aegis repository file manifest.
+# If you find a bug in this file, it could well be an Aegis bug.
+#
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#
+
+#
+# @configure_input@
+#
+# The configure script generates 2 files:
+# 1. This Makefile
+# 2. lib/config.h
+# If you change this Makefile, you may also need to change these files. To see
+# what is configured by the configure script, search for @ in the Makefile.in
+# file.
+#
+# If you wish to reconfigure the installations directories it is RECOMMENDED
+# that you re-run the configure script.
+#
+# Use "./configure --help" for a list of options.
+#
+
+#
+# directory containing the source
+#
+srcdir = @srcdir@
+VPATH = @srcdir@
+
+#
+# the name of the install program to use
+#
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_DIR = @INSTALL@ -m 0755 -d
+
+#
+# The name of the C compiler to use.
+#
+CC = @CC@
+
+#
+# The C compiler flags to use.
+#
+CFLAGS = @CFLAGS@
+
+#
+# The C preprocessor flags to use.
+#
+CPPFLAGS = @CPPFLAGS@
+
+#
+# The linker flags to use
+#
+LDFLAGS = @LDFLAGS@
+
+#
+# prefix for installation path
+#
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+#
+# Where to put the executables.
+#
+# On a network, this would only be shared between machines of identical
+# cpu-hw-os flavour. It can be read-only.
+#
+# The $(DESTDIR) is for packaging.
+#
+bindir = $(DESTDIR)@bindir@
+
+#
+# Where to put the manuals.
+#
+# On a network, this would be shared between all machines on the network. It can
+# be read-only.
+#
+# The $(DESTDIR) is for packaging.
+#
+mandir = $(DESTDIR)@mandir@
+
+# define this to silence ./configure warning
+datarootdir = $(DESTDIR)@datarootdir@
+
+#
+# Where to put the supplementary package executables.
+#
+# On a network, this would be shared between all machines of identical
+# architecture. It can be read-only.
+#
+# The $(DESTDIR) is for packaging.
+#
+libdir = $(DESTDIR)@libdir@
+
+#
+# Where to put the include files for the library.
+#
+# On a network, this would be shared between all machines of identical
+# architecture. It can be read-only.
+#
+# The $(DESTDIR) is for packaging.
+#
+includedir = $(DESTDIR)@includedir@
+
+#
+# The name of the GNU Libtool command.
+#
+LIBTOOL = @LIBTOOL@
+
+#
+# extra libraries required for your system
+#
+LIBS = @LIBS@
+
+#
+# shell to use to run tests and commands
+#
+SH = @SH@
+
+#
+# command file name extension (typically "" or ".exe")
+#
+EXEEXT = @EXEEXT@
+
+#
+# Set GROFF to the name of the roff command on your system, usually "groff" or
+# "troff" or "nroff".
+#
+GROFF = @GROFF@
+
+#
+# Set SOELIM to the name of the roff proprocessor command on your system,
+# usually "soelim" or "gsoelim".
+#
+SOELIM = @SOELIM@
+
+# ---------------------------------------------------------
+# You should not need to change anything below this line.
+
+#
+# The default target
+#
+the-default-target: all
+
+etc/building.pdf: etc/building.man man/man1/z_copyright.so
+	$(GROFF) -Tps -s -I. -t -man etc/building.man > etc/building.ps
+	ps2pdf etc/building.ps $@
+	rm etc/building.ps
+
+$(datarootdir)/doc/fstrcmp/building.pdf: .mkdir.__datarootdir__doc_fstrcmp \
+		etc/building.pdf
+	$(INSTALL_DATA) etc/building.pdf $@
+
+etc/readme.pdf: etc/new.0.1.so etc/new.0.2.so etc/new.0.3.so etc/new.0.4.so \
+		etc/new.0.5.so etc/new.0.6.so etc/new.0.7.so etc/readme.man \
+		man/man1/z_copyright.so
+	$(GROFF) -Tps -s -I. -t -man etc/readme.man > etc/readme.ps
+	ps2pdf etc/readme.ps $@
+	rm etc/readme.ps
+
+$(datarootdir)/doc/fstrcmp/readme.pdf: .mkdir.__datarootdir__doc_fstrcmp \
+		etc/readme.pdf
+	$(INSTALL_DATA) etc/readme.pdf $@
+
+etc/reference.pdf: etc/building.man etc/new.0.1.so etc/new.0.2.so \
+		etc/new.0.3.so etc/new.0.4.so etc/new.0.5.so etc/new.0.6.so \
+		etc/new.0.7.so etc/readme.man etc/ref-toc.so etc/reference.man \
+		man/man1/fstrcmp.1 man/man1/fstrcmp_license.1 \
+		man/man1/z_copyright.so man/man3/fmemcmp.3 man/man3/fmemcmpi.3 \
+		man/man3/fstrcasecmp.3 man/man3/fstrcasecmpi.3 \
+		man/man3/fstrcmp.3 man/man3/fstrcmpi.3 man/man3/fstrcoll.3 \
+		man/man3/fstrcolli.3 man/man3/fwcscmp.3 man/man3/fwcscmpi.3
+	$(GROFF) -Tps -s -I. -t -man etc/reference.man > etc/reference.ps
+	ps2pdf etc/reference.ps $@
+	rm etc/reference.ps
+
+$(datarootdir)/doc/fstrcmp/reference.pdf: .mkdir.__datarootdir__doc_fstrcmp \
+		etc/reference.pdf
+	$(INSTALL_DATA) etc/reference.pdf $@
+
+fstrcmp/main.$(OBJEXT) fstrcmp/main.lo: fstrcmp/main.c lib/ac/fcntl.h \
+		lib/ac/getopt.h lib/ac/stddef.h lib/ac/stdio.h lib/ac/stdlib.h \
+		lib/ac/string.h lib/ac/sys/stat.h lib/ac/sys/time.h \
+		lib/ac/sys/types.h lib/ac/unistd.h lib/config.messy.h \
+		lib/fstrcmp.h lib/program_name.h lib/version_print.h
+	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CPPFLAGS) $(CFLAGS) -I. -c \
+		fstrcmp/main.c -o fstrcmp/main.lo
+
+lib/ac/string.$(OBJEXT) lib/ac/string.lo: lib/ac/stddef.h lib/ac/stdio.h \
+		lib/ac/stdlib.h lib/ac/string.c lib/ac/string.h \
+		lib/config.messy.h lib/gcc_attributes.h
+	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CPPFLAGS) $(CFLAGS) -I. -c \
+		lib/ac/string.c -o lib/ac/string.lo
+
+lib/downcase.$(OBJEXT) lib/downcase.lo: lib/ac/ctype.h lib/ac/stdlib.h \
+		lib/ac/string.h lib/config.messy.h lib/downcase.c lib/downcase.h
+	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CPPFLAGS) $(CFLAGS) -I. -c \
+		lib/downcase.c -o lib/downcase.lo
+
+lib/fmemcmp.$(OBJEXT) lib/fmemcmp.lo: lib/ac/stddef.h lib/ac/stdio.h \
+		lib/ac/stdlib.h lib/ac/string.h lib/config.messy.h \
+		lib/diffseq.h lib/fmemcmp.c lib/fstrcmp.h lib/minmax.h \
+		lib/nmalloc.h
+	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CPPFLAGS) $(CFLAGS) -I. -c \
+		lib/fmemcmp.c -o lib/fmemcmp.lo
+
+lib/fmemcmpi.$(OBJEXT) lib/fmemcmpi.lo: lib/ac/stddef.h lib/ac/stdio.h \
+		lib/ac/stdlib.h lib/ac/string.h lib/config.messy.h \
+		lib/diffseq.h lib/fmemcmpi.c lib/fstrcmp.h lib/minmax.h \
+		lib/nmalloc.h
+	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CPPFLAGS) $(CFLAGS) -I. -c \
+		lib/fmemcmpi.c -o lib/fmemcmpi.lo
+
+lib/fstrcasecmp.$(OBJEXT) lib/fstrcasecmp.lo: lib/ac/stdlib.h \
+		lib/config.messy.h lib/downcase.h lib/fstrcasecmp.c \
+		lib/fstrcmp.h
+	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CPPFLAGS) $(CFLAGS) -I. -c \
+		lib/fstrcasecmp.c -o lib/fstrcasecmp.lo
+
+lib/fstrcasecmpi.$(OBJEXT) lib/fstrcasecmpi.lo: lib/ac/stdlib.h \
+		lib/config.messy.h lib/downcase.h lib/fstrcasecmpi.c \
+		lib/fstrcmp.h
+	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CPPFLAGS) $(CFLAGS) -I. -c \
+		lib/fstrcasecmpi.c -o lib/fstrcasecmpi.lo
+
+lib/fstrcmp.$(OBJEXT) lib/fstrcmp.lo: lib/ac/string.h lib/config.messy.h \
+		lib/fstrcmp.c lib/fstrcmp.h
+	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CPPFLAGS) $(CFLAGS) -I. -c \
+		lib/fstrcmp.c -o lib/fstrcmp.lo
+
+$(includedir)/fstrcmp.h: .mkdir.__includedir_ lib/fstrcmp.h
+	$(INSTALL_DATA) lib/fstrcmp.h $@
+
+lib/fstrcmpi.$(OBJEXT) lib/fstrcmpi.lo: lib/ac/string.h lib/config.messy.h \
+		lib/fstrcmp.h lib/fstrcmpi.c
+	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CPPFLAGS) $(CFLAGS) -I. -c \
+		lib/fstrcmpi.c -o lib/fstrcmpi.lo
+
+lib/fstrcoll.$(OBJEXT) lib/fstrcoll.lo: lib/ac/stddef.h lib/ac/stdlib.h \
+		lib/ac/string.h lib/config.messy.h lib/fstrcmp.h \
+		lib/fstrcoll.c lib/mbs_to_wcs.h
+	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CPPFLAGS) $(CFLAGS) -I. -c \
+		lib/fstrcoll.c -o lib/fstrcoll.lo
+
+lib/fstrcolli.$(OBJEXT) lib/fstrcolli.lo: lib/ac/stddef.h lib/ac/stdlib.h \
+		lib/ac/string.h lib/config.messy.h lib/fstrcmp.h \
+		lib/fstrcolli.c lib/mbs_to_wcs.h
+	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CPPFLAGS) $(CFLAGS) -I. -c \
+		lib/fstrcolli.c -o lib/fstrcolli.lo
+
+lib/fwcscmp.$(OBJEXT) lib/fwcscmp.lo: lib/ac/stddef.h lib/ac/stdio.h \
+		lib/ac/stdlib.h lib/ac/string.h lib/ac/wchar.h \
+		lib/config.messy.h lib/diffseq.h lib/fstrcmp.h lib/fwcscmp.c \
+		lib/minmax.h lib/nmalloc.h
+	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CPPFLAGS) $(CFLAGS) -I. -c \
+		lib/fwcscmp.c -o lib/fwcscmp.lo
+
+lib/fwcscmpi.$(OBJEXT) lib/fwcscmpi.lo: lib/ac/stddef.h lib/ac/stdio.h \
+		lib/ac/stdlib.h lib/ac/string.h lib/ac/wchar.h \
+		lib/config.messy.h lib/diffseq.h lib/fstrcmp.h lib/fwcscmpi.c \
+		lib/minmax.h lib/nmalloc.h
+	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CPPFLAGS) $(CFLAGS) -I. -c \
+		lib/fwcscmpi.c -o lib/fwcscmpi.lo
+
+lib/mbs_to_wcs.$(OBJEXT) lib/mbs_to_wcs.lo: lib/ac/stddef.h lib/ac/stdlib.h \
+		lib/ac/string.h lib/config.messy.h lib/mbs_to_wcs.c \
+		lib/mbs_to_wcs.h
+	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CPPFLAGS) $(CFLAGS) -I. -c \
+		lib/mbs_to_wcs.c -o lib/mbs_to_wcs.lo
+
+lib/nmalloc.$(OBJEXT) lib/nmalloc.lo: lib/ac/stddef.h lib/ac/stdlib.h \
+		lib/config.messy.h lib/nmalloc.c lib/nmalloc.h
+	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CPPFLAGS) $(CFLAGS) -I. -c \
+		lib/nmalloc.c -o lib/nmalloc.lo
+
+lib/program_name.$(OBJEXT) lib/program_name.lo: lib/ac/assert.h \
+		lib/ac/stddef.h lib/ac/stdlib.h lib/ac/string.h \
+		lib/ac/sys/types.h lib/ac/unistd.h lib/config.messy.h \
+		lib/program_name.c lib/program_name.h
+	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CPPFLAGS) $(CFLAGS) -I. -c \
+		lib/program_name.c -o lib/program_name.lo
+
+lib/version.$(OBJEXT) lib/version.lo: lib/version.c lib/version.h
+	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CPPFLAGS) $(CFLAGS) -I. -c \
+		lib/version.c -o lib/version.lo
+
+lib/version_print.$(OBJEXT) lib/version_print.lo: lib/ac/stdio.h \
+		lib/config.messy.h lib/version.h lib/version_print.c \
+		lib/version_print.h
+	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CPPFLAGS) $(CFLAGS) -I. -c \
+		lib/version_print.c -o lib/version_print.lo
+
+libdir/pkgconfig/fstrcmp.pc: config.status libdir/pkgconfig/fstrcmp.pc.in
+	CONFIG_FILES=$@:libdir/pkgconfig/fstrcmp.pc.in CONFIG_HEADERS= $(SH) \
+		config.status
+
+$(libdir)/pkgconfig/fstrcmp.pc: .mkdir.__libdir__pkgconfig \
+		libdir/pkgconfig/fstrcmp.pc
+	$(INSTALL_DATA) libdir/pkgconfig/fstrcmp.pc $@
+
+man/cat1/fstrcmp.1: man/man1/fstrcmp.1 man/man1/z_copyright.so
+	@mkdir -p man/cat1
+	GROFF_NO_SGR=-c $(GROFF) -I. -Tascii -t -man man/man1/fstrcmp.1 > $@
+
+$(mandir)/man1/fstrcmp.1: .mkdir.__mandir__man1 man/man1/fstrcmp.1 \
+		man/man1/z_copyright.so
+	$(SOELIM) -I. man/man1/fstrcmp.1 | sed '/^[.]XX ./d' > \
+		man/man1/fstrcmp.1.tmp
+	$(INSTALL_DATA) man/man1/fstrcmp.1.tmp $@
+	@rm -f man/man1/fstrcmp.1.tmp
+
+man/cat1/fstrcmp_license.1: man/man1/fstrcmp_license.1
+	@mkdir -p man/cat1
+	GROFF_NO_SGR=-c $(GROFF) -I. -Tascii -t -man \
+		man/man1/fstrcmp_license.1 > $@
+
+$(mandir)/man1/fstrcmp_license.1: .mkdir.__mandir__man1 \
+		man/man1/fstrcmp_license.1
+	sed '/^[.]XX ./d' < man/man1/fstrcmp_license.1 > \
+		man/man1/fstrcmp_license.1.tmp
+	$(INSTALL_DATA) man/man1/fstrcmp_license.1.tmp $@
+	@rm -f man/man1/fstrcmp_license.1.tmp
+
+man/cat3/fmemcmp.3: man/man1/z_copyright.so man/man3/fmemcmp.3
+	@mkdir -p man/cat3
+	GROFF_NO_SGR=-c $(GROFF) -I. -Tascii -t -man man/man3/fmemcmp.3 > $@
+
+$(mandir)/man3/fmemcmp.3: .mkdir.__mandir__man3 man/man1/z_copyright.so \
+		man/man3/fmemcmp.3
+	$(SOELIM) -I. man/man3/fmemcmp.3 | sed '/^[.]XX ./d' > \
+		man/man3/fmemcmp.3.tmp
+	$(INSTALL_DATA) man/man3/fmemcmp.3.tmp $@
+	@rm -f man/man3/fmemcmp.3.tmp
+
+man/cat3/fmemcmpi.3: man/man1/z_copyright.so man/man3/fmemcmpi.3
+	@mkdir -p man/cat3
+	GROFF_NO_SGR=-c $(GROFF) -I. -Tascii -t -man man/man3/fmemcmpi.3 > $@
+
+$(mandir)/man3/fmemcmpi.3: .mkdir.__mandir__man3 man/man1/z_copyright.so \
+		man/man3/fmemcmpi.3
+	$(SOELIM) -I. man/man3/fmemcmpi.3 | sed '/^[.]XX ./d' > \
+		man/man3/fmemcmpi.3.tmp
+	$(INSTALL_DATA) man/man3/fmemcmpi.3.tmp $@
+	@rm -f man/man3/fmemcmpi.3.tmp
+
+man/cat3/fstrcasecmp.3: man/man1/z_copyright.so man/man3/fstrcasecmp.3
+	@mkdir -p man/cat3
+	GROFF_NO_SGR=-c $(GROFF) -I. -Tascii -t -man man/man3/fstrcasecmp.3 > $@
+
+$(mandir)/man3/fstrcasecmp.3: .mkdir.__mandir__man3 man/man1/z_copyright.so \
+		man/man3/fstrcasecmp.3
+	$(SOELIM) -I. man/man3/fstrcasecmp.3 | sed '/^[.]XX ./d' > \
+		man/man3/fstrcasecmp.3.tmp
+	$(INSTALL_DATA) man/man3/fstrcasecmp.3.tmp $@
+	@rm -f man/man3/fstrcasecmp.3.tmp
+
+man/cat3/fstrcasecmpi.3: man/man1/z_copyright.so man/man3/fstrcasecmpi.3
+	@mkdir -p man/cat3
+	GROFF_NO_SGR=-c $(GROFF) -I. -Tascii -t -man man/man3/fstrcasecmpi.3 > \
+		$@
+
+$(mandir)/man3/fstrcasecmpi.3: .mkdir.__mandir__man3 man/man1/z_copyright.so \
+		man/man3/fstrcasecmpi.3
+	$(SOELIM) -I. man/man3/fstrcasecmpi.3 | sed '/^[.]XX ./d' > \
+		man/man3/fstrcasecmpi.3.tmp
+	$(INSTALL_DATA) man/man3/fstrcasecmpi.3.tmp $@
+	@rm -f man/man3/fstrcasecmpi.3.tmp
+
+man/cat3/fstrcmp.3: man/man1/z_copyright.so man/man3/fstrcmp.3
+	@mkdir -p man/cat3
+	GROFF_NO_SGR=-c $(GROFF) -I. -Tascii -t -man man/man3/fstrcmp.3 > $@
+
+$(mandir)/man3/fstrcmp.3: .mkdir.__mandir__man3 man/man1/z_copyright.so \
+		man/man3/fstrcmp.3
+	$(SOELIM) -I. man/man3/fstrcmp.3 | sed '/^[.]XX ./d' > \
+		man/man3/fstrcmp.3.tmp
+	$(INSTALL_DATA) man/man3/fstrcmp.3.tmp $@
+	@rm -f man/man3/fstrcmp.3.tmp
+
+man/cat3/fstrcmpi.3: man/man1/z_copyright.so man/man3/fstrcmpi.3
+	@mkdir -p man/cat3
+	GROFF_NO_SGR=-c $(GROFF) -I. -Tascii -t -man man/man3/fstrcmpi.3 > $@
+
+$(mandir)/man3/fstrcmpi.3: .mkdir.__mandir__man3 man/man1/z_copyright.so \
+		man/man3/fstrcmpi.3
+	$(SOELIM) -I. man/man3/fstrcmpi.3 | sed '/^[.]XX ./d' > \
+		man/man3/fstrcmpi.3.tmp
+	$(INSTALL_DATA) man/man3/fstrcmpi.3.tmp $@
+	@rm -f man/man3/fstrcmpi.3.tmp
+
+man/cat3/fstrcoll.3: man/man1/z_copyright.so man/man3/fstrcoll.3
+	@mkdir -p man/cat3
+	GROFF_NO_SGR=-c $(GROFF) -I. -Tascii -t -man man/man3/fstrcoll.3 > $@
+
+$(mandir)/man3/fstrcoll.3: .mkdir.__mandir__man3 man/man1/z_copyright.so \
+		man/man3/fstrcoll.3
+	$(SOELIM) -I. man/man3/fstrcoll.3 | sed '/^[.]XX ./d' > \
+		man/man3/fstrcoll.3.tmp
+	$(INSTALL_DATA) man/man3/fstrcoll.3.tmp $@
+	@rm -f man/man3/fstrcoll.3.tmp
+
+man/cat3/fstrcolli.3: man/man1/z_copyright.so man/man3/fstrcolli.3
+	@mkdir -p man/cat3
+	GROFF_NO_SGR=-c $(GROFF) -I. -Tascii -t -man man/man3/fstrcolli.3 > $@
+
+$(mandir)/man3/fstrcolli.3: .mkdir.__mandir__man3 man/man1/z_copyright.so \
+		man/man3/fstrcolli.3
+	$(SOELIM) -I. man/man3/fstrcolli.3 | sed '/^[.]XX ./d' > \
+		man/man3/fstrcolli.3.tmp
+	$(INSTALL_DATA) man/man3/fstrcolli.3.tmp $@
+	@rm -f man/man3/fstrcolli.3.tmp
+
+man/cat3/fwcscmp.3: man/man1/z_copyright.so man/man3/fwcscmp.3
+	@mkdir -p man/cat3
+	GROFF_NO_SGR=-c $(GROFF) -I. -Tascii -t -man man/man3/fwcscmp.3 > $@
+
+$(mandir)/man3/fwcscmp.3: .mkdir.__mandir__man3 man/man1/z_copyright.so \
+		man/man3/fwcscmp.3
+	$(SOELIM) -I. man/man3/fwcscmp.3 | sed '/^[.]XX ./d' > \
+		man/man3/fwcscmp.3.tmp
+	$(INSTALL_DATA) man/man3/fwcscmp.3.tmp $@
+	@rm -f man/man3/fwcscmp.3.tmp
+
+man/cat3/fwcscmpi.3: man/man1/z_copyright.so man/man3/fwcscmpi.3
+	@mkdir -p man/cat3
+	GROFF_NO_SGR=-c $(GROFF) -I. -Tascii -t -man man/man3/fwcscmpi.3 > $@
+
+$(mandir)/man3/fwcscmpi.3: .mkdir.__mandir__man3 man/man1/z_copyright.so \
+		man/man3/fwcscmpi.3
+	$(SOELIM) -I. man/man3/fwcscmpi.3 | sed '/^[.]XX ./d' > \
+		man/man3/fwcscmpi.3.tmp
+	$(INSTALL_DATA) man/man3/fwcscmpi.3.tmp $@
+	@rm -f man/man3/fwcscmpi.3.tmp
+
+script/test_prelude.sh: config.status script/test_prelude.sh.in
+	CONFIG_FILES=$@:script/test_prelude.sh.in CONFIG_HEADERS= $(SH) \
+		config.status
+
+bin/test_prelude$(EXEEXT): .bin script/test_prelude.sh
+	cp script/test_prelude.sh $@
+	chmod a+rx $@
+
+t0001a: all test/00/t0001a.sh
+	PATH=`pwd`/bin:$$PATH $(SH) test/00/t0001a.sh
+
+t0002a: all test/00/t0002a.sh
+	PATH=`pwd`/bin:$$PATH $(SH) test/00/t0002a.sh
+
+t0003a: all test/00/t0003a.sh
+	PATH=`pwd`/bin:$$PATH $(SH) test/00/t0003a.sh
+
+t0004a: all test/00/t0004a.sh
+	PATH=`pwd`/bin:$$PATH $(SH) test/00/t0004a.sh
+
+t0005a: all test/00/t0005a.sh
+	PATH=`pwd`/bin:$$PATH $(SH) test/00/t0005a.sh
+
+t0006a: all test/00/t0006a.sh
+	PATH=`pwd`/bin:$$PATH $(SH) test/00/t0006a.sh
+
+t0007a: all test/00/t0007a.sh
+	PATH=`pwd`/bin:$$PATH $(SH) test/00/t0007a.sh
+
+t0008a: all test/00/t0008a.sh
+	PATH=`pwd`/bin:$$PATH $(SH) test/00/t0008a.sh
+
+t0009a: all test/00/t0009a.sh
+	PATH=`pwd`/bin:$$PATH $(SH) test/00/t0009a.sh
+
+t0010a: all test/00/t0010a.sh
+	PATH=`pwd`/bin:$$PATH $(SH) test/00/t0010a.sh
+
+test_user/main.$(OBJEXT) test_user/main.lo: lib/ac/pwd.h lib/ac/stddef.h \
+		lib/ac/stdio.h lib/ac/sys/types.h lib/ac/unistd.h \
+		lib/config.messy.h test_user/main.c
+	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CPPFLAGS) $(CFLAGS) -I. -c \
+		test_user/main.c -o test_user/main.lo
+
+web-src/icon1.png: web-src/icon1.png.uue
+	uudecode -o $@ web-src/icon1.png.uue
+
+web-src/icon2.png: web-src/icon2.png.uue
+	uudecode -o $@ web-src/icon2.png.uue
+
+#
+# The lib/libfstrcmp.la library.
+#
+lib_obj = lib/ac/string.lo lib/downcase.lo lib/fmemcmp.lo lib/fmemcmpi.lo \
+		lib/fstrcasecmp.lo lib/fstrcasecmpi.lo lib/fstrcmp.lo \
+		lib/fstrcmpi.lo lib/fstrcoll.lo lib/fstrcolli.lo \
+		lib/fwcscmp.lo lib/fwcscmpi.lo lib/mbs_to_wcs.lo \
+		lib/nmalloc.lo lib/program_name.lo lib/version.lo \
+		lib/version_print.lo
+
+lib/libfstrcmp.la: $(lib_obj)
+	rm -f $@
+	$(LIBTOOL) --mode=link --tag=CC $(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) \
+		-o $@ $(lib_obj) $(LIBS) -rpath $(libdir) -version-info 6:0:6
+
+#
+# The install of the *.la file automatically causes "$(LIBTOOL) --mode=install"
+# to install the *.a and *.so* files as well, which is why you don't see them
+# explicitly mentioned here.
+#
+$(libdir)/libfstrcmp.la: .mkdir.__libdir_ lib/libfstrcmp.la
+	$(LIBTOOL) --mode=install $(INSTALL_DATA) lib/libfstrcmp.la $@
+
+.mkdir.__bindir_:
+	-$(INSTALL_DIR) $(bindir)
+	@-test -d $(bindir) && touch $@
+	@sleep 1
+
+.mkdir.__datarootdir_:
+	-$(INSTALL_DIR) $(datarootdir)
+	@-test -d $(datarootdir) && touch $@
+	@sleep 1
+
+.mkdir.__datarootdir__doc: .mkdir.__datarootdir_
+	-$(INSTALL_DIR) $(datarootdir)/doc
+	@-test -d $(datarootdir)/doc && touch $@
+	@sleep 1
+
+.mkdir.__datarootdir__doc_fstrcmp: .mkdir.__datarootdir__doc
+	-$(INSTALL_DIR) $(datarootdir)/doc/fstrcmp
+	@-test -d $(datarootdir)/doc/fstrcmp && touch $@
+	@sleep 1
+
+.mkdir.__includedir_:
+	-$(INSTALL_DIR) $(includedir)
+	@-test -d $(includedir) && touch $@
+	@sleep 1
+
+.mkdir.__libdir_:
+	-$(INSTALL_DIR) $(libdir)
+	@-test -d $(libdir) && touch $@
+	@sleep 1
+
+.mkdir.__libdir__pkgconfig: .mkdir.__libdir_
+	-$(INSTALL_DIR) $(libdir)/pkgconfig
+	@-test -d $(libdir)/pkgconfig && touch $@
+	@sleep 1
+
+.mkdir.__mandir_:
+	-$(INSTALL_DIR) $(mandir)
+	@-test -d $(mandir) && touch $@
+	@sleep 1
+
+.mkdir.__mandir__man1: .mkdir.__mandir_
+	-$(INSTALL_DIR) $(mandir)/man1
+	@-test -d $(mandir)/man1 && touch $@
+	@sleep 1
+
+.mkdir.__mandir__man3: .mkdir.__mandir_
+	-$(INSTALL_DIR) $(mandir)/man3
+	@-test -d $(mandir)/man3 && touch $@
+	@sleep 1
+
+#
+# The fstrcmp program.
+#
+fstrcmp_obj = fstrcmp/main.lo
+
+bin/fstrcmp$(EXEEXT): $(fstrcmp_obj) .bin lib/libfstrcmp.la
+	$(LIBTOOL) --mode=link --tag=CC $(CC) $(CPPFLAGS) $(CFLAGS) -o $@ \
+		$(fstrcmp_obj) lib/libfstrcmp.la $(LDFLAGS) $(LIBS)
+
+$(bindir)/fstrcmp$(EXEEXT): .mkdir.__bindir_ bin/fstrcmp$(EXEEXT)
+	$(LIBTOOL) --mode=install $(INSTALL_PROGRAM) bin/fstrcmp$(EXEEXT) $@
+
+#
+# The test_user program.
+#
+test_user_obj = test_user/main.lo
+
+bin/test_user$(EXEEXT): $(test_user_obj) .bin lib/libfstrcmp.la
+	$(LIBTOOL) --mode=link --tag=CC $(CC) $(CPPFLAGS) $(CFLAGS) -o $@ \
+		$(test_user_obj) lib/libfstrcmp.la $(LDFLAGS) $(LIBS)
+
+all: all-bin all-doc
+
+all-bin: bin/fstrcmp$(EXEEXT) bin/test_prelude$(EXEEXT) bin/test_user$(EXEEXT)
+
+all-doc: etc/building.pdf etc/readme.pdf etc/reference.pdf man/cat1/fstrcmp.1 \
+		man/cat1/fstrcmp_license.1 man/cat3/fmemcmp.3 \
+		man/cat3/fmemcmpi.3 man/cat3/fstrcasecmp.3 \
+		man/cat3/fstrcasecmpi.3 man/cat3/fstrcmp.3 man/cat3/fstrcmpi.3 \
+		man/cat3/fstrcoll.3 man/cat3/fstrcolli.3 man/cat3/fwcscmp.3 \
+		man/cat3/fwcscmpi.3
+
+.bin:
+	-mkdir bin
+	-chmod 0755 bin
+	@-test -d bin && touch $@
+	@sleep 1
+
+check: sure
+
+test_files = t0001a t0002a t0003a t0004a t0005a t0006a t0007a t0008a t0009a \
+		t0010a
+
+sure: $(test_files)
+	@echo Passed All Tests
+
+clean: clean-bin clean-doc clean-misc clean-obj
+
+clean-bin:
+	rm -f bin/fstrcmp$(EXEEXT) bin/test_prelude$(EXEEXT)
+	rm -f bin/test_user$(EXEEXT)
+
+clean-doc:
+	rm -f etc/building.pdf etc/readme.pdf etc/reference.pdf
+	rm -f man/cat1/fstrcmp.1 man/cat1/fstrcmp_license.1 man/cat3/fmemcmp.3
+	rm -f man/cat3/fmemcmpi.3 man/cat3/fstrcasecmp.3 man/cat3/fstrcasecmpi.3
+	rm -f man/cat3/fstrcmp.3 man/cat3/fstrcmpi.3 man/cat3/fstrcoll.3
+	rm -f man/cat3/fstrcolli.3 man/cat3/fwcscmp.3 man/cat3/fwcscmpi.3
+
+clean-misc:
+	rm -f .bin .mkdir.__bindir_ .mkdir.__datarootdir_
+	rm -f .mkdir.__datarootdir__doc .mkdir.__datarootdir__doc_fstrcmp
+	rm -f .mkdir.__includedir_ .mkdir.__libdir_ .mkdir.__libdir__pkgconfig
+	rm -f .mkdir.__mandir_ .mkdir.__mandir__man1 .mkdir.__mandir__man3 core
+	rm -f etc/building.pdf etc/readme.pdf etc/reference.pdf
+	rm -f web-src/icon1.png web-src/icon2.png
+
+clean-obj:
+	rm -f fstrcmp/main.lo fstrcmp/main.o lib/ac/string.lo lib/ac/string.o
+	rm -f lib/downcase.lo lib/downcase.o lib/fmemcmp.lo lib/fmemcmp.o
+	rm -f lib/fmemcmpi.lo lib/fmemcmpi.o lib/fstrcasecmp.lo
+	rm -f lib/fstrcasecmp.o lib/fstrcasecmpi.lo lib/fstrcasecmpi.o
+	rm -f lib/fstrcmp.lo lib/fstrcmp.o lib/fstrcmpi.lo lib/fstrcmpi.o
+	rm -f lib/fstrcoll.lo lib/fstrcoll.o lib/fstrcolli.lo lib/fstrcolli.o
+	rm -f lib/fwcscmp.lo lib/fwcscmp.o lib/fwcscmpi.lo lib/fwcscmpi.o
+	rm -f lib/libfstrcmp.a lib/libfstrcmp.la lib/mbs_to_wcs.lo
+	rm -f lib/mbs_to_wcs.o lib/nmalloc.lo lib/nmalloc.o lib/program_name.lo
+	rm -f lib/program_name.o lib/version.lo lib/version.o
+	rm -f lib/version_print.lo lib/version_print.o test_user/main.lo
+	rm -f test_user/main.o
+
+distclean: clean distclean-directories distclean-files
+
+distclean-files:
+	rm -f Makefile config.cache config.log config.status lib/config.h
+	rm -f libdir/pkgconfig/fstrcmp.pc script/test_prelude.sh
+
+distclean-directories:
+	rm -rf bin fstrcmp/.libs lib/.libs lib/ac/.libs test_user/.libs
+
+install: install-bin install-doc install-include install-libdir install-man
+
+install-bin: $(bindir)/fstrcmp$(EXEEXT)
+
+install-doc: $(datarootdir)/doc/fstrcmp/building.pdf \
+		$(datarootdir)/doc/fstrcmp/readme.pdf \
+		$(datarootdir)/doc/fstrcmp/reference.pdf
+
+install-include: $(includedir)/fstrcmp.h
+
+#
+# The install of the *.la file automatically causes "$(LIBTOOL) --mode=install"
+# to install the *.a and *.so* files as well, which is why you don't see them
+# explicitly mentioned here.
+#
+install-libdir: $(libdir)/libfstrcmp.la $(libdir)/pkgconfig/fstrcmp.pc
+
+install-man: $(mandir)/man1/fstrcmp.1 $(mandir)/man1/fstrcmp_license.1 \
+		$(mandir)/man3/fmemcmp.3 $(mandir)/man3/fmemcmpi.3 \
+		$(mandir)/man3/fstrcasecmp.3 $(mandir)/man3/fstrcasecmpi.3 \
+		$(mandir)/man3/fstrcmp.3 $(mandir)/man3/fstrcmpi.3 \
+		$(mandir)/man3/fstrcoll.3 $(mandir)/man3/fstrcolli.3 \
+		$(mandir)/man3/fwcscmp.3 $(mandir)/man3/fwcscmpi.3
+
+uninstall:
+	rm -f $(bindir)/fstrcmp$(EXEEXT) $(datarootdir)/doc/fstrcmp/building.pdf
+	rm -f $(datarootdir)/doc/fstrcmp/readme.pdf
+	rm -f $(datarootdir)/doc/fstrcmp/reference.pdf $(includedir)/fstrcmp.h
+	rm -f $(libdir)/libfstrcmp.a $(libdir)/libfstrcmp.la
+	rm -f $(libdir)/libfstrcmp.so* $(libdir)/pkgconfig/fstrcmp.pc
+	rm -f $(mandir)/man1/fstrcmp.1 $(mandir)/man1/fstrcmp_license.1
+	rm -f $(mandir)/man3/fmemcmp.3 $(mandir)/man3/fmemcmpi.3
+	rm -f $(mandir)/man3/fstrcasecmp.3 $(mandir)/man3/fstrcasecmpi.3
+	rm -f $(mandir)/man3/fstrcmp.3 $(mandir)/man3/fstrcmpi.3
+	rm -f $(mandir)/man3/fstrcoll.3 $(mandir)/man3/fstrcolli.3
+	rm -f $(mandir)/man3/fwcscmp.3 $(mandir)/man3/fwcscmpi.3
+
+.PHONY: all all-bin all-doc check clean clean-bin clean-doc distclean \
+		distclean-directories distclean-files install install-bin \
+		install-include install-libdir install-mandir sure t0001a \
+		t0002a t0003a t0004a t0005a t0006a t0007a t0008a t0009a t0010a \
+		the-default-target
+
+# vim: set ts=8 sw=8 noet :
+#
+# fstrcmp - fuzzy string compare library
+# Copyright (C) 2009 Peter Miller
+# Written by Peter Miller <pmiller@opensource.org.au>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or (at
+# your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#

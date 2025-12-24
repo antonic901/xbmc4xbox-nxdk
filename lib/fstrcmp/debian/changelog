@@ -1,0 +1,246 @@
+fstrcmp (0.7.D001-1) unstable; urgency=low
+
+  * This change set prepares he Fstrvmp projet fo rthe next public release.
+  * 0.5.D004: Closes: #694939
+  * 0.6.D003: Closes: #737341
+  * This is a summary, see earlier changelog entries for details of individual
+    bug fixes.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Wed, 05 Mar 2014 11:13:44 +1100
+
+fstrcmp (0.6.D003-1) unstable; urgency=low
+
+  * This change set updates the deian/control file to cope with the new
+    arvhiteture support, anddeal with out-of-date ./configure scripts, etc.
+  * Debian: Closes: #737341
+
+ -- Peter Miller <pmiller@opensource.org.au>  Wed, 05 Mar 2014 11:03:40 +1100
+
+fstrcmp (0.6.D002-1) unstable; urgency=low
+
+  * This change set removes a duplicate file from the tarball, which caused some
+    tar implementations to barf, and thus caused the package to fal to build.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Wed, 19 Feb 2014 20:08:27 +1100
+
+fstrcmp (0.6.D001-1) unstable; urgency=low
+
+  * This change set prepares the fstrcmp project for the next public release.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Wed, 05 Dec 2012 17:48:18 +1100
+
+fstrcmp (0.5.D004-1) unstable; urgency=low
+
+  * This change set fixes a broblem with the Debian "Breaks" control fields,
+    this affects upgrades from squeeze->wheezy
+  * Closes: #694939
+  * My thanks to Andreas Beckmann <debian@abeckmann.de> for reporting this
+    problem, and supplying the fix.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Tue, 04 Dec 2012 14:29:48 +1100
+
+fstrcmp (0.5.D003-1) unstable; urgency=low
+
+  * This change set fixes some more Lintian warning, and improves the tarball to
+    have a complete set of debian/ files.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Wed, 28 Nov 2012 10:39:59 +1100
+
+fstrcmp (0.5.D002-1) unstable; urgency=low
+
+  * This change set fixes a couple more Lintian warnings.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Tue, 27 Nov 2012 11:01:39 +1100
+
+fstrcmp (0.5.D001-1) unstable; urgency=low
+
+  * This change set prepares the fstrcmp project for the next public release.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Sun, 25 Nov 2012 22:04:26 +1100
+
+fstrcmp (0.4.D003-1) unstable; urgency=low
+
+  * This change set fixes a Debian packagein error, the affects upgrades from
+    squeeze->wheezy.
+  * Closes: #694286
+  * fstrcmp: missing Breaks+Replaces: libfstrcmp-dev (<< 0.4)
+
+ -- Peter Miller <pmiller@opensource.org.au>  Sun, 25 Nov 2012 21:47:10 +1100
+
+fstrcmp (0.4.D002-1) unstable; urgency=low
+
+  * This change set adds ~pm~ to the ppa version numbers, so can see source when
+    installed.	It also fixes a bunch of other problems with the debian pachage.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Tue, 13 Nov 2012 22:30:03 +1100
+
+fstrcmp (0.4.D001-1) unstable; urgency=low
+
+  * This change set prepares the fstrcmp project for the next public release.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Thu, 06 Oct 2011 10:39:17 +1100
+
+fstrcmp (0.3.D005-1) unstable; urgency=low
+
+  * This change set ensures that versions are sorted as version numbefs, not
+    simplke text, when writing entries.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Thu, 06 Oct 2011 10:21:29 +1100
+
+fstrcmp (0.3.D004-1) unstable; urgency=low
+
+  * This change set removes the XX macro warnings issued by lintian(1), and
+    several other warnings besides.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Sun, 15 May 2011 21:45:22 +1000
+
+fstrcmp (0.3.D003-1) unstable; urgency=low
+
+  * This change set fixes several warnings issued for recent gcc versions, as
+    they have better flow analysis for variables.
+  * Debian Bug#625080
+  * Debian Bug#625331
+  * My thanks to the Debian build farm for finding these problems.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Sun, 15 May 2011 20:55:46 +1000
+
+fstrcmp (0.3.D002-1) unstable; urgency=low
+
+  * This change set rebuilds the project for linux-x86_64 architecture.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Sat, 05 Dec 2009 19:29:34 +1100
+
+fstrcmp (0.3.D001-1) unstable; urgency=low
+
+  * This change set prepares fstrcmp for the next public release.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Tue, 14 Jul 2009 06:09:44 +1000
+
+fstrcmp (0.2.D002-1) unstable; urgency=low
+
+  * The debian/copyright file now explicitly states the provenance of the fuzzy
+    comparison code.
+  * The debian/control file now uses the correct sections for the runtime
+    library and debug symbols.
+  * Closes: #532267
+
+ -- Peter Miller <pmiller@opensource.org.au>  Mon, 13 Jul 2009 22:37:38 +1000
+
+fstrcmp (0.2.D001-1) unstable; urgency=low
+
+  * This change set prepares fstrcmp for the next public release.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Wed, 17 Jun 2009 17:39:14 +1000
+
+fstrcmp (0.1.D004-1) unstable; urgency=low
+
+  * The pacakge is nopw marked DM-Upload-Allowed so I can upload updates once a
+    DD has uploaded it first.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Wed, 17 Jun 2009 17:16:07 +1000
+
+fstrcmp (0.1.D003-1) unstable; urgency=low
+
+  * This change set attaches the debian bug tracking number to the project.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Mon, 08 Jun 2009 20:59:55 +1000
+
+fstrcmp (0.1.D002-1) unstable; urgency=low
+
+  * The include file now has C++ insulation.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Mon, 08 Jun 2009 20:47:30 +1000
+
+fstrcmp (0.1.D001-1) unstable; urgency=low
+
+  * This change set prepares fstrcmp for the first public release.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Mon, 08 Jun 2009 11:32:36 +1000
+
+fstrcmp (0.0.D013-1) unstable; urgency=low
+
+  * There is a new fstrcolli function, like fstrcoll except that it returns an
+    int.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Mon, 08 Jun 2009 11:07:41 +1000
+
+fstrcmp (0.0.D012-1) unstable; urgency=low
+
+  * This change set makes improvements to the Debian packaging.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Sun, 07 Jun 2009 22:35:18 +1000
+
+fstrcmp (0.0.D011-1) unstable; urgency=low
+
+  * This change set makes improvements to the Debian packaging.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Sun, 07 Jun 2009 22:13:23 +1000
+
+fstrcmp (0.0.D010-1) unstable; urgency=low
+
+  * There is a new fstrcoll function, for making fuzzy comparisons of multi-byte
+    character strings.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Sun, 07 Jun 2009 21:53:24 +1000
+
+fstrcmp (0.0.D009-1) unstable; urgency=low
+
+  * The dosucmentation has been cleaned up in preparation for release.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Sun, 07 Jun 2009 21:21:08 +1000
+
+fstrcmp (0.0.D008-1) unstable; urgency=low
+
+  * There is a new fstrcmp --select option, that may be used to perform a fuzzy
+    search for a needle in a haystack.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Sun, 07 Jun 2009 19:45:47 +1000
+
+fstrcmp (0.0.D007-1) unstable; urgency=low
+
+  * The type of the OFFSET_T needs to be signed.  It help if you read the
+    comments.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Sun, 07 Jun 2009 14:09:13 +1000
+
+fstrcmp (0.0.D006-1) unstable; urgency=low
+
+  * There is a new fstrcasecmpi function, same as fstrcmpi but case in-
+    sensitive.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Sun, 07 Jun 2009 00:13:33 +1000
+
+fstrcmp (0.0.D005-1) unstable; urgency=low
+
+  * There is are new fmemcmpi and fstrcmpi functions, that return integer
+    results, for use on systems where floating point is not available, or is
+    slow.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Sat, 06 Jun 2009 23:24:40 +1000
+
+fstrcmp (0.0.D004-1) unstable; urgency=low
+
+  * There is a new fmemcmp() function in the library, for comparing arrays of
+    bytes.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Sat, 06 Jun 2009 20:23:43 +1000
+
+fstrcmp (0.0.D003-1) unstable; urgency=low
+
+  * This change set adds a web icon.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Fri, 05 Jun 2009 17:27:30 +1000
+
+fstrcmp (0.0.D002-1) unstable; urgency=low
+
+  * There is now an fstrcmp function in the library, and an fstrcmp command to
+    test it with.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Fri, 05 Jun 2009 17:17:20 +1000
+
+fstrcmp (0.0.D001-1) unstable; urgency=low
+
+  * Initial project skeleton.
+
+ -- Peter Miller <pmiller@opensource.org.au>  Tue, 02 Jun 2009 17:47:22 +1000
+

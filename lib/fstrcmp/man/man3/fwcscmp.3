@@ -1,0 +1,59 @@
+.\"
+.\" fstrcmp - fuzzy string compare library
+.\" Copyright (C) 2009, 2011 Peter Miller
+.\" Written by Peter Miller <pmiller@opensource.org.au>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 3 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program. If not, see <http://www.gnu.org/licenses/>.
+.\"
+.ds n) fwcscmp
+.TH fwcscmp 3
+.SH NAME
+fwcscmp \- fuzzy comparison of two wide-character strings
+.if require_index \{
+.XX "fwcscmp(3)" "fuzzy comparison of two wide-character strings"
+.\}
+.SH SYNOPSIS
+#include <fstrcmp.h>
+.sp 0.3
+#define FSTRCMP_IDENTICAL
+.br
+#define FSTRCMP_THRESHOLD
+.br
+#define FSTRCMP_ERROR
+.sp 0.3
+double fwcscmp(const wchar_t *string1, const wchar_t *string2);
+.SH DESCRIPTION
+The \f[B]fwcscmp\fP() function compares the two wide-character strings,
+\f[I]string1\fP and \f[I]string2\fP.
+.SH RETURN VALUE
+The \f[B]fwcscmp\fP function returns a floating point value between 0.0
+and FSTRCMP_IDENTICAL.  A value of 0.0 means the two wide-character
+strings are utterly un-alike.  A value of FSTRCMP_IDENTICAL means
+the two wide-character strings are identical.  A value of more than
+FSTRCMP_THRESHOLD (it lies between 0.0 and FSTRCMP_IDENTICAL) would be
+considered "similar" by most people.
+.PP
+A value of FSTRCMP_ERROR (always negative) indicates a \f[I]malloc\fP(3)
+failure.
+.SH SEE ALSO
+.TP 8n
+\f[I]fstrcmp\fP(3)
+fuzzy comparison of two strings
+.TP 8n
+\f[I]fwcscmpi\fP(3)
+fuzzy comparison of two wide-character strings
+.TP 8n
+\f[I]wcscmp\fP(3)
+compare two wide-character strings
+.so man/man1/z_copyright.so

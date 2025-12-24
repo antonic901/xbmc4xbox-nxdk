@@ -31,7 +31,7 @@
 #include "utils/log.h"
 
 #include <array>
-#include <fstrcmp/fstrcmp.h>
+#include <fstrcmp.h>
 
 using namespace XFILE;
 using KODI::UTILITY::CDigest;

@@ -1,0 +1,90 @@
+/*
+ * fstrcmp - fuzzy string compare library
+ * Copyright (C) 2009 Peter Miller
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+c_src_files =
+    [match_mask explain/%0%.c [source_files]]
+    [match_mask lib/%0%.c [source_files]]
+    ;
+
+all += po/fstrcmp.pot;
+
+po/fstrcmp.pot: [c_src_files]
+    etc/xgettext-postprocess.sh
+{
+    xgettext
+        [addprefix "-D" [search_list]]
+        --files-from\=- /* read list of files from stdin */
+        --keyword\=i18n
+        --keyword\=gettext
+        --keyword\=explain_gettext
+        --add-comments
+
+        "--copyright-holder='Peter Miller <pmiller@opensource.org.au>'"
+        "--msgid-bugs-address='Peter Miller <pmiller@opensource.org.au>'"
+        --package-name\=fstrcmp
+        --package-version\=[version]
+        --width\=75
+        --sort-output
+        --force-po
+        -o [target]
+        ;
+data
+[unsplit "\n" [c_src_files]]
+dataend
+    sh [resolve etc/xgettext-postprocess.sh] [target];
+}
+
+if [find_command msg-comment-check] then
+    all += check-po-comments;
+
+check-po-comments: po/fstrcmp.pot
+{
+    msg-comment-check [resolve po/fstrcmp.pot];
+}
+
+all += etc/manually-confirmed.merge;
+
+etc/manually-confirmed.merge: po/fstrcmp.pot etc/manually-confirmed.po
+{
+    msgmerge
+        --indent
+        --sort-output
+        --width\=75
+        -v -v
+        --no-location
+        --force-po
+        -o [target]
+        [resolve etc/manually-confirmed.po po/fstrcmp.pot]
+        ;
+
+    /*
+     * There should be no differences.
+     * If there are, this next command will show them and exit failure.
+     */
+    msgcmp --use-fuzzy
+        [resolve etc/manually-confirmed.po]
+        [resolve po/fstrcmp.pot]
+        ;
+
+    /*
+     * Only need the timestamp, discard the file contents.
+     */
+#if 0
+    > [target];
+#endif
+}

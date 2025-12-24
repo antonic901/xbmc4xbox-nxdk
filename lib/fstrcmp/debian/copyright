@@ -1,0 +1,95 @@
+Format: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?rev=174
+Upstream-Name: fstrcmp
+Upstream-Contact: Peter Miller <pmiller@opensource.org.au>
+Source: http://fstrcmp.sourceforge.net/
+
+Files: lib/ac/assert.h
+ lib/ac/ctype.h
+ lib/ac/errno.h
+ lib/ac/stdarg.h
+ lib/ac/stddef.h
+ lib/ac/stdio.h
+ lib/ac/stdlib.h
+ lib/ac/string.c
+ lib/ac/string.h
+ lib/ac/sys/types.h
+ lib/ac/unistd.h
+ lib/config.messy.h
+ lib/downcase.c
+ lib/downcase.h
+ lib/fstrcasecmp.c
+ lib/fstrcasecmpi.c
+ lib/fstrcmp.h
+ lib/fstrcoll.c
+ lib/fstrcolli.c
+ lib/gcc_attributes.h
+ lib/mbs_to_wcs.c
+ lib/mbs_to_wcs.h
+ lib/minmax.h
+ lib/nmalloc.c
+ lib/nmalloc.h
+ lib/program_name.c
+ lib/program_name.h
+ lib/version.c
+ lib/version.h
+ lib/warn_unused_result.h
+Copyright: 2009, Peter Miller
+License: LGPL-3+
+ The licenses covering these files are unknown.
+
+Files: fstrcmp/main.c
+ lib/ac/fcntl.h
+ lib/ac/getopt.h
+ lib/ac/pthread.h
+ lib/ac/pwd.h
+ lib/ac/sys/stat.h
+ lib/ac/sys/time.h
+ lib/ac/wchar.h
+ lib/config.h
+ lib/fstrcmp.c
+ lib/fstrcmpi.c
+ test_user/main.c
+Copyright: 2009, 2012, 2014, Peter Miller
+ 2009, 2014 Peter Miller
+ 2009, Peter Miller
+License: GPL-3+
+ On Debian systems, the complete text of the GNU
+ General Public License, version 3, can be found in
+ /usr/share/common-licenses/GPL-3.
+
+Files: lib/fmemcmp.c
+ lib/fmemcmpi.c
+ lib/fwcscmp.c
+ lib/fwcscmpi.c
+Copyright: 1988-2006, Free Software Foundation, Inc
+ 2009, Peter Miller
+License: GPL-3+
+ On Debian systems, the complete text of the GNU
+ General Public License, version 3, can be found in
+ /usr/share/common-licenses/GPL-3.
+
+Files: lib/diffseq.h
+Copyright: 1988-1989, 1992-1995, 2001-2004, 2006-2007, Free
+ 2009, 2011 Peter Miller
+License: GPL-3+
+ On Debian systems, the complete text of the GNU
+ General Public License, version 3, can be found in
+ /usr/share/common-licenses/GPL-3.
+
+Files: lib/version_print.c
+Copyright: %s Peter Miller\n", fstrcmp__years());
+ 2009, Peter Miller
+License: LGPL-3+
+ The licenses covering these files are unknown.
+
+Files: lib/version_print.h
+Copyright: 2009, Peter Miller
+ of fstrcmp, and its
+License: LGPL-3+
+ The licenses covering these files are unknown.
+
+Files: lib/patchlevel.h
+Copyright: *No copyright*
+License: UNKNOWN
+ The licenses covering these files are unknown.
+

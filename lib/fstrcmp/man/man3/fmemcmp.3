@@ -1,0 +1,62 @@
+.\"
+.\" fstrcmp - fuzzy string compare library
+.\" Copyright (C) 2009, 2011, 2012 Peter Miller
+.\" Written by Peter Miller <pmiller@opensource.org.au>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 3 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program. If not, see <http://www.gnu.org/licenses/>.
+.\"
+.ds n) fmemcmp
+.TH fmemcmp 3
+.SH NAME
+fmemcmp \- fuzzy comparison of two memory areas
+.if require_index \{
+.XX "fmemcmp(3)" "fuzzy comparison of two memory areas"
+.\}
+.SH SYNOPSIS
+#include <fstrcmp.h>
+.sp 0.3
+#define FSTRCMP_IDENTICAL
+.br
+#define FSTRCMP_THRESHOLD
+.br
+#define FSTRCMP_ERROR
+.sp 0.3
+double
+'in +0.5i
+fmemcmp(const void *data1, size_t size1, const void *data2, size_t size2);
+.in -0.5i
+.SH DESCRIPTION
+The \f[B]fmemcmp\fP() function compares the two memory areas,
+the \f[I]size1\fP bytes pointed to by \f[I]data1\fP and
+the \f[I]size2\fP bytes pointed to by \f[I]data2\fP.
+.SH RETURN VALUE
+The \f[B]fmemcmp\fP function returns a floating point value between
+0.0 and FSTRCMP_IDENTICAL.  A value of 0.0 means the memory areas are
+utterly un\[hy]alike.  A value of FSTRCMP_IDENTICAL means the memory areas are
+identical.  A value of more than FSTRCMP_THRESHOLD (it lies between 0.0
+and FSTRCMP_IDENTICAL) would be considered "similar" by most people.
+.PP
+A value of FSTRCMP_ERROR (always negative) indicates a \f[I]malloc\fP(3)
+failure.
+.SH SEE ALSO
+.TP 8n
+\f[I]fmemcmpi\fP(3)
+fuzzy comparison of two memory areas
+.TP 8n
+\f[I]fstrcmp\fP(3)
+fuzzy comparison of two strings
+.TP 8n
+\f[I]memcmp\fP(3)
+compare memory areas
+.so man/man1/z_copyright.so

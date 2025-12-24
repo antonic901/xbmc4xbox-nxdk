@@ -1,0 +1,101 @@
+Read Me(fstrcmp)                                              Read Me(fstrcmp)
+
+
+
+NAME
+       fstrcmp - fuzzy string compare library
+
+DESCRIPTION
+       The fstrcmp package provides a library which may be used to make fuzzy
+       comparisons of strings and byte arrays.  It also provides simple
+       commands for use in shell scripts.
+
+   License
+       The library is licensed under the GNU GPL.  The code is derived from
+       the fuzzy comparisons functions in GNU Gettext, which is GNU GPL
+       licensed.  The GNU Gettext fuzzy comparisons functions were, in turn,
+       derived from GNU Diff, which is also GNU GPL licensed.
+
+       These license details are important, because only GPL licensed
+       programs, or compatibly licensed programs, may link against this
+       library.
+
+HOME PAGE
+       The latest version of fstrcmp is available on the Web from:
+
+            URL:    http://fstrcmp.sourceforge.net/
+            File:   index.html           # the fstrcmp page
+            File:   fstrcmp.0.7.README   # Description, from the tar file
+            File:   fstrcmp.0.7.lsm      # Description, LSM format
+            File:   fstrcmp.0.7.tar.gz   # the complete source
+            File:   fstrcmp.0.7.pdf      # Reference Manual
+
+BUILDING FSTRCMP
+       Full instructions for building fstrcmp may be found in the BUILDING
+       file included in the source distribution.
+
+COPYRIGHT
+       fstrcmp version 0.7
+       Copyright (C) 2009 Peter Miller
+       Peter Miller <pmiller@opensource.org.au>
+
+       The comparison code is derived from the fuzzy comparison functions in
+       GNU Gettext 0.17.  The GNU Gettext comparison functions were, in turn,
+       derived from GNU Diff 2.7.
+
+       Copyright (C) 1988-2009 Free Software Foundation
+
+       This program is free software; you can redistribute it and/or modify it
+       under the terms of the GNU General Public License as published by the
+       Free Software Foundation; either version 3 of the License, or (at your
+       option) any later version.
+
+       This program is distributed in the hope that it will be useful, but
+       WITHOUT ANY WARRANTY; without even the implied warranty of
+       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+       General Public License for more details.
+
+       You should have received a copy of the GNU General Public License along
+       with this program. If not, see <http://www.gnu.org/licenses/>.
+
+       It should be in the LICENSE file included in the source distribution.
+
+RELEASE NOTES
+       This section details the various features and bug fixes of the various
+       releases.  For excruciating and complete detail, and also credits for
+       those of you who have generously sent me suggestions and bug reports,
+       see the etc/CHANGES.* files.
+
+   Version 0.7 (2014-Mar-05)
+       * This change set updates the deian/control file to add autoreconf
+         support, to cope with out-of-date ./configure scripts, etc.  Debian:
+         Closes: #737341
+
+   Version 0.6 (2012-Dec-05)
+       * Several Debian packaging improvements, and fewer Lintian warnings.
+
+   Version 0.5 (2012-Nov-25)
+       * Several Debian packaging errors have been fixed.
+
+   Version 0.4 (2011-Oct-06)
+       * Several macro warnings issued by lintian(1) have been fixed.
+
+       * The Debian build farm discovered several new warnings issued for
+         recent gcc versions.
+         Debian Bug#625080
+         Debian Bug#625331
+
+   Version 0.3 (2009-Jul-14)
+       * The debian/copyright file now explicitly states the provenance of the
+       fuzzy comparison code.  The debian/control file now uses the correct
+       sections for the runtime library and debug symbols.
+
+   Version 0.2 (2009-Jun-17)
+       * The include file now has C++ insulation.
+
+   Version 0.1 (2009-Jun-08)
+       First public release.
+
+
+
+Reference Manual                    fstrcmp                   Read Me(fstrcmp)

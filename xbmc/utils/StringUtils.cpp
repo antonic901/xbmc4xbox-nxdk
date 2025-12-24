@@ -41,7 +41,7 @@
 #include <string.h>
 #include <time.h>
 
-#include <fstrcmp/fstrcmp.h>
+#include <fstrcmp.h>
 #include <memory>
 
 // don't move or std functions end up in PCRE namespace

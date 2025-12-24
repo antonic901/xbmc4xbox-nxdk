@@ -1,0 +1,142 @@
+.\"
+.\" fstrcmp - fuzzy string compare library
+.\" Copyright (C) 2009, 2011 Peter Miller
+.\" Written by Peter Miller <pmiller@opensource.org.au>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 3 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program. If not, see <http://www.gnu.org/licenses/>.
+.\"
+.ds n) fstrcmp
+.TH \*(n) 1
+.SH NAME
+fstrcmp \- fuzzy comparison of strings
+.if require_index \{
+.XX "fstrcmp(1)" "fuzzy comparison of strings"
+.\}
+.SH SYNOPSIS
+.B \*(n)
+[ \fB\-p\fP ]
+.I first\[hy]string
+.I second\[hy]string
+.sp 0.3
+.B \*(n)
+\fB\-w\fP
+.I first\[hy]string
+.I second\[hy]string
+.sp 0.3
+.B \*(n)
+\fB\-a\fP
+.I first\[hy]file
+.I second\[hy]file
+.sp 0.3
+.B \*(n)
+.B \-s
+.I needle
+.IR haystack \&...
+.sp 0.3
+.B \*(n)
+.B \-\-version
+.SH DESCRIPTION
+The \*(n) command is used to
+make fuzzy comparisons between strings.
+The \[lq]edit distance\[rq] between the strings is printed, with 0.0
+meaning the strings are utterly un\[hy]alike, and 1.0 meaning the strings
+are identical.
+.PP
+You may need to quote the string to insulate them from the shell.
+.SH OPTIONS
+The \*(n) command understands the following options:
+.TP 8n
+\fB\-a\fP
+.TP 8n
+\fB\-\-files\-as\-bytes\fP
+This option is used to compare two files as arrays of bytes.
+See \f[I]fmemcmp\fP(3) for more information.
+.TP 8n
+\fB\-p\fP
+.TP 8n
+\fB\-\-pair\fP
+This option is used to compare two strings as arrays of bytes.
+This is the default.
+See \f[I]fstrcmp\fP(3) for more information.
+.TP 8n
+.B \-s
+.TP 8n
+.B \-\-select
+This option is used to select the closest
+.I needle
+from the provided
+.I haystack
+alternatives.
+The most similar (single) choice is printed.
+If none are particularly similar, nothing is printed.
+See \f[I]fstrcmp\fP(3) for more information.
+See below for example.
+.TP 8n
+\fB\-V\fP
+.TP 8n
+\fB\-\-version\fP
+This option may be used to print the version of the \*(n) command,
+and then exit.
+.TP 8n
+\fB\-w\fP
+.TP 8n
+\fB\-\-wide\-pair\fP
+This option is used to compare two multi\[hy]byte character strings.
+See \f[I]fstrcoll\fP(3) for more information.
+.SH EXIT STATUS
+The \*(n) command exits with status 1 on any error.
+The \*(n) command only exits with status 0 if there are no errors.
+.SH EXAMPLE
+The \fI\*(n) \-\-select\fP option may be used in a shell script to
+improve error messages.
+.RS
+.nf
+.ft CW
+case "$action" in
+start)
+    start
+    ;;
+stop)
+    stop
+    ;;
+restart)
+    stop
+    start
+    ;;
+*)
+    echo "$0: action \e"$action\e" unknown" 1>&2
+    guess=`fstrcmp \-\-select "$action" stop start restart`
+    if [ "$guess" ]
+    then
+        echo "$0: did you mean \e"$guess\e" instead?" 1>&2
+    fi
+    exit 1
+    ;;
+esac
+.ft R
+.fi
+.RE
+Thus, the error message frequently suggests the correct action
+in the face of simple finger problems on the command line.
+.SH SEE ALSO
+.TP 8n
+\f[I]fstrcmp\fP(3)
+fuzzy comparison of strings
+.TP 8n
+\f[I]fstrcoll\fP(3)
+fuzzy comparison of two multi\[hy]byte character strings
+.TP 8n
+\f[I]fstrcmpi\fP(3)
+fuzzy comparison of strings, integer variation
+.so man/man1/z_copyright.so

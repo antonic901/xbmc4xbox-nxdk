@@ -631,13 +631,13 @@ target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/crossguid/crossguid/incl
 target_link_libraries(xbmc PUBLIC ${NXDK_DIR}/lib/fribidi.lib)
 target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/fribidi/fribidi/lib)
 
-# Bring in fstrcmp support
-target_link_libraries(xbmc PUBLIC ${NXDK_DIR}/lib/fstrcmp.lib)
-target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/fstrcmp/fstrcmp/lib)
-
 # Bring in libiconv support
 target_link_libraries(xbmc PUBLIC ${NXDK_DIR}/lib/libiconv.lib)
 target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/libiconv)
+
+# Bring in fstrcmp library
+add_subdirectory(lib/fstrcmp)
+target_link_libraries(xbmc PUBLIC fstrcmp)
 
 # Bring in SQLite library
 add_subdirectory(lib/sqlite)
