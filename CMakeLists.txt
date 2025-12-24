@@ -623,10 +623,6 @@ target_link_options(xbmc PRIVATE "-include:_automount_d_drive")
 target_link_libraries(xbmc PUBLIC ${NXDK_DIR}/lib/libnxdk_net.lib)
 target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/net/lwip/src/include ${NXDK_DIR}/lib/net/nforceif/include ${NXDK_DIR}/lib/net/nvnetdrv)
 
-# Bring in crossguid support
-target_link_libraries(xbmc PUBLIC ${NXDK_DIR}/lib/crossguid.lib)
-target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/crossguid/crossguid/include/crossguid/guid.hpp)
-
 # Bring in fribidi support
 target_link_libraries(xbmc PUBLIC ${NXDK_DIR}/lib/fribidi.lib)
 target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/fribidi/fribidi/lib)
@@ -707,6 +703,19 @@ set(PCRE2_BUILD_TESTS OFF CACHE BOOL "Disable PCRE2 tests")
 set(PCRE2_BUILD_PCRE2GREP OFF CACHE BOOL "Disable building pcre2grep program")
 FetchContent_MakeAvailable(pcre2)
 target_link_libraries(xbmc PRIVATE pcre2-8)
+
+# Bring in crossguid
+message(STATUS "Downloading crossguid")
+FetchContent_Declare(
+  crossguid
+  GIT_REPOSITORY https://github.com/graeme-hill/crossguid.git
+  GIT_TAG        ca1bf4b810e2d188d04cb6286f957008ee1b7681
+  GIT_PROGRESS TRUE
+  PATCH_COMMAND ${GIT_EXECUTABLE} apply ${CMAKE_SOURCE_DIR}/lib/crossguid_nxdk.patch
+)
+set(CROSSGUID_TESTS OFF CACHE BOOL "Disablee crossguid tests")
+FetchContent_MakeAvailable(crossguid)
+target_link_libraries(xbmc PRIVATE crossguid)
 
 #Pre-build commands
 
