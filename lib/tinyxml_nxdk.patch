@@ -1,0 +1,26 @@
+diff --git a/tinyxml.cpp b/tinyxml.cpp
+index fccd8dc..4fe569a 100644
+--- a/tinyxml.cpp
++++ b/tinyxml.cpp
+@@ -38,7 +38,7 @@ bool TiXmlBase::condenseWhiteSpace = true;
+ // Microsoft compiler security
+ FILE* TiXmlFOpen( const char* filename, const char* mode )
+ {
+-	#if defined(_MSC_VER) && (_MSC_VER >= 1400 )
++	#if defined(_MSC_VER) && (_MSC_VER >= 1400 ) && (!NXDK)
+ 		FILE* fp = 0;
+ 		errno_t err = fopen_s( &fp, filename, mode );
+ 		if ( !err && fp )
+diff --git a/tinyxml.h b/tinyxml.h
+index 12a7750..2cc32c4 100644
+--- a/tinyxml.h
++++ b/tinyxml.h
+@@ -64,7 +64,7 @@ distribution.
+ #define TIXML_SAFE
+ 
+ #ifdef TIXML_SAFE
+-	#if defined(_MSC_VER) && (_MSC_VER >= 1400 )
++	#if defined(_MSC_VER) && (_MSC_VER >= 1400 ) && (!NXDK)
+ 		// Microsoft visual studio, version 2005 and higher.
+ 		#define TIXML_SNPRINTF _snprintf_s
+ 		#define TIXML_SSCANF   sscanf_s

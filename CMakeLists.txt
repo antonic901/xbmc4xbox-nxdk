@@ -647,10 +647,6 @@ target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/pcre)
 target_link_libraries(xbmc PUBLIC ${NXDK_DIR}/lib/sqlite.lib)
 target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/sqlite)
 
-# Bring in tinyxml support
-target_link_libraries(xbmc PUBLIC ${NXDK_DIR}/lib/tinyxml.lib)
-target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/tinyxml)
-
 # Bring in FMT library
 message(STATUS "Downloading fmtlib")
 FetchContent_Declare(
@@ -677,6 +673,18 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(json)
 target_link_libraries(xbmc PRIVATE nlohmann_json::nlohmann_json)
+
+# Bring in TinyXML 2.6.2
+message(STATUS "Downloading tinyxml")
+FetchContent_Declare(
+  tinyxml
+  GIT_REPOSITORY https://github.com/xbmc4xbox/tinyxml.git
+  GIT_TAG        b3c39f382075b73cbec7e88687b5762ba11ef65c
+  GIT_PROGRESS TRUE
+  PATCH_COMMAND ${GIT_EXECUTABLE} apply ${CMAKE_SOURCE_DIR}/lib/tinyxml_nxdk.patch
+)
+FetchContent_MakeAvailable(tinyxml)
+target_link_libraries(xbmc PRIVATE tinyxml)
 
 # Bring in TinyXML2
 message(STATUS "Downloading tinyxml2")
