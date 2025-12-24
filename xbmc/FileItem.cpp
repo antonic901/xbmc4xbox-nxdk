@@ -2490,7 +2490,7 @@ void CFileItemList::Stack(bool stackFiles /* = true */)
 void CFileItemList::StackFolders()
 {
   // Precompile our REs
-  VECCREGEXP folderRegExps;
+  std::vector<CRegExp> folderRegExps;
   CRegExp folderRegExp(true, CRegExp::autoUtf8);
   const std::vector<std::string>& strFolderRegExps = CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_folderStackRegExps;
 
@@ -2535,7 +2535,7 @@ void CFileItemList::StackFolders()
 
         bool bMatch(false);
 
-        VECCREGEXP::iterator expr = folderRegExps.begin();
+        std::vector<CRegExp>::iterator expr = folderRegExps.begin();
         while (!bMatch && expr != folderRegExps.end())
         {
           //CLog::Log(LOGDEBUG,"{}: Running expression {} on {}", __FUNCTION__, expr->GetPattern(), item->GetLabel());
@@ -2591,7 +2591,7 @@ void CFileItemList::StackFolders()
 void CFileItemList::StackFiles()
 {
   // Precompile our REs
-  VECCREGEXP stackRegExps;
+  std::vector<CRegExp> stackRegExps;
   CRegExp tmpRegExp(true, CRegExp::autoUtf8);
   const std::vector<std::string>& strStackRegExps = CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoStackRegExps;
   std::vector<std::string>::const_iterator strRegExp = strStackRegExps.begin();
@@ -2632,7 +2632,7 @@ void CFileItemList::StackFiles()
     std::string           file1;
     std::string           filePath;
     std::vector<int>      stack;
-    VECCREGEXP::iterator  expr        = stackRegExps.begin();
+    std::vector<CRegExp>::iterator  expr        = stackRegExps.begin();
 
     URIUtils::Split(item1->GetPath(), filePath, file1);
     if (URIUtils::HasEncodedFilename(CURL(filePath)))
@@ -3577,7 +3577,7 @@ std::string CFileItem::FindTrailer() const
   std::string strFile3 = URIUtils::AddFileToFolder(strDir, "movie-trailer");
 
   // Precompile our REs
-  VECCREGEXP matchRegExps;
+  std::vector<CRegExp> matchRegExps;
   CRegExp tmpRegExp(true, CRegExp::autoUtf8);
   const std::vector<std::string>& strMatchRegExps = CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_trailerMatchRegExps;
 
@@ -3605,7 +3605,7 @@ std::string CFileItem::FindTrailer() const
     }
     else
     {
-      VECCREGEXP::iterator expr = matchRegExps.begin();
+      std::vector<CRegExp>::iterator expr = matchRegExps.begin();
 
       while (expr != matchRegExps.end())
       {

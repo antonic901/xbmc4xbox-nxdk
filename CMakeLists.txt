@@ -639,10 +639,6 @@ target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/fstrcmp/fstrcmp/lib)
 target_link_libraries(xbmc PUBLIC ${NXDK_DIR}/lib/libiconv.lib)
 target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/libiconv)
 
-# Bring in pcre support
-target_link_libraries(xbmc PUBLIC ${NXDK_DIR}/lib/pcre.lib)
-target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/pcre)
-
 # Bring in SQLite library
 add_subdirectory(lib/sqlite)
 target_link_libraries(xbmc PUBLIC sqlite)
@@ -692,12 +688,25 @@ FetchContent_Declare(
   tinyxml2
   GIT_REPOSITORY https://github.com/leethomason/tinyxml2.git
   GIT_TAG        11.0.0
-  GIT_PROGRESS  TRUE
+  GIT_PROGRESS TRUE
   PATCH_COMMAND ${GIT_EXECUTABLE} apply ${CMAKE_SOURCE_DIR}/lib/tinyxml2_nxdk.patch
 )
 set(tinyxml2_BUILD_TESTING OFF CACHE BOOL "Disable tinyxml2 tests")
 FetchContent_MakeAvailable(tinyxml2)
 target_link_libraries(xbmc PRIVATE tinyxml2::tinyxml2)
+
+# Bring in PCRE2
+message(STATUS "Downloading pcre2")
+FetchContent_Declare(
+  pcre2
+  GIT_REPOSITORY https://github.com/PCRE2Project/pcre2.git
+  GIT_TAG        pcre2-10.47
+  GIT_PROGRESS TRUE
+)
+set(PCRE2_BUILD_TESTS OFF CACHE BOOL "Disable PCRE2 tests")
+set(PCRE2_BUILD_PCRE2GREP OFF CACHE BOOL "Disable building pcre2grep program")
+FetchContent_MakeAvailable(pcre2)
+target_link_libraries(xbmc PRIVATE pcre2-8)
 
 #Pre-build commands
 
