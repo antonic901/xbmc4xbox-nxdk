@@ -1,30 +1,5 @@
 #include "unimplemented.h"
 
-void __std_terminate() { std::terminate(); }
-void __CxxFrameHandler3() {}
-void _CxxThrowException(void*, void*) {}
-
-void testException()
-{
-  try
-  {
-    throw std::runtime_error("Test exception!");
-  }
-  catch (const std::exception& e)
-  {
-    // Catch standard exceptions
-  }
-  catch (...)
-  {
-    // Catch any other unknown exceptions
-  }
-}
-
-void* __RTDynamicCast(void* ptr, long, void*, bool)
-{
-  return ptr;
-}
-
 void* __RTtypeid(void * inptr)
 {
   return nullptr;

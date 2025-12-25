@@ -5,16 +5,7 @@
 #define UNIMPLEMENTED_H
 #include <windows.h>
 
-#include <exception>
-#include <iostream>
-
-extern "C" void __std_terminate();
-extern "C" void __CxxFrameHandler3();
-extern "C" void _CxxThrowException(void*, void*);
-extern "C" void* __RTDynamicCast(void* ptr, long, void*, bool);
 extern "C" void* __RTtypeid(void * inptr);
-
-void testException();
 
 #include <string>
 #include <wchar.h>
