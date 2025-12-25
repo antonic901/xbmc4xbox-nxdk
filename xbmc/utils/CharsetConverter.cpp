@@ -21,7 +21,7 @@
 #include <mutex>
 
 #include <fribidi/fribidi.h>
-#include <libiconv/iconv.h>
+#include <iconv.h>
 
 #ifdef WORDS_BIGENDIAN
   #define ENDIAN_SUFFIX "BE"
