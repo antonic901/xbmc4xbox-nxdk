@@ -1,9 +1,5 @@
 *.obj
 *.d
-*.exe
-*.lib
 build/
-XBMC.zip
-RELEASE/
-DEBUG/
-BUILD/
+dist/
+XBMC4Xbox.zip
