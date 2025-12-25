@@ -20,7 +20,7 @@
 #include <algorithm>
 #include <mutex>
 
-#include <fribidi/fribidi.h>
+#include <fribidi.h>
 #include <iconv.h>
 
 #ifdef WORDS_BIGENDIAN
