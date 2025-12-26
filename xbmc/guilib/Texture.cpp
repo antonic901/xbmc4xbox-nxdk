@@ -22,10 +22,8 @@
 #include "guilib/GraphicContext.h"
 #include "utils/log.h"
 #include "utils/URIUtils.h"
-#include "DDSImage.h"
 #include "filesystem/File.h"
 #include "filesystem/ResourceFile.h"
-#include "filesystem/XbtFile.h"
 #if defined(TARGET_DARWIN_IOS)
 #include <ImageIO/ImageIO.h>
 #include "filesystem/File.h"
@@ -233,12 +231,7 @@ bool CBaseTexture::LoadFromFileInternal(const std::string& texturePath, unsigned
 {
   if (URIUtils::HasExtension(texturePath, ".dds"))
   { // special case for DDS images
-    CDDSImage image;
-    if (image.ReadFile(texturePath))
-    {
-      Update(image.GetWidth(), image.GetHeight(), 0, image.GetFormat(), image.GetData(), false);
-      return true;
-    }
+    CLog::Log(LOGWARNING, "{} - DDS images are not supported ({})", __FUNCTION__, texturePath);
     return false;
   }
 
@@ -264,12 +257,8 @@ bool CBaseTexture::LoadFromFileInternal(const std::string& texturePath, unsigned
   // handle xbt:// paths differently because it allows loading the texture directly from memory
   if (url.IsProtocol("xbt"))
   {
-    XFILE::CXbtFile xbtFile;
-    if (!xbtFile.Open(url))
+    CLog::Log(LOGWARNING, "{} - images from XBT/XPR are not supported ({})", __FUNCTION__, texturePath);
       return false;
-
-    return LoadFromMemory(xbtFile.GetImageWidth(), xbtFile.GetImageHeight(), 0, xbtFile.GetImageFormat(),
-                          xbtFile.HasImageAlpha(), reinterpret_cast<unsigned char*>(buf.get()));
   }
 
   IImage* pImage;
