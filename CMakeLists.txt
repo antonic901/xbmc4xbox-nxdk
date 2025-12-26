@@ -42,7 +42,7 @@ add_compile_options(
     -Wno-invalid-offsetof
 )
 
-add_definitions(-D_CRT_RAND_S -D_XBOX -DNXDK -DMEMP_NUM_NETBUF=6 -DMEMP_NUM_NETCONN=6)
+add_definitions(-D_CRT_RAND_S -D_XBOX -DNXDK -DMEMP_NUM_NETBUF=6 -DMEMP_NUM_NETCONN=6 -DHAS_GL)
 
 add_executable(xbmc
   xbmc/AutoSwitch.cpp

@@ -40,6 +40,9 @@
     #include <OpenGL/gl.h>
     #include <OpenGL/glu.h>
     #include <OpenGL/glext.h>
+  #elif defined(_XBOX)
+    #include <GL/gl.h>
+    #include <GL/glext.h>
   #endif
 #elif HAS_GLES == 2
   #if defined(TARGET_DARWIN)
