@@ -138,45 +138,45 @@ void CGUITextureGL::Draw(float *x, float *y, float *z, const CRect &texture, con
 {
   // Top-left vertex (corner)
   glColor4ub(m_col[0], m_col[1], m_col[2], m_col[3]);
-  glMultiTexCoord2fARB(GL_TEXTURE0_ARB, texture.x1, texture.y1);
-  if (m_diffuse.size())
-    glMultiTexCoord2fARB(GL_TEXTURE1_ARB, diffuse.x1, diffuse.y1);
+  // glMultiTexCoord2fARB(GL_TEXTURE0_ARB, texture.x1, texture.y1);
+  // if (m_diffuse.size())
+  //   glMultiTexCoord2fARB(GL_TEXTURE1_ARB, diffuse.x1, diffuse.y1);
   glVertex3f(x[0], y[0], z[0]);
 
   // Top-right vertex (corner)
   glColor4ub(m_col[0], m_col[1], m_col[2], m_col[3]);
-  if (orientation & 4)
-    glMultiTexCoord2fARB(GL_TEXTURE0_ARB, texture.x1, texture.y2);
-  else
-    glMultiTexCoord2fARB(GL_TEXTURE0_ARB, texture.x2, texture.y1);
+  // if (orientation & 4)
+  //   glMultiTexCoord2fARB(GL_TEXTURE0_ARB, texture.x1, texture.y2);
+  // else
+  //   glMultiTexCoord2fARB(GL_TEXTURE0_ARB, texture.x2, texture.y1);
   if (m_diffuse.size())
   {
-    if (m_info.orientation & 4)
-      glMultiTexCoord2fARB(GL_TEXTURE1_ARB, diffuse.x1, diffuse.y2);
-    else
-      glMultiTexCoord2fARB(GL_TEXTURE1_ARB, diffuse.x2, diffuse.y1);
+    // if (m_info.orientation & 4)
+    //   glMultiTexCoord2fARB(GL_TEXTURE1_ARB, diffuse.x1, diffuse.y2);
+    // else
+    //   glMultiTexCoord2fARB(GL_TEXTURE1_ARB, diffuse.x2, diffuse.y1);
   }
   glVertex3f(x[1], y[1], z[1]);
 
   // Bottom-right vertex (corner)
   glColor4ub(m_col[0], m_col[1], m_col[2], m_col[3]);
-  glMultiTexCoord2fARB(GL_TEXTURE0_ARB, texture.x2, texture.y2);
-  if (m_diffuse.size())
-    glMultiTexCoord2fARB(GL_TEXTURE1_ARB, diffuse.x2, diffuse.y2);
+  // glMultiTexCoord2fARB(GL_TEXTURE0_ARB, texture.x2, texture.y2);
+  // if (m_diffuse.size())
+  //   glMultiTexCoord2fARB(GL_TEXTURE1_ARB, diffuse.x2, diffuse.y2);
   glVertex3f(x[2], y[2], z[2]);
 
   // Bottom-left vertex (corner)
   glColor4ub(m_col[0], m_col[1], m_col[2], m_col[3]);
-  if (orientation & 4)
-    glMultiTexCoord2fARB(GL_TEXTURE0_ARB, texture.x2, texture.y1);
-  else
-    glMultiTexCoord2fARB(GL_TEXTURE0_ARB, texture.x1, texture.y2);
+  // if (orientation & 4)
+  //   glMultiTexCoord2fARB(GL_TEXTURE0_ARB, texture.x2, texture.y1);
+  // else
+  //   glMultiTexCoord2fARB(GL_TEXTURE0_ARB, texture.x1, texture.y2);
   if (m_diffuse.size())
   {
-    if (m_info.orientation & 4)
-      glMultiTexCoord2fARB(GL_TEXTURE1_ARB, diffuse.x2, diffuse.y1);
-    else
-      glMultiTexCoord2fARB(GL_TEXTURE1_ARB, diffuse.x1, diffuse.y2);
+    // if (m_info.orientation & 4)
+    //   glMultiTexCoord2fARB(GL_TEXTURE1_ARB, diffuse.x2, diffuse.y1);
+    // else
+    //   glMultiTexCoord2fARB(GL_TEXTURE1_ARB, diffuse.x1, diffuse.y2);
   }
   glVertex3f(x[3], y[3], z[3]);
 }

@@ -111,16 +111,16 @@ void CGLTexture::LoadToGPU()
 
   switch (m_format)
   {
-  case XB_FMT_DXT1:
-    format = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
-    break;
-  case XB_FMT_DXT3:
-    format = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
-    break;
-  case XB_FMT_DXT5:
-  case XB_FMT_DXT5_YCoCg:
-    format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-    break;
+  // case XB_FMT_DXT1:
+  //   format = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+  //   break;
+  // case XB_FMT_DXT3:
+  //   format = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+  //   break;
+  // case XB_FMT_DXT5:
+  // case XB_FMT_DXT5_YCoCg:
+  //   format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+  //   break;
   case XB_FMT_RGB8:
     format = GL_RGB;
     numcomponents = GL_RGB;
@@ -138,8 +138,8 @@ void CGLTexture::LoadToGPU()
   else
   {
     // changed from glCompressedTexImage2D to support GL < 1.3
-    glCompressedTexImage2DARB(GL_TEXTURE_2D, 0, format,
-      m_textureWidth, m_textureHeight, 0, GetPitch() * GetRows(), m_pixels);
+    // glCompressedTexImage2DARB(GL_TEXTURE_2D, 0, format,
+    //   m_textureWidth, m_textureHeight, 0, GetPitch() * GetRows(), m_pixels);
   }
 
   glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
