@@ -240,7 +240,7 @@ bool CBaseTexture::LoadFromFileInternal(const std::string& texturePath, unsigned
 
   // Read image into memory to use our vfs
   XFILE::CFile file;
-  XFILE::auto_buffer buf;
+  std::vector<uint8_t> buf;
 
   if (file.LoadFile(texturePath, buf) <= 0)
     return false;
@@ -268,7 +268,7 @@ bool CBaseTexture::LoadFromFileInternal(const std::string& texturePath, unsigned
   else
     pImage = ImageFactory::CreateLoaderFromMimeType(strMimeType);
 
-  if (!LoadIImage(pImage, (unsigned char *)buf.get(), buf.size(), width, height))
+  if (!LoadIImage(pImage, buf.data(), buf.size(), width, height))
   {
     CLog::Log(LOGDEBUG, "%s - Load of %s failed.", __FUNCTION__, CURL::GetRedacted(texturePath).c_str());
     delete pImage;
