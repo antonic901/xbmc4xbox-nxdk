@@ -23,9 +23,9 @@
 #include "GLUtils.h"
 #include "log.h"
 #include "settings/AdvancedSettings.h"
-#include "windowing/WindowingFactory.h"
 
 void _VerifyGLState(const char* szfile, const char* szfunction, int lineno){
+#ifndef _XBOX
 #if defined(HAS_GL) && defined(_DEBUG)
 #define printMatrix(matrix)                                             \
   {                                                                     \
@@ -60,10 +60,12 @@ void _VerifyGLState(const char* szfile, const char* szfunction, int lineno){
   printMatrix(matrix);
 //  abort();
 #endif
+#endif
 }
 
 void LogGraphicsInfo()
 {
+#ifndef _XBOX
 #if defined(HAS_GL) || defined(HAS_GLES)
   const GLubyte *s;
 
@@ -120,6 +122,7 @@ void LogGraphicsInfo()
   CLog::Log(LOGNOTICE,
             "Please define LogGraphicsInfo for your chosen graphics libary");
 #endif /* !HAS_GL */
+#endif /* !_XBOX */
 }
 
 int glFormatElementByteCount(GLenum format)
