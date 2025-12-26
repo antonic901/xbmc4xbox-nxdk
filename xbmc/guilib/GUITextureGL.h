@@ -1,3 +1,11 @@
+/*!
+\file GUITextureGL.h
+\brief
+*/
+
+#ifndef GUILIB_GUITEXTUREGL_H
+#define GUILIB_GUITEXTUREGL_H
+
 #pragma once
 
 /*
@@ -20,16 +28,21 @@
  *
  */
 
-#ifdef NXDK
-#include <windows.h>
+#include "GUITexture.h"
+
+#include "system_gl.h"
+
+class CGUITextureGL : public CGUITextureBase
+{
+public:
+  CGUITextureGL(float posX, float posY, float width, float height, const CTextureInfo& texture);
+  static void DrawQuad(const CRect &coords, color_t color, CBaseTexture *texture = NULL, const CRect *texCoords = NULL);
+protected:
+  void Begin(color_t color);
+  void Draw(float *x, float *y, float *z, const CRect &texture, const CRect &diffuse, int orientation);
+  void End();
+private:
+  GLubyte m_col[4];
+};
+
 #endif
-
-#define SAFE_DELETE(p)       do { delete (p);     (p)=NULL; } while (0)
-#define SAFE_DELETE_ARRAY(p) do { delete[] (p);   (p)=NULL; } while (0)
-#define SAFE_RELEASE(p)      do { if(p) { (p)->Release(); (p)=NULL; } } while (0)
-
-// Useful pixel colour manipulation macros
-#define GET_A(color)            ((color >> 24) & 0xFF)
-#define GET_R(color)            ((color >> 16) & 0xFF)
-#define GET_G(color)            ((color >>  8) & 0xFF)
-#define GET_B(color)            ((color >>  0) & 0xFF)

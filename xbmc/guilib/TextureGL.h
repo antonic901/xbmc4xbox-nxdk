@@ -1,5 +1,3 @@
-#pragma once
-
 /*
  *      Copyright (C) 2005-2013 Team XBMC
  *      http://xbmc.org
@@ -20,16 +18,30 @@
  *
  */
 
-#ifdef NXDK
-#include <windows.h>
+#pragma once
+
+#include "Texture.h"
+
+#if defined(HAS_GL) || defined(HAS_GLES)
+
+#include "system_gl.h"
+
+/************************************************************************/
+/*    CGLTexture                                                       */
+/************************************************************************/
+class CGLTexture : public CBaseTexture
+{
+public:
+  CGLTexture(unsigned int width = 0, unsigned int height = 0, unsigned int format = XB_FMT_A8R8G8B8);
+  virtual ~CGLTexture();
+
+  void CreateTextureObject();
+  virtual void DestroyTextureObject();
+  void LoadToGPU();
+  void BindToUnit(unsigned int unit);
+
+protected:
+  GLuint m_texture;
+};
+
 #endif
-
-#define SAFE_DELETE(p)       do { delete (p);     (p)=NULL; } while (0)
-#define SAFE_DELETE_ARRAY(p) do { delete[] (p);   (p)=NULL; } while (0)
-#define SAFE_RELEASE(p)      do { if(p) { (p)->Release(); (p)=NULL; } } while (0)
-
-// Useful pixel colour manipulation macros
-#define GET_A(color)            ((color >> 24) & 0xFF)
-#define GET_R(color)            ((color >> 16) & 0xFF)
-#define GET_G(color)            ((color >>  8) & 0xFF)
-#define GET_B(color)            ((color >>  0) & 0xFF)

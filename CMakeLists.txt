@@ -294,6 +294,7 @@ add_executable(xbmc
   xbmc/guilib/GUITextBox.cpp
   xbmc/guilib/GUITextLayout.cpp
   xbmc/guilib/GUITexture.cpp
+  xbmc/guilib/GUITextureGL.cpp
   xbmc/guilib/GUITexturePBKIT.cpp
   xbmc/guilib/GUIToggleButtonControl.cpp
   xbmc/guilib/GUIVideoControl.cpp
@@ -304,6 +305,7 @@ add_executable(xbmc
   xbmc/guilib/IWindowManagerCallback.cpp
   xbmc/guilib/LocalizeStrings.cpp
   xbmc/guilib/Texture.cpp
+  xbmc/guilib/TextureGL.cpp
   xbmc/guilib/TextureManager.cpp
   xbmc/guilib/VisibleEffect.cpp
   xbmc/guilib/guiinfo/AddonsGUIInfo.cpp
@@ -516,6 +518,7 @@ add_executable(xbmc
   xbmc/utils/FileExtensionProvider.cpp
   xbmc/utils/FileOperationJob.cpp
   xbmc/utils/FileUtils.cpp
+  xbmc/utils/GLUtils.cpp
   xbmc/utils/GroupUtils.cpp
   xbmc/utils/HTMLUtil.cpp
   xbmc/utils/HttpHeader.cpp
