@@ -26,7 +26,6 @@
 #include "utils/log.h"
 #include "utils/GLUtils.h"
 #include "guilib/Geometry.h"
-#include "windowing/WindowingFactory.h"
 
 #if defined(HAS_GL)
 
@@ -39,10 +38,14 @@ CGUITextureGL::CGUITextureGL(float posX, float posY, float width, float height, 
 void CGUITextureGL::Begin(color_t color)
 {
   int range, unit = 0;
+#ifdef _XBOX
+  range = 235 - 16;
+#else
   if(g_Windowing.UseLimitedColor())
     range = 235 - 16;
   else
     range = 255 -  0;
+#endif
 
   m_col[0] = GET_R(color) * range / 255;
   m_col[1] = GET_G(color) * range / 255;
@@ -93,7 +96,9 @@ void CGUITextureGL::Begin(color_t color)
     VerifyGLState();
   }
 
+#ifndef _XBOX
   if(g_Windowing.UseLimitedColor())
+#endif
   {
     texture->BindToUnit(unit++); // dummy bind
     const GLfloat rgba[4] = {16.0f / 255.0f, 16.0f / 255.0f, 16.0f / 255.0f, 0.0f};
