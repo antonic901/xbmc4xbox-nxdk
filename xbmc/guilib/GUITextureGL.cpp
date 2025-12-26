@@ -52,7 +52,7 @@ void CGUITextureGL::Begin(color_t color)
   m_col[2] = GET_B(color) * range / 255;
   m_col[3] = GET_A(color);
 
-  CBaseTexture* texture = m_texture.m_textures[m_currentFrame];
+  CTexture* texture = m_texture.m_textures[m_currentFrame].get();
   texture->LoadToGPU();
   if (m_diffuse.size())
     m_diffuse.m_textures[0]->LoadToGPU();
@@ -181,7 +181,7 @@ void CGUITextureGL::Draw(float *x, float *y, float *z, const CRect &texture, con
   glVertex3f(x[3], y[3], z[3]);
 }
 
-void CGUITextureGL::DrawQuad(const CRect &rect, color_t color, CBaseTexture *texture, const CRect *texCoords)
+void CGUITextureGL::DrawQuad(const CRect &rect, color_t color, CTexture *texture, const CRect *texCoords)
 {
   if (texture)
   {

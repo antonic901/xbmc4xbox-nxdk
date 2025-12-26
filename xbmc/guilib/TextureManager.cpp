@@ -42,6 +42,10 @@
 #include "windowing/WindowingFactory.h" // for g_Windowing in CGUITextureManager::FreeUnusedTextures
 #endif
 
+#if defined(HAS_GL) || defined(HAS_GLES)
+#include "system_gl.h"
+#endif
+
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
@@ -518,7 +522,7 @@ const CTextureArray& CGUITextureManager::Load(const std::string& strTextureName,
     auto frame = anim.ReadFrame();
     while (frame)
     {
-      CTexture *glTexture = new CTexture();
+      std::unique_ptr<CTexture> glTexture = CTexture::CreateTexture();
       if (glTexture)
       {
         glTexture->LoadFromMemory(anim.Width(), anim.Height(), frame->GetPitch(), XB_FMT_A8R8G8B8, true, frame->m_pImage);
@@ -530,7 +534,7 @@ const CTextureArray& CGUITextureManager::Load(const std::string& strTextureName,
       if (pMap->GetMemoryUsage() <= maxMemoryUsage)
       {
         frame = anim.ReadFrame();
-      } 
+      }
       else
       {
         CLog::Log(LOGDEBUG, "Memory limit (%" PRIu64 " bytes) exceeded, %i frames extracted from file : %s", (maxMemoryUsage/11)*12,pMap->GetTexture().size(), CURL::GetRedacted(strPath).c_str());
@@ -678,7 +682,7 @@ void CGUITextureManager::Cleanup()
   }
 #if 0
 #if 0
-  // Kodi Krypton XBT bundle 
+  // Kodi Krypton XBT bundle
   m_TexBundle[0].Close();
   m_TexBundle[1].Close();
   m_TexBundle[0] = CTextureBundle(true);

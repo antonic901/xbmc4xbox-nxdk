@@ -18,8 +18,10 @@
  *
  */
 
+#include "TextureGL.h"
+
 #include "system.h"
-#include "Texture.h"
+#include "ServiceBroker.h"
 #include "guilib/GraphicContext.h"
 #include "utils/log.h"
 #include "utils/GLUtils.h"
@@ -34,8 +36,15 @@
 /************************************************************************/
 /*    CGLTexture                                                       */
 /************************************************************************/
+std::unique_ptr<CTexture> CTexture::CreateTexture(unsigned int width,
+                                                  unsigned int height,
+                                                  unsigned int format)
+{
+  return std::make_unique<CGLTexture>(width, height, format);
+}
+
 CGLTexture::CGLTexture(unsigned int width, unsigned int height, unsigned int format)
-: CBaseTexture(width, height, format)
+: CTexture(width, height, format)
 {
   m_texture = 0;
 }
@@ -53,7 +62,7 @@ void CGLTexture::CreateTextureObject()
 void CGLTexture::DestroyTextureObject()
 {
   if (m_texture)
-    g_TextureManager.ReleaseHwTexture(m_texture);
+    CServiceBroker::GetGUI()->GetTextureManager().ReleaseHwTexture(m_texture);
 }
 
 void CGLTexture::LoadToGPU()
