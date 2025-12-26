@@ -266,6 +266,8 @@ add_executable(xbmc
   xbmc/guilib/GUIFixedListContainer.cpp
   xbmc/guilib/GUIFont.cpp
   xbmc/guilib/GUIFontManager.cpp
+  xbmc/guilib/GUIFontTTF.cpp
+  xbmc/guilib/GUIFontTTFGL.cpp
   xbmc/guilib/GUIImage.cpp
   xbmc/guilib/GUIIncludes.cpp
   xbmc/guilib/GUIKeyboardFactory.cpp
@@ -741,6 +743,17 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 FetchContent_MakeAvailable(pbgl)
 target_link_libraries(xbmc PRIVATE pbgl)
+
+# Bring in freetype
+message(STATUS "Downloading freetype")
+FetchContent_Declare(
+  freetype
+  GIT_REPOSITORY https://gitlab.freedesktop.org/freetype/freetype.git
+  GIT_TAG        VER-2-14-1
+  GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(freetype)
+target_link_libraries(xbmc PRIVATE freetype)
 
 #Pre-build commands
 

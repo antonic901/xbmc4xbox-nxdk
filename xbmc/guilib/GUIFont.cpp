@@ -19,10 +19,7 @@
  */
 
 #include "GUIFont.h"
-#if 0
-// TODO: We need FreeType library for this
 #include "GUIFontTTF.h"
-#endif
 #include "GraphicContext.h"
 
 #include "threads/SingleLock.h"
@@ -39,12 +36,7 @@ CScrollInfo::CScrollInfo(unsigned int wait /* = 50 */, float pos /* = 0 */,
     initialWait = wait;
     initialPos = pos;
     SetSpeed(speed ? speed : defaultSpeed);
-    std::wstring wsuffix;
-    g_charsetConverter.utf8ToW(scrollSuffix, wsuffix);
-    suffix.clear();
-    suffix.reserve(wsuffix.size());
-    for (vecText::size_type i = 0; i < wsuffix.size(); i++)
-      suffix.push_back(wsuffix[i]);
+    g_charsetConverter.utf8ToW(scrollSuffix, suffix);
     Reset();
 }
 
@@ -60,8 +52,7 @@ float CScrollInfo::GetPixelsPerFrame()
     delta = 100; // assume a minimum of 10 fps
   m_lastFrameTime = currentTime;
   // do an exponential moving average of the frame time
-  if (delta)
-    m_averageFrameTime = m_averageFrameTime + (delta - m_averageFrameTime) * alphaEMA;
+  m_averageFrameTime = m_averageFrameTime + (delta - m_averageFrameTime) * alphaEMA;
   // and multiply by pixel speed (per ms) to get number of pixels to move this frame
   return pixelSpeed * m_averageFrameTime;
 }
@@ -75,20 +66,16 @@ CGUIFont::CGUIFont(const std::string& strFontName, uint32_t style, color_t textC
   m_shadowColor = shadowColor;
   m_lineSpacing = lineSpacing;
   m_origHeight = origHeight;
-#if 0
   m_font = font;
 
   if (m_font)
     m_font->AddReference();
-#endif
 }
 
 CGUIFont::~CGUIFont()
 {
-#if 0
   if (m_font)
     m_font->RemoveReference();
-#endif
 }
 
 std::string& CGUIFont::GetFontName()
@@ -99,7 +86,6 @@ std::string& CGUIFont::GetFontName()
 void CGUIFont::DrawText( float x, float y, const vecColors &colors, color_t shadowColor,
                 const vecText &text, uint32_t alignment, float maxPixelWidth)
 {
-#if 0
   if (!m_font) return;
 
   bool clip = maxPixelWidth > 0;
@@ -123,19 +109,17 @@ void CGUIFont::DrawText( float x, float y, const vecColors &colors, color_t shad
 
   if (clip)
     g_graphicsContext.RestoreClipRegion();
-#endif
 }
 
 bool CGUIFont::UpdateScrollInfo(const vecText &text, CScrollInfo &scrollInfo)
 {
   // draw at our scroll position
   // we handle the scrolling as follows:
-  //   We scroll on a per-pixel basis (eschewing the use of character indices
-  //   which were also in use previously). The complete string, including suffix,
-  //   is plotted to achieve the desired effect - normally just the one time, but
-  //   if there is a wrap point within the viewport then it will be plotted twice.
-  //   If the string is smaller than the viewport, then it may be plotted even
-  //   more times than that.
+  //   We scroll on a per-pixel basis up until we have scrolled the first character outside
+  //   of our viewport, whereby we cycle the string around, and reset the scroll position.
+  //
+  //   pixelPos is the amount in pixels to move the string by.
+  //   characterPos is the amount in characters to rotate the string by.
   //
   if (scrollInfo.waitTime)
   {
@@ -151,19 +135,54 @@ bool CGUIFont::UpdateScrollInfo(const vecText &text, CScrollInfo &scrollInfo)
   // move along by the appropriate scroll amount
   float scrollAmount = fabs(scrollInfo.GetPixelsPerFrame() * g_graphicsContext.GetGUIScaleX());
 
-  if (!scrollInfo.m_widthValid)
+  if (scrollInfo.pixelSpeed > 0)
   {
-    /* Calculate the pixel width of the complete string */
-    scrollInfo.m_textWidth = GetTextWidth(text);
-    scrollInfo.m_totalWidth = scrollInfo.m_textWidth + GetTextWidth(scrollInfo.suffix);
-    scrollInfo.m_widthValid = true;
+    // we want to move scrollAmount, grab the next character
+    float charWidth = GetCharWidth(scrollInfo.GetCurrentChar(text));
+    if (scrollInfo.pixelPos + scrollAmount < charWidth)
+      scrollInfo.pixelPos += scrollAmount;  // within the current character
+    else
+    { // past the current character, decrement scrollAmount by the charWidth and move to the next character
+      while (scrollInfo.pixelPos + scrollAmount >= charWidth)
+      {
+        scrollAmount -= (charWidth - scrollInfo.pixelPos);
+        scrollInfo.pixelPos = 0;
+        scrollInfo.characterPos++;
+        if (scrollInfo.characterPos >= text.size() + scrollInfo.suffix.size())
+        {
+          scrollInfo.Reset();
+          break;
+        }
+        charWidth = GetCharWidth(scrollInfo.GetCurrentChar(text));
+      }
+    }
   }
-  scrollInfo.pixelPos += scrollAmount;
-  assert(scrollInfo.m_totalWidth != 0);
-  while (scrollInfo.pixelPos >= scrollInfo.m_totalWidth)
-    scrollInfo.pixelPos -= scrollInfo.m_totalWidth;
+  else if (scrollInfo.pixelSpeed < 0)
+  { // scrolling backwards
+    // we want to move scrollAmount, grab the next character
+    float charWidth = GetCharWidth(scrollInfo.GetCurrentChar(text));
+    if (scrollInfo.pixelPos + scrollAmount < charWidth)
+      scrollInfo.pixelPos += scrollAmount;  // within the current character
+    else
+    { // past the current character, decrement scrollAmount by the charWidth and move to the next character
+      while (scrollInfo.pixelPos + scrollAmount >= charWidth)
+      {
+        scrollAmount -= (charWidth - scrollInfo.pixelPos);
+        scrollInfo.pixelPos = 0;
+        if (scrollInfo.characterPos == 0)
+        {
+          scrollInfo.Reset();
+          scrollInfo.characterPos = text.size() + scrollInfo.suffix.size() - 1;
+          break;
+        }
+        scrollInfo.characterPos--;
+        charWidth = GetCharWidth(scrollInfo.GetCurrentChar(text));
+      }
+    }
+  }
 
-  if (scrollInfo.pixelPos != old.pixelPos)
+  if(scrollInfo.characterPos != old.characterPos
+  || scrollInfo.pixelPos     != old.pixelPos)
     return true;
   else
     return false;
@@ -172,31 +191,42 @@ bool CGUIFont::UpdateScrollInfo(const vecText &text, CScrollInfo &scrollInfo)
 void CGUIFont::DrawScrollingText(float x, float y, const vecColors &colors, color_t shadowColor,
                 const vecText &text, uint32_t alignment, float maxWidth, const CScrollInfo &scrollInfo)
 {
-#if 0
   if (!m_font) return;
   if (!shadowColor) shadowColor = m_shadowColor;
+
+  float spaceWidth = GetCharWidth(L' ');
+  // max chars on screen + extra margin chars
+  vecText::size_type maxChars =
+    std::min<vecText::size_type>(
+      (text.size() + (vecText::size_type)scrollInfo.suffix.size()),
+      (vecText::size_type)((maxWidth * 1.05f) / spaceWidth));
 
   if (!text.size() || ClippedRegionIsEmpty(x, y, maxWidth, alignment))
     return; // nothing to render
 
-  if (!scrollInfo.m_widthValid)
-  {
-    /* Calculate the pixel width of the complete string */
-    scrollInfo.m_textWidth = GetTextWidth(text);
-    scrollInfo.m_totalWidth = scrollInfo.m_textWidth + GetTextWidth(scrollInfo.suffix);
-    scrollInfo.m_widthValid = true;
-  }
+  maxWidth = ROUND((maxWidth + scrollInfo.pixelPos) / g_graphicsContext.GetGUIScaleX());
 
-  assert(scrollInfo.m_totalWidth != 0);
-
-  float textPixelWidth = ROUND(scrollInfo.m_textWidth / g_graphicsContext.GetGUIScaleX());
-  float suffixPixelWidth = ROUND((scrollInfo.m_totalWidth - scrollInfo.m_textWidth) / g_graphicsContext.GetGUIScaleX());
-
+  float charWidth = GetCharWidth(scrollInfo.GetCurrentChar(text));
   float offset;
   if(scrollInfo.pixelSpeed >= 0)
     offset = scrollInfo.pixelPos;
   else
-    offset = scrollInfo.m_totalWidth - scrollInfo.pixelPos;
+    offset = charWidth - scrollInfo.pixelPos;
+
+  // Now rotate our string as needed, only take a slightly larger then visible part of the text.
+  unsigned int pos = scrollInfo.characterPos;
+  vecText renderText;
+  renderText.reserve(maxChars);
+  for (vecText::size_type i = 0; i < maxChars; i++)
+  {
+    if (pos >= text.size() + scrollInfo.suffix.size())
+      pos = 0;
+    if (pos < text.size())
+      renderText.push_back(text[pos]);
+    else
+      renderText.push_back(scrollInfo.suffix[pos - text.size()]);
+    pos++;
+  }
 
   vecColors renderColors;
   for (unsigned int i = 0; i < colors.size(); i++)
@@ -209,20 +239,11 @@ void CGUIFont::DrawScrollingText(float x, float y, const vecColors &colors, colo
     vecColors shadowColors;
     for (unsigned int i = 0; i < renderColors.size(); i++)
       shadowColors.push_back((renderColors[i] & 0xff000000) != 0 ? shadowColor : 0);
-    for (float dx = -offset; dx < maxWidth; dx += scrollInfo.m_totalWidth)
-    {
-      m_font->DrawTextInternal(x + dx + 1, y + 1, shadowColors, text, alignment, textPixelWidth, scroll);
-      m_font->DrawTextInternal(x + dx + scrollInfo.m_textWidth + 1, y + 1, shadowColors, scrollInfo.suffix, alignment, suffixPixelWidth, scroll);
-    }
+    m_font->DrawTextInternal(x - offset + 1, y + 1, shadowColors, renderText, alignment, maxWidth + m_font->GetLineHeight(2.0f), scroll);
   }
-  for (float dx = -offset; dx < maxWidth; dx += scrollInfo.m_totalWidth)
-  {
-    m_font->DrawTextInternal(x + dx, y, renderColors, text, alignment, textPixelWidth, scroll);
-    m_font->DrawTextInternal(x + dx + scrollInfo.m_textWidth, y, renderColors, scrollInfo.suffix, alignment, suffixPixelWidth, scroll);
-  }
+  m_font->DrawTextInternal(x - offset, y, renderColors, renderText, alignment, maxWidth + m_font->GetLineHeight(2.0f), scroll);
 
   g_graphicsContext.RestoreClipRegion();
-#endif
 }
 
 // remaps unsupported font glpyhs to other suitable ones
@@ -235,7 +256,6 @@ wchar_t CGUIFont::RemapGlyph(wchar_t letter)
 
 bool CGUIFont::ClippedRegionIsEmpty(float x, float y, float width, uint32_t alignment) const
 {
-#if 0
   if (alignment & XBFONT_CENTER_X)
     x -= width * 0.5f;
   else if (alignment & XBFONT_RIGHT)
@@ -244,83 +264,58 @@ bool CGUIFont::ClippedRegionIsEmpty(float x, float y, float width, uint32_t alig
     y -= m_font->GetLineHeight(m_lineSpacing);
 
   return !g_graphicsContext.SetClipRegion(x, y, width, m_font->GetTextHeight(1, 2) * g_graphicsContext.GetGUIScaleY());
-#endif
-  return false;
 }
 
 float CGUIFont::GetTextWidth( const vecText &text )
 {
-#if 0
   if (!m_font) return 0;
   CSingleLock lock(g_graphicsContext);
   return m_font->GetTextWidthInternal(text.begin(), text.end()) * g_graphicsContext.GetGUIScaleX();
-#endif
-  return 0;
 }
 
 float CGUIFont::GetCharWidth( character_t ch )
 {
-#if 0
   if (!m_font) return 0;
   CSingleLock lock(g_graphicsContext);
   return m_font->GetCharWidthInternal(ch) * g_graphicsContext.GetGUIScaleX();
-#endif
-  return 0;
 }
 
 float CGUIFont::GetTextHeight(int numLines) const
 {
-#if 0
   if (!m_font) return 0;
   return m_font->GetTextHeight(m_lineSpacing, numLines) * g_graphicsContext.GetGUIScaleY();
-#endif
-  return 0;
 }
 
 float CGUIFont::GetTextBaseLine() const
 {
-#if 0
   if (!m_font) return 0;
   return m_font->GetTextBaseLine() * g_graphicsContext.GetGUIScaleY();
-#endif
-  return 0;
 }
 
 float CGUIFont::GetLineHeight() const
 {
-#if 0
   if (!m_font) return 0;
   return m_font->GetLineHeight(m_lineSpacing) * g_graphicsContext.GetGUIScaleY();
-#endif
-  return 0;
 }
 
 float CGUIFont::GetScaleFactor() const
 {
-#if 0
   if (!m_font) return 1.0f;
   return m_font->GetFontHeight() / m_origHeight;
-#endif
-  return 0;
 }
 
 void CGUIFont::Begin()
 {
-#if 0
   if (!m_font) return;
   m_font->Begin();
-#endif
 }
 
 void CGUIFont::End()
 {
-#if 0
   if (!m_font) return;
   m_font->End();
-#endif
 }
 
-#if 0
 void CGUIFont::SetFont(CGUIFontTTFBase *font)
 {
   if (m_font == font)
@@ -331,4 +326,3 @@ void CGUIFont::SetFont(CGUIFontTTFBase *font)
   if (m_font)
     m_font->AddReference();
 }
-#endif
