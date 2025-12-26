@@ -303,6 +303,7 @@ add_executable(xbmc
   xbmc/guilib/GUIWrappingListContainer.cpp
   xbmc/guilib/GraphicContext.cpp
   xbmc/guilib/IWindowManagerCallback.cpp
+  xbmc/guilib/JpegIO.cpp
   xbmc/guilib/LocalizeStrings.cpp
   xbmc/guilib/Texture.cpp
   xbmc/guilib/TextureGL.cpp
@@ -628,6 +629,10 @@ target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/net/lwip/src/include ${N
 
 # Bring in pbkit support
 target_link_libraries(xbmc PUBLIC ${NXDK_DIR}/lib/libpbkit.lib)
+
+# Bring in libjpeg-turbo support
+target_link_libraries(xbmc PUBLIC ${NXDK_DIR}/lib/libjpeg.lib)
+target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/libjpeg ${NXDK_DIR}/lib/libjpeg/libjpeg-turbo)
 
 # Bring in fribidi library
 add_subdirectory(lib/fribidi)

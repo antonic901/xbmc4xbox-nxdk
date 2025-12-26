@@ -11,6 +11,7 @@
 #include "ServiceBroker.h"
 #include "addons/ExtsMimeSupportList.h"
 #include "addons/addoninfo/AddonType.h"
+#include "guilib/JpegIO.h"
 #include "utils/Mime.h"
 #include "utils/log.h"
 
@@ -36,10 +37,9 @@ IImage* ImageFactory::CreateLoader(const CURL& url)
 
 IImage* ImageFactory::CreateLoaderFromMimeType(const std::string& strMimeType)
 {
-  if (strMimeType == "image/jpg" || strMimeType == "image/jpeg")
-  { // TODO: use libjpeg-turbo
-    CLog::Log(LOGWARNING, "{} - missing libjpeg-turbo!", __FUNCTION__, strMimeType);
-    return nullptr;
+  if (strMimeType == "image/jpg" || strMimeType == "image/jpeg" || strMimeType == "image/tbn")
+  {
+    return new CJpegIO();
   }
   else if (strMimeType == "image/png")
   { // TODO: use libpng
