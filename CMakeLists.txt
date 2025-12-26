@@ -623,6 +623,9 @@ target_link_options(xbmc PRIVATE "-include:_automount_d_drive")
 target_link_libraries(xbmc PUBLIC ${NXDK_DIR}/lib/libnxdk_net.lib)
 target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/net/lwip/src/include ${NXDK_DIR}/lib/net/nforceif/include ${NXDK_DIR}/lib/net/nvnetdrv)
 
+# Bring in pbkit support
+target_link_libraries(xbmc PUBLIC ${NXDK_DIR}/lib/libpbkit.lib)
+
 # Bring in fribidi library
 add_subdirectory(lib/fribidi)
 target_link_libraries(xbmc PUBLIC fribidi)
@@ -716,6 +719,20 @@ FetchContent_Declare(
 set(CROSSGUID_TESTS OFF CACHE BOOL "Disablee crossguid tests")
 FetchContent_MakeAvailable(crossguid)
 target_link_libraries(xbmc PRIVATE crossguid)
+
+# Bring in pbgl
+message(STATUS "Downloading pbgl")
+FetchContent_Declare(
+  pbgl
+  GIT_REPOSITORY https://github.com/xbmc4xbox/pbgl.git
+  GIT_TAG        8c9ae8ab7a4955aff9ebfc2eeef9bf90e3249cbc
+  GIT_PROGRESS TRUE
+)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  add_definitions(-DPBGL_DEBUG)
+endif()
+FetchContent_MakeAvailable(pbgl)
+target_link_libraries(xbmc PRIVATE pbgl)
 
 #Pre-build commands
 
