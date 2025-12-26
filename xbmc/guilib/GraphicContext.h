@@ -275,7 +275,7 @@ public:
 
   CRect generateAABB(const CRect &rect) const;
 
-  int GetMaxTextureSize() const { return m_maxTextureSize; };
+  unsigned int GetMaxTextureSize() const { return m_maxTextureSize; };
 protected:
   void SetFullScreenViewWindow(RESOLUTION &res);
 
@@ -314,7 +314,7 @@ private:
 
   CRect m_scissors;
 
-  int m_maxTextureSize;
+  unsigned int m_maxTextureSize;
 };
 
 /*!
