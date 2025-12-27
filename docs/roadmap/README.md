@@ -13,54 +13,56 @@ The first goal is basically getting **GUILIB** working properly. That includes p
 ### Milestone 0
 Milestone 0 (zero) should add missing features to NXDK which are required by XBMC. File [unimplemented.h](https://github.com/antonic901/xbmc4xbox-nxdk/blob/master/xbmc/unimplemented.h) contains mock functions which are still not implemented in NXDK but are required by XBMC.
 
-* [ ] - Missing support for **exceptions** and **try/catch** blocks
-* [ ] - Missing support for `typeid` and `dynamic_cast`
-* [ ] - Missing support for **WideCharToMultiByte**, **MultiByteToWideChar** and **vswprintf**
-* [ ] - Missing `winapi` functions **FileTimeToLocalFileTime, SystemTimeToFileTime, CompareFileTime, FileTimeToSystemTime and LocalFileTimeToFileTime, FlushFileBuffers**
-* [ ] - Missing support for `atof`
+* [ ] Missing support for **exceptions** and **try/catch** blocks
+* [ ] Missing support for `typeid` and `dynamic_cast`
+* [ ] Missing support for **WideCharToMultiByte**, **MultiByteToWideChar** and **vswprintf**
+* [ ] Missing **WINAPI** functions `LocalFileTimeToFileTime`, `FlushFileBuffers`
+* [ ] Missing support for `atof`
 
 ### Milestone 1
 Milestone 1 (one) is dealing with GUILIB and everything related to it. That includes:
-* [ ] - Texture loading -> implementation of CTexture which is used for loading textures (libjpeg-turbo/libpng). Example from XBMC4Xbox is [here](https://github.com/antonic901/xbmc4xbox-redux/blob/master/xbmc/guilib/Texture.h)
-* [ ] - Texture rendering -> implementation of CGUITexturePBKIT which is used for texture rendering. Example from XBMC4Xbox is [here](https://github.com/antonic901/xbmc4xbox-redux/blob/master/xbmc/guilib/GUITextureD3D.cpp)
-* [ ] - Properly initialize GPU device and everything related to it -> That's implementation of CGraphicContext
-* [ ] - Properly create and initialize application -> Implement CApplication::Create(...), CApplication::Initialize(...), CApplication::Render(...), CApplication::Process(...) etc.
-* [ ] - Font rendering - implementation of CGUIFontTTF, CGUIFont and CGUIFontManager. `freetype` lib is required for this
+* [x] Texture loading -> implementation of CTexture which is used for loading textures (libjpeg-turbo/libpng). Example from XBMC4Xbox is [here](https://github.com/antonic901/xbmc4xbox-redux/blob/master/xbmc/guilib/Texture.h) - added with [0a5a7e22](https://github.com/antonic901/xbmc4xbox-nxdk/commit/0a5a7e22b19a2c2f970e0af39909b800dd9706e9)
+* [x] Texture rendering -> implementation of CGUITexturePBKIT which is used for texture rendering. Example from XBMC4Xbox is [here](https://github.com/antonic901/xbmc4xbox-redux/blob/master/xbmc/guilib/GUITextureD3D.cpp) - added with [0a5a7e22](https://github.com/antonic901/xbmc4xbox-nxdk/commit/0a5a7e22b19a2c2f970e0af39909b800dd9706e9)
+* [ ] Properly initialize GPU device and everything related to it -> That's implementation of CGraphicContext
+* [ ] Properly create and initialize application -> Implement CApplication::Create(...), CApplication::Initialize(...), CApplication::Render(...), CApplication::Process(...) etc.
+* [x] - Font rendering - implementation of CGUIFontTTF, CGUIFont and CGUIFontManager. `freetype` lib is required for this - added with [0a5a7e22](https://github.com/antonic901/xbmc4xbox-nxdk/commit/0a5a7e22b19a2c2f970e0af39909b800dd9706e9)
+
+**IMPORTANT:** Texture loading and rendering was added with https://github.com/antonic901/xbmc4xbox-nxdk/pull/17. Read description of that PR to learn more!
 
 **FOR DEVS: to quickly test CGraphicContext, texture loading and texture rendering we can use CSplash. CSplash is using texture loader and graphic context to load and render splash image. If that doesn't work then everything else regarding rendering and textures won't work.**
 
 ### Milestone 2
 Milestone 2 (two) should add support for basic joypads and audio.
 
-* [ ] - UI audio - implement CGUIAudioManager and CAudioContext which is used for GUI audio actions which are WMA files
-* [ ] - Joypad input - implement basic support for input devices, aka joypads -> check `CInputManager::ProcessPeripherals`
+* [ ] UI audio - implement CGUIAudioManager and CAudioContext which is used for GUI audio actions which are WMA files
+* [ ] Joypad input - implement basic support for input devices, aka joypads -> check `CInputManager::ProcessPeripherals`
 
 ### Milestone 3
 Milestone 3 (three) should add support for reading HDD, partitions, free space, DVD drive support etc.
 
-* [ ] - CXboxProvider - implement of IStorageProvider interface which is used to read removable drives, HDD partitions, free space etc.
-* [ ] - DVD Drive support - reading inserted CDs and information about them -> requires `libcdio`
+* [ ] CXboxProvider - implement of IStorageProvider interface which is used to read removable drives, HDD partitions, free space etc.
+* [ ] DVD Drive support - reading inserted CDs and information about them -> requires `libcdio`
 
 ### Milestone 4
 Milestone 4 (four) should add support for general Network and support for remote VFS paths (http/https).
-* [ ] - Basic network support - support for LAN connection
-* [ ] - Remote VFS paths - this one requires `libcurl` which is used for reading remote VFS paths (ex. `https://path/to/file`)
+* [ ] Basic network support - support for LAN connection
+* [ ] Remote VFS paths - this one requires `libcurl` which is used for reading remote VFS paths (ex. `https://path/to/file`)
 
 ### Milestone 5
 Milestone 5 (five) should add missing libraries which are required by XBMC but they are still not backported.
 
-* [ ] - [UnRARX](https://github.com/antonic901/xbmc4xbox-redux/tree/master/lib/UnrarXLib) - support for ZIP/RAR archives inside Kodi VFS
-* [ ] - [libcurl](https://github.com/antonic901/xbmc4xbox-redux/tree/master/lib/libcurl) - support for HTTP and other network protocols in Kodi VFS
-* [ ] - [freetype](https://github.com/antonic901/xbmc4xbox-redux/tree/master/lib/freetype) - support for fonts (CGUIFontTTF, CGUIFont and CGUIFontManager)
-* [ ] - [libcdio](https://github.com/antonic901/xbmc4xbox-redux/blob/master/docs/libcdio.rar) - used for reading DVD information
-* [ ] - [DllLoader](https://github.com/antonic901/xbmc4xbox-redux/tree/master/xbmc/cores/DllLoader) - use for loading custom DLLs which were build using MinGW and Make. This version only support Windows 2K/XP compatible DLLs
+* [ ] [UnRARX](https://github.com/antonic901/xbmc4xbox-redux/tree/master/lib/UnrarXLib) - support for ZIP/RAR archives inside Kodi VFS
+* [ ] [libcurl](https://github.com/antonic901/xbmc4xbox-redux/tree/master/lib/libcurl) - support for HTTP and other network protocols in Kodi VFS
+* [x] [freetype](https://github.com/antonic901/xbmc4xbox-redux/tree/master/lib/freetype) - support for fonts (CGUIFontTTF, CGUIFont and CGUIFontManager) - added with [0a5a7e22](https://github.com/antonic901/xbmc4xbox-nxdk/commit/0a5a7e22b19a2c2f970e0af39909b800dd9706e9)
+* [ ] [libcdio](https://github.com/antonic901/xbmc4xbox-redux/blob/master/docs/libcdio.rar) - used for reading DVD information
+* [ ] [DllLoader](https://github.com/antonic901/xbmc4xbox-redux/tree/master/xbmc/cores/DllLoader) - use for loading custom DLLs which were build using MinGW and Make. This version only support Windows 2K/XP compatible DLLs
 
 ### Milestone 6
 At Milestone 6 (six) XBMC should be stable so we should start utilizing DllLoader and backporting Python and binary addons.
 
 * [ ] Python Interpreter - support for Python scripts
 * [ ] Binary addons - support for Screensavers, Visualizations, PVR etc.
-* [ ] Move soem libs to DLLs - to preserve some memory, libraries like libjpeg-turbo, libpng and libcurl should be build as DLL and loaded using DllLoader. This would keep them in memory only when we need them, but not all the time
+* [ ] Move some libs to DLLs - to preserve some memory, libraries like libcurl should be build as DLL and loaded using DllLoader. This would keep them in memory only when we need them, but not all the time
 
 ### Milestone 7
 Milestone 7 (seven) should add support for video and music playback. This one requires FFMpeg library because it is core of PAPlayer and DVDPlayer.
