@@ -153,6 +153,16 @@ void CGraphicContext::ClipRect(CRect &vertex, CRect &texture, CRect *texture2)
   }
 }
 
+CRect CGraphicContext::GetClipRegion()
+{
+  if (m_clipRegions.empty())
+    return CRect(0, 0, m_iScreenWidth, m_iScreenHeight);
+  CRect clipRegion(m_clipRegions.top());
+  if (!m_origins.empty())
+    clipRegion -= m_origins.top();
+  return clipRegion;
+}
+
 bool CGraphicContext::SetViewPort(float fx, float fy , float fwidth, float fheight, bool intersectPrevious /* = false */)
 {
 #if 0

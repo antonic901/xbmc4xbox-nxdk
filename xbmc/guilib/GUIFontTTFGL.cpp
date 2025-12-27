@@ -28,8 +28,6 @@
 #include "GraphicContext.h"
 #include "utils/log.h"
 #include "utils/GLUtils.h"
-#include "windowing/WindowingFactory.h"
-#include "guilib/MatrixGLES.h"
 
 // stuff for freetype
 #include <ft2build.h>
@@ -156,7 +154,7 @@ void CGUIFontTTFGL::LastEnd()
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   glDrawArrays(GL_QUADS, 0, m_vertex.size());
-  glPopClientAttrib();
+  // glPopClientAttrib();
 
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, 0);

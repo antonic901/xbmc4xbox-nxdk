@@ -195,6 +195,7 @@ public:
   inline void ScaleFinalCoords(float &x, float &y, float &z) const { m_finalTransform.TransformPosition(x, y, z); }
   bool RectIsAngled(float x1, float y1, float x2, float y2) const;
 
+  inline const TransformMatrix &GetGUIMatrix() const { return m_finalTransform; }
   inline float GetGUIScaleX() const { return m_guiScaleX; };
   inline float GetGUIScaleY() const { return m_guiScaleY; };
   inline DWORD MergeAlpha(color_t color) const
@@ -241,6 +242,7 @@ public:
     */
   void RestoreClipRegion();
   void ClipRect(CRect &vertex, CRect &texture, CRect *diffuse = NULL);
+  CRect GetClipRegion();
   inline void AddGUITransform()
   {
     m_groupTransform.push(m_guiTransform);

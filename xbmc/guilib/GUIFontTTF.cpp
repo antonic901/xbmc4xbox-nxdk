@@ -377,7 +377,7 @@ void CGUIFontTTFBase::DrawTextInternal(float x, float y, const vecColors &colors
                             colors, text,
                             alignment, maxPixelWidth,
                             scrolling,
-                            XbmcThreads::SystemClockMillis(),
+                            std::chrono::steady_clock::now(),
                             dirtyCache) :
       unusedVertexBuffer;
   std::shared_ptr<std::vector<SVertex> > tempVertices = std::make_shared<std::vector<SVertex> >();
@@ -387,7 +387,7 @@ void CGUIFontTTFBase::DrawTextInternal(float x, float y, const vecColors &colors
                            colors, text,
                            alignment, maxPixelWidth,
                            scrolling,
-                           XbmcThreads::SystemClockMillis(),
+                           std::chrono::steady_clock::now(),
                            dirtyCache));
   if (dirtyCache)
   {
@@ -528,7 +528,7 @@ void CGUIFontTTFBase::DrawTextInternal(float x, float y, const vecColors &colors
                                                           colors, text,
                                                           rawAlignment, maxPixelWidth,
                                                           scrolling,
-                                                          XbmcThreads::SystemClockMillis(),
+                                                          std::chrono::steady_clock::now(),
                                                           dirtyCache);
       CVertexBuffer newVertexBuffer = CreateVertexBuffer(*tempVertices);
       vertexBuffer = newVertexBuffer;
@@ -540,7 +540,7 @@ void CGUIFontTTFBase::DrawTextInternal(float x, float y, const vecColors &colors
                            colors, text,
                            rawAlignment, maxPixelWidth,
                            scrolling,
-                           XbmcThreads::SystemClockMillis(),
+                           std::chrono::steady_clock::now(),
                            dirtyCache) = *static_cast<CGUIFontCacheStaticValue *>(&tempVertices);
       /* Append the new vertices to the set collected since the first Begin() call */
       m_vertex.insert(m_vertex.end(), tempVertices->begin(), tempVertices->end());
