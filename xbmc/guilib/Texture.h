@@ -1,6 +1,6 @@
 /*
- *      Copyright (C) 2005-2008 Team XBMC
- *      http://www.xbmc.org
+ *      Copyright (C) 2005-2013 Team XBMC
+ *      http://xbmc.org
  *
  *  This Program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -13,45 +13,39 @@
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with XBMC; see the file COPYING.  If not, write to
- *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
- *  http://www.gnu.org/copyleft/gpl.html
+ *  along with XBMC; see the file COPYING.  If not, see
+ *  <http://www.gnu.org/licenses/>.
  *
  */
 
-/*!
-\file Texture.h
-\brief
-*/
-
-#ifndef GUILIB_TEXTURE_H
-#define GUILIB_TEXTURE_H
-
-#include "XBTF.h"
-
 #pragma once
 
-struct ImageInfo;
+#include "system.h"
+#include "XBTF.h"
+#include "guilib/imagefactory.h"
+#ifdef TARGET_POSIX
+#include "linux/XMemUtils.h"
+#endif
+
+#pragma pack(1)
+struct COLOR {unsigned char b,g,r,x;};	// Windows GDI expects 4bytes per color
+#pragma pack()
 
 /*!
 \ingroup textures
 \brief Base texture class, subclasses of which depend on the render spec (DX, GL etc.)
-This class is not real backport from Kodi/XBMC. This class is abstraction of current way how textures are loaded by XBMC4Xbox
-and it's DirectX dependant. This class export same methods just like the one from Kodi. For example CTexture::LoadFromFile
-before was known as CPicture::Load.
 */
 class CTexture
 {
 
 public:
-#if 0
-  CTexture(unsigned int width = 0, unsigned int height = 0, unsigned int format = XB_FMT_A8R8G8B8,
-               IDirect3DTexture8* texture = NULL, IDirect3DPalette8* palette = NULL, bool packed = false);
-#else
-  CTexture(unsigned int width = 0, unsigned int height = 0, unsigned int format = XB_FMT_A8R8G8B8,
-               void* texture = NULL, void* palette = NULL, bool packed = false);
-#endif
+  CTexture(unsigned int width = 0, unsigned int height = 0, unsigned int format = XB_FMT_A8R8G8B8);
+
   virtual ~CTexture();
+
+  static std::unique_ptr<CTexture> CreateTexture(unsigned int width = 0,
+                                                 unsigned int height = 0,
+                                                 unsigned int format = XB_FMT_A8R8G8B8);
 
   /*! \brief Load a texture from a file
    Loads a texture from a file, restricting in size if needed based on maxHeight and maxWidth.
@@ -59,11 +53,11 @@ public:
    \param texturePath the path of the texture to load.
    \param idealWidth the ideal width of the texture (defaults to 0, no ideal width).
    \param idealHeight the ideal height of the texture (defaults to 0, no ideal height).
-   \param autoRotate whether the textures should be autorotated based on EXIF information (defaults to false).
+   \param strMimeType mimetype of the given texture if available (defaults to empty)
    \return a CTexture pointer to the created texture - NULL if the texture failed to load.
    */
   static std::unique_ptr<CTexture> LoadFromFile(const std::string& texturePath, unsigned int idealWidth = 0, unsigned int idealHeight = 0,
-                                    bool autoRotate = false);
+                                    bool requirePixels = false, const std::string& strMimeType = "");
 
   /*! \brief Load a texture from a file in memory
    Loads a texture from a file in memory, restricting in size if needed based on maxHeight and maxWidth.
@@ -76,22 +70,23 @@ public:
    \return a CTexture pointer to the created texture - NULL if the texture failed to load.
    */
   static std::unique_ptr<CTexture> LoadFromFileInMemory(unsigned char* buffer, size_t bufferSize, const std::string& mimeType,
-                                            unsigned int idealWidth = 0, unsigned int idealHeight = 0);                                  
+                                            unsigned int idealWidth = 0, unsigned int idealHeight = 0);
 
-#if 0
-  bool LoadPaletted(unsigned int width, unsigned int height, unsigned int pitch, unsigned int format, const unsigned char *pixels, IDirect3DPalette8 *palette);
-#endif
+  bool LoadFromMemory(unsigned int width, unsigned int height, unsigned int pitch, unsigned int format, bool hasAlpha, unsigned char* pixels);
+  bool LoadPaletted(unsigned int width, unsigned int height, unsigned int pitch, unsigned int format, const unsigned char *pixels, const COLOR *palette);
 
   bool HasAlpha() const;
 
-#if 0
-  IDirect3DTexture8* GetTextureObject() const { return m_texture; }
-  IDirect3DPalette8* GetPaletteObject() const { return m_palette; }
-  void SetPaletteObject(IDirect3DPalette8* palette) { m_palette = palette; }
-#endif
+  void SetMipmapping();
+  bool IsMipmapped() const;
+
+  virtual void CreateTextureObject() = 0;
+  virtual void DestroyTextureObject() = 0;
+  virtual void LoadToGPU() = 0;
+  virtual void BindToUnit(unsigned int unit) = 0;
 
   unsigned char* GetPixels() const { return m_pixels; }
-  unsigned int GetPitch() const { return m_pitch; }
+  unsigned int GetPitch() const { return GetPitch(m_textureWidth); }
   unsigned int GetRows() const { return GetRows(m_textureHeight); }
   unsigned int GetTextureWidth() const { return m_textureWidth; }
   unsigned int GetTextureHeight() const { return m_textureHeight; }
@@ -102,15 +97,15 @@ public:
   /*! \brief return the original height of the image, before scaling/cropping */
   unsigned int GetOriginalHeight() const { return m_originalHeight; }
 
-  bool GetTexCoordsArePixels() const { return m_texCoordsArePixels; }
   int GetOrientation() const { return m_orientation; }
   void SetOrientation(int orientation) { m_orientation = orientation; }
 
+  void Update(unsigned int width, unsigned int height, unsigned int pitch, unsigned int format, const unsigned char *pixels, bool loadToGPU);
   void Allocate(unsigned int width, unsigned int height, unsigned int format);
-  // populates some general info about loaded texture (width, height, pitch etc.)
-  bool GetTextureInfo();
+  void ClampToEdge();
 
   static unsigned int PadPow2(unsigned int x);
+  static bool SwapBlueRed(unsigned char *pixels, unsigned int height, unsigned int pitch, unsigned int elements = 4, unsigned int offset=0);
 
 private:
   // no copy constructor
@@ -119,10 +114,12 @@ private:
 protected:
   bool LoadFromFileInMem(unsigned char* buffer, size_t size, const std::string& mimeType,
                          unsigned int maxWidth, unsigned int maxHeight);
-  bool LoadFromFileInternal(const std::string& texturePath, unsigned int maxWidth, unsigned int maxHeight, bool autoRotate);
-  void LoadFromImage(ImageInfo &image, bool autoRotate = false);
+  bool LoadFromFileInternal(const std::string& texturePath, unsigned int maxWidth, unsigned int maxHeight, bool requirePixels, const std::string& strMimeType = "");
+  bool LoadIImage(IImage* pImage, unsigned char* buffer, unsigned int bufSize, unsigned int width, unsigned int height);
   // helpers for computation of texture parameters for compressed textures
+  unsigned int GetPitch(unsigned int width) const;
   unsigned int GetRows(unsigned int height) const;
+  unsigned int GetBlockSize() const;
 
   unsigned int m_imageWidth;
   unsigned int m_imageHeight;
@@ -131,24 +128,10 @@ protected:
   unsigned int m_originalWidth;   ///< original image width before scaling or cropping
   unsigned int m_originalHeight;  ///< original image height before scaling or cropping
 
-#if 0
-  IDirect3DTexture8* m_texture;
-  /* NOTICE for future:
-    Note that in SDL and Win32 we already convert the paletted textures into normal textures,
-    so there's no chance of having m_palette as a real palette */
-  IDirect3DPalette8* m_palette;
-#endif
-
-  // this variable should hold Data which represents loaded Texture
   unsigned char* m_pixels;
+  bool m_loadedToGPU;
   unsigned int m_format;
-  unsigned int m_pitch;
   int m_orientation;
   bool m_hasAlpha;
-  // What is this? On Kodi it's always false
-  bool m_texCoordsArePixels;
-  // true if texture is loaded from .XPR
-  bool m_packed;
+  bool m_mipmapping;
 };
-
-#endif

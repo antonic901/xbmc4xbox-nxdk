@@ -23,7 +23,6 @@
 #include <math.h>
 
 #if defined(HAS_GL)
-#include "rendering/gl/RenderSystemGL.h"
 #include "utils/GLUtils.h"
 #elif defined(HAS_GLES)
 #include "rendering/gles/RenderSystemGLES.h"
@@ -845,22 +844,59 @@ void CSlideShowPic::Render(float* x, float* y, CTexture* pTexture, UTILS::COLOR:
   }
 
 #elif defined(HAS_GL)
-  CRenderSystemGL *renderSystem = dynamic_cast<CRenderSystemGL*>(CServiceBroker::GetRenderSystem());
   if (pTexture)
   {
+    int unit = 0;
     pTexture->LoadToGPU();
-    pTexture->BindToUnit(0);
+    pTexture->BindToUnit(unit++);
 
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
+    glEnable(GL_BLEND);          // Turn Blending On
 
-    renderSystem->EnableShader(ShaderMethodGL::SM_TEXTURE);
+    // diffuse coloring
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+    glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_MODULATE);
+    glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_TEXTURE0);
+    glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_COLOR);
+    glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE1_RGB, GL_PRIMARY_COLOR);
+    glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND1_RGB, GL_SRC_COLOR);
+
+#ifndef _XBOX
+    if(g_Windowing.UseLimitedColor())
+#endif
+    {
+      // compress range
+      pTexture->BindToUnit(unit++); // dummy bind
+      const GLfloat rgba1[4] = {(235.0 - 16.0f) / 255.0f, (235.0 - 16.0f) / 255.0f, (235.0 - 16.0f) / 255.0f, 1.0f};
+      glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE , GL_COMBINE);
+      glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, rgba1);
+      glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_RGB , GL_MODULATE);
+      glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_RGB , GL_PREVIOUS);
+      glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE1_RGB , GL_CONSTANT);
+      glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_RGB , GL_SRC_COLOR);
+      glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND1_RGB , GL_SRC_COLOR);
+      glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_ALPHA , GL_REPLACE);
+      glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_ALPHA , GL_PREVIOUS);
+
+      // transition
+      pTexture->BindToUnit(unit++); // dummy bind
+      const GLfloat rgba2[4] = {16.0f / 255.0f, 16.0f / 255.0f, 16.0f / 255.0f, 0.0f};
+      glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE , GL_COMBINE);
+      glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, rgba2);
+      glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_RGB , GL_ADD);
+      glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_RGB , GL_PREVIOUS);
+      glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE1_RGB , GL_CONSTANT);
+      glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_RGB , GL_SRC_COLOR);
+      glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND1_RGB , GL_SRC_COLOR);
+      glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_ALPHA , GL_REPLACE);
+      glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_ALPHA , GL_PREVIOUS);
+    }
   }
   else
-  {
-    renderSystem->EnableShader(ShaderMethodGL::SM_DEFAULT);
-  }
+    glDisable(GL_TEXTURE_2D);
+  glPolygonMode(GL_FRONT_AND_BACK, pTexture ? GL_FILL : GL_LINE);
 
+  glBegin(GL_QUADS);
   float u1 = 0, u2 = 1, v1 = 0, v2 = 1;
   if (pTexture)
   {
@@ -868,82 +904,26 @@ void CSlideShowPic::Render(float* x, float* y, CTexture* pTexture, UTILS::COLOR:
     v2 = (float)pTexture->GetHeight() / pTexture->GetTextureHeight();
   }
 
-  GLubyte colour[4];
-  GLubyte idx[4] = {0, 1, 3, 2};  //determines order of the vertices
-  GLuint vertexVBO;
-  GLuint indexVBO;
-  struct PackedVertex
-  {
-    float x, y, z;
-    float u1, v1;
-  } vertex[4];
+  glColor4ub((GLubyte)GET_R(color), (GLubyte)GET_G(color), (GLubyte)GET_B(color), (GLubyte)GET_A(color));
+  glTexCoord2f(u1, v1);
+  glVertex3f(x[0], y[0], 0);
 
-  // Setup vertex position values
-  vertex[0].x = x[0];
-  vertex[0].y = y[0];
-  vertex[0].z = 0;
-  vertex[0].u1 = u1;
-  vertex[0].v1 = v1;
+  // Bottom-left vertex (corner)
+  glColor4ub((GLubyte)GET_R(color), (GLubyte)GET_G(color), (GLubyte)GET_B(color), (GLubyte)GET_A(color));
+  glTexCoord2f(u2, v1);
+  glVertex3f(x[1], y[1], 0);
 
-  vertex[1].x = x[1];
-  vertex[1].y = y[1];
-  vertex[1].z = 0;
-  vertex[1].u1 = u2;
-  vertex[1].v1 = v1;
+  // Bottom-right vertex (corner)
+  glColor4ub((GLubyte)GET_R(color), (GLubyte)GET_G(color), (GLubyte)GET_B(color), (GLubyte)GET_A(color));
+  glTexCoord2f(u2, v2);
+  glVertex3f(x[2], y[2], 0);
 
-  vertex[2].x = x[2];
-  vertex[2].y = y[2];
-  vertex[2].z = 0;
-  vertex[2].u1 = u2;
-  vertex[2].v1 = v2;
+  // Top-right vertex (corner)
+  glColor4ub((GLubyte)GET_R(color), (GLubyte)GET_G(color), (GLubyte)GET_B(color), (GLubyte)GET_A(color));
+  glTexCoord2f(u1, v2);
+  glVertex3f(x[3], y[3], 0);
 
-  vertex[3].x = x[3];
-  vertex[3].y = y[3];
-  vertex[3].z = 0;
-  vertex[3].u1 = u1;
-  vertex[3].v1 = v2;
-
-  GLint posLoc  = renderSystem->ShaderGetPos();
-  GLint tex0Loc = renderSystem->ShaderGetCoord0();
-  GLint uniColLoc= renderSystem->ShaderGetUniCol();
-
-  glGenBuffers(1, &vertexVBO);
-  glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(PackedVertex)*4, &vertex[0], GL_STATIC_DRAW);
-
-  glVertexAttribPointer(posLoc, 3, GL_FLOAT, 0, sizeof(PackedVertex),
-                        reinterpret_cast<const GLvoid*>(offsetof(PackedVertex, x)));
-  glVertexAttribPointer(tex0Loc, 2, GL_FLOAT, 0, sizeof(PackedVertex),
-                        reinterpret_cast<const GLvoid*>(offsetof(PackedVertex, u1)));
-
-  glEnableVertexAttribArray(posLoc);
-  glEnableVertexAttribArray(tex0Loc);
-
-  // Setup Colour values
-  colour[0] = KODI::UTILS::GL::GetChannelFromARGB(KODI::UTILS::GL::ColorChannel::R, color);
-  colour[1] = KODI::UTILS::GL::GetChannelFromARGB(KODI::UTILS::GL::ColorChannel::G, color);
-  colour[2] = KODI::UTILS::GL::GetChannelFromARGB(KODI::UTILS::GL::ColorChannel::B, color);
-  colour[3] = KODI::UTILS::GL::GetChannelFromARGB(KODI::UTILS::GL::ColorChannel::A, color);
-
-  glUniform4f(uniColLoc,(colour[0] / 255.0f), (colour[1] / 255.0f),
-                        (colour[2] / 255.0f), (colour[3] / 255.0f));
-
-  glGenBuffers(1, &indexVBO);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLubyte)*4, idx, GL_STATIC_DRAW);
-
-  glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, 0);
-
-  glDisableVertexAttribArray(posLoc);
-  glDisableVertexAttribArray(tex0Loc);
-
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glDeleteBuffers(1, &vertexVBO);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-  glDeleteBuffers(1, &indexVBO);
-
-  renderSystem->DisableShader();
-
+  glEnd();
 #elif defined(HAS_GLES)
   CRenderSystemGLES *renderSystem = dynamic_cast<CRenderSystemGLES*>(CServiceBroker::GetRenderSystem());
   if (pTexture)

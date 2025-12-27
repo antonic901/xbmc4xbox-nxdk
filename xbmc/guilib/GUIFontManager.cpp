@@ -23,6 +23,7 @@
 #include "GUIComponent.h"
 #include "GUIWindowManager.h"
 #include "addons/Skin.h"
+#include "GUIFontTTF.h"
 #include "GUIFont.h"
 #include "ServiceBroker.h"
 #include "utils/XMLUtils.h"
@@ -128,7 +129,6 @@ CGUIFont* GUIFontManager::LoadTTF(const std::string& strFontName, const std::str
   // check if we already have this font file loaded (font object could differ only by color or style)
   std::string TTFfontName = StringUtils::Format("%s_%f_%f%s", strFilename.c_str(), newSize, aspect, border ? "_border" : "");
 
-#if 0
   CGUIFontTTFBase* pFontFile = GetFontFile(TTFfontName);
   if (!pFontFile)
   {
@@ -169,8 +169,6 @@ CGUIFont* GUIFontManager::LoadTTF(const std::string& strFontName, const std::str
   m_vecFontInfo.push_back(fontInfo);
 
   return pNewFont;
-#endif
-  return nullptr;
 }
 
 bool GUIFontManager::OnMessage(CGUIMessage &message)
@@ -223,7 +221,6 @@ void GUIFontManager::ReloadTTFFonts(void)
     RescaleFontSizeAndAspect(&newSize, &aspect, fontInfo.sourceRes, fontInfo.preserveAspect);
 
     std::string TTFfontName = StringUtils::Format("%s_%f_%f%s", strFilename.c_str(), newSize, aspect, fontInfo.border ? "_border" : "");
-#if 0
     CGUIFontTTFBase* pFontFile = GetFontFile(TTFfontName);
     if (!pFontFile)
     {
@@ -240,7 +237,6 @@ void GUIFontManager::ReloadTTFFonts(void)
     }
 
     font->SetFont(pFontFile);
-#endif
   }
 }
 
@@ -257,7 +253,6 @@ void GUIFontManager::Unload(const std::string& strFontName)
   }
 }
 
-#if 0
 void GUIFontManager::FreeFontFile(CGUIFontTTFBase *pFont)
 {
   for (std::vector<CGUIFontTTFBase*>::iterator it = m_vecFontFiles.begin(); it != m_vecFontFiles.end(); ++it)
@@ -270,9 +265,7 @@ void GUIFontManager::FreeFontFile(CGUIFontTTFBase *pFont)
     }
   }
 }
-#endif
 
-#if 0
 CGUIFontTTFBase* GUIFontManager::GetFontFile(const std::string& strFileName)
 {
   for (int i = 0; i < (int)m_vecFontFiles.size(); ++i)
@@ -281,10 +274,8 @@ CGUIFontTTFBase* GUIFontManager::GetFontFile(const std::string& strFileName)
     if (StringUtils::EqualsNoCase(pFont->GetFileName(), strFileName))
       return pFont;
   }
-
   return NULL;
 }
-#endif
 
 CGUIFont* GUIFontManager::GetFont(const std::string& strFontName, bool fallback /*= true*/)
 {
@@ -350,11 +341,7 @@ void GUIFontManager::Clear()
 void GUIFontManager::LoadFonts(const std::string& fontSet)
 {
   // Get the file to load fonts from:
-#if 0
   const std::string strPath = g_SkinInfo->GetSkinPath("Font.xml", &m_skinResolution);
-#else
-  const std::string strPath = "special://xbmc/addons/skin.estuary/xml/Font.xml";
-#endif
   CLog::Log(LOGINFO, "Loading fonts from %s", strPath.c_str());
 
   CXBMCTinyXML xmlDoc;

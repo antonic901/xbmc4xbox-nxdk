@@ -19,10 +19,7 @@
  */
 
 #include "GUIFont.h"
-#if 0
-// TODO: We need FreeType library for this
 #include "GUIFontTTF.h"
-#endif
 #include "GraphicContext.h"
 
 #include "threads/SingleLock.h"
@@ -75,20 +72,16 @@ CGUIFont::CGUIFont(const std::string& strFontName, uint32_t style, color_t textC
   m_shadowColor = shadowColor;
   m_lineSpacing = lineSpacing;
   m_origHeight = origHeight;
-#if 0
   m_font = font;
 
   if (m_font)
     m_font->AddReference();
-#endif
 }
 
 CGUIFont::~CGUIFont()
 {
-#if 0
   if (m_font)
     m_font->RemoveReference();
-#endif
 }
 
 std::string& CGUIFont::GetFontName()
@@ -99,7 +92,6 @@ std::string& CGUIFont::GetFontName()
 void CGUIFont::DrawText( float x, float y, const vecColors &colors, color_t shadowColor,
                 const vecText &text, uint32_t alignment, float maxPixelWidth)
 {
-#if 0
   if (!m_font) return;
 
   bool clip = maxPixelWidth > 0;
@@ -123,7 +115,6 @@ void CGUIFont::DrawText( float x, float y, const vecColors &colors, color_t shad
 
   if (clip)
     g_graphicsContext.RestoreClipRegion();
-#endif
 }
 
 bool CGUIFont::UpdateScrollInfo(const vecText &text, CScrollInfo &scrollInfo)
@@ -172,7 +163,6 @@ bool CGUIFont::UpdateScrollInfo(const vecText &text, CScrollInfo &scrollInfo)
 void CGUIFont::DrawScrollingText(float x, float y, const vecColors &colors, color_t shadowColor,
                 const vecText &text, uint32_t alignment, float maxWidth, const CScrollInfo &scrollInfo)
 {
-#if 0
   if (!m_font) return;
   if (!shadowColor) shadowColor = m_shadowColor;
 
@@ -222,7 +212,6 @@ void CGUIFont::DrawScrollingText(float x, float y, const vecColors &colors, colo
   }
 
   g_graphicsContext.RestoreClipRegion();
-#endif
 }
 
 // remaps unsupported font glpyhs to other suitable ones
@@ -235,7 +224,6 @@ wchar_t CGUIFont::RemapGlyph(wchar_t letter)
 
 bool CGUIFont::ClippedRegionIsEmpty(float x, float y, float width, uint32_t alignment) const
 {
-#if 0
   if (alignment & XBFONT_CENTER_X)
     x -= width * 0.5f;
   else if (alignment & XBFONT_RIGHT)
@@ -244,83 +232,58 @@ bool CGUIFont::ClippedRegionIsEmpty(float x, float y, float width, uint32_t alig
     y -= m_font->GetLineHeight(m_lineSpacing);
 
   return !g_graphicsContext.SetClipRegion(x, y, width, m_font->GetTextHeight(1, 2) * g_graphicsContext.GetGUIScaleY());
-#endif
-  return false;
 }
 
 float CGUIFont::GetTextWidth( const vecText &text )
 {
-#if 0
   if (!m_font) return 0;
-  CSingleLock lock(g_graphicsContext);
+  std::unique_lock<CCriticalSection> lock(g_graphicsContext);
   return m_font->GetTextWidthInternal(text.begin(), text.end()) * g_graphicsContext.GetGUIScaleX();
-#endif
-  return 0;
 }
 
 float CGUIFont::GetCharWidth( character_t ch )
 {
-#if 0
   if (!m_font) return 0;
-  CSingleLock lock(g_graphicsContext);
+  std::unique_lock<CCriticalSection> lock(g_graphicsContext);
   return m_font->GetCharWidthInternal(ch) * g_graphicsContext.GetGUIScaleX();
-#endif
-  return 0;
 }
 
 float CGUIFont::GetTextHeight(int numLines) const
 {
-#if 0
   if (!m_font) return 0;
   return m_font->GetTextHeight(m_lineSpacing, numLines) * g_graphicsContext.GetGUIScaleY();
-#endif
-  return 0;
 }
 
 float CGUIFont::GetTextBaseLine() const
 {
-#if 0
   if (!m_font) return 0;
   return m_font->GetTextBaseLine() * g_graphicsContext.GetGUIScaleY();
-#endif
-  return 0;
 }
 
 float CGUIFont::GetLineHeight() const
 {
-#if 0
   if (!m_font) return 0;
   return m_font->GetLineHeight(m_lineSpacing) * g_graphicsContext.GetGUIScaleY();
-#endif
-  return 0;
 }
 
 float CGUIFont::GetScaleFactor() const
 {
-#if 0
   if (!m_font) return 1.0f;
   return m_font->GetFontHeight() / m_origHeight;
-#endif
-  return 0;
 }
 
 void CGUIFont::Begin()
 {
-#if 0
   if (!m_font) return;
   m_font->Begin();
-#endif
 }
 
 void CGUIFont::End()
 {
-#if 0
   if (!m_font) return;
   m_font->End();
-#endif
 }
 
-#if 0
 void CGUIFont::SetFont(CGUIFontTTFBase *font)
 {
   if (m_font == font)
@@ -331,4 +294,3 @@ void CGUIFont::SetFont(CGUIFontTTFBase *font)
   if (m_font)
     m_font->AddReference();
 }
-#endif

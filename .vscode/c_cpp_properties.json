@@ -11,7 +11,8 @@
                 "NXDK",
                 "_XBOX",
                 "_WIN32",
-                "_MSC_VER"
+                "_MSC_VER",
+                "HAS_GL"
             ],
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c23",

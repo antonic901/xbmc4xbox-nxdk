@@ -42,7 +42,7 @@ add_compile_options(
     -Wno-invalid-offsetof
 )
 
-add_definitions(-D_CRT_RAND_S -D_XBOX -DNXDK -DMEMP_NUM_NETBUF=6 -DMEMP_NUM_NETCONN=6)
+add_definitions(-D_CRT_RAND_S -D_XBOX -DNXDK -DMEMP_NUM_NETBUF=6 -DMEMP_NUM_NETCONN=6 -DHAS_GL)
 
 add_executable(xbmc
   xbmc/AutoSwitch.cpp
@@ -266,6 +266,8 @@ add_executable(xbmc
   xbmc/guilib/GUIFixedListContainer.cpp
   xbmc/guilib/GUIFont.cpp
   xbmc/guilib/GUIFontManager.cpp
+  xbmc/guilib/GUIFontTTF.cpp
+  xbmc/guilib/GUIFontTTFGL.cpp
   xbmc/guilib/GUIImage.cpp
   xbmc/guilib/GUIIncludes.cpp
   xbmc/guilib/GUIKeyboardFactory.cpp
@@ -294,6 +296,7 @@ add_executable(xbmc
   xbmc/guilib/GUITextBox.cpp
   xbmc/guilib/GUITextLayout.cpp
   xbmc/guilib/GUITexture.cpp
+  xbmc/guilib/GUITextureGL.cpp
   xbmc/guilib/GUITexturePBKIT.cpp
   xbmc/guilib/GUIToggleButtonControl.cpp
   xbmc/guilib/GUIVideoControl.cpp
@@ -302,8 +305,10 @@ add_executable(xbmc
   xbmc/guilib/GUIWrappingListContainer.cpp
   xbmc/guilib/GraphicContext.cpp
   xbmc/guilib/IWindowManagerCallback.cpp
+  xbmc/guilib/JpegIO.cpp
   xbmc/guilib/LocalizeStrings.cpp
   xbmc/guilib/Texture.cpp
+  xbmc/guilib/TextureGL.cpp
   xbmc/guilib/TextureManager.cpp
   xbmc/guilib/VisibleEffect.cpp
   xbmc/guilib/guiinfo/AddonsGUIInfo.cpp
@@ -516,6 +521,7 @@ add_executable(xbmc
   xbmc/utils/FileExtensionProvider.cpp
   xbmc/utils/FileOperationJob.cpp
   xbmc/utils/FileUtils.cpp
+  xbmc/utils/GLUtils.cpp
   xbmc/utils/GroupUtils.cpp
   xbmc/utils/HTMLUtil.cpp
   xbmc/utils/HttpHeader.cpp
@@ -626,6 +632,10 @@ target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/net/lwip/src/include ${N
 # Bring in pbkit support
 target_link_libraries(xbmc PUBLIC ${NXDK_DIR}/lib/libpbkit.lib)
 
+# Bring in libjpeg-turbo support
+target_link_libraries(xbmc PUBLIC ${NXDK_DIR}/lib/libjpeg.lib)
+target_include_directories(xbmc PRIVATE ${NXDK_DIR}/lib/libjpeg ${NXDK_DIR}/lib/libjpeg/libjpeg-turbo)
+
 # Bring in fribidi library
 add_subdirectory(lib/fribidi)
 target_link_libraries(xbmc PUBLIC fribidi)
@@ -733,6 +743,17 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 FetchContent_MakeAvailable(pbgl)
 target_link_libraries(xbmc PRIVATE pbgl)
+
+# Bring in freetype
+message(STATUS "Downloading freetype")
+FetchContent_Declare(
+  freetype
+  GIT_REPOSITORY https://gitlab.freedesktop.org/freetype/freetype.git
+  GIT_TAG        VER-2-14-1
+  GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(freetype)
+target_link_libraries(xbmc PRIVATE freetype)
 
 #Pre-build commands
 
