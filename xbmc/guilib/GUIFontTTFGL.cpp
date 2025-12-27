@@ -25,10 +25,8 @@
 #include "Texture.h"
 #include "TextureManager.h"
 #include "GraphicContext.h"
-#include "gui3d.h"
 #include "utils/log.h"
 #include "utils/GLUtils.h"
-#include "windowing/WindowingFactory.h"
 
 // stuff for freetype
 #include <ft2build.h>
@@ -118,7 +116,9 @@ void CGUIFontTTFGL::Begin()
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     VerifyGLState();
 
+#ifndef _XBOX
     if(g_Windowing.UseLimitedColor())
+#endif
     {
       glActiveTexture(GL_TEXTURE1);
       glBindTexture(GL_TEXTURE_2D, m_nTexture); // dummy bind
