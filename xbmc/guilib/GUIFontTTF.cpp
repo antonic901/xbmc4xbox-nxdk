@@ -69,7 +69,7 @@ public:
       FT_Done_FreeType(m_library);
   }
 
-  FT_Face GetFont(const std::string &filename, float size, float aspect, XUTILS::auto_buffer& memoryBuf)
+  FT_Face GetFont(const std::string &filename, float size, float aspect, std::vector<uint8_t>& memoryBuf)
   {
     // don't have it yet - create it
     if (!m_library)
@@ -98,7 +98,7 @@ public:
       XFILE::CFile f;
       if (f.LoadFile(realFile, memoryBuf) <= 0)
         return NULL;
-      if (FT_New_Memory_Face(m_library, (const FT_Byte*)memoryBuf.get(), memoryBuf.size(), 0, &face) != 0)
+      if (FT_New_Memory_Face(m_library, (const FT_Byte*)memoryBuf.data(), memoryBuf.size(), 0, &face) != 0)
         return NULL;
     }
 #ifndef TARGET_WINDOWS
@@ -582,7 +582,7 @@ bool CGUIFontTTFBase::CacheCharacter(wchar_t letter, uint32_t style, Character *
   FT_Glyph glyph = NULL;
   if (FT_Load_Glyph( m_face, glyph_index, FT_LOAD_TARGET_LIGHT ))
   {
-    CLog::Log(LOGDEBUG, "%s Failed to load glyph %x", __FUNCTION__, letter);
+    CLog::Log(LOGDEBUG, "{} Failed to load glyph {:x}", __FUNCTION__, static_cast<uint32_t>(letter));
     return false;
   }
   // make bold if applicable
@@ -594,7 +594,7 @@ bool CGUIFontTTFBase::CacheCharacter(wchar_t letter, uint32_t style, Character *
   // grab the glyph
   if (FT_Get_Glyph(m_face->glyph, &glyph))
   {
-    CLog::Log(LOGDEBUG, "%s Failed to get glyph %x", __FUNCTION__, letter);
+    CLog::Log(LOGDEBUG, "{} Failed to get glyph {:x}", __FUNCTION__, static_cast<uint32_t>(letter));
     return false;
   }
   if (m_stroker)
@@ -602,7 +602,7 @@ bool CGUIFontTTFBase::CacheCharacter(wchar_t letter, uint32_t style, Character *
   // render the glyph
   if (FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, NULL, 1))
   {
-    CLog::Log(LOGDEBUG, "%s Failed to render glyph %x to a bitmap", __FUNCTION__, letter);
+    CLog::Log(LOGDEBUG, "{} Failed to render glyph {:x} to a bitmap", __FUNCTION__, static_cast<uint32_t>(letter));
     return false;
   }
   FT_BitmapGlyph bitGlyph = (FT_BitmapGlyph)glyph;
@@ -629,7 +629,7 @@ bool CGUIFontTTFBase::CacheCharacter(wchar_t letter, uint32_t style, Character *
         // check for max height
         if (newHeight > g_graphicsContext.GetMaxTextureSize())
         {
-          CLog::Log(LOGDEBUG, "%s: New cache texture is too large (%u > %u pixels long)", __FUNCTION__, newHeight, g_Windowing.GetMaxTextureSize());
+          CLog::Log(LOGDEBUG, "%s: New cache texture is too large (%u > %u pixels long)", __FUNCTION__, newHeight, g_graphicsContext.GetMaxTextureSize());
           FT_Done_Glyph(glyph);
           return false;
         }
@@ -757,7 +757,7 @@ void CGUIFontTTFBase::RenderCharacter(float posX, float posY, const Character *c
     if (!m_vertex)
     {
       free(old);
-      CLog::Log(LOGSEVERE, "%s: can't allocate %" PRIdS" bytes for texture", __FUNCTION__ , m_vertex_size * sizeof(SVertex));
+      CLog::Log(LOGSEVERE, "{}: can't allocate {} bytes for texture", __FUNCTION__ , m_vertex_size * sizeof(SVertex));
       return;
     }
   }

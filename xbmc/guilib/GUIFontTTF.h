@@ -172,7 +172,7 @@ protected:
   static int justification_word_weight;
 
   std::string m_strFileName;
-  XUTILS::auto_buffer m_fontFileInMemory; // used only in some cases, see CFreeTypeLibrary::GetFont()
+  std::vector<uint8_t> m_fontFileInMemory; // used only in some cases, see CFreeTypeLibrary::GetFont()
 
 private:
   CGUIFontTTFBase(const CGUIFontTTFBase&);
