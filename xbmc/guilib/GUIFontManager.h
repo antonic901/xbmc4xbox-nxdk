@@ -28,6 +28,9 @@
  *
  */
 
+#include <utility>
+#include <vector>
+
 #include "GraphicContext.h"
 #include "IMsgTargetCallback.h"
 #include "utils/GlobalsHandling.h"
@@ -38,6 +41,7 @@ class CGUIFontTTFBase;
 class CXBMCTinyXML;
 class TiXmlNode;
 class CSetting;
+struct StringSettingOption;
 
 struct OrigFontInfo
 {
@@ -76,7 +80,7 @@ public:
   void Clear();
   void FreeFontFile(CGUIFontTTFBase *pFont);
 
-  static void SettingOptionsFontsFiller(const CSetting *setting, std::vector< std::pair<std::string, std::string> > &list, std::string &current, void *data);
+  static void SettingOptionsFontsFiller(const std::shared_ptr<const CSetting>& setting, std::vector<StringSettingOption>& list, std::string& current, void* data);
 
 protected:
   void ReloadTTFFonts();
