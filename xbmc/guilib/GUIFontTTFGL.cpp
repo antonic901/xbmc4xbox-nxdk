@@ -97,7 +97,7 @@ void CGUIFontTTFGL::Begin()
     }
 
     // Turn Blending On
-    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+    // glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE);
     glEnable(GL_BLEND);
 #ifdef HAS_GL
     glEnable(GL_TEXTURE_2D);
@@ -157,7 +157,7 @@ void CGUIFontTTFGL::End()
     return;
 
 #ifdef HAS_GL
-  glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
+  // glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
 
   glColorPointer   (4, GL_UNSIGNED_BYTE, sizeof(SVertex), (char*)m_vertex + offsetof(SVertex, r));
   glVertexPointer  (3, GL_FLOAT        , sizeof(SVertex), (char*)m_vertex + offsetof(SVertex, x));
@@ -166,7 +166,7 @@ void CGUIFontTTFGL::End()
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   glDrawArrays(GL_QUADS, 0, m_vertex_count);
-  glPopClientAttrib();
+  // glPopClientAttrib();
 
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, 0);
