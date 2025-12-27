@@ -201,11 +201,11 @@ void CGUIFontTTFBase::RemoveReference()
 
 void CGUIFontTTFBase::ClearCharacterCache()
 {
-  delete(m_texture);
+  m_texture.reset();
 
   DeleteHardwareTexture();
 
-  m_texture = NULL;
+  m_texture = nullptr;
   delete[] m_char;
   m_char = new Character[CHAR_CHUNK];
   memset(m_charquick, 0, sizeof(m_charquick));
@@ -219,8 +219,8 @@ void CGUIFontTTFBase::ClearCharacterCache()
 
 void CGUIFontTTFBase::Clear()
 {
-  delete(m_texture);
-  m_texture = NULL;
+  m_texture.reset();
+  m_texture = nullptr;
   delete[] m_char;
   memset(m_charquick, 0, sizeof(m_charquick));
   m_char = NULL;
@@ -303,8 +303,8 @@ bool CGUIFontTTFBase::Load(const std::string& strFilename, float height, float a
 
   m_height = height;
 
-  delete(m_texture);
-  m_texture = NULL;
+  m_texture.reset();
+  m_texture = nullptr;
   delete[] m_char;
   m_char = NULL;
 
@@ -316,7 +316,7 @@ bool CGUIFontTTFBase::Load(const std::string& strFilename, float height, float a
   m_textureHeight = 0;
   m_textureWidth = ((m_cellHeight * CHARS_PER_TEXTURE_LINE) & ~63) + 64;
 
-  m_textureWidth = CBaseTexture::PadPow2(m_textureWidth);
+  m_textureWidth = CTexture::PadPow2(m_textureWidth);
 
   if (m_textureWidth > g_Windowing.GetMaxTextureSize())
     m_textureWidth = g_Windowing.GetMaxTextureSize();
@@ -634,19 +634,18 @@ bool CGUIFontTTFBase::CacheCharacter(wchar_t letter, uint32_t style, Character *
           return false;
         }
 
-        CBaseTexture* newTexture = NULL;
-        newTexture = ReallocTexture(newHeight);
-        if(newTexture == NULL)
+        std::unique_ptr<CTexture> newTexture = ReallocTexture(newHeight);
+        if(!newTexture)
         {
           FT_Done_Glyph(glyph);
           CLog::Log(LOGDEBUG, "%s: Failed to allocate new texture of height %u", __FUNCTION__, newHeight);
           return false;
         }
-        m_texture = newTexture;
+        m_texture = std::move(newTexture);
       }
     }
 
-    if(m_texture == NULL)
+    if(!m_texture)
     {
       FT_Done_Glyph(glyph);
       CLog::Log(LOGDEBUG, "%s: no texture to cache character to", __FUNCTION__);

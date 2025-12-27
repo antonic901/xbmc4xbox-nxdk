@@ -34,7 +34,7 @@
 #include "utils/auto_buffer.h"
 
 // forward definition
-class CBaseTexture;
+class CTexture;
 
 struct FT_FaceRec_;
 struct FT_LibraryRec_;
@@ -118,7 +118,7 @@ protected:
   void RenderCharacter(float posX, float posY, const Character *ch, color_t color, bool roundX);
   void ClearCharacterCache();
 
-  virtual CBaseTexture* ReallocTexture(unsigned int& newHeight) = 0;
+  virtual std::unique_ptr<CTexture> ReallocTexture(unsigned int& newHeight) = 0;
   virtual bool CopyCharToTexture(FT_BitmapGlyph bitGlyph, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2) = 0;
   virtual void DeleteHardwareTexture() = 0;
 
@@ -126,7 +126,7 @@ protected:
   void EmboldenGlyph(FT_GlyphSlot slot);
   static void ObliqueGlyph(FT_GlyphSlot slot);
 
-  CBaseTexture* m_texture;        // texture that holds our rendered characters (8bit alpha only)
+  std::unique_ptr<CTexture> m_texture;        // texture that holds our rendered characters (8bit alpha only)
 
   unsigned int m_textureWidth;       // width of our texture
   unsigned int m_textureHeight;      // heigth of our texture
