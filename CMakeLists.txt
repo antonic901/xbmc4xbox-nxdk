@@ -846,7 +846,7 @@ message(STATUS "Downloading pbgl")
 FetchContent_Declare(
   pbgl
   GIT_REPOSITORY https://github.com/fgsfdsfgs/pbgl.git
-  GIT_TAG        9fbfdd63ec9040e52762bf76daccdb4158abc21f
+  GIT_TAG        017ab17c4530bf3e2ad446a50de9b18ea6011548
   GIT_PROGRESS TRUE
 )
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

@@ -125,9 +125,6 @@ bool CRenderSystemGL::ResetRenderSystem(int width, int height)
     //clear error flags
     ResetGLErrors();
 
-#ifdef NXDK
-    GLint maxtex = 4;
-#else
     GLint maxtex;
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxtex);
 
@@ -146,7 +143,6 @@ bool CRenderSystemGL::ResetRenderSystem(int width, int height)
                 (int)maxtex);
       maxtex = 3;
     }
-#endif
 
     //reset texture matrix for all textures
     for (GLint i = 0; i < maxtex; i++)
